@@ -12,10 +12,10 @@
 				Delivering <span class="accent">Delight</span>
 			</h1>
 			<p class="hero-subtitle">
-				Developer, creator, and problem solver. I build digital experiences that delight. 😁
+				 For as long as I have lived, I have loved to create. I've built startups, developed apps, and produced videos. I live to create. I work to delight.
 			</p>
 			<div class="hero-cta">
-				<Button href="/projects" size="lg">View My Work</Button>
+				<Button href="/contact" size="lg">Contact Me</Button>
 				<Button href="/about" variant="secondary" size="lg">About Me</Button>
 			</div>
 		</div>
@@ -81,6 +81,11 @@
 		position: relative;
 		z-index: 3;
 		padding-top: var(--space-8);
+	}
+	
+	.hi {
+		font-size: 1.25rem;
+		margin-bottom: .5rem;
 	}
 
 	.hero-title {
@@ -158,11 +163,16 @@
 		flex-shrink: 0;
 		z-index: 2;
 	}
-
+	
 	.profile-image {
 		display: block;
 		height: auto;
 		width: auto;
+		filter: saturate(0%);
+		transition: filter 0.5s ease;
+		&:hover {
+			filter: saturate(100%);
+		}
 	}
 
 	.profile-image-mobile {
