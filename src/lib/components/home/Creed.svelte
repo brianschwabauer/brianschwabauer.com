@@ -31,8 +31,9 @@
 <section class="creed">
 	<div class="creed-inner">
 		<h2 class="creed-heading scroll-reveal">
-			After hundreds of projects,<br />
-			<span class="accent">I've learned a few things</span>
+			How I approach<br />
+			<i class="accent">every project</i>
+			<!-- <span class="accent">I've learned a few things</span> -->
 		</h2>
 
 		<div class="creed-list">
