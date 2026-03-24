@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import Button from '$lib/components/shared/Button.svelte';
+	import { Button } from '@delightstack/components/actions';
 
 	let { data, children } = $props();
 

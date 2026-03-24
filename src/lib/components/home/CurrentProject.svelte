@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/components/shared/Button.svelte';
+	import { Button } from '@delightstack/components/actions';
 
 	interface Props {
 		project?: {
@@ -43,7 +43,7 @@
 
 				{#if displayProject.link}
 					<div class="project-cta">
-						<Button href={displayProject.link} variant="secondary">Learn More</Button>
+						<Button href={displayProject.link} outline>Learn More</Button>
 					</div>
 				{/if}
 			</div>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Button from '$lib/components/shared/Button.svelte';
+	import { Button } from '@delightstack/components/actions';
+	import { Input, Checkbox } from '@delightstack/components/form';
 	import TipTapEditor from '$lib/components/editor/TipTapEditor.svelte';
 
 	let { data } = $props();
@@ -111,7 +112,7 @@
 				<h1>Edit Project</h1>
 			</div>
 			<div class="header-actions">
-				<Button variant="danger" onclick={handleDelete} loading={deleting}>Delete</Button>
+				<Button error onclick={handleDelete} loading={deleting}>Delete</Button>
 				<Button onclick={handleSave} loading={saving}>Save Changes</Button>
 			</div>
 		</div>
@@ -123,46 +124,37 @@
 		<div class="edit-form">
 			<div class="form-row">
 				<div class="field full">
-					<label for="title">Title</label>
-					<input type="text" id="title" bind:value={title} placeholder="Project name" />
+					<Input label="Title" bind:value={title} placeholder="Project name" />
 				</div>
 			</div>
 
 			<div class="form-row">
 				<div class="field full">
-					<label for="tagline">Tagline</label>
-					<input type="text" id="tagline" bind:value={tagline} placeholder="Short description" />
+					<Input label="Tagline" bind:value={tagline} placeholder="Short description" />
 				</div>
 			</div>
 
 			<div class="form-row">
 				<div class="field">
-					<label for="technologies">Technologies (comma-separated)</label>
-					<input type="text" id="technologies" bind:value={technologies} placeholder="React, Node.js, PostgreSQL" />
+					<Input label="Technologies (comma-separated)" bind:value={technologies} placeholder="React, Node.js, PostgreSQL" />
 				</div>
 				<div class="field checkbox">
-					<label>
-						<input type="checkbox" bind:checked={featured} />
-						Featured
-					</label>
+					<Checkbox bind:checked={featured} label="Featured" />
 				</div>
 			</div>
 
 			<div class="form-row">
 				<div class="field">
-					<label for="externalUrl">Live URL</label>
-					<input type="url" id="externalUrl" bind:value={externalUrl} placeholder="https://example.com" />
+					<Input type="url" label="Live URL" bind:value={externalUrl} placeholder="https://example.com" />
 				</div>
 				<div class="field">
-					<label for="githubUrl">GitHub URL</label>
-					<input type="url" id="githubUrl" bind:value={githubUrl} placeholder="https://github.com/..." />
+					<Input type="url" label="GitHub URL" bind:value={githubUrl} placeholder="https://github.com/..." />
 				</div>
 			</div>
 
 			<div class="form-row">
 				<div class="field full">
-					<label for="coverImage">Cover Image URL</label>
-					<input type="url" id="coverImage" bind:value={coverImage} placeholder="https://..." />
+					<Input type="url" label="Cover Image URL" bind:value={coverImage} placeholder="https://..." />
 				</div>
 			</div>
 

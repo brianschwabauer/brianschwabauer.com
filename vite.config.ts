@@ -4,6 +4,9 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	plugins: [sveltekit()],
 	server: {
-		port: 5180
+		port: 5180,
+		fs: {
+			allow: ['delightstack']
+		}
 	}
 });

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { TimelineEntry } from '$lib/server/db/schema';
+	import Image from '@delightstack/components/media/Image.svelte';
 
 	interface Props {
 		entry: TimelineEntry;
@@ -62,7 +63,7 @@
 		{#if entry.mediaUrl && entry.mediaType !== 'none'}
 			<div class="entry-media">
 				{#if entry.mediaType === 'image'}
-					<img src={entry.mediaUrl} alt={entry.title} loading="lazy" />
+					<Image src={entry.mediaUrl} alt={entry.title} />
 				{:else if entry.mediaType === 'video'}
 					<video src={entry.mediaUrl} controls preload="metadata"></video>
 				{/if}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { signIn } from '@auth/sveltekit/client';
-	import Button from '$lib/components/shared/Button.svelte';
+	import { Button } from '@delightstack/components/actions';
 </script>
 
 <svelte:head>
@@ -46,7 +46,7 @@
 		</div>
 
 		<div class="back-home">
-			<Button href="/" variant="ghost">Back to Home</Button>
+			<Button href="/" transparent>Back to Home</Button>
 		</div>
 	</div>
 </div>

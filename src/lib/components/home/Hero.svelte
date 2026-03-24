@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/components/shared/Button.svelte';
+	import { Button } from '@delightstack/components/actions';
 </script>
 
 <section class="hero">
@@ -15,8 +15,8 @@
 				 For as long as I have lived, I have loved to create. I've built startups, developed apps, and produced videos. I live to create. I work to delight.
 			</p>
 			<div class="hero-cta">
-				<Button href="/contact" size="lg">Contact Me</Button>
-				<Button href="/about" variant="secondary" size="lg">About Me</Button>
+				<Button href="/contact" size="2" accent>Contact Me</Button>
+				<Button href="/about" outline size="2">About Me</Button>
 			</div>
 		</div>
 		<div class="hero-image">

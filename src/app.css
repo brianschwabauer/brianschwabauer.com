@@ -10,6 +10,8 @@
 	--color-border: #e0e0e0;
 
 	/* Accent Colors */
+	--color-primary: #00b4a0;
+	--color-secondary: #00b4a0;
 	--color-accent: #00b4a0;
 	--color-accent-hover: #00a090;
 	--color-accent-light: rgba(0, 180, 160, 0.1);

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/components/shared/Button.svelte';
+	import { Button } from '@delightstack/components/actions';
 	import ContactModal from './ContactModal.svelte';
 
 	let modalOpen = $state(false);
@@ -11,7 +11,7 @@
 		<p class="cta-description">
 			I'm always interested in hearing about new projects and opportunities.
 		</p>
-		<Button onclick={() => (modalOpen = true)} size="lg" variant="secondary">
+		<Button onclick={() => (modalOpen = true)} size="2" outline>
 			Don't push this button
 		</Button>
 	</div>

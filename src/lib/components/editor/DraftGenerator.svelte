@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Modal from '$lib/components/shared/Modal.svelte';
-	import Button from '$lib/components/shared/Button.svelte';
+	import { Modal, Button } from '@delightstack/components/actions';
+	import { Input } from '@delightstack/components/form';
 
 	interface Props {
 		open: boolean;
@@ -54,20 +54,17 @@
 			<div class="error">{error}</div>
 		{/if}
 
-		<div class="field">
-			<label for="outline">Outline</label>
-			<textarea
-				id="outline"
-				bind:value={outline}
-				placeholder={type === 'blog'
-					? 'e.g., - Introduction to SvelteKit\n- Why I chose it for my portfolio\n- Key features I love\n- Challenges I faced\n- Conclusion'
-					: 'e.g., Started learning Svelte, built first project, deployed to Cloudflare'}
-				rows="8"
-			></textarea>
-		</div>
+		<Input
+			type="textarea"
+			label="Outline"
+			bind:value={outline}
+			placeholder={type === 'blog'
+				? 'e.g., - Introduction to SvelteKit\n- Why I chose it for my portfolio\n- Key features I love\n- Challenges I faced\n- Conclusion'
+				: 'e.g., Started learning Svelte, built first project, deployed to Cloudflare'}
+		/>
 
 		<div class="actions">
-			<Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>
+			<Button outline onclick={() => (open = false)}>Cancel</Button>
 			<Button onclick={handleGenerate} loading={generating} disabled={!outline.trim()}>
 				Generate Draft
 			</Button>

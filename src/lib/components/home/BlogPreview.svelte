@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/components/shared/Button.svelte';
+	import { Button } from '@delightstack/components/actions';
 	import type { BlogPost } from '$lib/server/db/schema';
 
 	interface Props {
@@ -39,7 +39,7 @@
 	<div class="blog-preview-inner">
 		<div class="section-header scroll-reveal">
 			<h2 class="section-title">Latest Thoughts</h2>
-			<Button href="/blog" variant="ghost">View All Posts</Button>
+			<Button href="/blog" transparent>View All Posts</Button>
 		</div>
 
 		<div class="posts-grid">

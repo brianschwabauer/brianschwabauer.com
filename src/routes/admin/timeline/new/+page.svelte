@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Button from '$lib/components/shared/Button.svelte';
+	import { Button } from '@delightstack/components/actions';
+	import { Input, Select, Checkbox } from '@delightstack/components/form';
 	import TipTapEditor from '$lib/components/editor/TipTapEditor.svelte';
 	import DraftGenerator from '$lib/components/editor/DraftGenerator.svelte';
 
@@ -86,7 +87,7 @@
 			<h1>New Timeline Entry</h1>
 		</div>
 		<div class="header-actions">
-			<Button variant="secondary" onclick={() => (generatorOpen = true)}>AI Generate</Button>
+			<Button outline onclick={() => (generatorOpen = true)}>AI Generate</Button>
 			<Button onclick={handleSave} loading={saving}>Save Entry</Button>
 		</div>
 	</div>
@@ -98,55 +99,45 @@
 	<div class="edit-form">
 		<div class="form-row">
 			<div class="field">
-				<label for="year">Year</label>
-				<input type="number" id="year" bind:value={year} min="1990" max="2100" />
+				<Input type="number" label="Year" bind:value={year} min={1990} max={2100} />
 			</div>
 			<div class="field">
-				<label for="month">Month (optional)</label>
-				<select id="month" bind:value={month}>
-					<option value={null}>No month</option>
-					{#each Array(12) as _, i}
-						<option value={i + 1}>
-							{new Date(2000, i, 1).toLocaleString('default', { month: 'long' })}
-						</option>
-					{/each}
-				</select>
+				<Select label="Month (optional)" bind:value={month} options={[
+					{ value: null, label: 'No month' },
+					...Array.from({ length: 12 }, (_, i) => ({
+						value: i + 1,
+						label: new Date(2000, i, 1).toLocaleString('default', { month: 'long' })
+					}))
+				]} />
 			</div>
 			<div class="field">
-				<label for="category">Category</label>
-				<select id="category" bind:value={category}>
-					<option value="development">Development</option>
-					<option value="videography">Videography</option>
-					<option value="life">Life</option>
-				</select>
+				<Select label="Category" bind:value={category} options={[
+					{ value: 'development', label: 'Development' },
+					{ value: 'videography', label: 'Videography' },
+					{ value: 'life', label: 'Life' }
+				]} />
 			</div>
 		</div>
 
 		<div class="form-row">
 			<div class="field full">
-				<label for="title">Title</label>
-				<input type="text" id="title" bind:value={title} placeholder="What happened?" />
+				<Input label="Title" bind:value={title} placeholder="What happened?" />
 			</div>
 		</div>
 
 		<div class="form-row">
 			<div class="field">
-				<label for="mediaType">Media Type</label>
-				<select id="mediaType" bind:value={mediaType}>
-					<option value="none">None</option>
-					<option value="image">Image</option>
-					<option value="video">Video</option>
-				</select>
+				<Select label="Media Type" bind:value={mediaType} options={[
+					{ value: 'none', label: 'None' },
+					{ value: 'image', label: 'Image' },
+					{ value: 'video', label: 'Video' }
+				]} />
 			</div>
 			<div class="field" style="flex: 2">
-				<label for="mediaUrl">Media URL</label>
-				<input type="url" id="mediaUrl" bind:value={mediaUrl} placeholder="https://..." disabled={mediaType === 'none'} />
+				<Input type="url" label="Media URL" bind:value={mediaUrl} placeholder="https://..." disabled={mediaType === 'none'} />
 			</div>
 			<div class="field checkbox">
-				<label>
-					<input type="checkbox" bind:checked={featured} />
-					Featured
-				</label>
+				<Checkbox bind:checked={featured} label="Featured" />
 			</div>
 		</div>
 

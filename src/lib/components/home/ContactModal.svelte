@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Modal from '$lib/components/shared/Modal.svelte';
-	import Button from '$lib/components/shared/Button.svelte';
+	import { Modal, Button } from '@delightstack/components/actions';
+	import { Input } from '@delightstack/components/form';
 
 	interface Props {
 		open: boolean;
@@ -52,7 +52,7 @@
 	}
 </script>
 
-<Modal bind:open title={submitted ? "Thanks!" : "Let's Chat"} onClose={handleClose}>
+<Modal bind:open title={submitted ? "Thanks!" : "Let's Chat"} onclose={handleClose}>
 	{#if submitted}
 		<div class="success">
 			<div class="success-icon">
@@ -73,26 +73,9 @@
 				<div class="error">{error}</div>
 			{/if}
 
-			<div class="form-field">
-				<label for="name">Name</label>
-				<input type="text" id="name" bind:value={name} required placeholder="Your name" />
-			</div>
-
-			<div class="form-field">
-				<label for="email">Email</label>
-				<input type="email" id="email" bind:value={email} required placeholder="you@example.com" />
-			</div>
-
-			<div class="form-field">
-				<label for="message">Message</label>
-				<textarea
-					id="message"
-					bind:value={message}
-					required
-					rows="4"
-					placeholder="What's on your mind?"
-				></textarea>
-			</div>
+			<Input label="Name" bind:value={name} required placeholder="Your name" />
+			<Input type="email" label="Email" bind:value={email} required placeholder="you@example.com" />
+			<Input type="textarea" label="Message" bind:value={message} required placeholder="What's on your mind?" />
 
 			<div class="form-actions">
 				<Button type="submit" loading={submitting}>Send Message</Button>

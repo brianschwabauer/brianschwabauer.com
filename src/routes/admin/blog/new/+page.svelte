@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Button from '$lib/components/shared/Button.svelte';
+	import { Button } from '@delightstack/components/actions';
+	import { Input, Select } from '@delightstack/components/form';
 	import TipTapEditor from '$lib/components/editor/TipTapEditor.svelte';
 	import DraftGenerator from '$lib/components/editor/DraftGenerator.svelte';
 
@@ -87,7 +88,7 @@
 			<h1>New Post</h1>
 		</div>
 		<div class="header-actions">
-			<Button variant="secondary" onclick={() => (generatorOpen = true)}>AI Generate</Button>
+			<Button outline onclick={() => (generatorOpen = true)}>AI Generate</Button>
 			<Button onclick={handleSave} loading={saving}>Save Post</Button>
 		</div>
 	</div>
@@ -99,33 +100,28 @@
 	<div class="edit-form">
 		<div class="form-row">
 			<div class="field full">
-				<label for="title">Title</label>
-				<input type="text" id="title" bind:value={title} placeholder="Post title" />
+				<Input label="Title" bind:value={title} placeholder="Post title" />
 			</div>
 		</div>
 
 		<div class="form-row">
 			<div class="field full">
-				<label for="excerpt">Excerpt</label>
-				<textarea id="excerpt" bind:value={excerpt} placeholder="Brief summary..." rows="2"></textarea>
+				<Input type="textarea" label="Excerpt" bind:value={excerpt} placeholder="Brief summary..." />
 			</div>
 		</div>
 
 		<div class="form-row">
 			<div class="field">
-				<label for="category">Category</label>
-				<input type="text" id="category" bind:value={category} placeholder="e.g., Development" />
+				<Input label="Category" bind:value={category} placeholder="e.g., Development" />
 			</div>
 			<div class="field">
-				<label for="tags">Tags (comma-separated)</label>
-				<input type="text" id="tags" bind:value={tags} placeholder="svelte, typescript, web" />
+				<Input label="Tags (comma-separated)" bind:value={tags} placeholder="svelte, typescript, web" />
 			</div>
 			<div class="field">
-				<label for="status">Status</label>
-				<select id="status" bind:value={status}>
-					<option value="draft">Draft</option>
-					<option value="published">Published</option>
-				</select>
+				<Select label="Status" bind:value={status} options={[
+					{ value: 'draft', label: 'Draft' },
+					{ value: 'published', label: 'Published' }
+				]} />
 			</div>
 		</div>
 

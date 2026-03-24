@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ThemeToggle from './ThemeToggle.svelte';
+	import { ThemeToggle } from '@delightstack/components/actions';
 	import FullScreenMenu from './FullScreenMenu.svelte';
 
 	let { showThemeToggle = false, invertLogo = false } = $props();

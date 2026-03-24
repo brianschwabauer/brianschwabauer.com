@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Project } from '$lib/server/db/schema';
+	import Image from '@delightstack/components/media/Image.svelte';
 
 	interface Props {
 		project: Project;
@@ -21,7 +22,7 @@
 	<a href="/projects/{project.slug}" class="project-link">
 		<div class="project-image">
 			{#if project.coverImage}
-				<img src={project.coverImage} alt={project.title} loading="lazy" />
+				<Image src={project.coverImage} alt={project.title} fit="cover" />
 			{:else}
 				<div class="image-placeholder">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
