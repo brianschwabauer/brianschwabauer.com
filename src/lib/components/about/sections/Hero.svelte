@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { media } from '../media';
 
 	const projectStars = [
@@ -59,26 +58,14 @@
 	});
 
 	const currentYear = new Date().getFullYear();
-	let displayYear = $state(currentYear);
-	let intro = $state(true);
-
-	onMount(() => {
-		const start = performance.now();
-		const dur = 4200;
-		let raf = 0;
-		const tick = (t: number) => {
-			const p = Math.min(1, (t - start) / dur);
-			const eased = 1 - Math.pow(1 - p, 3);
-			displayYear = Math.round(currentYear - (currentYear - 2006) * eased);
-			if (p < 1) raf = requestAnimationFrame(tick);
-			else intro = false;
-		};
-		raf = requestAnimationFrame(tick);
-		return () => cancelAnimationFrame(raf);
-	});
 
 	function scrollNext() {
-		window.scrollBy({ top: window.innerHeight * 0.9, behavior: 'smooth' });
+		const hero = document.getElementById('hero');
+		const next = hero?.nextElementSibling as HTMLElement | null;
+		const target = next ?? hero;
+		if (!target) return;
+		const top = target.getBoundingClientRect().top + window.scrollY - 64;
+		window.scrollTo({ top, behavior: 'smooth' });
 	}
 </script>
 
@@ -104,36 +91,25 @@
 
 	<div class="hero-inner">
 		<div class="badge">
-			<span class="ping"></span>
-			<span>Brian Schwabauer · since {currentYear - 2006}+ years</span>
+			<span class="avatar" aria-hidden="true">
+				<img src="/profile_picture2.webp" alt="" loading="eager" decoding="async" />
+				<span class="avatar-ring"></span>
+			</span>
+			<span>👋 Hi, I'm Brian Schwabauer</span>
 		</div>
 
 		<h1>
-			<span class="grad">Hi, I'm Brian.</span><br />
-			<span class="muted">I've been making things on screens</span><br />
-			<span class="muted">for two decades.</span>
+			<span class="grad">Delivering</span>
+			<span class="grad accent">Delight</span>
 		</h1>
 
 		<p class="lede">
-			I build <a href="https://showandtour.com" target="_blank" rel="noopener">Show&amp;Tour</a>, software for real estate
-			photographers. Before that I was a film kid with a miniDV camera, a green-screen bedroom wall, and a friend
-			named Kevin. This page is the long version of how those two things connect.
+			For as long as I have lived, I have loved to create. I've built startups, developed apps, and
+			produced videos. I live to create. I work to delight.
 		</p>
 
-		<div class="counter" class:intro>
-			<div class="counter-label">Rewinding…</div>
-			<div class="counter-number" aria-live="off">{displayYear}</div>
-			<div class="counter-rail">
-				<div class="counter-fill" style:width="{((currentYear - displayYear) / (currentYear - 2006)) * 100}%"></div>
-			</div>
-			<div class="counter-meta">
-				<span>{currentYear}</span>
-				<span>2006</span>
-			</div>
-		</div>
-
 		<button class="cta" type="button" onclick={scrollNext}>
-			<span>Start at the beginning</span>
+			<span>See what I'm up to</span>
 			<svg viewBox="0 0 24 24" aria-hidden="true">
 				<path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 			</svg>
@@ -216,8 +192,8 @@
 	.badge {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.65rem;
-		padding: 0.45rem 1rem;
+		gap: 0.6rem;
+		padding: 0.35rem 0.95rem 0.35rem 0.35rem;
 		border-radius: 999px;
 		background: rgba(255, 255, 255, 0.08);
 		border: 1px solid rgba(255, 255, 255, 0.16);
@@ -228,33 +204,67 @@
 		color: rgba(255, 255, 255, 0.85);
 		backdrop-filter: blur(8px);
 	}
-	.ping {
-		width: 8px;
-		height: 8px;
+	.avatar {
+		position: relative;
+		display: inline-block;
+		width: 32px;
+		height: 32px;
 		border-radius: 50%;
-		background: #00f2c3;
-		box-shadow: 0 0 14px #00f2c3;
-		animation: ping 2s ease-in-out infinite;
+		overflow: hidden;
+		flex-shrink: 0;
+		isolation: isolate;
 	}
-	@keyframes ping {
-		0%, 100% { opacity: 1; transform: scale(1); }
-		50% { opacity: 0.55; transform: scale(1.3); }
+	.avatar img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		filter: saturate(0.85);
+		transition: filter 350ms ease;
+	}
+	.badge:hover .avatar img {
+		filter: saturate(1.15);
+	}
+	.avatar-ring {
+		position: absolute;
+		inset: 0;
+		border-radius: 50%;
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 12px rgba(0, 242, 195, 0.4);
+		pointer-events: none;
+		z-index: 1;
 	}
 	h1 {
-		font-size: clamp(2.4rem, 7vw, 5.4rem);
-		font-weight: 800;
-		line-height: 1.02;
-		letter-spacing: -0.03em;
+		font-family: 'Nunito Sans', sans-serif;
+		font-size: clamp(3rem, 13vw, 5rem);
+		font-weight: 900;
+		line-height: 0.9;
+		letter-spacing: -0.04em;
 		margin: 0.4rem 0 0.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+	}
+	@media (min-width: 768px) {
+		h1 { font-size: clamp(6rem, 11vw, 9rem); }
 	}
 	.grad {
-		background: linear-gradient(95deg, #ffffff 20%, #00f2c3 60%, #6c63ff 95%);
+		/* padding-bottom extends the painted area so background-clip:text
+		   covers descenders (g, y, p). The matching negative margin-top on
+		   the next line keeps the original tight line spacing. */
+		padding-bottom: 0.18em;
+		background: linear-gradient(95deg, #ffffff 20%, #00f2c3 70%, #6c63ff 100%);
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
 	}
-	.muted {
-		color: rgba(255, 255, 255, 0.75);
+	.grad + .grad {
+		margin-top: -0.18em;
+	}
+	.grad.accent {
+		background: linear-gradient(95deg, #00f2c3, #6c63ff 80%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
 	}
 	.lede {
 		max-width: 44rem;
@@ -263,62 +273,6 @@
 		color: rgba(255, 255, 255, 0.75);
 		margin: 0;
 	}
-	.lede a {
-		color: #00f2c3;
-		text-decoration: underline;
-		text-decoration-color: rgba(0, 242, 195, 0.4);
-		text-underline-offset: 4px;
-	}
-	.lede a:hover { color: #fff; }
-
-	.counter {
-		width: min(28rem, 90%);
-		padding: 1.25rem 1.4rem;
-		background: rgba(0, 0, 0, 0.35);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 14px;
-		backdrop-filter: blur(8px);
-		display: flex;
-		flex-direction: column;
-		gap: 0.45rem;
-		margin-top: 0.4rem;
-	}
-	.counter-label {
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		letter-spacing: 0.32em;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.55);
-	}
-	.counter-number {
-		font-family: var(--font-mono);
-		font-size: clamp(2.4rem, 6vw, 3.6rem);
-		font-weight: 800;
-		letter-spacing: -0.02em;
-		font-variant-numeric: tabular-nums;
-		color: #fff;
-		line-height: 1;
-	}
-	.counter-rail {
-		height: 3px;
-		background: rgba(255, 255, 255, 0.12);
-		border-radius: 4px;
-		overflow: hidden;
-		margin-top: 0.4rem;
-	}
-	.counter-fill {
-		height: 100%;
-		background: linear-gradient(90deg, #00f2c3, #6c63ff);
-		transition: width 80ms linear;
-	}
-	.counter-meta {
-		display: flex;
-		justify-content: space-between;
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		color: rgba(255, 255, 255, 0.55);
-		letter-spacing: 0.08em;
-	}
 	.cta {
 		display: inline-flex;
 		align-items: center;
@@ -326,17 +280,22 @@
 		background: rgba(255, 255, 255, 0.05);
 		color: #fff;
 		border: 1px solid rgba(255, 255, 255, 0.2);
-		padding: 0.8rem 1.4rem;
+		padding: 0.85rem 1.5rem;
 		border-radius: 999px;
 		font: inherit;
 		font-weight: 600;
 		cursor: pointer;
 		margin-top: 0.6rem;
-		transition: background 200ms ease, transform 200ms ease;
+		transition: background 200ms ease, transform 200ms ease, border-color 200ms ease;
 	}
 	.cta:hover {
 		background: rgba(255, 255, 255, 0.12);
+		border-color: rgba(0, 242, 195, 0.45);
 		transform: translateY(-2px);
+	}
+	.cta:focus-visible {
+		outline: 2px solid #00f2c3;
+		outline-offset: 3px;
 	}
 	.cta svg {
 		width: 18px;

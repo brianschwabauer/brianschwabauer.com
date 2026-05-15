@@ -31,8 +31,6 @@
 			</div>
 
 			<nav class="footer-nav">
-				<a href="/about">About</a>
-				<a href="/projects">Projects</a>
 				<a href="/blog">Blog</a>
 				<a href="/blog/rss.xml">RSS</a>
 			</nav>

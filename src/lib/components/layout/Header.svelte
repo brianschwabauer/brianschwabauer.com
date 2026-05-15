@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { ThemeToggle } from '@delightstack/components/actions';
-	import FullScreenMenu from './FullScreenMenu.svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { hideHeaderLogo } from '$lib/stores/navState';
 
 	let { showThemeToggle = false, invertLogo = false } = $props();
 
-	let menuOpen = $state(false);
 	let scrolled = $state(false);
 
 	if (typeof window !== 'undefined') {
@@ -17,47 +18,39 @@
 		});
 	}
 
-	const navLinks = [
-		{ href: '/', label: 'Home' },
-		{ href: '/about', label: 'About' },
-		{ href: '/projects', label: 'Projects' },
-		{ href: '/blog', label: 'Blog' }
-	];
+	const onRootPage = $derived($page.url.pathname === '/');
+	const logoHidden = $derived($hideHeaderLogo);
+
+	function handleLogoClick(e: MouseEvent) {
+		if (onRootPage) {
+			e.preventDefault();
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}
+		// Otherwise, default <a href="/"> navigation runs.
+	}
 </script>
 
 <header class="header" class:scrolled>
 	<div class="header-inner">
-		<a href="/" class="logo">
+		<a
+			href="/"
+			class="logo"
+			class:hidden={logoHidden}
+			onclick={handleLogoClick}
+			aria-label="Brian Schwabauer — back to top"
+			tabindex={logoHidden ? -1 : 0}
+		>
 			<img src="/logo.svg" alt="Brian Schwabauer" class="logo-img" class:invert={invertLogo} />
 		</a>
-
-		<nav class="nav-desktop">
-			{#each navLinks as link}
-				<a href={link.href} class="nav-link">{link.label}</a>
-			{/each}
-		</nav>
 
 		<div class="header-actions">
 			{#if showThemeToggle}
 				<ThemeToggle />
 			{/if}
-			<button
-				class="menu-toggle"
-				onclick={() => (menuOpen = !menuOpen)}
-				aria-label="Toggle menu"
-				aria-expanded={menuOpen}
-			>
-				<span class="menu-icon" class:open={menuOpen}>
-					<span></span>
-					<span></span>
-					<span></span>
-				</span>
-			</button>
+			<a href="/blog" class="blog-link" class:on-dark={invertLogo}>Blog</a>
 		</div>
 	</div>
 </header>
-
-<FullScreenMenu bind:open={menuOpen} links={navLinks} />
 
 <style>
 	.header {
@@ -99,6 +92,14 @@
 		font-size: var(--text-xl);
 		color: var(--color-text);
 		text-decoration: none;
+		transition: opacity 200ms ease, transform 200ms ease, visibility 0s linear 0s;
+	}
+	.logo.hidden {
+		opacity: 0;
+		pointer-events: none;
+		transform: translateY(-4px);
+		visibility: hidden;
+		transition: opacity 200ms ease, transform 200ms ease, visibility 0s linear 200ms;
 	}
 
 	.logo-img {
@@ -110,76 +111,36 @@
 		filter: brightness(0) invert(1);
 	}
 
-	.nav-desktop {
-		display: none;
-		gap: var(--space-8);
-		margin-left: auto;
-		margin-right: var(--space-6);
-	}
-
-	@media (min-width: 768px) {
-		.nav-desktop {
-			display: flex;
-		}
-	}
-
-	.nav-link {
-		color: var(--color-text-secondary);
-		font-weight: 500;
-		transition: color var(--transition-fast);
-	}
-
-	.nav-link:hover {
-		color: var(--color-text);
-	}
-
 	.header-actions {
 		display: flex;
 		align-items: center;
 		gap: var(--space-3);
+		margin-left: auto;
 	}
 
-	.menu-toggle {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 40px;
-		height: 40px;
-		background: var(--color-surface);
-		border-radius: var(--radius-md);
+	.blog-link {
+		font-family: var(--font-mono, ui-monospace, monospace);
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--color-text-secondary);
+		padding: 0.55rem 1rem;
+		border-radius: 999px;
 		border: 1px solid var(--color-border);
+		transition: color var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast);
 	}
-
-	@media (min-width: 768px) {
-		.menu-toggle {
-			display: none;
-		}
+	.blog-link:hover {
+		color: var(--color-text);
+		background: var(--color-surface);
 	}
-
-	.menu-icon {
-		display: flex;
-		flex-direction: column;
-		gap: 5px;
-		width: 20px;
+	.blog-link.on-dark {
+		color: rgba(255, 255, 255, 0.78);
+		border-color: rgba(255, 255, 255, 0.22);
 	}
-
-	.menu-icon span {
-		display: block;
-		height: 2px;
-		background: var(--color-text);
-		border-radius: 1px;
-		transition: transform var(--transition-fast), opacity var(--transition-fast);
-	}
-
-	.menu-icon.open span:nth-child(1) {
-		transform: translateY(7px) rotate(45deg);
-	}
-
-	.menu-icon.open span:nth-child(2) {
-		opacity: 0;
-	}
-
-	.menu-icon.open span:nth-child(3) {
-		transform: translateY(-7px) rotate(-45deg);
+	.blog-link.on-dark:hover {
+		color: #fff;
+		background: rgba(255, 255, 255, 0.08);
+		border-color: rgba(0, 242, 195, 0.45);
 	}
 </style>

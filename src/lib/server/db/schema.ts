@@ -88,30 +88,6 @@ export const blogPosts = sqliteTable('blog_posts', {
 		.$defaultFn(() => new Date())
 });
 
-export const projects = sqliteTable('projects', {
-	id: text('id')
-		.primaryKey()
-		.$defaultFn(() => crypto.randomUUID()),
-	slug: text('slug').notNull().unique(),
-	title: text('title').notNull(),
-	tagline: text('tagline'),
-	description: text('description'),
-	descriptionHtml: text('description_html'),
-	coverImage: text('cover_image'),
-	images: text('images'), // JSON array stored as string
-	technologies: text('technologies'), // JSON array stored as string
-	externalUrl: text('external_url'),
-	githubUrl: text('github_url'),
-	featured: integer('featured', { mode: 'boolean' }).notNull().default(false),
-	sortOrder: integer('sort_order').notNull().default(0),
-	createdAt: integer('created_at', { mode: 'timestamp_ms' })
-		.notNull()
-		.$defaultFn(() => new Date()),
-	updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
-		.notNull()
-		.$defaultFn(() => new Date())
-});
-
 export const contactSubmissions = sqliteTable('contact_submissions', {
 	id: text('id')
 		.primaryKey()
@@ -133,9 +109,6 @@ export type NewUser = typeof users.$inferInsert;
 
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type NewBlogPost = typeof blogPosts.$inferInsert;
-
-export type Project = typeof projects.$inferSelect;
-export type NewProject = typeof projects.$inferInsert;
 
 export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 export type NewContactSubmission = typeof contactSubmissions.$inferInsert;
