@@ -16,6 +16,7 @@
     "@sveltejs/adapter-cloudflare": "^5.1.0",
     "@sveltejs/kit": "^2.55.0",
     "@sveltejs/vite-plugin-svelte": "^5.1.1",
+    "@types/video.js": "^7.3.58",
     "drizzle-kit": "^0.30.0",
     "svelte": "^5.54.0",
     "svelte-check": "^4.4.5",
@@ -34,7 +35,8 @@
     "@tiptap/extension-link": "^2.10.0",
     "@tiptap/pm": "^2.10.0",
     "@tiptap/starter-kit": "^2.10.0",
-    "drizzle-orm": "^0.38.0"
+    "drizzle-orm": "^0.38.0",
+    "video.js": "^8.23.7"
   },
   "type": "module"
 }

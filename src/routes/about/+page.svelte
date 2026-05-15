@@ -1,123 +1,85 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import Starfield from '$lib/components/about/Starfield.svelte';
-	import Timeline from '$lib/components/about/Timeline.svelte';
+	import Hero from '$lib/components/about/sections/Hero.svelte';
+	import HumbleBeginnings from '$lib/components/about/sections/HumbleBeginnings.svelte';
+	import GreenScreen from '$lib/components/about/sections/GreenScreen.svelte';
+	import PowerRangers from '$lib/components/about/sections/PowerRangers.svelte';
+	import TakingItSeriously from '$lib/components/about/sections/TakingItSeriously.svelte';
+	import MusicVideos from '$lib/components/about/sections/MusicVideos.svelte';
+	import Animation from '$lib/components/about/sections/Animation.svelte';
+	import Festivals from '$lib/components/about/sections/Festivals.svelte';
+	import Spunksters from '$lib/components/about/sections/Spunksters.svelte';
+	import College from '$lib/components/about/sections/College.svelte';
+	import WhatMakesUsHuman from '$lib/components/about/sections/WhatMakesUsHuman.svelte';
+	import Freelancer from '$lib/components/about/sections/Freelancer.svelte';
+	import Entrepreneurship from '$lib/components/about/sections/Entrepreneurship.svelte';
+	import ShowAndTour from '$lib/components/about/sections/ShowAndTour.svelte';
+	import SideProjects from '$lib/components/about/sections/SideProjects.svelte';
+	import YearScrubber from '$lib/components/about/primitives/YearScrubber.svelte';
 
 	let { data } = $props();
+	const signedIn = $derived(Boolean(data.signedIn));
 
-	let container: HTMLElement;
-
-	onMount(() => {
-		// Scroll to bottom on page load (reverse chronology - start at "present")
-		if (container) {
-			// Wait for content to render
-			setTimeout(() => {
-				container.scrollTo({
-					top: container.scrollHeight,
-					behavior: 'instant'
-				});
-			}, 100);
-		}
-	});
+	const stops = [
+		{ id: 'hero', year: 'Today', label: 'Today' },
+		{ id: 'humble-beginnings', year: '2006', label: 'Humble Beginnings' },
+		{ id: 'green-screen', year: '2007', label: 'Green Screen' },
+		{ id: 'power-rangers', year: '2008', label: 'Power Rangers' },
+		{ id: 'taking-it-seriously', year: '2009', label: 'First Websites' },
+		{ id: 'music-videos', year: '2010', label: 'Music Videos' },
+		{ id: 'animation', year: '2011', label: 'Animation & VFX' },
+		{ id: 'festivals-ksms', year: '2011', label: 'Festivals & KSMS' },
+		{ id: 'spunksters', year: '2013', label: 'The Spunksters' },
+		{ id: 'college', year: '2014', label: 'College' },
+		{ id: 'what-makes-us-human', year: '2015', label: 'Senior Thesis' },
+		{ id: 'freelancer', year: '2017', label: 'Freelancer' },
+		{ id: 'entrepreneurship', year: '2019', label: 'Entrepreneurship' },
+		{ id: 'showandtour', year: '2024', label: 'Show&Tour' },
+		{ id: 'side-projects', year: '2026', label: 'Side Projects' }
+	];
 </script>
 
 <svelte:head>
-	<title>About - Brian Schwabauer</title>
+	<title>About · Brian Schwabauer</title>
 	<meta
 		name="description"
-		content="My journey through development, videography, and life. A reverse-chronological timeline of experiences and projects."
+		content="Two decades of making things on screens — short films, music videos, motion graphics, weird Flash games, websites, products, and the platform I'm building now. The long version."
 	/>
+	<meta property="og:title" content="About · Brian Schwabauer" />
+	<meta property="og:description" content="Two decades of making things on screens. A scrolly-telling of where I started, what I learned, and what I'm building now." />
 </svelte:head>
 
-<div class="about-page" bind:this={container}>
-	<Starfield />
+<div class="about">
+	<YearScrubber {stops} />
 
-	<div class="about-content">
-		<header class="about-header">
-			<h1 class="about-title">My Journey</h1>
-			<p class="about-subtitle">
-				Scroll up to travel back through time. From today back to the beginning.
-			</p>
-			<div class="scroll-hint">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<polyline points="18 15 12 9 6 15" />
-				</svg>
-				<span>Scroll up</span>
-			</div>
-		</header>
-
-		<Timeline entries={data.entries} />
-	</div>
+	<Hero />
+	<HumbleBeginnings {signedIn} />
+	<GreenScreen {signedIn} />
+	<PowerRangers />
+	<TakingItSeriously />
+	<MusicVideos />
+	<Animation />
+	<Festivals {signedIn} />
+	<Spunksters />
+	<College />
+	<WhatMakesUsHuman />
+	<Freelancer />
+	<Entrepreneurship />
+	<ShowAndTour />
+	<SideProjects />
 </div>
 
 <style>
-	.about-page {
-		min-height: 100vh;
-		background: linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+	.about {
+		background: #06060a;
+		color: #fff;
 		position: relative;
-		overflow-x: hidden;
+		isolation: isolate;
 	}
-
-	.about-content {
-		position: relative;
-		z-index: 1;
+	:global(html) {
+		scroll-behavior: smooth;
+		scroll-padding-top: 80px;
 	}
-
-	.about-header {
-		text-align: center;
-		padding: var(--space-24) var(--space-4) var(--space-16);
-		max-width: var(--container-md);
-		margin: 0 auto;
-	}
-
-	.about-title {
-		font-size: var(--text-5xl);
-		font-weight: 700;
-		margin-bottom: var(--space-4);
-		background: linear-gradient(135deg, #ffffff, var(--color-accent));
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
-	}
-
-	@media (min-width: 768px) {
-		.about-title {
-			font-size: var(--text-6xl);
-		}
-	}
-
-	.about-subtitle {
-		font-size: var(--text-lg);
-		color: var(--color-text-secondary);
-		margin-bottom: var(--space-8);
-	}
-
-	.scroll-hint {
-		display: inline-flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-2);
-		color: var(--color-accent);
-		animation: bounce 2s ease-in-out infinite;
-	}
-
-	.scroll-hint svg {
-		width: 24px;
-		height: 24px;
-	}
-
-	.scroll-hint span {
-		font-size: var(--text-sm);
-		font-weight: 500;
-	}
-
-	@keyframes bounce {
-		0%,
-		100% {
-			transform: translateY(0);
-		}
-		50% {
-			transform: translateY(-10px);
-		}
+	:global(body) {
+		background: #06060a;
 	}
 </style>

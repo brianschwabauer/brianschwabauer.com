@@ -26,20 +26,6 @@
 		</div>
 
 		<div class="stat-card">
-			<div class="stat-icon timeline">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<circle cx="12" cy="12" r="10" />
-					<polyline points="12 6 12 12 16 14" />
-				</svg>
-			</div>
-			<div class="stat-content">
-				<span class="stat-value">{data.timelineCount}</span>
-				<span class="stat-label">Timeline Entries</span>
-			</div>
-			<a href="/admin/timeline" class="stat-link">Manage</a>
-		</div>
-
-		<div class="stat-card">
 			<div class="stat-icon projects">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 					<rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
@@ -116,11 +102,6 @@
 	.stat-icon.blog {
 		background: rgba(0, 180, 160, 0.1);
 		color: var(--color-accent);
-	}
-
-	.stat-icon.timeline {
-		background: rgba(139, 92, 246, 0.1);
-		color: #8b5cf6;
 	}
 
 	.stat-icon.projects {
