@@ -9,24 +9,23 @@
 
 	let { children } = $props();
 
-	const isAboutPage = $derived($page.url.pathname === '/about');
+	const isRootPage = $derived($page.url.pathname === '/');
 	const isAdminPage = $derived($page.url.pathname.startsWith('/admin'));
 
 	// Force theme based on page:
 	// - Admin pages: respect user preference (no force)
-	// - About page: force dark (space theme)
+	// - Root page (long scrolly page): force dark
 	// - Other public pages: force light
 	$effect(() => {
 		if (isAdminPage) {
-			theme.forceTheme(null); // Respect user's stored preference
-		} else if (isAboutPage) {
+			theme.forceTheme(null);
+		} else if (isRootPage) {
 			theme.forceTheme('dark');
 		} else {
 			theme.forceTheme('light');
 		}
 	});
 
-	// Ensure theme is applied on mount (only matters for admin pages now)
 	onMount(() => {
 		if (isAdminPage) {
 			const stored = localStorage.getItem('theme');
@@ -38,12 +37,12 @@
 </script>
 
 <svelte:head>
-	<meta name="description" content="Brian Schwabauer - Developer, Creator, Problem Solver. Building digital experiences that make a difference." />
+	<meta name="description" content="Brian Schwabauer — Delivering Delight. Two decades of making things on screens, and the platform I'm building now." />
 </svelte:head>
 
 <div class="app">
-	<Header showThemeToggle={isAdminPage} invertLogo={isAboutPage} />
-	<main>
+	<Header showThemeToggle={isAdminPage} invertLogo={isRootPage} />
+	<main class:flush={isRootPage}>
 		{@render children()}
 	</main>
 	<Footer />
@@ -58,6 +57,9 @@
 
 	main {
 		flex: 1;
-		padding-top: 80px; /* Account for fixed header */
+		padding-top: 80px;
+	}
+	main.flush {
+		padding-top: 0; /* root page hero handles its own top spacing */
 	}
 </style>
