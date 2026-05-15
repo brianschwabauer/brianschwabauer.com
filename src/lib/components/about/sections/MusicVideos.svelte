@@ -94,6 +94,11 @@
 						<LazyMedia src="2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif" alt="Summoning a guitar via reversed footage" ratio="16 / 9" />
 					</div>
 				</Reveal>
+				<Reveal variant="up" delay={160}>
+					<div class="track-video">
+						<VideoPlayer slug="2007-08-26_flashlight" title="Flashlight (2007) — music video" ratio="16 / 9" />
+					</div>
+				</Reveal>
 			</div>
 		</div>
 
@@ -116,6 +121,11 @@
 				<Reveal variant="up" delay={120}>
 					<MediaGrid items={flavaShots} min={200} gap={6} ratio="4 / 3" />
 				</Reveal>
+				<Reveal variant="up" delay={160}>
+					<div class="track-video">
+						<VideoPlayer slug="2010-03-25_do_da_flava_g" title="Do Da Flava G (2010) — music video" ratio="16 / 9" />
+					</div>
+				</Reveal>
 			</div>
 		</div>
 
@@ -133,6 +143,11 @@
 				</Reveal>
 				<Reveal variant="up" delay={120}>
 					<MediaGrid items={calcShots} min={220} gap={6} ratio="16 / 9" />
+				</Reveal>
+				<Reveal variant="up" delay={160}>
+					<div class="track-video">
+						<VideoPlayer slug="2010-08-10_you_derive_me_crazy" title="You Derive Me Crazy (2010) — calculus parody music video" ratio="16 / 9" />
+					</div>
 				</Reveal>
 			</div>
 		</div>
@@ -332,6 +347,10 @@
 	}
 	@media (max-width: 640px) {
 		.paired { grid-template-columns: 1fr; }
+	}
+	.track-video {
+		margin-top: 1.2rem;
+		max-width: 820px;
 	}
 
 	.prose p { line-height: 1.65; margin-bottom: 1rem; }

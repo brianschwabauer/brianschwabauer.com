@@ -83,6 +83,20 @@
 			<Reveal variant="up" delay={120}>
 				<MediaGrid items={yardSale} min={200} gap={6} ratio="16 / 9" captions={true} />
 			</Reveal>
+			<Reveal variant="up" delay={160}>
+				<div class="inline-video">
+					<VideoPlayer slug="2009-03-22_yard_sale" title="Yard Sale (2009) — the stuffed-animal short" ratio="16 / 9" />
+				</div>
+			</Reveal>
+
+			<Reveal variant="up" delay={200}>
+				<details class="extra-video">
+					<summary>Also watch — Austin Fender (2008) · our first festival submission</summary>
+					<div class="inline-video">
+						<VideoPlayer slug="2008-03-19_austin_fender" title="Austin Fender (2008)" ratio="16 / 9" />
+					</div>
+				</details>
+			</Reveal>
 		</div>
 
 		<div class="ksms-block">
@@ -183,6 +197,16 @@
 					<MediaGrid items={liveBroadcastShots} min={220} gap={6} ratio="16 / 9" captions={true} />
 				</Reveal>
 
+				<Reveal variant="up" delay={180}>
+					<div class="inline-video">
+						<VideoPlayer
+							slug="2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip"
+							title="KSMS live broadcast · basketball vs SM-NW (2011) — broadcast opener"
+							ratio="16 / 9"
+						/>
+					</div>
+				</Reveal>
+
 				<p class="aside">
 					The tape decks were our "instant replay" rig. Each camera also fed a tape deck that recorded its input
 					to a DV tape. When something happened we wanted to replay, we'd rewind, hit play on the deck, and
@@ -220,24 +244,56 @@
 						/>
 					</div>
 				</Reveal>
+
+				<Reveal variant="up" delay={180}>
+					<div class="block-party-videos">
+						<div class="bp-video-card">
+							<div class="bp-video-eyebrow">FULL SHOW</div>
+							<VideoPlayer slug="2011-04-14_ksms_block_party" title="KSMS Block Party (2011) — full live show" ratio="16 / 9" />
+						</div>
+						<div class="bp-video-card">
+							<div class="bp-video-eyebrow">TRAILER</div>
+							<VideoPlayer slug="2011-04-15_block_party_trailer" title="Block Party trailer (2011)" ratio="16 / 9" />
+						</div>
+						<div class="bp-video-card">
+							<div class="bp-video-eyebrow">PROMO</div>
+							<VideoPlayer slug="2011-04-14_this_is_ksms_basketball_shot" title="This is KSMS — trick-shot promo (2011)" ratio="16 / 9" />
+						</div>
+					</div>
+				</Reveal>
+			</div>
+
+			<div class="midwestside">
+				<Reveal>
+					<h4 class="lb-title">A MidWestSide Story (2010)</h4>
+					<p>
+						A parody short film for KSMS about life in the midwest. Just a fun one with Kevin and a handful of
+						KSMS regulars.
+					</p>
+				</Reveal>
+				<Reveal variant="up" delay={120}>
+					<div class="inline-video">
+						<VideoPlayer slug="2010-03-20_a_midwestside_story" title="A MidWestSide Story (2010)" ratio="16 / 9" />
+					</div>
+				</Reveal>
 			</div>
 		</div>
 
-		<Reveal>
-			<Expandable label="One last festival film before college — Long Time No See">
-				<div class="prose">
-					<p>
-						Kevin and I were headed to different colleges, so we made one last film together that summer —
-						<strong>Long Time No See</strong> (2011). A fish-out-of-water comedy about a guy meeting his
-						foreign-raised long-lost brother. Lighter on effects, heavier on story. Our best storytelling at
-						that point.
-					</p>
-					{#if signedIn}
-						<VideoPlayer slug="2011-08-28_long_time_no_see" title="Long Time No See (2011)" />
-					{/if}
+		<div class="last-film">
+			<Reveal>
+				<h3 class="sub">One last film before college — Long Time No See (2011)</h3>
+				<p>
+					Kevin and I were headed to different colleges, so we made one last film together that summer. A
+					fish-out-of-water comedy about a guy meeting his foreign-raised long-lost brother. Lighter on effects,
+					heavier on story. Our best storytelling at that point.
+				</p>
+			</Reveal>
+			<Reveal variant="up" delay={120}>
+				<div class="inline-video">
+					<VideoPlayer slug="2011-08-28_long_time_no_see" title="Long Time No See (2011)" ratio="16 / 9" />
 				</div>
-			</Expandable>
-		</Reveal>
+			</Reveal>
+		</div>
 	</div>
 </SectionShell>
 
@@ -488,4 +544,57 @@
 
 	.prose p { line-height: 1.65; margin-bottom: 1rem; }
 	.prose strong { color: #ffb84d; }
+
+	.inline-video {
+		max-width: 880px;
+		margin: 2rem auto 0;
+	}
+	.extra-video {
+		max-width: 880px;
+		margin: 1.5rem auto 0;
+	}
+	.extra-video summary {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-family: var(--font-mono);
+		font-size: 0.78rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		padding: 0.5rem 1rem;
+		border: 1px solid rgba(255, 184, 77, 0.4);
+		border-radius: 999px;
+		cursor: pointer;
+		list-style: none;
+		color: #ffb84d;
+	}
+	.extra-video[open] summary { margin-bottom: 1rem; }
+	.extra-video summary::-webkit-details-marker { display: none; }
+
+	.block-party-videos {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 1rem;
+		margin: 2.5rem 0;
+	}
+	@media (max-width: 900px) {
+		.block-party-videos { grid-template-columns: 1fr; }
+	}
+	.bp-video-card {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+	.bp-video-eyebrow {
+		font-family: var(--font-mono);
+		font-size: 0.65rem;
+		letter-spacing: 0.32em;
+		color: #ff3a3a;
+	}
+
+	.midwestside { margin: 4rem 0; }
+	.midwestside p { max-width: 56rem; line-height: 1.6; margin-bottom: 1rem; }
+
+	.last-film { margin: 5rem 0 0; }
+	.last-film p { max-width: 56rem; line-height: 1.6; margin-bottom: 1rem; }
 </style>

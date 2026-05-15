@@ -106,6 +106,17 @@
 				<div class="eyebrow">FROM THE FILM</div>
 				<MediaGrid items={filmShots} min={240} gap={6} ratio="16 / 9" />
 			</Reveal>
+			<Reveal variant="up" delay={120}>
+				<div class="full-film">
+					<div class="full-film-eyebrow">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<polygon points="6,4 22,12 6,20" fill="currentColor" />
+						</svg>
+						<span>WATCH THE FULL FILM · 15 MIN</span>
+					</div>
+					<VideoPlayer slug="2014-06-04_what_makes_us_human" title="What Makes Us Human (2014) — full senior thesis short" ratio="16 / 9" />
+				</div>
+			</Reveal>
 		</div>
 
 		<div class="concept-grid">
@@ -332,4 +343,24 @@
 		line-height: 1.65;
 		margin-bottom: 1.5rem;
 	}
+
+	.full-film {
+		margin: 2.5rem auto 0;
+		max-width: 920px;
+		padding: 1.4rem;
+		background: linear-gradient(135deg, rgba(0, 242, 195, 0.06), transparent);
+		border: 1px solid rgba(0, 242, 195, 0.25);
+		border-radius: 14px;
+	}
+	.full-film-eyebrow {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-family: var(--font-mono);
+		font-size: 0.78rem;
+		letter-spacing: 0.32em;
+		color: #00f2c3;
+		margin-bottom: 0.8rem;
+	}
+	.full-film-eyebrow svg { width: 14px; height: 14px; }
 </style>
