@@ -5,6 +5,7 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import VideoPlayer from '../primitives/VideoPlayer.svelte';
 	import MediaGrid from '../primitives/MediaGrid.svelte';
+	import Expandable from '../primitives/Expandable.svelte';
 
 	const spunkstersPhotos = [
 		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_01.avif',
@@ -58,6 +59,11 @@
 		<div class="logo-stage">
 			<Reveal variant="up">
 				<LazyMedia src="2013-06-22_the_spunksters-logo_animation.avif" alt="The Spunksters logo animation" ratio="16 / 9" />
+			</Reveal>
+			<Reveal variant="up" delay={100}>
+				<div class="inline-video">
+					<VideoPlayer slug="2013-06-22_the_spunksters" title="The Spunksters (2013) — the live awards show" ratio="16 / 9" />
+				</div>
 			</Reveal>
 		</div>
 
@@ -117,6 +123,9 @@
 					We ran out of time to shoot a real music video, so we did a photo shoot, set it to the song, and called
 					it done. It got cheers from a backyard. It belongs there.
 				</p>
+				<div class="bubbly-video">
+					<VideoPlayer slug="2013-06-22_bubbly_bros" title="Bubbly Bros (2013) — photo music video" ratio="16 / 9" />
+				</div>
 			</Reveal>
 		</div>
 
@@ -134,6 +143,11 @@
 				<div class="trailer-pair">
 					<LazyMedia src="2013-06-22_power_rangers_iii_trailer-logo_animation.avif" alt="Power Rangers III logo animation" ratio="16 / 9" />
 					<LazyMedia src="2013-06-22_power_rangers_iii_trailer-kevin_visits_zordons_grave.avif" alt="Kevin visits Zordon's grave" ratio="16 / 9" />
+				</div>
+			</Reveal>
+			<Reveal variant="up" delay={140}>
+				<div class="inline-video">
+					<VideoPlayer slug="2013-06-22_power_rangers_iii_trailer" title="Power Rangers 360 III — fake trailer (2013)" ratio="16 / 9" />
 				</div>
 			</Reveal>
 		</div>
@@ -353,4 +367,10 @@
 		color: #ffd934;
 		margin-top: 0.3rem;
 	}
+
+	.inline-video {
+		max-width: 880px;
+		margin: 2rem auto 0;
+	}
+	.bubbly-video { margin-top: 1.2rem; }
 </style>

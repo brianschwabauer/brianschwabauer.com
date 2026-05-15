@@ -174,13 +174,11 @@
 				</div>
 			</Reveal>
 
-			{#if signedIn}
-				<Reveal variant="up" delay={200}>
-					<div class="pac-video">
-						<VideoPlayer slug="2008-01-06_pac-attack" title="Pac-Attack (2008) — full short" ratio="16 / 9" />
-					</div>
-				</Reveal>
-			{/if}
+			<Reveal variant="up" delay={200}>
+				<div class="pac-video">
+					<VideoPlayer slug="2008-01-06_pac-attack" title="Pac-Attack (2008) — full short" ratio="16 / 9" />
+				</div>
+			</Reveal>
 		</div>
 
 		<div class="ae-block">
@@ -208,6 +206,27 @@
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<MediaGrid items={nuisanceShots} min={240} gap={10} ratio="4 / 3" captions={true} />
+			</Reveal>
+			<Reveal variant="up" delay={150}>
+				<div class="inline-video">
+					<VideoPlayer slug="2008-08-21_nuisance-b-gone" title="Nuisance-B-Gone — the fake infomercial" ratio="16 / 9" />
+				</div>
+			</Reveal>
+		</div>
+
+		<div class="sideline-block">
+			<Reveal variant="up">
+				<h3 class="sub">Sideline Huddler</h3>
+				<p>
+					My sister Amanda "invented" a warm blanket with a waterproof shell for outdoor sports — basically a
+					Snuggie you could take outside, before Snuggies existed. We made her a fake commercial that put her
+					into rain, snow, and fire via green screen.
+				</p>
+			</Reveal>
+			<Reveal variant="up" delay={100}>
+				<div class="inline-video">
+					<VideoPlayer slug="2009-02-13_sideline_huddler" title="Sideline Huddler — Amanda's invention commercial" ratio="16 / 9" />
+				</div>
 			</Reveal>
 		</div>
 
@@ -326,8 +345,12 @@
 		font-family: var(--font-mono);
 		letter-spacing: 0.04em;
 	}
-	.xyz-block, .pac-block, .ae-block, .nuisance-block {
+	.xyz-block, .pac-block, .ae-block, .nuisance-block, .sideline-block {
 		margin: 4rem 0;
+	}
+	.inline-video {
+		max-width: 880px;
+		margin: 2rem auto 0;
 	}
 
 	.pac-grid {

@@ -93,6 +93,11 @@
 					</div>
 				</div>
 			</Reveal>
+			<Reveal variant="up" delay={120}>
+				<div class="inline-video">
+					<VideoPlayer slug="2012-04-27_facebook" title="Facebook in Real Life (2012)" ratio="16 / 9" />
+				</div>
+			</Reveal>
 		</div>
 
 		<div class="node-block">
@@ -174,6 +179,11 @@
 					<LazyMedia src="2014-05-12_pickvid_promo_video-logo_animation.avif" alt="PickVid logo animation" ratio="16 / 9" />
 				</div>
 			</Reveal>
+			<Reveal variant="up" delay={130}>
+				<div class="inline-video">
+					<VideoPlayer slug="2014-05-12_pickvid_promo_video" title="PickVid (2014) — promo video / demo" ratio="16 / 9" />
+				</div>
+			</Reveal>
 		</div>
 
 		<div class="bear-bus">
@@ -196,6 +206,11 @@
 					<LazyMedia src="2013-12-02_bear_bus_bash_flash_game_screen_recording-main_menu.avif" alt="Bear Bus Bash — main menu" ratio="4 / 3" />
 					<LazyMedia src="2013-12-02_bear_bus_bash_flash_game_screen_recording-gameplay_clip.avif" alt="Bear Bus Bash — gameplay" ratio="4 / 3" />
 					<LazyMedia src="2013-12-02_bear_bus_bash_flash_game_screen_recording-victory_results_page.avif" alt="Bear Bus Bash — victory" ratio="4 / 3" />
+				</div>
+			</Reveal>
+			<Reveal variant="up" delay={140}>
+				<div class="inline-video">
+					<VideoPlayer slug="2013-12-02_bear_bus_bash_flash_game_screen_recording" title="Bear Bus Bash (2013) — full gameplay recording" ratio="16 / 9" />
 				</div>
 			</Reveal>
 		</div>
@@ -221,6 +236,11 @@
 						<LazyMedia src="2015-04-12_split_life-sato_48-film_snapshot_2.avif" alt="Split Life — perspective B" ratio="16 / 9" />
 						<div class="split-tag b">PERSPECTIVE B · RIGHT</div>
 					</div>
+				</div>
+			</Reveal>
+			<Reveal variant="up" delay={130}>
+				<div class="inline-video">
+					<VideoPlayer slug="2015-04-12_split_life-sato_48" title="Split Life (2015) — 48-hour dual-perspective oner" ratio="16 / 9" />
 				</div>
 			</Reveal>
 
@@ -249,13 +269,36 @@
 
 		<div class="more-projects">
 			<Reveal>
-				<h3 class="sub-small">Other things on the floor of the cutting room:</h3>
-				<ul class="project-list">
-					<li><strong>Katie Bauer's Breakup (2014)</strong> — directing class group film; I script-supervised, edited, and did the VFX. The character realizes she's inside a film and tries to escape it; boom mic crashes the frame intentionally.</li>
-					<li><strong>One Up (2014)</strong> — a cinematography-class short about two guys trying to one-up each other to get the same job. Real lighting setups, real coverage.</li>
-					<li><strong>Nice to Meet You (2014)</strong> — a summer warmup for my senior thesis, shot in Canon RAW on a 5D mkIV with Magic Lantern firmware. Pretending the girl on the bench was on the phone the whole time pays off in the final beat.</li>
-					<li><strong>Legacy (2015)</strong> — a quiet 2-character short for my directing class. A husband obsessed with his career, a wife who wants him home. Conversation as conflict.</li>
-				</ul>
+				<h3 class="sub-small">Other films from these years:</h3>
+			</Reveal>
+
+			<Reveal variant="up" delay={80}>
+				<div class="film-quad">
+					<article class="film-quad-card">
+						<h4>Katie Bauer's Breakup <span class="film-year">2014</span></h4>
+						<p>Directing-class group film. I script-supervised, edited, and did the VFX. The character realizes
+							she's inside a film and tries to escape it; boom mic crashes the frame on purpose.</p>
+						<VideoPlayer slug="2014-05-15_katie_bauers_breakup" title="Katie Bauer's Breakup (2014)" ratio="16 / 9" />
+					</article>
+					<article class="film-quad-card">
+						<h4>One Up <span class="film-year">2014</span></h4>
+						<p>Cinematography-class short. Two guys try to one-up each other to land the same job. Real lighting
+							setups, real coverage.</p>
+						<VideoPlayer slug="2014-09-24_med_465-one_up" title="One Up (2014)" ratio="16 / 9" />
+					</article>
+					<article class="film-quad-card">
+						<h4>Nice to Meet You <span class="film-year">2014</span></h4>
+						<p>Senior-thesis warmup, shot in Canon RAW on a 5D mkIV with Magic Lantern firmware. The girl on the
+							bench was on the phone the whole time.</p>
+						<VideoPlayer slug="2014-09-02_nice_to_meet_you" title="Nice to Meet You (2014)" ratio="16 / 9" />
+					</article>
+					<article class="film-quad-card">
+						<h4>Legacy <span class="film-year">2015</span></h4>
+						<p>A quiet 2-character short for my directing class. A husband obsessed with his career, a wife who
+							wants him home. Conversation as conflict.</p>
+						<VideoPlayer slug="2015-04-22_legacy" title="Legacy (2015)" ratio="16 / 9" />
+					</article>
+				</div>
 			</Reveal>
 
 			<Reveal variant="up" delay={120}>
@@ -491,23 +534,49 @@
 	.split-tag.a { border-left: 2px solid #00f2c3; }
 	.split-tag.b { border-left: 2px solid #ff5fb3; }
 
-	.project-list {
-		list-style: none;
-		padding: 0;
+	.film-quad {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-		gap: 1rem;
-		margin: 0;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.5rem;
+		margin: 1.5rem 0 2.5rem;
 	}
-	.project-list li {
-		padding: 1.1rem 1.2rem;
+	@media (max-width: 768px) {
+		.film-quad { grid-template-columns: 1fr; }
+	}
+	.film-quad-card {
+		padding: 1.4rem;
 		background: rgba(255, 255, 255, 0.03);
-		border-left: 3px solid #7a4dff;
-		border-radius: 0 8px 8px 0;
-		line-height: 1.55;
-		font-size: 0.95rem;
+		border: 1px solid rgba(122, 77, 255, 0.2);
+		border-radius: 12px;
+		display: flex;
+		flex-direction: column;
+		gap: 0.7rem;
 	}
-	.project-list strong { color: #ff5fb3; }
+	.film-quad-card h4 {
+		font-size: 1.15rem;
+		font-weight: 800;
+		margin: 0;
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+	}
+	.film-year {
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.2em;
+		color: #7a4dff;
+		font-weight: 700;
+	}
+	.film-quad-card p {
+		font-size: 0.92rem;
+		line-height: 1.5;
+		opacity: 0.85;
+		margin: 0 0 0.4rem;
+	}
+	.inline-video {
+		max-width: 880px;
+		margin: 2rem auto 0;
+	}
 	.oneup-bts { margin: 2.5rem 0; }
 	.bts-eyebrow {
 		font-family: var(--font-mono);

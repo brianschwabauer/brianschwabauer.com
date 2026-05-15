@@ -102,6 +102,12 @@
 					/>
 				</div>
 			</Reveal>
+
+			<Reveal variant="up" delay={200}>
+				<div class="inline-video">
+					<VideoPlayer slug="2009-12-25_calamity" title="Calamity (2009) — full stop-motion short" ratio="16 / 9" />
+				</div>
+			</Reveal>
 		</div>
 
 		<div class="exposure">
@@ -158,6 +164,12 @@
 				</div>
 			</Reveal>
 
+			<Reveal variant="up" delay={130}>
+				<div class="inline-video">
+					<VideoPlayer slug="2011-03-01_exposure" title="Exposure (2011) — the camera-robot short" ratio="16 / 9" />
+				</div>
+			</Reveal>
+
 			<Reveal>
 				<Expandable label="The film-making tricks behind the shoot">
 					<div class="prose">
@@ -207,6 +219,21 @@
 					<LazyMedia src="2011-08-28_xyz_news-iprez-kevin_as_weather_man_on_green_screen_raw_shot.avif" alt="Kevin on greenscreen" ratio="16 / 9" />
 					<LazyMedia src="2011-08-28_xyz_news-iprez-film_snapshot_of_kevin_as_news_anchor.avif" alt="Kevin in the final cut" ratio="16 / 9" />
 				</div>
+			</Reveal>
+
+			<Reveal variant="up" delay={140}>
+				<div class="inline-video">
+					<VideoPlayer slug="2011-08-28_xyz_news-iprez" title="XYZ News — iPrez (2011)" ratio="16 / 9" />
+				</div>
+			</Reveal>
+
+			<Reveal variant="up" delay={170}>
+				<details class="extra-video">
+					<summary>Also watch — XYZ News Special Report (2011)</summary>
+					<div class="inline-video">
+						<VideoPlayer slug="2011-03-18_xyz_news_special_report" title="XYZ News Special Report (2011)" ratio="16 / 9" />
+					</div>
+				</details>
 			</Reveal>
 		</div>
 	</div>
@@ -412,4 +439,30 @@
 	}
 
 	.prose p { line-height: 1.65; margin-bottom: 1rem; }
+
+	.inline-video {
+		max-width: 880px;
+		margin: 2rem auto 0;
+	}
+	.extra-video {
+		max-width: 880px;
+		margin: 1.5rem auto 0;
+	}
+	.extra-video summary {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-family: var(--font-mono);
+		font-size: 0.78rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		padding: 0.5rem 1rem;
+		border: 1px solid rgba(108, 99, 255, 0.4);
+		border-radius: 999px;
+		cursor: pointer;
+		list-style: none;
+		color: #6c63ff;
+	}
+	.extra-video[open] summary { margin-bottom: 1rem; }
+	.extra-video summary::-webkit-details-marker { display: none; }
 </style>
