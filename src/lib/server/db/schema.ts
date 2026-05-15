@@ -88,28 +88,6 @@ export const blogPosts = sqliteTable('blog_posts', {
 		.$defaultFn(() => new Date())
 });
 
-export const timelineEntries = sqliteTable('timeline_entries', {
-	id: text('id')
-		.primaryKey()
-		.$defaultFn(() => crypto.randomUUID()),
-	year: integer('year').notNull(),
-	month: integer('month'),
-	title: text('title').notNull(),
-	description: text('description'),
-	descriptionHtml: text('description_html'),
-	category: text('category', { enum: ['development', 'videography', 'life'] }).notNull(),
-	mediaType: text('media_type', { enum: ['image', 'video', 'none'] }).default('none'),
-	mediaUrl: text('media_url'),
-	featured: integer('featured', { mode: 'boolean' }).notNull().default(false),
-	sortOrder: integer('sort_order').notNull().default(0),
-	createdAt: integer('created_at', { mode: 'timestamp_ms' })
-		.notNull()
-		.$defaultFn(() => new Date()),
-	updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
-		.notNull()
-		.$defaultFn(() => new Date())
-});
-
 export const projects = sqliteTable('projects', {
 	id: text('id')
 		.primaryKey()
@@ -124,7 +102,6 @@ export const projects = sqliteTable('projects', {
 	technologies: text('technologies'), // JSON array stored as string
 	externalUrl: text('external_url'),
 	githubUrl: text('github_url'),
-	timelineEntryId: text('timeline_entry_id').references(() => timelineEntries.id),
 	featured: integer('featured', { mode: 'boolean' }).notNull().default(false),
 	sortOrder: integer('sort_order').notNull().default(0),
 	createdAt: integer('created_at', { mode: 'timestamp_ms' })
@@ -156,9 +133,6 @@ export type NewUser = typeof users.$inferInsert;
 
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type NewBlogPost = typeof blogPosts.$inferInsert;
-
-export type TimelineEntry = typeof timelineEntries.$inferSelect;
-export type NewTimelineEntry = typeof timelineEntries.$inferInsert;
 
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;

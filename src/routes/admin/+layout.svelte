@@ -26,7 +26,6 @@
 			<nav class="sidebar-nav">
 				<a href="/admin" class:active={$page.url.pathname === '/admin'}>Dashboard</a>
 				<a href="/admin/blog" class:active={$page.url.pathname.startsWith('/admin/blog')}>Blog Posts</a>
-				<a href="/admin/timeline" class:active={$page.url.pathname.startsWith('/admin/timeline')}>Timeline</a>
 				<a href="/admin/projects" class:active={$page.url.pathname.startsWith('/admin/projects')}>Projects</a>
 				<a href="/admin/messages" class:active={$page.url.pathname.startsWith('/admin/messages')}>Messages</a>
 			</nav>
