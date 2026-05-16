@@ -1,37 +1,20 @@
 import type { RequestHandler } from './$types';
-import { getDb } from '$lib/server/db';
-import { blogPosts } from '$lib/server/db/schema';
-import { eq, desc } from 'drizzle-orm';
-import type { D1Database } from '@cloudflare/workers-types';
+import { listLatest } from '$lib/server/blog';
 
 export const GET: RequestHandler = async ({ platform, url }) => {
 	const siteUrl = url.origin;
-
-	let posts: typeof blogPosts.$inferSelect[] = [];
-
-	if (platform?.env?.DB) {
-		try {
-			const db = getDb(platform.env.DB as unknown as D1Database);
-			posts = await db
-				.select()
-				.from(blogPosts)
-				.where(eq(blogPosts.status, 'published'))
-				.orderBy(desc(blogPosts.publishedAt))
-				.limit(20);
-		} catch {
-			// Continue with empty posts
-		}
-	}
+	const posts = platform?.env?.KV ? (await listLatest(platform.env.KV)).slice(0, 20) : [];
 
 	const items = posts
 		.map((post) => {
 			const pubDate = post.publishedAt ? new Date(post.publishedAt).toUTCString() : '';
+			const desc = post.summary ?? post.aiSummary;
 			return `
 		<item>
 			<title><![CDATA[${post.title}]]></title>
 			<link>${siteUrl}/blog/${post.slug}</link>
 			<guid isPermaLink="true">${siteUrl}/blog/${post.slug}</guid>
-			${post.excerpt ? `<description><![CDATA[${post.excerpt}]]></description>` : ''}
+			${desc ? `<description><![CDATA[${desc}]]></description>` : ''}
 			${pubDate ? `<pubDate>${pubDate}</pubDate>` : ''}
 			${post.category ? `<category>${post.category}</category>` : ''}
 		</item>`;

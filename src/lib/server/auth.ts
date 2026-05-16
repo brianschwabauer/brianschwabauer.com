@@ -1,46 +1,53 @@
 import { SvelteKitAuth } from '@auth/sveltekit';
 import GitHub from '@auth/sveltekit/providers/github';
 import Google from '@auth/sveltekit/providers/google';
-import { DrizzleAdapter } from '@auth/drizzle-adapter';
-import { getDb } from './db';
-import { users, accounts, sessions, verificationTokens } from './db/schema';
-import type { D1Database } from '@cloudflare/workers-types';
+
+function parseAdminEmails(raw: string | undefined): Set<string> {
+	if (!raw) return new Set();
+	return new Set(
+		raw
+			.split(',')
+			.map((email) => email.trim().toLowerCase())
+			.filter(Boolean)
+	);
+}
+
+export function isAdminEmail(email: string | null | undefined, adminList: string | undefined) {
+	if (!email) return false;
+	return parseAdminEmails(adminList).has(email.toLowerCase());
+}
 
 export function createAuth(platform: App.Platform | undefined) {
-	if (!platform?.env?.DB) {
-		throw new Error('Database not available');
+	const env = platform?.env;
+	if (!env?.AUTH_SECRET) {
+		throw new Error('AUTH_SECRET not configured');
 	}
 
-	const db = getDb(platform.env.DB as unknown as D1Database);
+	const adminEmails = env.ADMIN_EMAILS;
 
 	return SvelteKitAuth({
-		adapter: DrizzleAdapter(db, {
-			usersTable: users,
-			accountsTable: accounts,
-			sessionsTable: sessions,
-			verificationTokensTable: verificationTokens
-		}),
+		session: { strategy: 'jwt' },
 		providers: [
 			GitHub({
-				clientId: platform.env.AUTH_GITHUB_ID,
-				clientSecret: platform.env.AUTH_GITHUB_SECRET
+				clientId: env.AUTH_GITHUB_ID,
+				clientSecret: env.AUTH_GITHUB_SECRET
 			}),
 			Google({
-				clientId: platform.env.AUTH_GOOGLE_ID,
-				clientSecret: platform.env.AUTH_GOOGLE_SECRET
+				clientId: env.AUTH_GOOGLE_ID,
+				clientSecret: env.AUTH_GOOGLE_SECRET
 			})
 		],
-		secret: platform.env.AUTH_SECRET,
+		secret: env.AUTH_SECRET,
 		trustHost: true,
 		callbacks: {
-			async session({ session, user }) {
+			async jwt({ token, user }) {
+				if (user?.email) token.email = user.email;
+				token.role = isAdminEmail(token.email as string | undefined, adminEmails) ? 'admin' : 'user';
+				return token;
+			},
+			async session({ session, token }) {
 				if (session.user) {
-					session.user.id = user.id;
-					// Fetch user role from database
-					const dbUser = await db.query.users.findFirst({
-						where: (users, { eq }) => eq(users.id, user.id)
-					});
-					(session.user as { role?: string }).role = dbUser?.role ?? 'user';
+					(session.user as { role?: string }).role = (token.role as string) ?? 'user';
 				}
 				return session;
 			}

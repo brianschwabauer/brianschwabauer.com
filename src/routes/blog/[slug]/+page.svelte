@@ -3,30 +3,23 @@
 
 	let { data } = $props();
 
-	function formatDate(date: Date | number | null | undefined) {
+	function formatDate(date: number | null | undefined) {
 		if (!date) return '';
-		const d = date instanceof Date ? date : new Date(date);
-		return d.toLocaleDateString('en-US', {
+		return new Date(date).toLocaleDateString('en-US', {
 			month: 'long',
 			day: 'numeric',
 			year: 'numeric'
 		});
 	}
 
-	function getTags(): string[] {
-		if (!data.post?.tags) return [];
-		try {
-			return JSON.parse(data.post.tags);
-		} catch {
-			return [];
-		}
-	}
+	const summary = $derived(data.post?.summary ?? data.post?.aiSummary ?? '');
+	const tags = $derived(data.post?.tags ?? []);
 </script>
 
 <svelte:head>
 	<title>{data.post?.title ?? 'Post Not Found'} - Brian Schwabauer</title>
-	{#if data.post?.excerpt}
-		<meta name="description" content={data.post.excerpt} />
+	{#if summary}
+		<meta name="description" content={summary} />
 	{/if}
 </svelte:head>
 
@@ -42,13 +35,13 @@
 
 			<h1 class="post-title">{data.post.title}</h1>
 
-			{#if data.post.excerpt}
-				<p class="post-excerpt">{data.post.excerpt}</p>
+			{#if summary}
+				<p class="post-excerpt">{summary}</p>
 			{/if}
 
-			{#if getTags().length > 0}
+			{#if tags.length > 0}
 				<div class="post-tags">
-					{#each getTags() as tag}
+					{#each tags as tag}
 						<span class="tag">{tag}</span>
 					{/each}
 				</div>

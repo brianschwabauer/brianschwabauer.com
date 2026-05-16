@@ -4,6 +4,5 @@ import { getPost } from '$lib/server/blog';
 export const load: PageServerLoad = async ({ params, platform }) => {
 	if (!platform?.env?.KV) return { post: null };
 	const post = await getPost(platform.env.KV, params.slug);
-	if (!post || post.status !== 'published') return { post: null };
-	return { post };
+	return { post: post ?? null };
 };

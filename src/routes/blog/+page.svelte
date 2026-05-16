@@ -35,7 +35,7 @@
 
 	{#if filteredPosts.length > 0}
 		<div class="posts-grid">
-			{#each filteredPosts as post (post.id)}
+			{#each filteredPosts as post (post.slug)}
 				<PostCard {post} />
 			{/each}
 		</div>

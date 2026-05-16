@@ -3,6 +3,11 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [sveltekit()],
+	build: {
+		rollupOptions: {
+			external: [/^cloudflare:/]
+		}
+	},
 	server: {
 		port: 5180,
 		fs: {
