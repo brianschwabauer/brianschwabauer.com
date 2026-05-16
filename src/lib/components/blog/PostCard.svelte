@@ -1,30 +1,22 @@
 <script lang="ts">
-	import type { BlogPost } from '$lib/server/db/schema';
+	import type { BlogPostMeta } from '$lib/server/blog';
 
 	interface Props {
-		post: BlogPost;
+		post: BlogPostMeta;
 	}
 
 	let { post }: Props = $props();
 
-	function formatDate(date: Date | number | null | undefined) {
+	function formatDate(date: number | null | undefined) {
 		if (!date) return '';
-		const d = date instanceof Date ? date : new Date(date);
-		return d.toLocaleDateString('en-US', {
+		return new Date(date).toLocaleDateString('en-US', {
 			month: 'long',
 			day: 'numeric',
 			year: 'numeric'
 		});
 	}
 
-	function getTags(): string[] {
-		if (!post.tags) return [];
-		try {
-			return JSON.parse(post.tags);
-		} catch {
-			return [];
-		}
-	}
+	const summary = $derived(post.summary ?? post.aiSummary ?? '');
 </script>
 
 <article class="post-card">
@@ -38,13 +30,13 @@
 
 		<h2 class="post-title">{post.title}</h2>
 
-		{#if post.excerpt}
-			<p class="post-excerpt">{post.excerpt}</p>
+		{#if summary}
+			<p class="post-excerpt">{summary}</p>
 		{/if}
 
-		{#if getTags().length > 0}
+		{#if post.tags.length > 0}
 			<div class="post-tags">
-				{#each getTags() as tag}
+				{#each post.tags as tag}
 					<span class="tag">{tag}</span>
 				{/each}
 			</div>

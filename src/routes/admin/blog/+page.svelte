@@ -26,8 +26,8 @@
 
 	{#if data.posts.length > 0}
 		<div class="posts-list">
-			{#each data.posts as post (post.id)}
-				<a href="/admin/blog/{post.id}" class="post-item">
+			{#each data.posts as post (post.slug)}
+				<a href="/admin/blog/{post.slug}" class="post-item">
 					<div class="post-info">
 						<h3 class="post-title">{post.title}</h3>
 						<div class="post-meta">

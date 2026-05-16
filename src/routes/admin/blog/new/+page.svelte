@@ -6,7 +6,7 @@
 	import DraftGenerator from '$lib/components/editor/DraftGenerator.svelte';
 
 	let title = $state('');
-	let excerpt = $state('');
+	let summary = $state('');
 	let category = $state('');
 	let tags = $state('');
 	let status = $state<'draft' | 'published'>('draft');
@@ -44,7 +44,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					title: title.trim(),
-					excerpt: excerpt.trim() || null,
+					summary: summary.trim() || null,
 					category: category.trim() || null,
 					tags: tags
 						.split(',')
@@ -62,7 +62,7 @@
 			}
 
 			const { post } = await res.json();
-			goto(`/admin/blog/${post.id}`);
+			goto(`/admin/blog/${post.slug}`);
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Something went wrong';
 		} finally {
@@ -106,7 +106,12 @@
 
 		<div class="form-row">
 			<div class="field full">
-				<Input type="textarea" label="Excerpt" bind:value={excerpt} placeholder="Brief summary..." />
+				<Input
+					type="textarea"
+					label="Summary"
+					bind:value={summary}
+					placeholder="Brief summary (leave blank to auto-generate)..."
+				/>
 			</div>
 		</div>
 

@@ -1,30 +1,13 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getDb } from '$lib/server/db';
-import { users } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
-import type { D1Database } from '@cloudflare/workers-types';
 import Anthropic from '@anthropic-ai/sdk';
 
-async function isAdmin(platform: App.Platform | undefined, locals: App.Locals): Promise<boolean> {
-	if (!platform?.env?.DB || !locals.session?.user?.id) {
-		return false;
-	}
-
-	const db = getDb(platform.env.DB as unknown as D1Database);
-	const [user] = await db
-		.select({ role: users.role })
-		.from(users)
-		.where(eq(users.id, locals.session.user.id))
-		.limit(1);
-
-	return user?.role === 'admin';
+function isAdmin(locals: App.Locals): boolean {
+	return (locals.session?.user as { role?: string } | undefined)?.role === 'admin';
 }
 
 export const POST: RequestHandler = async ({ request, platform, locals }) => {
-	if (!(await isAdmin(platform, locals))) {
-		throw error(403, 'Unauthorized');
-	}
+	if (!isAdmin(locals)) throw error(403, 'Unauthorized');
 
 	if (!platform?.env?.ANTHROPIC_API_KEY) {
 		throw error(500, 'AI service not configured');
@@ -37,9 +20,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	}
 
 	try {
-		const client = new Anthropic({
-			apiKey: platform.env.ANTHROPIC_API_KEY
-		});
+		const client = new Anthropic({ apiKey: platform.env.ANTHROPIC_API_KEY });
 
 		const response = await client.messages.create({
 			model: 'claude-sonnet-4-20250514',

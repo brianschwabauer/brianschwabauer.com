@@ -9,16 +9,9 @@
 
 	const initialPost = data.post;
 	let title = $state(initialPost?.title ?? '');
-	let excerpt = $state(initialPost?.excerpt ?? '');
+	let summary = $state(initialPost?.summary ?? initialPost?.aiSummary ?? '');
 	let category = $state(initialPost?.category ?? '');
-	let tags = $state((() => {
-		try {
-			const parsed = initialPost?.tags ? JSON.parse(initialPost.tags) : [];
-			return Array.isArray(parsed) ? parsed.join(', ') : '';
-		} catch {
-			return '';
-		}
-	})());
+	let tags = $state(initialPost?.tags?.join(', ') ?? '');
 	let status = $state<'draft' | 'published'>(initialPost?.status === 'published' ? 'published' : 'draft');
 	let contentHtml = $state(initialPost?.contentHtml ?? '');
 
@@ -48,12 +41,12 @@
 		error = '';
 
 		try {
-			const res = await fetch(`/api/blog/${data.post?.id}`, {
+			const res = await fetch(`/api/blog/${data.post?.slug}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					title: title.trim(),
-					excerpt: excerpt.trim() || null,
+					summary: summary.trim() || null,
 					category: category.trim() || null,
 					tags: tags
 						.split(',')
@@ -70,7 +63,6 @@
 				throw new Error(resData.message || 'Failed to save');
 			}
 
-			// Show success briefly
 			error = '';
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Something went wrong';
@@ -80,21 +72,12 @@
 	}
 
 	async function handleDelete() {
-		if (!confirm('Are you sure you want to delete this post? This cannot be undone.')) {
-			return;
-		}
+		if (!confirm('Are you sure you want to delete this post? This cannot be undone.')) return;
 
 		deleting = true;
-
 		try {
-			const res = await fetch(`/api/blog/${data.post?.id}`, {
-				method: 'DELETE'
-			});
-
-			if (!res.ok) {
-				throw new Error('Failed to delete');
-			}
-
+			const res = await fetch(`/api/blog/${data.post?.slug}`, { method: 'DELETE' });
+			if (!res.ok) throw new Error('Failed to delete');
 			goto('/admin/blog');
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to delete';
@@ -140,7 +123,12 @@
 
 			<div class="form-row">
 				<div class="field full">
-					<Input type="textarea" label="Excerpt" bind:value={excerpt} placeholder="Brief summary..." />
+					<Input
+						type="textarea"
+						label="Summary"
+						bind:value={summary}
+						placeholder="Brief summary (leave blank to auto-generate)..."
+					/>
 				</div>
 			</div>
 
@@ -149,20 +137,32 @@
 					<Input label="Category" bind:value={category} placeholder="e.g., Development" />
 				</div>
 				<div class="field">
-					<Input label="Tags (comma-separated)" bind:value={tags} placeholder="svelte, typescript, web" />
+					<Input
+						label="Tags (comma-separated)"
+						bind:value={tags}
+						placeholder="svelte, typescript, web"
+					/>
 				</div>
 				<div class="field">
-					<Select label="Status" bind:value={status} options={[
-						{ value: 'draft', label: 'Draft' },
-						{ value: 'published', label: 'Published' }
-					]} />
+					<Select
+						label="Status"
+						bind:value={status}
+						options={[
+							{ value: 'draft', label: 'Draft' },
+							{ value: 'published', label: 'Published' }
+						]}
+					/>
 				</div>
 			</div>
 
 			<div class="form-row">
 				<div class="field full">
 					<label>Content</label>
-					<TipTapEditor bind:this={editor} content={data.post.contentHtml || ''} onUpdate={handleEditorUpdate} />
+					<TipTapEditor
+						bind:this={editor}
+						content={data.post.contentHtml || ''}
+						onUpdate={handleEditorUpdate}
+					/>
 				</div>
 			</div>
 		</div>
@@ -251,21 +251,6 @@
 		font-size: var(--text-sm);
 		font-weight: 500;
 		margin-bottom: var(--space-2);
-	}
-
-	.field input,
-	.field textarea,
-	.field select {
-		width: 100%;
-	}
-
-	.field select {
-		appearance: none;
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23666'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
-		background-repeat: no-repeat;
-		background-position: right 12px center;
-		background-size: 16px;
-		padding-right: 40px;
 	}
 
 	.not-found {
