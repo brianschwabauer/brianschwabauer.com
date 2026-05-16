@@ -5,11 +5,15 @@ pages_build_output_dir = ".svelte-kit/cloudflare"
 
 [[kv_namespaces]]
 binding = "KV"
-id = "local"
+id = "0b2ff2ae425c43259c71f137972d3691"
 
 [ai]
 binding = "AI"
 
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "brianschwabauer"
+
 [[send_email]]
 name = "SEND_EMAIL"
-destination_address = "brian@showandtour.com"
+destination_address = "brian@brianschwabauer.com"
