@@ -17,6 +17,8 @@
 	const summary = $derived(data.post?.summary ?? data.post?.aiSummary ?? '');
 	const tags = $derived(data.post?.tags ?? []);
 	const featured = $derived(data.post?.featuredImage ?? null);
+	const focalX = $derived(data.post?.coverFocalX ?? 50);
+	const focalY = $derived(data.post?.coverFocalY ?? 50);
 	const ogImage = $derived(featured ? `/cdn/image/${featured.path}/default` : null);
 	const isAdmin = $derived(
 		($page.data.session?.user as { role?: string } | undefined)?.role === 'admin'
@@ -83,15 +85,15 @@
 		{#if featured}
 			<figure
 				class="post-featured"
-				style={bgStyle(featured)}
-				style:aspect-ratio={featured.aspect_ratio || 16 / 9}>
+				style={bgStyle(featured)}>
 				<img
 					src={`/cdn/image/${featured.path}/default`}
 					alt={featured.alt_text ?? ''}
 					width={featured.width || undefined}
 					height={featured.height || undefined}
 					loading="eager"
-					decoding="async" />
+					decoding="async"
+					style:object-position={`${focalX}% ${focalY}%`} />
 			</figure>
 		{/if}
 
@@ -238,12 +240,14 @@
 		max-width: var(--measure);
 		overflow: hidden;
 		border-radius: var(--radius-lg);
+		aspect-ratio: 2.35;
 	}
 
 	.post-featured img {
 		display: block;
 		width: 100%;
-		height: auto;
+		height: 100%;
+		object-fit: cover;
 	}
 
 	/* The .prose class (defined in app.css) handles the inner text-column
