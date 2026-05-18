@@ -78,7 +78,7 @@
 		try {
 			const res = await fetch(`/api/blog/${data.post?.slug}`, { method: 'DELETE' });
 			if (!res.ok) throw new Error('Failed to delete');
-			goto('/admin/blog');
+			goto('/admin');
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to delete';
 			deleting = false;
@@ -94,7 +94,7 @@
 	<div class="edit-post">
 		<div class="page-header">
 			<div>
-				<a href="/admin/blog" class="back-link">
+				<a href="/admin" class="back-link">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 						<line x1="19" y1="12" x2="5" y2="12" />
 						<polyline points="12 19 5 12 12 5" />
@@ -173,7 +173,7 @@
 	<div class="not-found">
 		<h1>Post Not Found</h1>
 		<p>The post you're looking for doesn't exist.</p>
-		<Button href="/admin/blog">Back to Posts</Button>
+		<Button href="/admin">Back to Posts</Button>
 	</div>
 {/if}
 
