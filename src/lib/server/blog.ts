@@ -1,4 +1,6 @@
 import type { KVNamespace } from '@cloudflare/workers-types';
+import type { TipTapDoc } from './renderDoc';
+import type { ImageRecord } from '$lib/types/images';
 
 const LATEST_INDEX_KEY = '/blog.json';
 const ALL_INDEX_KEY = '/blog/all.json';
@@ -11,11 +13,14 @@ export interface BlogPost {
 	title: string;
 	summary: string | null;
 	aiSummary: string | null;
-	content: string;
-	contentHtml: string;
+	/** Plain-text extract of `content` — used by search + AI summary. */
+	contentText: string;
+	/** TipTap JSON document — the source of truth for the post body. */
+	content: TipTapDoc;
 	category: string | null;
 	tags: string[];
 	status: BlogStatus;
+	featuredImage: ImageRecord | null;
 	publishedAt: number | null;
 	createdAt: number;
 	updatedAt: number;
@@ -31,6 +36,7 @@ export interface BlogPostMeta {
 	category: string | null;
 	tags: string[];
 	status: BlogStatus;
+	featuredImage: ImageRecord | null;
 	publishedAt: number | null;
 	createdAt: number;
 	updatedAt: number;
@@ -60,6 +66,7 @@ function toMeta(post: BlogPost): BlogPostMeta {
 		category: post.category,
 		tags: post.tags,
 		status: post.status,
+		featuredImage: post.featuredImage,
 		publishedAt: post.publishedAt,
 		createdAt: post.createdAt,
 		updatedAt: post.updatedAt
@@ -117,13 +124,14 @@ async function writeIndexes(kv: KVNamespace, allPosts: BlogPostMeta[]): Promise<
 export interface SavePostInput {
 	slug?: string;
 	title: string;
-	content: string;
-	contentHtml: string;
+	content: TipTapDoc;
+	contentText: string;
 	summary?: string | null;
 	aiSummary?: string | null;
 	category?: string | null;
 	tags?: string[];
 	status?: BlogStatus;
+	featuredImage?: ImageRecord | null;
 	publishedAt?: number | null;
 	contentHash?: string | null;
 	embedding?: number[] | null;
@@ -146,11 +154,13 @@ export async function savePost(kv: KVNamespace, input: SavePostInput): Promise<B
 		title: input.title,
 		summary: input.summary ?? existing?.summary ?? null,
 		aiSummary: input.aiSummary ?? existing?.aiSummary ?? null,
+		contentText: input.contentText,
 		content: input.content,
-		contentHtml: input.contentHtml,
 		category: input.category ?? existing?.category ?? null,
 		tags: input.tags ?? existing?.tags ?? [],
 		status,
+		featuredImage:
+			input.featuredImage === undefined ? existing?.featuredImage ?? null : input.featuredImage,
 		publishedAt:
 			input.publishedAt !== undefined
 				? input.publishedAt

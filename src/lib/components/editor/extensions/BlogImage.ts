@@ -1,0 +1,165 @@
+/**
+ * Custom TipTap node for blog images with width-mode breakout + resize handles.
+ *
+ * Attributes:
+ *   src            CDN URL of the default variant
+ *   path           R2 key prefix (e.g. "blog/2026/sunset"), used to rebuild variant URLs
+ *   alt            alt text
+ *   width          intrinsic pixel width
+ *   height         intrinsic pixel height
+ *   thumbhash      ~33-char base64 ThumbHash for placeholder
+ *   bgColor        CSS oklch() string for background placeholder
+ *   fileName       original filename
+ *   widthMode      'normal' | 'wide' | 'full'
+ *   widthPct       30-100 (percentage of text column, only meaningful in 'normal')
+ *   variants       JSON-encoded array of {name,width,height,mime_type} for srcset
+ *
+ * The editor uses createBlogImageNodeView() for inline display + resize.
+ * Storage HTML uses renderHTML below; the public page uses the JSON via
+ * src/lib/server/renderDoc.ts to produce the final optimized markup.
+ */
+import { Node, mergeAttributes } from '@tiptap/core';
+import { createBlogImageNodeView } from './BlogImageNodeView';
+
+export type WidthMode = 'normal' | 'wide' | 'full';
+
+export interface BlogImageAttrs {
+	src: string;
+	path: string;
+	alt: string | null;
+	width: number;
+	height: number;
+	thumbhash: string | null;
+	bgColor: string | null;
+	fileName: string | null;
+	widthMode: WidthMode;
+	widthPct: number;
+	variants: string;
+}
+
+declare module '@tiptap/core' {
+	interface Commands<ReturnType> {
+		blogImage: {
+			/** Insert a BlogImage node from a record returned by the upload/media API. */
+			setBlogImage: (attrs: Partial<BlogImageAttrs> & { src: string; path: string }) => ReturnType;
+		};
+	}
+}
+
+export const BlogImage = Node.create({
+	name: 'blogImage',
+	group: 'block',
+	atom: true,
+	draggable: true,
+	selectable: true,
+
+	addAttributes() {
+		return {
+			src: { default: '' },
+			path: { default: '' },
+			alt: { default: null },
+			width: {
+				default: 0,
+				parseHTML: (el) => Number(el.getAttribute('width')) || Number(el.dataset.width) || 0,
+			},
+			height: {
+				default: 0,
+				parseHTML: (el) => Number(el.getAttribute('height')) || Number(el.dataset.height) || 0,
+			},
+			thumbhash: {
+				default: null,
+				parseHTML: (el) => el.dataset.thumbhash || null,
+				renderHTML: (attrs) => (attrs.thumbhash ? { 'data-thumbhash': attrs.thumbhash } : {}),
+			},
+			bgColor: {
+				default: null,
+				parseHTML: (el) => el.dataset.bg || null,
+				renderHTML: (attrs) => (attrs.bgColor ? { 'data-bg': attrs.bgColor } : {}),
+			},
+			fileName: {
+				default: null,
+				parseHTML: (el) => el.dataset.fileName || null,
+				renderHTML: (attrs) => (attrs.fileName ? { 'data-file-name': attrs.fileName } : {}),
+			},
+			widthMode: {
+				default: 'normal',
+				parseHTML: (el) => (el.dataset.widthMode as WidthMode) || 'normal',
+				renderHTML: (attrs) => ({ 'data-width-mode': attrs.widthMode }),
+			},
+			widthPct: {
+				default: 100,
+				parseHTML: (el) => Number(el.dataset.widthPct) || 100,
+				renderHTML: (attrs) => ({ 'data-width-pct': String(attrs.widthPct) }),
+			},
+			variants: {
+				default: '[]',
+				parseHTML: (el) => el.dataset.variants || '[]',
+				renderHTML: (attrs) => (attrs.variants ? { 'data-variants': attrs.variants } : {}),
+			},
+		};
+	},
+
+	parseHTML() {
+		return [
+			{
+				tag: 'figure.blog-img',
+				getAttrs: (el) => {
+					if (!(el instanceof HTMLElement)) return false;
+					const img = el.querySelector('img');
+					if (!img) return false;
+					return {
+						src: img.getAttribute('src') || '',
+						path: el.dataset.path || '',
+					};
+				},
+			},
+		];
+	},
+
+	renderHTML({ HTMLAttributes, node }) {
+		const attrs = node.attrs as BlogImageAttrs;
+		return [
+			'figure',
+			mergeAttributes(HTMLAttributes, {
+				class: 'blog-img',
+				'data-path': attrs.path,
+			}),
+			[
+				'img',
+				{
+					src: attrs.src,
+					alt: attrs.alt ?? '',
+					width: attrs.width || null,
+					height: attrs.height || null,
+				},
+			],
+		];
+	},
+
+	addCommands() {
+		return {
+			setBlogImage:
+				(attrs) =>
+				({ commands }) =>
+					commands.insertContent({
+						type: this.name,
+						attrs: {
+							widthMode: 'normal',
+							widthPct: 100,
+							alt: null,
+							thumbhash: null,
+							bgColor: null,
+							fileName: null,
+							variants: '[]',
+							width: 0,
+							height: 0,
+							...attrs,
+						},
+					}),
+		};
+	},
+
+	addNodeView() {
+		return createBlogImageNodeView();
+	},
+});

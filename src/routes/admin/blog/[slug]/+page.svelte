@@ -5,10 +5,17 @@
 	import { Input, Select } from '@delightstack/components/form';
 	import TipTapEditor from '$lib/components/editor/TipTapEditor.svelte';
 	import DraftGenerator from '$lib/components/editor/DraftGenerator.svelte';
+	import ImagePicker from '$lib/components/media/ImagePicker.svelte';
+	import type { JSONContent } from '@tiptap/core';
+	import type { ImageRecord } from '$lib/client/images';
 
 	let { data } = $props();
 
 	const initialPost = data.post;
+	const emptyDoc: JSONContent = { type: 'doc', content: [{ type: 'paragraph' }] };
+	const initialContent: JSONContent =
+		(initialPost?.content as JSONContent | undefined) ?? emptyDoc;
+
 	let title = $state(initialPost?.title ?? '');
 	let summary = $state(initialPost?.summary ?? initialPost?.aiSummary ?? '');
 	let category = $state(initialPost?.category ?? '');
@@ -16,7 +23,9 @@
 	let status = $state<'draft' | 'published'>(
 		initialPost?.status === 'published' ? 'published' : 'draft'
 	);
-	let contentHtml = $state(initialPost?.contentHtml ?? '');
+	let content = $state<JSONContent>(initialContent);
+	let contentText = $state(initialPost?.contentText ?? '');
+	let featuredImage = $state<ImageRecord | null>(initialPost?.featuredImage ?? null);
 	let slug = $state(initialPost?.slug ?? '');
 	let publishedAtInput = $state(toLocalDateTimeInput(initialPost?.publishedAt ?? null));
 
@@ -53,16 +62,7 @@
 			.filter(Boolean)
 	);
 
-	function snapshotOf(values: {
-		title: string;
-		summary: string;
-		category: string;
-		tags: string[];
-		status: string;
-		contentHtml: string;
-		slug: string;
-		publishedAt: number | null;
-	}): string {
+	function snapshotOf(values: Record<string, unknown>): string {
 		return JSON.stringify(values);
 	}
 
@@ -73,7 +73,8 @@
 			category: initialPost?.category ?? '',
 			tags: initialPost?.tags ?? [],
 			status: initialPost?.status === 'published' ? 'published' : 'draft',
-			contentHtml: initialPost?.contentHtml ?? '',
+			content: initialContent,
+			featuredImagePath: initialPost?.featuredImage?.path ?? null,
 			slug: initialPost?.slug ?? '',
 			publishedAt: initialPost?.publishedAt ?? null
 		})
@@ -86,7 +87,8 @@
 			category,
 			tags: normalizedTags,
 			status,
-			contentHtml,
+			content,
+			featuredImagePath: featuredImage?.path ?? null,
 			slug,
 			publishedAt: fromLocalDateTimeInput(publishedAtInput)
 		})
@@ -94,13 +96,16 @@
 
 	const hasChanges = $derived(savedSnapshot !== currentSnapshot);
 
-	function handleEditorUpdate(html: string) {
-		contentHtml = html;
+	function handleEditorUpdate(json: JSONContent, text: string) {
+		content = json;
+		contentText = text;
 	}
 
-	function handleGenerated(generatedContent: string) {
-		editor?.setContent(generatedContent);
-		contentHtml = generatedContent;
+	function handleGenerated(generatedHtml: string) {
+		editor?.setContent(generatedHtml);
+		// Pull the resulting JSON + text back from the editor after it parses the HTML.
+		content = editor?.getJSON() ?? emptyDoc;
+		contentText = editor?.getText() ?? '';
 	}
 
 	async function handleSave() {
@@ -125,8 +130,9 @@
 					summary: summary.trim() || null,
 					category: category.trim() || null,
 					tags: normalizedTags,
-					content: editor?.getText() || '',
-					contentHtml,
+					content,
+					contentText,
+					featuredImage,
 					status,
 					slug,
 					publishedAt: fromLocalDateTimeInput(publishedAtInput)
@@ -231,6 +237,12 @@
 				</div>
 			</div>
 
+			<div class="featured-row">
+				<ImagePicker
+					image={featuredImage}
+					onChange={(img) => (featuredImage = img)} />
+			</div>
+
 			<div class="advanced-toggle">
 				<button
 					type="button"
@@ -299,7 +311,7 @@
 				<div class="field full">
 					<TipTapEditor
 						bind:this={editor}
-						content={data.post.contentHtml || ''}
+						content={initialContent}
 						onUpdate={handleEditorUpdate} />
 				</div>
 			</div>
@@ -381,6 +393,10 @@
 		margin-bottom: var(--space-4);
 		flex-wrap: wrap;
 		align-items: flex-end;
+	}
+
+	.featured-row {
+		margin-bottom: var(--space-4);
 	}
 
 	.field.title-field {

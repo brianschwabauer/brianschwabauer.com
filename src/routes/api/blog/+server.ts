@@ -3,6 +3,8 @@ import type { RequestHandler } from './$types';
 import { listLatest, listAllAdmin, savePost, getPost, slugify } from '$lib/server/blog';
 import { rebuildIndex, rebuildVectorIndex } from '$lib/server/searchIndex';
 import { augmentWithAi } from '$lib/server/blogAi';
+import type { TipTapDoc } from '$lib/server/renderDoc';
+import type { ImageRecord } from '$lib/types/images';
 
 function isAdmin(locals: App.Locals): boolean {
 	return (locals.session?.user as { role?: string } | undefined)?.role === 'admin';
@@ -20,16 +22,29 @@ export const GET: RequestHandler = async ({ platform, locals, url }) => {
 	return json({ posts });
 };
 
+interface CreateBody {
+	title?: string;
+	content?: TipTapDoc;
+	contentText?: string;
+	summary?: string | null;
+	category?: string | null;
+	tags?: unknown;
+	status?: 'draft' | 'published';
+	slug?: string;
+	publishedAt?: number | null;
+	featuredImage?: ImageRecord | null;
+}
+
 export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	if (!isAdmin(locals)) throw error(403, 'Unauthorized');
 	if (!platform?.env?.KV) throw error(500, 'KV not available');
 
-	const data = await request.json();
-	const { title, content, contentHtml, summary, category, tags, status, slug, publishedAt } =
-		data;
+	const data = (await request.json()) as CreateBody;
+	const { title, content, contentText, summary, category, tags, status, slug, publishedAt } = data;
 
 	if (!title || typeof title !== 'string') throw error(400, 'Title is required');
-	if (typeof content !== 'string') throw error(400, 'Content is required');
+	if (!content || typeof content !== 'object') throw error(400, 'Content (JSON doc) is required');
+	if (typeof contentText !== 'string') throw error(400, 'contentText is required');
 
 	const env = platform.env;
 
@@ -47,7 +62,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	try {
 		const { aiSummary, embedding, contentHash } = await augmentWithAi(env, {
 			title,
-			content,
+			content: contentText,
 			userSummary: summary ?? null,
 			existing
 		});
@@ -56,12 +71,13 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			slug: explicitSlug,
 			title,
 			content,
-			contentHtml: contentHtml || '',
+			contentText,
 			summary: summary || null,
 			aiSummary,
 			category: category || null,
-			tags: Array.isArray(tags) ? tags : [],
+			tags: Array.isArray(tags) ? tags.filter((t): t is string => typeof t === 'string') : [],
 			status: status || 'draft',
+			featuredImage: data.featuredImage ?? null,
 			publishedAt:
 				typeof publishedAt === 'number'
 					? publishedAt

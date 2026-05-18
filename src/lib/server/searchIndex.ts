@@ -12,22 +12,8 @@ import {
 const INDEX_KEY = '/index.json';
 const VECTOR_INDEX_KEY = '/index-vectors.json';
 
-function stripHtml(html: string): string {
-	return html
-		.replace(/<style[\s\S]*?<\/style>/gi, '')
-		.replace(/<script[\s\S]*?<\/script>/gi, '')
-		.replace(/<[^>]+>/g, ' ')
-		.replace(/\s+/g, ' ')
-		.trim();
-}
-
-function blogEntry(post: BlogPost | (BlogPostMeta & { content?: string; contentHtml?: string })): SearchEntry {
-	const body =
-		'contentHtml' in post && post.contentHtml
-			? stripHtml(post.contentHtml)
-			: 'content' in post && post.content
-				? post.content
-				: '';
+function blogEntry(post: BlogPost | BlogPostMeta): SearchEntry {
+	const body = 'contentText' in post && post.contentText ? post.contentText : '';
 	return {
 		id: `blog:${post.slug}`,
 		type: 'blog',

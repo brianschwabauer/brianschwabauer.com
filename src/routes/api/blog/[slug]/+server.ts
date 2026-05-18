@@ -10,9 +10,24 @@ import {
 } from '$lib/server/blog';
 import { rebuildIndex, rebuildVectorIndex } from '$lib/server/searchIndex';
 import { augmentWithAi } from '$lib/server/blogAi';
+import type { TipTapDoc } from '$lib/server/renderDoc';
+import type { ImageRecord } from '$lib/types/images';
 
 function isAdmin(locals: App.Locals): boolean {
 	return (locals.session?.user as { role?: string } | undefined)?.role === 'admin';
+}
+
+interface UpdateBody {
+	title?: string;
+	content?: TipTapDoc;
+	contentText?: string;
+	summary?: string | null;
+	category?: string | null;
+	tags?: unknown;
+	status?: 'draft' | 'published';
+	slug?: string;
+	publishedAt?: number | null;
+	featuredImage?: ImageRecord | null;
 }
 
 export const GET: RequestHandler = async ({ params, platform, locals }) => {
@@ -35,10 +50,11 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 	const existing = await getPost(platform.env.KV, params.slug);
 	if (!existing) throw error(404, 'Post not found');
 
-	const data = await request.json();
+	const data = (await request.json()) as UpdateBody;
 	const env = platform.env;
 	const nextTitle = data.title ?? existing.title;
 	const nextContent = data.content ?? existing.content;
+	const nextContentText = data.contentText ?? existing.contentText;
 	const userSummary = data.summary !== undefined ? data.summary : existing.summary;
 
 	let workingSlug = existing.slug;
@@ -61,21 +77,25 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 
 	const { aiSummary, embedding, contentHash } = await augmentWithAi(env, {
 		title: nextTitle,
-		content: nextContent,
+		content: nextContentText,
 		userSummary,
-		existing
+		existing: { ...existing, contentText: nextContentText, content: nextContent }
 	});
 
 	const updated = await savePost(env.KV, {
 		slug: workingSlug,
 		title: nextTitle,
 		content: nextContent,
-		contentHtml: data.contentHtml ?? existing.contentHtml,
+		contentText: nextContentText,
 		summary: userSummary,
 		aiSummary,
 		category: data.category !== undefined ? data.category : existing.category,
-		tags: Array.isArray(data.tags) ? data.tags : existing.tags,
+		tags: Array.isArray(data.tags)
+			? data.tags.filter((t): t is string => typeof t === 'string')
+			: existing.tags,
 		status: data.status ?? existing.status,
+		featuredImage:
+			data.featuredImage === undefined ? existing.featuredImage : data.featuredImage,
 		publishedAt:
 			data.publishedAt === undefined
 				? undefined

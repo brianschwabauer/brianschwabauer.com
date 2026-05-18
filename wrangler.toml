@@ -17,3 +17,14 @@ bucket_name = "brianschwabauer"
 [[send_email]]
 name = "SEND_EMAIL"
 destination_address = "brian@brianschwabauer.com"
+
+# ── Image processor (separate worker via service binding) ───────────────────
+# The actual Cloudflare Container running @delightstack/images lives in a
+# dedicated worker (brianschwabauer-images, see wrangler.images.toml). The
+# main site forwards /api/images/* and /cdn/image/* to it via this binding.
+# Keeping the container DO out of the main worker means the main worker's
+# build never has to resolve `cloudflare:workers` imports during Vite SSR.
+
+[[services]]
+binding = "IMAGE_PROCESSOR"
+service = "brianschwabauer-images"

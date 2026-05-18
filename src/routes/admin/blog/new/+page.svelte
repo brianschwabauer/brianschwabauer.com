@@ -5,14 +5,20 @@
 	import { Input, Select } from '@delightstack/components/form';
 	import TipTapEditor from '$lib/components/editor/TipTapEditor.svelte';
 	import DraftGenerator from '$lib/components/editor/DraftGenerator.svelte';
+	import ImagePicker from '$lib/components/media/ImagePicker.svelte';
+	import type { JSONContent } from '@tiptap/core';
+	import type { ImageRecord } from '$lib/client/images';
+
+	const emptyDoc: JSONContent = { type: 'doc', content: [{ type: 'paragraph' }] };
 
 	let title = $state('');
 	let summary = $state('');
 	let category = $state('');
 	let tags = $state('');
 	let status = $state<'draft' | 'published'>('draft');
-	let content = $state('');
-	let contentHtml = $state('');
+	let content = $state<JSONContent>(emptyDoc);
+	let contentText = $state('');
+	let featuredImage = $state<ImageRecord | null>(null);
 	let slug = $state('');
 	let publishedAtInput = $state('');
 
@@ -34,14 +40,15 @@
 		if (cleaned !== slug) slug = cleaned;
 	});
 
-	function handleEditorUpdate(html: string, text: string) {
-		contentHtml = html;
-		content = text;
+	function handleEditorUpdate(json: JSONContent, text: string) {
+		content = json;
+		contentText = text;
 	}
 
-	function handleGenerated(generatedContent: string) {
-		editor?.setContent(generatedContent);
-		contentHtml = generatedContent;
+	function handleGenerated(generatedHtml: string) {
+		editor?.setContent(generatedHtml);
+		content = editor?.getJSON() ?? emptyDoc;
+		contentText = editor?.getText() ?? '';
 	}
 
 	async function handleSave() {
@@ -65,8 +72,9 @@
 						.split(',')
 						.map((t) => t.trim())
 						.filter(Boolean),
-					content: content || '',
-					contentHtml: contentHtml || '',
+					content,
+					contentText,
+					featuredImage,
 					status,
 					slug: slug.trim() || undefined,
 					publishedAt: fromLocalDateTimeInput(publishedAtInput)
@@ -149,6 +157,10 @@
 			</div>
 		</div>
 
+		<div class="featured-row">
+			<ImagePicker image={featuredImage} onChange={(img) => (featuredImage = img)} />
+		</div>
+
 		<div class="advanced-toggle">
 			<button
 				type="button"
@@ -215,7 +227,7 @@
 
 		<div class="form-row">
 			<div class="field full">
-				<TipTapEditor bind:this={editor} content="" onUpdate={handleEditorUpdate} />
+				<TipTapEditor bind:this={editor} content={emptyDoc} onUpdate={handleEditorUpdate} />
 			</div>
 		</div>
 	</div>
@@ -287,6 +299,10 @@
 		margin-bottom: var(--space-4);
 		flex-wrap: wrap;
 		align-items: flex-end;
+	}
+
+	.featured-row {
+		margin-bottom: var(--space-4);
 	}
 
 	.field.title-field {

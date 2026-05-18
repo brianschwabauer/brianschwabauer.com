@@ -9,6 +9,11 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 		.map((post) => {
 			const pubDate = post.publishedAt ? new Date(post.publishedAt).toUTCString() : '';
 			const desc = post.summary ?? post.aiSummary;
+			const img = post.featuredImage;
+			// RSS enclosure for the featured image — readers display it as a thumbnail
+			const enclosure = img
+				? `<enclosure url="${siteUrl}/cdn/image/${img.path}/default" type="${escapeAttr(img.mime_type)}" length="0" />`
+				: '';
 			return `
 		<item>
 			<title><![CDATA[${post.title}]]></title>
@@ -17,6 +22,7 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 			${desc ? `<description><![CDATA[${desc}]]></description>` : ''}
 			${pubDate ? `<pubDate>${pubDate}</pubDate>` : ''}
 			${post.category ? `<category>${post.category}</category>` : ''}
+			${enclosure}
 		</item>`;
 		})
 		.join('\n');
@@ -41,3 +47,7 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 		}
 	});
 };
+
+function escapeAttr(s: string): string {
+	return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+}
