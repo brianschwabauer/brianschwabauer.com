@@ -35,6 +35,18 @@ export interface BlogImageAttrs {
 	widthMode: WidthMode;
 	widthPct: number;
 	variants: string;
+	/**
+	 * Transient flag for the optimistic upload placeholder. Only ever true
+	 * while a drop/paste upload is in flight. Stripped from saved JSON by
+	 * TipTapEditor.svelte so storage never carries blob URLs.
+	 */
+	uploading: boolean;
+	/**
+	 * Transient correlation ID. Set on placeholder insertion so the drop
+	 * handler can find the right node to replace once the upload resolves.
+	 * Also stripped from saved JSON.
+	 */
+	uploadId: string | null;
 }
 
 declare module '@tiptap/core' {
@@ -96,6 +108,17 @@ export const BlogImage = Node.create({
 				parseHTML: (el) => el.dataset.variants || '[]',
 				renderHTML: (attrs) => (attrs.variants ? { 'data-variants': attrs.variants } : {}),
 			},
+			// Transient placeholder state — never parsed from or rendered to HTML
+			uploading: {
+				default: false,
+				parseHTML: () => false,
+				renderHTML: () => ({}),
+			},
+			uploadId: {
+				default: null,
+				parseHTML: () => null,
+				renderHTML: () => ({}),
+			},
 		};
 	},
 
@@ -153,6 +176,8 @@ export const BlogImage = Node.create({
 							variants: '[]',
 							width: 0,
 							height: 0,
+							uploading: false,
+							uploadId: null,
 							...attrs,
 						},
 					}),
