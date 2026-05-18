@@ -1,5 +1,4 @@
 import { SvelteKitAuth } from '@auth/sveltekit';
-import GitHub from '@auth/sveltekit/providers/github';
 import Google from '@auth/sveltekit/providers/google';
 
 function parseAdminEmails(raw: string | undefined): Set<string> {
@@ -28,10 +27,6 @@ export function createAuth(platform: App.Platform | undefined) {
 	return SvelteKitAuth({
 		session: { strategy: 'jwt' },
 		providers: [
-			GitHub({
-				clientId: env.AUTH_GITHUB_ID,
-				clientSecret: env.AUTH_GITHUB_SECRET
-			}),
 			Google({
 				clientId: env.AUTH_GOOGLE_ID,
 				clientSecret: env.AUTH_GOOGLE_SECRET
