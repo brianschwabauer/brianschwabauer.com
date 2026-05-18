@@ -231,6 +231,30 @@
 		transform: translateX(-50%);
 	}
 
+	/* While the user is dragging a side handle, drive the figure's width
+	   from a pixel custom-property so it tracks the cursor continuously
+	   (with magnetic-snap gravity applied in BlogImageNodeView). Universal
+	   margin-50% / translate(-50%) centering matches the wide/full modes
+	   and works for any width up to the viewport. */
+	.body-host :global(figure.blog-img.is-dragging) {
+		width: var(--blog-img-drag-px) !important;
+		max-width: 100vw !important;
+		margin-left: 50% !important;
+		margin-right: 0 !important;
+		transform: translateX(-50%) !important;
+	}
+
+	/* After release: animate from the drag-time pixel width to the
+	   committed mode's natural width. Centering is held at 50%/translate
+	   for the duration so a normal-mode landing doesn't jump horizontally
+	   while shrinking from a wider intermediate. */
+	.body-host :global(figure.blog-img.is-snapping) {
+		transition: width 280ms cubic-bezier(0.34, 1.2, 0.64, 1);
+		margin-left: 50% !important;
+		margin-right: 0 !important;
+		transform: translateX(-50%) !important;
+	}
+
 	.body-host :global(figure.blog-img .blog-img-inner) {
 		position: relative;
 		background: var(--blog-img-bg, var(--color-bg-secondary));

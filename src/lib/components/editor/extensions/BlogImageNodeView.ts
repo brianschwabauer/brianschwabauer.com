@@ -2,8 +2,12 @@
  * Vanilla NodeView for BlogImage.
  * - Renders a <figure> with image + side resize handles.
  * - Shows a small width-mode toolbar (Normal / Wide / Full) when selected.
- * - Dragging a side handle in 'normal' mode adjusts widthPct.
- *   Past column edges, it snaps to 'wide' then 'full'. Dragging back shrinks.
+ * - Dragging a side handle scales the figure's pixel width in real time.
+ *   As the cursor approaches a discrete breakpoint (column-width / wide /
+ *   full), magnetic gravity pulls the visual width toward that snap point;
+ *   moving past the escape radius releases it back to following the cursor.
+ *   Releasing commits the closest discrete state and a short CSS transition
+ *   animates from the drag-time pixel width to the mode's natural width.
  *
  * Uses ProseMirror's NodeView contract (instead of an extra svelte adapter dep).
  */
@@ -16,7 +20,18 @@ interface ViewState {
 	pct: number;
 }
 
+interface SnapPoint {
+	px: number;
+	mode: WidthMode;
+	pct: number;
+}
+
 const WIDE_PX = 1100;
+// Cursor distance from a snap point at which magnetic pull engages. Once
+// snapped, the user must drag past ESCAPE_RADIUS to break out — gives the
+// snaps a sticky-but-escapable feel without flickering near boundaries.
+const SNAP_RADIUS = 60;
+const ESCAPE_RADIUS = 100;
 
 export function createBlogImageNodeView(): NodeViewRenderer {
 	return (props: NodeViewRendererProps) => {
@@ -174,79 +189,111 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 			handle.addEventListener('pointerdown', (e) => {
 				e.preventDefault();
 				e.stopPropagation();
-				const startX = e.clientX;
-				const parent = dom.parentElement;
-				const columnWidth = parent
-					? parent.getBoundingClientRect().width
-					: 720;
-				const startState: ViewState = {
-					mode: (node.attrs.widthMode as WidthMode) || 'normal',
-					pct: Number(node.attrs.widthPct) || 100,
-				};
 
+				const startX = e.clientX;
+				const startWidthPx = dom.getBoundingClientRect().width;
+				const parent = dom.parentElement;
+				const colWidth = parent ? parent.getBoundingClientRect().width : 720;
+				const viewport = window.innerWidth;
+				const minWidthPx = Math.max(120, 0.3 * colWidth);
+
+				const snapPoints: SnapPoint[] = [
+					{ px: colWidth, mode: 'normal', pct: 100 },
+					{ px: WIDE_PX, mode: 'wide', pct: 100 },
+					{ px: viewport, mode: 'full', pct: 100 },
+				];
+
+				let snappedTo: SnapPoint | null = null;
+
+				// Seed the drag-time width to the current rendered width BEFORE
+				// flipping is-dragging — otherwise the figure paints one frame
+				// with width:auto (invalid-var fallback) and visibly jumps.
+				dom.style.setProperty('--blog-img-drag-px', `${startWidthPx}px`);
+				dom.classList.add('is-dragging');
 				handle.setPointerCapture(e.pointerId);
+
 				const onMove = (ev: PointerEvent) => {
 					ev.preventDefault();
-					// Two handles, mirrored: dragging outward on either side widens.
+					// Two handles mirrored: dragging outward on either side widens
+					// the figure by 2 * deltaPx (one handle's contribution per side).
 					const deltaPx = (ev.clientX - startX) * direction;
-					const next = computeNextState(startState, deltaPx, columnWidth);
-					applyAttrs({ ...node.attrs, widthMode: next.mode, widthPct: next.pct });
+					const targetPx = clamp(startWidthPx + deltaPx * 2, minWidthPx, viewport);
+
+					const radius = snappedTo ? ESCAPE_RADIUS : SNAP_RADIUS;
+					let nearest: SnapPoint | null = null;
+					let minDist = Infinity;
+					for (const sp of snapPoints) {
+						const d = Math.abs(targetPx - sp.px);
+						if (d < minDist && d <= radius) {
+							minDist = d;
+							nearest = sp;
+						}
+					}
+
+					let displayedPx: number;
+					if (nearest) {
+						snappedTo = nearest;
+						// Magnetic gravity: zero follow at the snap point, full
+						// follow at the escape boundary — keeps the visual width
+						// continuous when the user breaks out of the snap zone.
+						const pull = targetPx - nearest.px;
+						const t = Math.min(1, Math.abs(pull) / ESCAPE_RADIUS);
+						const gravity = 0.35;
+						const eased = gravity * t + (1 - gravity) * t * t;
+						displayedPx = nearest.px + Math.sign(pull) * eased * ESCAPE_RADIUS;
+					} else {
+						snappedTo = null;
+						displayedPx = targetPx;
+					}
+
+					dom.style.setProperty('--blog-img-drag-px', `${displayedPx}px`);
 				};
+
 				const onUp = (ev: PointerEvent) => {
 					ev.preventDefault();
 					handle.removeEventListener('pointermove', onMove);
 					handle.removeEventListener('pointerup', onUp);
 					handle.removeEventListener('pointercancel', onUp);
 					handle.releasePointerCapture(e.pointerId);
+
 					const deltaPx = (ev.clientX - startX) * direction;
-					const next = computeNextState(startState, deltaPx, columnWidth);
-					updateAttrs({ widthMode: next.mode, widthPct: next.pct });
+					const targetPx = clamp(startWidthPx + deltaPx * 2, minWidthPx, viewport);
+
+					let finalState: ViewState;
+					if (snappedTo) {
+						finalState = { mode: snappedTo.mode, pct: snappedTo.pct };
+					} else if (targetPx <= colWidth) {
+						const pct = clamp(Math.round((targetPx / colWidth) * 100), 30, 100);
+						finalState = { mode: 'normal', pct };
+					} else {
+						// Released outside any snap zone between snap points — pick
+						// the nearest mode by midpoint so release direction matches
+						// the user's intent.
+						const mid1 = (colWidth + WIDE_PX) / 2;
+						const mid2 = (WIDE_PX + viewport) / 2;
+						if (targetPx <= mid1) finalState = { mode: 'normal', pct: 100 };
+						else if (targetPx <= mid2) finalState = { mode: 'wide', pct: 100 };
+						else finalState = { mode: 'full', pct: 100 };
+					}
+
+					// Enable the transition first (with the drag-time pixel width
+					// still applied), then commit the discrete state and drop
+					// is-dragging in the next frame — width animates from the
+					// pixel value to the committed mode's natural width.
+					dom.classList.add('is-snapping');
+					applyAttrs({ ...node.attrs, widthMode: finalState.mode, widthPct: finalState.pct });
+					updateAttrs({ widthMode: finalState.mode, widthPct: finalState.pct });
+					requestAnimationFrame(() => {
+						dom.classList.remove('is-dragging');
+						dom.style.removeProperty('--blog-img-drag-px');
+					});
+					setTimeout(() => dom.classList.remove('is-snapping'), 360);
 				};
+
 				handle.addEventListener('pointermove', onMove);
 				handle.addEventListener('pointerup', onUp);
 				handle.addEventListener('pointercancel', onUp);
 			});
-		}
-
-		function computeNextState(start: ViewState, deltaPx: number, colWidth: number): ViewState {
-			// Both handles' deltaPx is positive when dragging outward (wider).
-			// Translate the total widening (left+right both move outward → multiply by 2).
-			const widthChangePx = deltaPx * 2;
-			const viewport = typeof window !== 'undefined' ? window.innerWidth : colWidth;
-
-			if (start.mode === 'normal') {
-				const startWidthPx = (start.pct / 100) * colWidth;
-				const newWidthPx = startWidthPx + widthChangePx;
-				// Past the column → wide
-				if (newWidthPx > colWidth + 80) {
-					if (newWidthPx > WIDE_PX + 80) return { mode: 'full', pct: 100 };
-					return { mode: 'wide', pct: 100 };
-				}
-				const pct = clamp(Math.round((newWidthPx / colWidth) * 100), 30, 100);
-				return { mode: 'normal', pct };
-			}
-
-			if (start.mode === 'wide') {
-				const startWidthPx = WIDE_PX;
-				const newWidthPx = startWidthPx + widthChangePx;
-				if (newWidthPx < colWidth - 80) {
-					const pct = clamp(Math.round((newWidthPx / colWidth) * 100), 30, 100);
-					return { mode: 'normal', pct };
-				}
-				if (newWidthPx > viewport - 80) return { mode: 'full', pct: 100 };
-				return { mode: 'wide', pct: 100 };
-			}
-
-			// start.mode === 'full'
-			const newWidthPx = viewport + widthChangePx;
-			if (newWidthPx < WIDE_PX - 80) {
-				if (newWidthPx < colWidth - 80) {
-					const pct = clamp(Math.round((newWidthPx / colWidth) * 100), 30, 100);
-					return { mode: 'normal', pct };
-				}
-				return { mode: 'wide', pct: 100 };
-			}
-			return { mode: 'full', pct: 100 };
 		}
 
 		function updateAttrs(patch: Partial<Record<string, unknown>>) {
