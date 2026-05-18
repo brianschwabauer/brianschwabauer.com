@@ -6,10 +6,12 @@
 	import Link from '@tiptap/extension-link';
 	import { BlogImage } from './extensions/BlogImage';
 	import { imageDropHandler, recordToBlogImageAttrs } from './extensions/imageDropHandler';
+	import { SlashCommand } from './extensions/slashCommand';
 	import MediaLibrary from '$lib/components/media/MediaLibrary.svelte';
 	import { notify } from '$lib/components/dialogs';
 	import EditorBubbleMenu from './EditorBubbleMenu.svelte';
 	import EditorPlusMenu from './EditorPlusMenu.svelte';
+	import EditorSlashMenu from './EditorSlashMenu.svelte';
 	import EditorMobileBar from './EditorMobileBar.svelte';
 	import type { ImageRecord } from '$lib/client/images';
 
@@ -49,6 +51,12 @@
 	let editor: Editor | null = $state(null);
 	let libraryOpen = $state(false);
 	let isDocEmpty = $state(true);
+	// Plain mutable ref shared with EditorSlashMenu — the SlashCommand
+	// extension calls `.onKeyDown` to give the menu a chance to intercept
+	// navigation keys before ProseMirror processes them.
+	const slashRef: { onKeyDown: (event: KeyboardEvent) => boolean } = {
+		onKeyDown: () => false,
+	};
 
 	onMount(() => {
 		editor = new Editor({
@@ -67,6 +75,9 @@
 							tone: 'error',
 						});
 					},
+				}),
+				SlashCommand.configure({
+					onKeyDown: (event) => slashRef.onKeyDown(event),
 				}),
 			],
 			content: content ?? '',
@@ -145,6 +156,7 @@
 
 <EditorBubbleMenu {editor} {onAiAction} />
 <EditorPlusMenu {editor} onPickImage={openMediaLibrary} />
+<EditorSlashMenu {editor} {slashRef} onPickImage={openMediaLibrary} />
 <EditorMobileBar {editor} onPickImage={openMediaLibrary} />
 
 <MediaLibrary bind:open={libraryOpen} onSelect={insertFromLibrary} title="Insert Image" />
