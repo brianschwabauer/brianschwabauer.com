@@ -54,16 +54,46 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 		const toolbar = document.createElement('div');
 		toolbar.className = 'blog-img-toolbar';
 		toolbar.setAttribute('contenteditable', 'false');
+		// Width-mode icons: an outer "page" frame with a filled "image" rect
+		// inside that grows narrow → wider → full bleed. Native title attrs
+		// surface the human label on hover.
 		toolbar.innerHTML = `
-			<button type="button" data-mode="normal" title="Normal width">N</button>
-			<button type="button" data-mode="wide" title="Wide">W</button>
-			<button type="button" data-mode="full" title="Full bleed">F</button>
+			<button type="button" data-mode="normal" title="Inline (text column width)" aria-label="Inline (text column width)">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+					<rect x="3" y="6" width="18" height="12" rx="1.5" />
+					<rect x="9" y="9.5" width="6" height="5" rx="0.75" fill="currentColor" stroke="none" />
+				</svg>
+			</button>
+			<button type="button" data-mode="wide" title="Wide (break out past text column)" aria-label="Wide">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+					<rect x="3" y="6" width="18" height="12" rx="1.5" />
+					<rect x="6" y="9.5" width="12" height="5" rx="0.75" fill="currentColor" stroke="none" />
+				</svg>
+			</button>
+			<button type="button" data-mode="full" title="Full bleed (edge-to-edge)" aria-label="Full bleed">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+					<rect x="3" y="6" width="18" height="12" rx="1.5" />
+					<rect x="3" y="9.5" width="18" height="5" fill="currentColor" stroke="none" />
+				</svg>
+			</button>
 			<span class="blog-img-sep"></span>
-			<button type="button" data-action="alt" title="Edit alt text">Alt</button>
+			<button type="button" data-action="alt" title="Edit alt text" aria-label="Edit alt text">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M5 18 9 7l4 11" />
+					<path d="M6.5 14h5" />
+					<path d="M15 18v-7" />
+					<path d="M15 18h4" />
+					<path d="M15 14h3" />
+					<path d="M15 11h4" />
+				</svg>
+			</button>
 		`;
-		inner.appendChild(toolbar);
 
 		dom.appendChild(inner);
+		// Toolbar must sit on the outer figure, not inside .blog-img-inner —
+		// the inner has overflow:hidden so the image clips to its border-radius,
+		// which would also clip a toolbar placed at top: -Xpx.
+		dom.appendChild(toolbar);
 
 		// ── render attrs onto the DOM ───────────────────────────────────────
 		function applyAttrs(attrs: Record<string, unknown>) {
