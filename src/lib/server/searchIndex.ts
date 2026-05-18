@@ -1,59 +1,16 @@
 import type { KVNamespace } from '@cloudflare/workers-types';
-import { create, insertMultiple } from '@orama/orama';
-import { persist, restore } from '@orama/plugin-data-persistence';
+import { create, insertMultiple, save, load } from '@orama/orama';
 import { listAllPublished, type BlogPost, type BlogPostMeta } from './blog';
 import { EMBEDDING_DIM } from './embeddings';
+import {
+	indexSchema,
+	vectorIndexSchema,
+	type SearchEntry,
+	type VectorSearchEntry
+} from '$lib/search';
 
 const INDEX_KEY = '/index.json';
 const VECTOR_INDEX_KEY = '/index-vectors.json';
-
-export const indexSchema = {
-	id: 'string',
-	type: 'string',
-	title: 'string',
-	summary: 'string',
-	body: 'string',
-	category: 'string',
-	tags: 'string[]',
-	date: 'number',
-	url: 'string'
-} as const;
-
-export const vectorIndexSchema = {
-	id: 'string',
-	type: 'string',
-	title: 'string',
-	summary: 'string',
-	category: 'string',
-	tags: 'string[]',
-	date: 'number',
-	url: 'string',
-	embedding: `vector[${EMBEDDING_DIM}]`
-} as const;
-
-export interface SearchEntry {
-	id: string;
-	type: 'blog' | 'home';
-	title: string;
-	summary: string;
-	body: string;
-	category: string;
-	tags: string[];
-	date: number;
-	url: string;
-}
-
-export interface VectorSearchEntry {
-	id: string;
-	type: 'blog';
-	title: string;
-	summary: string;
-	category: string;
-	tags: string[];
-	date: number;
-	url: string;
-	embedding: number[];
-}
 
 function stripHtml(html: string): string {
 	return html
@@ -118,8 +75,7 @@ export async function rebuildIndex(kv: KVNamespace): Promise<void> {
 	if (entries.length > 0) {
 		await insertMultiple(db, entries as unknown as Record<string, unknown>[]);
 	}
-	const persisted = await persist(db, 'json');
-	await kv.put(INDEX_KEY, persisted as string);
+	await kv.put(INDEX_KEY, JSON.stringify(save(db)));
 }
 
 export async function rebuildVectorIndex(kv: KVNamespace): Promise<void> {
@@ -141,8 +97,7 @@ export async function rebuildVectorIndex(kv: KVNamespace): Promise<void> {
 	if (entries.length > 0) {
 		await insertMultiple(db, entries as unknown as Record<string, unknown>[]);
 	}
-	const persisted = await persist(db, 'json');
-	await kv.put(VECTOR_INDEX_KEY, persisted as string);
+	await kv.put(VECTOR_INDEX_KEY, JSON.stringify(save(db)));
 }
 
 export async function readPersistedIndex(kv: KVNamespace): Promise<string | null> {
@@ -153,4 +108,8 @@ export async function readPersistedVectorIndex(kv: KVNamespace): Promise<string 
 	return kv.get(VECTOR_INDEX_KEY);
 }
 
-export { restore };
+export function restoreVectorIndex(persisted: string) {
+	const db = create({ schema: vectorIndexSchema });
+	load(db, JSON.parse(persisted));
+	return db;
+}
