@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
+	import { invalidateAll } from '$app/navigation';
 	import { Button } from '@delightstack/components/actions';
 	import { create, insertMultiple, search, type AnyOrama, type Results } from '@orama/orama';
 	import type { BlogPostMeta, BlogStatus } from '$lib/server/blog';
@@ -28,13 +29,11 @@
 	let query = $state('');
 	let statusFilter = $state<StatusFilter>('all');
 	let sortKey = $state<SortKey>('updated-desc');
+	let busySlug = $state<string | null>(null);
+	let actionError = $state<string | null>(null);
 
 	let db = $state<AnyOrama | null>(null);
 	let matchedIds = $state<Set<string> | null>(null);
-
-	const postsBySlug = $derived(
-		new Map(data.posts.map((p: BlogPostMeta) => [p.slug, p]))
-	);
 
 	onMount(async () => {
 		const next = create({ schema: adminSchema });
@@ -120,6 +119,41 @@
 			year: 'numeric'
 		});
 	}
+
+	async function togglePinned(post: BlogPostMeta) {
+		if (busySlug) return;
+		busySlug = post.slug;
+		actionError = null;
+		try {
+			const res = await fetch(`/api/blog/${post.slug}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ pinned: !post.pinned })
+			});
+			if (!res.ok) throw new Error(`Pin failed (${res.status})`);
+			await invalidateAll();
+		} catch (err) {
+			actionError = err instanceof Error ? err.message : 'Failed to update pin state';
+		} finally {
+			busySlug = null;
+		}
+	}
+
+	async function deletePost(post: BlogPostMeta) {
+		if (busySlug) return;
+		if (!confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
+		busySlug = post.slug;
+		actionError = null;
+		try {
+			const res = await fetch(`/api/blog/${post.slug}`, { method: 'DELETE' });
+			if (!res.ok) throw new Error(`Delete failed (${res.status})`);
+			await invalidateAll();
+		} catch (err) {
+			actionError = err instanceof Error ? err.message : 'Failed to delete post';
+		} finally {
+			busySlug = null;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -176,26 +210,76 @@
 	</div>
 </div>
 
+{#if actionError}
+	<div class="action-error" role="alert">{actionError}</div>
+{/if}
+
 {#if visiblePosts.length > 0}
 	<div class="posts-list">
 		{#each visiblePosts as post (post.slug)}
-			<a href="/admin/blog/{post.slug}" class="post-item">
-				<div class="post-info">
-					<h3 class="post-title">{post.title}</h3>
-					<div class="post-meta">
-						<span class="post-status" class:published={post.status === 'published'} class:archived={post.status === 'archived'}>
-							{post.status}
-						</span>
-						<span class="post-date">{formatDate(post.publishedAt ?? post.updatedAt)}</span>
-						{#if post.category}
-							<span class="post-category">{post.category}</span>
-						{/if}
+			<div class="post-item" class:pinned={post.pinned} class:busy={busySlug === post.slug}>
+				<a href="/admin/blog/{post.slug}" class="post-link">
+					<div class="post-info">
+						<h3 class="post-title">
+							{#if post.pinned}
+								<span class="pin-badge" title="Pinned to top of blog" aria-label="Pinned">
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+										<line x1="12" x2="12" y1="17" y2="22" />
+										<path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
+									</svg>
+								</span>
+							{/if}
+							{post.title}
+						</h3>
+						<div class="post-meta">
+							<span class="post-status" class:published={post.status === 'published'} class:archived={post.status === 'archived'}>
+								{post.status}
+							</span>
+							<span class="post-date">{formatDate(post.publishedAt ?? post.updatedAt)}</span>
+							{#if post.category}
+								<span class="post-category">{post.category}</span>
+							{/if}
+						</div>
 					</div>
+				</a>
+				<div class="post-actions">
+					<Button
+						transparent
+						icon
+						popoverPlacement="bottom-end"
+						popoverCloseOnInsideClick
+						aria-label="More actions for {post.title}"
+						disabled={busySlug === post.slug}
+					>
+						<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="more-icon">
+							<circle cx="5" cy="12" r="2" />
+							<circle cx="12" cy="12" r="2" />
+							<circle cx="19" cy="12" r="2" />
+						</svg>
+						{#snippet menu()}
+							<div class="menu">
+								<button type="button" class="menu-item" onclick={() => togglePinned(post)}>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="menu-icon">
+										<line x1="12" x2="12" y1="17" y2="22" />
+										<path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
+									</svg>
+									{post.pinned ? 'Unpin from top' : 'Pin to top'}
+								</button>
+								<button type="button" class="menu-item danger" onclick={() => deletePost(post)}>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="menu-icon">
+										<polyline points="3 6 5 6 21 6" />
+										<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+										<path d="M10 11v6" />
+										<path d="M14 11v6" />
+										<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+									</svg>
+									Delete post
+								</button>
+							</div>
+						{/snippet}
+					</Button>
 				</div>
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chevron">
-					<polyline points="9 18 15 12 9 6" />
-				</svg>
-			</a>
+			</div>
 		{/each}
 	</div>
 {:else if data.posts.length === 0}
@@ -215,7 +299,8 @@
 	.page-header,
 	.controls,
 	.posts-list,
-	.empty-state {
+	.empty-state,
+	.action-error {
 		max-width: var(--measure);
 		margin-left: auto;
 		margin-right: auto;
@@ -326,6 +411,16 @@
 		min-width: 150px;
 	}
 
+	.action-error {
+		padding: var(--space-3) var(--space-4);
+		margin-bottom: var(--space-4);
+		background: rgba(220, 60, 60, 0.08);
+		border: 1px solid rgba(220, 60, 60, 0.35);
+		color: #d33;
+		border-radius: var(--radius-md);
+		font-size: var(--text-sm);
+	}
+
 	.posts-list {
 		display: flex;
 		flex-direction: column;
@@ -334,15 +429,12 @@
 
 	.post-item {
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: var(--space-4) var(--space-5);
+		align-items: stretch;
+		gap: var(--space-1);
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
-		text-decoration: none;
-		color: inherit;
-		transition: border-color var(--transition-fast), background-color var(--transition-fast);
+		transition: border-color var(--transition-fast), background-color var(--transition-fast), opacity var(--transition-fast);
 	}
 
 	.post-item:hover {
@@ -350,10 +442,52 @@
 		background: var(--color-bg-secondary);
 	}
 
+	.post-item.pinned {
+		border-color: rgba(0, 180, 160, 0.45);
+	}
+
+	.post-item.busy {
+		opacity: 0.6;
+		pointer-events: none;
+	}
+
+	.post-link {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-3);
+		padding: var(--space-4) var(--space-2) var(--space-4) var(--space-5);
+		text-decoration: none;
+		color: inherit;
+		min-width: 0;
+	}
+
+	.post-info {
+		min-width: 0;
+	}
+
 	.post-title {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
 		font-size: var(--text-lg);
 		font-weight: 600;
 		margin-bottom: var(--space-2);
+	}
+
+	.pin-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.25rem;
+		height: 1.25rem;
+		color: var(--color-accent);
+	}
+
+	.pin-badge svg {
+		width: 100%;
+		height: 100%;
 	}
 
 	.post-meta {
@@ -361,6 +495,7 @@
 		align-items: center;
 		gap: var(--space-3);
 		font-size: var(--text-sm);
+		flex-wrap: wrap;
 	}
 
 	.post-status {
@@ -390,10 +525,60 @@
 		color: var(--color-text-secondary);
 	}
 
-	.chevron {
-		width: 20px;
-		height: 20px;
-		color: var(--color-text-muted);
+	.post-actions {
+		display: flex;
+		align-items: center;
+		padding-right: var(--space-3);
+	}
+
+	.more-icon {
+		width: 18px;
+		height: 18px;
+	}
+
+	.menu {
+		display: flex;
+		flex-direction: column;
+		min-width: 180px;
+		padding: var(--space-1);
+	}
+
+	.menu-item {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		width: 100%;
+		padding: var(--space-2) var(--space-3);
+		background: transparent;
+		border: 0;
+		border-radius: var(--radius-sm);
+		color: var(--color-text);
+		font-size: var(--text-sm);
+		text-align: left;
+		cursor: pointer;
+		transition: background-color var(--transition-fast), color var(--transition-fast);
+	}
+
+	.menu-item:hover {
+		background: var(--color-bg-secondary);
+	}
+
+	.menu-item.danger {
+		color: #d33;
+	}
+
+	.menu-item.danger:hover {
+		background: rgba(220, 60, 60, 0.08);
+	}
+
+	.menu-icon {
+		width: 16px;
+		height: 16px;
+		flex-shrink: 0;
+	}
+
+	.menu-item .menu-icon {
+		color: currentColor;
 	}
 
 	.empty-state {

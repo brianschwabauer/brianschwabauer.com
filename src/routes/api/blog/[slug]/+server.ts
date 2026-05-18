@@ -30,6 +30,7 @@ interface UpdateBody {
 	featuredImage?: ImageRecord | null;
 	coverFocalX?: number;
 	coverFocalY?: number;
+	pinned?: boolean;
 }
 
 export const GET: RequestHandler = async ({ params, platform, locals }) => {
@@ -102,6 +103,7 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 			data.coverFocalX === undefined ? existing.coverFocalX : data.coverFocalX,
 		coverFocalY:
 			data.coverFocalY === undefined ? existing.coverFocalY : data.coverFocalY,
+		pinned: data.pinned === undefined ? existing.pinned : data.pinned,
 		publishedAt:
 			data.publishedAt === undefined
 				? undefined
