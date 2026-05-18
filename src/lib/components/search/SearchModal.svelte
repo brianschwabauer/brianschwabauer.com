@@ -4,6 +4,7 @@
 	import { page } from '$app/stores';
 	import { create, load, search, type AnyOrama, type Results } from '@orama/orama';
 	import { categoryLabel, indexSchema, type SearchEntry } from '$lib/search';
+	import { bgStyle, thumbnailURL } from '$lib/client/images';
 
 	interface Props {
 		open: boolean;
@@ -283,23 +284,34 @@
 							onmouseenter={() => (activeIndex = i)}
 							onclick={() => navigate(hit)}
 						>
-							<div class="result-head">
-								<span class="result-category">{categoryLabel(hit)}</span>
-								{#if hit.date && hit.type === 'blog'}
-									<time class="result-date">{formatDate(hit.date)}</time>
-								{/if}
-							</div>
-							<div class="result-title">{hit.title}</div>
-							{#if hit.summary}
-								<div class="result-summary">{hit.summary}</div>
-							{/if}
-							{#if hit.tags && hit.tags.length > 0}
-								<div class="result-tags">
-									{#each hit.tags.slice(0, 4) as tag}
-										<span class="tag">{tag}</span>
-									{/each}
+							{#if hit.featuredImage}
+								<div class="result-thumb" style={bgStyle(hit.featuredImage)}>
+									<img
+										src={thumbnailURL(hit.featuredImage)}
+										alt=""
+										loading="lazy"
+										style:object-position="{hit.coverFocalX ?? 50}% {hit.coverFocalY ?? 50}%" />
 								</div>
 							{/if}
+							<div class="result-body">
+								<div class="result-head">
+									<span class="result-category">{categoryLabel(hit)}</span>
+									{#if hit.date && hit.type === 'blog'}
+										<time class="result-date">{formatDate(hit.date)}</time>
+									{/if}
+								</div>
+								<div class="result-title">{hit.title}</div>
+								{#if hit.summary}
+									<div class="result-summary">{hit.summary}</div>
+								{/if}
+								{#if hit.tags && hit.tags.length > 0}
+									<div class="result-tags">
+										{#each hit.tags.slice(0, 4) as tag}
+											<span class="tag">{tag}</span>
+										{/each}
+									</div>
+								{/if}
+							</div>
 						</button>
 					{/each}
 				{/if}
@@ -454,7 +466,8 @@
 	}
 
 	.result {
-		display: block;
+		display: flex;
+		gap: var(--space-3);
 		width: 100%;
 		text-align: left;
 		padding: var(--space-3) var(--space-4);
@@ -467,6 +480,27 @@
 	.result:hover,
 	.result.active {
 		background: var(--color-bg-secondary);
+	}
+
+	.result-thumb {
+		flex-shrink: 0;
+		width: 96px;
+		aspect-ratio: 3 / 2;
+		overflow: hidden;
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--color-border);
+	}
+
+	.result-thumb img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.result-body {
+		flex: 1;
+		min-width: 0;
 	}
 
 	.result-head {
