@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button } from '@delightstack/components/actions';
+	import { page } from '$app/stores';
 	import { bgStyle } from '$lib/client/images';
 
 	let { data } = $props();
@@ -17,6 +18,9 @@
 	const tags = $derived(data.post?.tags ?? []);
 	const featured = $derived(data.post?.featuredImage ?? null);
 	const ogImage = $derived(featured ? `/cdn/image/${featured.path}/default` : null);
+	const isAdmin = $derived(
+		($page.data.session?.user as { role?: string } | undefined)?.role === 'admin'
+	);
 </script>
 
 <svelte:head>
@@ -40,6 +44,19 @@
 
 <article class="post-page">
 	{#if data.post}
+		{#if isAdmin}
+			<a class="edit-post-fab" href={`/admin/blog/${data.post.slug}`} title="Edit this post">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+					<path d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+				</svg>
+				<span>Edit Post</span>
+			</a>
+		{/if}
+		{#if data.isDraftPreview}
+			<div class="draft-banner" role="status">
+				Draft preview — only visible to admins until published
+			</div>
+		{/if}
 		<header class="post-header">
 			<div class="post-meta">
 				{#if data.post.category}
@@ -108,9 +125,46 @@
 	   figures opt out and span up to --prose-wide.
 	*/
 	.post-page {
+		position: relative;
 		max-width: var(--prose-wide);
 		margin: 0 auto;
 		padding: var(--space-12) var(--space-4) var(--space-24);
+	}
+
+	.edit-post-fab {
+		position: fixed;
+		top: 96px;
+		right: var(--space-4);
+		z-index: 30;
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-3);
+		background: var(--color-surface);
+		color: var(--color-text);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-full);
+		font-size: var(--text-sm);
+		font-weight: 500;
+		box-shadow: var(--shadow-md);
+		transition: color 120ms ease, border-color 120ms ease;
+	}
+
+	.edit-post-fab:hover {
+		color: var(--color-accent);
+		border-color: var(--color-accent);
+	}
+
+	.draft-banner {
+		max-width: var(--measure);
+		margin: 0 auto var(--space-6);
+		padding: var(--space-2) var(--space-4);
+		text-align: center;
+		font-size: var(--text-sm);
+		color: var(--color-warning);
+		background: color-mix(in oklch, var(--color-warning) 14%, transparent);
+		border: 1px solid var(--color-warning);
+		border-radius: var(--radius-md);
 	}
 
 	@media (min-width: 768px) {
