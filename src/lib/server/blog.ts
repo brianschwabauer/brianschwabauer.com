@@ -173,3 +173,34 @@ export async function deletePost(kv: KVNamespace, slug: string): Promise<void> {
 	const remaining = allIndex.posts.filter((p) => p.slug !== slug);
 	await writeIndexes(kv, remaining);
 }
+
+export class SlugConflictError extends Error {
+	constructor(slug: string) {
+		super(`A post with slug "${slug}" already exists`);
+		this.name = 'SlugConflictError';
+	}
+}
+
+export async function renamePost(
+	kv: KVNamespace,
+	oldSlug: string,
+	newSlug: string
+): Promise<BlogPost | null> {
+	if (oldSlug === newSlug) return getPost(kv, oldSlug);
+
+	const post = await getPost(kv, oldSlug);
+	if (!post) return null;
+
+	const conflict = await getPost(kv, newSlug);
+	if (conflict) throw new SlugConflictError(newSlug);
+
+	const renamed: BlogPost = { ...post, slug: newSlug, updatedAt: Date.now() };
+	await kv.put(postKey(newSlug), JSON.stringify(renamed));
+	await kv.delete(postKey(oldSlug));
+
+	const allIndex = await readIndex(kv, ALL_INDEX_KEY);
+	const others = allIndex.posts.filter((p) => p.slug !== oldSlug && p.slug !== newSlug);
+	await writeIndexes(kv, [...others, toMeta(renamed)]);
+
+	return renamed;
+}

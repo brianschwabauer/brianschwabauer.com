@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { Button } from '@delightstack/components/actions';
+	import { Expand } from '@delightstack/components/display';
 	import { Input, Select } from '@delightstack/components/form';
 	import TipTapEditor from '$lib/components/editor/TipTapEditor.svelte';
 	import DraftGenerator from '$lib/components/editor/DraftGenerator.svelte';
@@ -12,12 +13,19 @@
 	let status = $state<'draft' | 'published'>('draft');
 	let content = $state('');
 	let contentHtml = $state('');
+	let slug = $state('');
 
 	let saving = $state(false);
 	let error = $state('');
 	let generatorOpen = $state(false);
+	let advancedOpen = $state(false);
 
 	let editor: TipTapEditor;
+
+	$effect(() => {
+		const cleaned = slug.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+		if (cleaned !== slug) slug = cleaned;
+	});
 
 	function handleEditorUpdate(html: string, text: string) {
 		contentHtml = html;
@@ -52,12 +60,13 @@
 						.filter(Boolean),
 					content: content || '',
 					contentHtml: contentHtml || '',
-					status
+					status,
+					slug: slug.trim() || undefined
 				})
 			});
 
 			if (!res.ok) {
-				const data = await res.json();
+				const data = await res.json().catch(() => ({}));
 				throw new Error(data.message || 'Failed to create post');
 			}
 
@@ -88,7 +97,26 @@
 			<h1>New Post</h1>
 		</div>
 		<div class="header-actions">
-			<Button outline onclick={() => (generatorOpen = true)}>AI Generate</Button>
+			<Button
+				icon
+				transparent
+				size="00"
+				tooltip="More actions"
+				aria-label="More actions"
+				popoverCloseOnInsideClick>
+				<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+					<circle cx="12" cy="5" r="2" />
+					<circle cx="12" cy="12" r="2" />
+					<circle cx="12" cy="19" r="2" />
+				</svg>
+				{#snippet menu()}
+					<div class="action-menu">
+						<Button transparent fullWidth onclick={() => (generatorOpen = true)}>
+							AI Generate
+						</Button>
+					</div>
+				{/snippet}
+			</Button>
 			<Button onclick={handleSave} loading={saving}>Save Post</Button>
 		</div>
 	</div>
@@ -98,41 +126,77 @@
 	{/if}
 
 	<div class="edit-form">
-		<div class="form-row">
-			<div class="field full">
+		<div class="title-row">
+			<div class="field title-field">
 				<Input label="Title" bind:value={title} placeholder="Post title" />
 			</div>
+			<div class="field status-field">
+				<Select
+					label="Status"
+					bind:value={status}
+					options={[
+						{ value: 'draft', label: 'Draft' },
+						{ value: 'published', label: 'Published' }
+					]} />
+			</div>
 		</div>
+
+		<div class="advanced-toggle">
+			<button
+				type="button"
+				class="advanced-button"
+				aria-expanded={advancedOpen}
+				onclick={() => (advancedOpen = !advancedOpen)}>
+				<svg
+					viewBox="0 0 24 24"
+					fill="currentColor"
+					class="chevron"
+					class:open={advancedOpen}
+					aria-hidden="true">
+					<path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
+				</svg>
+				Advanced Settings
+			</button>
+		</div>
+
+		<Expand show={advancedOpen}>
+			<div class="advanced-panel">
+				<div class="form-row">
+					<div class="field full">
+						<Input
+							label="Slug / Path / URL"
+							bind:value={slug}
+							placeholder="auto-generated from title"
+							prefix="/blog/" />
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="field full">
+						<Input
+							type="textarea"
+							label="Summary"
+							bind:value={summary}
+							placeholder="Brief summary (leave blank to auto-generate)..." />
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="field">
+						<Input label="Category" bind:value={category} placeholder="e.g., Development" />
+					</div>
+					<div class="field">
+						<Input
+							label="Tags (comma-separated)"
+							bind:value={tags}
+							placeholder="svelte, typescript, web" />
+					</div>
+				</div>
+			</div>
+		</Expand>
 
 		<div class="form-row">
 			<div class="field full">
-				<Input
-					type="textarea"
-					label="Summary"
-					bind:value={summary}
-					placeholder="Brief summary (leave blank to auto-generate)..."
-				/>
-			</div>
-		</div>
-
-		<div class="form-row">
-			<div class="field">
-				<Input label="Category" bind:value={category} placeholder="e.g., Development" />
-			</div>
-			<div class="field">
-				<Input label="Tags (comma-separated)" bind:value={tags} placeholder="svelte, typescript, web" />
-			</div>
-			<div class="field">
-				<Select label="Status" bind:value={status} options={[
-					{ value: 'draft', label: 'Draft' },
-					{ value: 'published', label: 'Published' }
-				]} />
-			</div>
-		</div>
-
-		<div class="form-row">
-			<div class="field full">
-				<label>Content</label>
 				<TipTapEditor bind:this={editor} content="" onUpdate={handleEditorUpdate} />
 			</div>
 		</div>
@@ -178,7 +242,15 @@
 
 	.header-actions {
 		display: flex;
-		gap: var(--space-3);
+		gap: var(--space-2);
+		align-items: center;
+	}
+
+	.action-menu {
+		display: flex;
+		flex-direction: column;
+		min-width: 180px;
+		padding: var(--space-1);
 	}
 
 	.error {
@@ -191,10 +263,75 @@
 		font-size: var(--text-sm);
 	}
 
+	.title-row {
+		display: flex;
+		gap: var(--space-4);
+		margin-bottom: var(--space-4);
+		flex-wrap: wrap;
+		align-items: flex-end;
+	}
+
+	.field.title-field {
+		flex: 1 1 240px;
+		min-width: 240px;
+	}
+
+	.field.status-field {
+		flex: 0 0 140px;
+		min-width: 140px;
+		width: 140px;
+	}
+
+	.advanced-toggle {
+		margin: var(--space-2) 0 var(--space-4);
+	}
+
+	.advanced-button {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		background: none;
+		border: none;
+		padding: var(--space-2) 0;
+		color: var(--color-text-secondary);
+		font-size: var(--text-sm);
+		font-weight: 500;
+		cursor: pointer;
+	}
+
+	.advanced-button:hover {
+		color: var(--color-accent);
+	}
+
+	.advanced-button .chevron {
+		width: 16px;
+		height: 16px;
+		transform: rotate(-90deg);
+		transition: transform 200ms ease;
+	}
+
+	.advanced-button .chevron.open {
+		transform: rotate(0deg);
+	}
+
+	.advanced-panel {
+		padding: var(--space-4);
+		margin-bottom: var(--space-6);
+		border: 1px solid var(--color-border, rgba(127, 127, 127, 0.2));
+		border-radius: var(--radius-md);
+		background: rgba(127, 127, 127, 0.04);
+		min-width: 0;
+	}
+
 	.form-row {
 		display: flex;
 		gap: var(--space-4);
 		margin-bottom: var(--space-6);
+		flex-wrap: wrap;
+	}
+
+	.advanced-panel .form-row:last-child {
+		margin-bottom: 0;
 	}
 
 	.field {
@@ -204,27 +341,5 @@
 	.field.full {
 		flex: none;
 		width: 100%;
-	}
-
-	.field label {
-		display: block;
-		font-size: var(--text-sm);
-		font-weight: 500;
-		margin-bottom: var(--space-2);
-	}
-
-	.field input,
-	.field textarea,
-	.field select {
-		width: 100%;
-	}
-
-	.field select {
-		appearance: none;
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23666'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
-		background-repeat: no-repeat;
-		background-position: right 12px center;
-		background-size: 16px;
-		padding-right: 40px;
 	}
 </style>

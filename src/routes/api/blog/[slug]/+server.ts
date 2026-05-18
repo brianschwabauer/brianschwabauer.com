@@ -1,6 +1,13 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { deletePost, getPost, savePost } from '$lib/server/blog';
+import {
+	deletePost,
+	getPost,
+	renamePost,
+	savePost,
+	slugify,
+	SlugConflictError
+} from '$lib/server/blog';
 import { rebuildIndex, rebuildVectorIndex } from '$lib/server/searchIndex';
 import { augmentWithAi } from '$lib/server/blogAi';
 
@@ -34,6 +41,24 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 	const nextContent = data.content ?? existing.content;
 	const userSummary = data.summary !== undefined ? data.summary : existing.summary;
 
+	let workingSlug = existing.slug;
+	if (typeof data.slug === 'string') {
+		const requested = slugify(data.slug);
+		if (!requested) throw error(400, 'Invalid slug');
+		if (requested !== existing.slug) {
+			try {
+				const renamed = await renamePost(env.KV, existing.slug, requested);
+				if (!renamed) throw error(404, 'Post not found');
+				workingSlug = requested;
+			} catch (err) {
+				if (err instanceof SlugConflictError) {
+					throw error(409, 'A post with this slug already exists');
+				}
+				throw err;
+			}
+		}
+	}
+
 	const { aiSummary, embedding, contentHash } = await augmentWithAi(env, {
 		title: nextTitle,
 		content: nextContent,
@@ -42,7 +67,7 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 	});
 
 	const updated = await savePost(env.KV, {
-		slug: existing.slug,
+		slug: workingSlug,
 		title: nextTitle,
 		content: nextContent,
 		contentHtml: data.contentHtml ?? existing.contentHtml,

@@ -25,13 +25,22 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	if (!platform?.env?.KV) throw error(500, 'KV not available');
 
 	const data = await request.json();
-	const { title, content, contentHtml, summary, category, tags, status } = data;
+	const { title, content, contentHtml, summary, category, tags, status, slug } = data;
 
 	if (!title || typeof title !== 'string') throw error(400, 'Title is required');
 	if (typeof content !== 'string') throw error(400, 'Content is required');
 
 	const env = platform.env;
-	const targetSlug = slugify(title);
+
+	let explicitSlug: string | undefined;
+	if (typeof slug === 'string' && slug.trim()) {
+		explicitSlug = slugify(slug);
+		if (!explicitSlug) throw error(400, 'Invalid slug');
+		const conflict = await getPost(env.KV, explicitSlug);
+		if (conflict) throw error(409, 'A post with this slug already exists');
+	}
+
+	const targetSlug = explicitSlug ?? slugify(title);
 	const existing = targetSlug ? await getPost(env.KV, targetSlug) : null;
 
 	try {
@@ -43,6 +52,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 		});
 
 		const post = await savePost(env.KV, {
+			slug: explicitSlug,
 			title,
 			content,
 			contentHtml: contentHtml || '',
