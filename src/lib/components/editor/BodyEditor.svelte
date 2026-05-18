@@ -7,6 +7,7 @@
 	import { BlogImage } from './extensions/BlogImage';
 	import { imageDropHandler, recordToBlogImageAttrs } from './extensions/imageDropHandler';
 	import MediaLibrary from '$lib/components/media/MediaLibrary.svelte';
+	import { notify } from '$lib/components/dialogs';
 	import EditorBubbleMenu from './EditorBubbleMenu.svelte';
 	import EditorPlusMenu from './EditorPlusMenu.svelte';
 	import EditorMobileBar from './EditorMobileBar.svelte';
@@ -60,7 +61,11 @@
 				imageDropHandler.configure({
 					onUploadError: (err, file) => {
 						console.error(`Failed to upload ${file.name}:`, err);
-						alert(`Failed to upload ${file.name}: ${err.message}`);
+						void notify({
+							title: 'Upload failed',
+							message: `Couldn’t upload ${file.name}: ${err.message}`,
+							tone: 'error',
+						});
 					},
 				}),
 			],

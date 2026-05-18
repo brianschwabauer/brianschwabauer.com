@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
-	import { Button } from '@delightstack/components/actions';
+	import { Button, alert } from '@delightstack/components/actions';
 	import { create, insertMultiple, search, type AnyOrama, type Results } from '@orama/orama';
 	import type { BlogPostMeta, BlogStatus } from '$lib/server/blog';
 
@@ -141,7 +141,13 @@
 
 	async function deletePost(post: BlogPostMeta) {
 		if (busySlug) return;
-		if (!confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
+		const ok = await alert({
+			title: 'Delete this post?',
+			message: `“${post.title}” will be removed permanently. This can’t be undone.`,
+			continueText: 'Delete',
+			destructive: true,
+		});
+		if (!ok) return;
 		busySlug = post.slug;
 		actionError = null;
 		try {

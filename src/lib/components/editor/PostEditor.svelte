@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { Button } from '@delightstack/components/actions';
+	import { Button, alert } from '@delightstack/components/actions';
 	import TitleEditor from './TitleEditor.svelte';
 	import BodyEditor from './BodyEditor.svelte';
 	import FeaturedImagePicker from './FeaturedImagePicker.svelte';
@@ -204,7 +204,13 @@
 			goto('/admin');
 			return;
 		}
-		if (!confirm('Delete this post? This cannot be undone.')) return;
+		const ok = await alert({
+			title: 'Delete this post?',
+			message: 'This can’t be undone — the post will be removed permanently.',
+			continueText: 'Delete',
+			destructive: true,
+		});
+		if (!ok) return;
 		deleting = true;
 		try {
 			const res = await fetch(`/api/blog/${initial?.slug}`, { method: 'DELETE' });

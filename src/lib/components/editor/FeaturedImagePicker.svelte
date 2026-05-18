@@ -1,5 +1,6 @@
 <script lang="ts">
 	import MediaLibrary from '$lib/components/media/MediaLibrary.svelte';
+	import { prompt } from '$lib/components/dialogs';
 	import { bgStyle, type ImageRecord } from '$lib/client/images';
 
 	interface Props {
@@ -59,9 +60,14 @@
 		repositioning = false;
 	}
 
-	function handleAltEdit() {
+	async function handleAltEdit() {
 		if (!image) return;
-		const next = prompt('Alt text for the cover image:', image.alt_text ?? '');
+		const next = await prompt({
+			title: 'Cover image alt text',
+			message: 'A short description used by screen readers and shown if the image fails to load.',
+			value: image.alt_text ?? '',
+			placeholder: 'Describe the image…',
+		});
 		if (next === null) return;
 		const cleaned = next.trim();
 		onChange?.({ ...image, alt_text: cleaned || null });

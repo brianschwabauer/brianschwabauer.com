@@ -14,6 +14,7 @@
 import type { NodeViewRenderer, NodeViewRendererProps } from '@tiptap/core';
 import type { Node as PMNode } from '@tiptap/pm/model';
 import type { WidthMode } from './BlogImage';
+import { editImageDetails } from '$lib/components/dialogs';
 
 interface ViewState {
 	mode: WidthMode;
@@ -98,21 +99,10 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 				</svg>
 			</button>
 			<span class="blog-img-sep"></span>
-			<button type="button" data-action="alt" title="Edit alt text" aria-label="Edit alt text">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M5 18 9 7l4 11" />
-					<path d="M6.5 14h5" />
-					<path d="M15 18v-7" />
-					<path d="M15 18h4" />
-					<path d="M15 14h3" />
-					<path d="M15 11h4" />
-				</svg>
-			</button>
-			<button type="button" data-action="caption" title="Edit caption" aria-label="Edit caption">
+			<button type="button" data-action="settings" title="Image settings" aria-label="Image settings">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<rect x="3" y="5" width="18" height="14" rx="2" />
-					<line x1="7" y1="14" x2="17" y2="14" />
-					<line x1="7" y1="17" x2="13" y2="17" />
+					<circle cx="12" cy="12" r="3" />
+					<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.18.41.5.74.91.91l.09.03a2 2 0 0 1 0 4l-.09.03a1.65 1.65 0 0 0-1 1.03z" />
 				</svg>
 			</button>
 		`;
@@ -170,14 +160,23 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 				updateAttrs({ widthMode: mode, widthPct: mode === 'normal' ? 100 : 100 });
 				return;
 			}
-			if (btn.dataset.action === 'alt') {
-				const next = prompt('Alt text:', (node.attrs.alt as string) ?? '');
-				if (next !== null) updateAttrs({ alt: next.trim() || null });
-				return;
-			}
-			if (btn.dataset.action === 'caption') {
-				const next = prompt('Caption:', (node.attrs.caption as string) ?? '');
-				if (next !== null) updateAttrs({ caption: next.trim() || null });
+			if (btn.dataset.action === 'settings') {
+				void editImageDetails({
+					title: 'Image settings',
+					previewSrc: (node.attrs.src as string) ?? '',
+					previewAlt: (node.attrs.alt as string | null) ?? '',
+					previewStyle: node.attrs.bgColor
+						? `background-color:${node.attrs.bgColor};`
+						: '',
+					alt: (node.attrs.alt as string) ?? '',
+					caption: (node.attrs.caption as string) ?? '',
+				}).then((result) => {
+					if (!result) return;
+					updateAttrs({
+						alt: result.alt || null,
+						caption: result.caption || null,
+					});
+				});
 			}
 		});
 
