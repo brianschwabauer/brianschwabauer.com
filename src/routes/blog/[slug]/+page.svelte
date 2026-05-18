@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button } from '@delightstack/components/actions';
+	import { bgStyle } from '$lib/client/images';
 
 	let { data } = $props();
 
@@ -14,12 +15,26 @@
 
 	const summary = $derived(data.post?.summary ?? data.post?.aiSummary ?? '');
 	const tags = $derived(data.post?.tags ?? []);
+	const featured = $derived(data.post?.featuredImage ?? null);
+	const ogImage = $derived(featured ? `/cdn/image/${featured.path}/default` : null);
 </script>
 
 <svelte:head>
 	<title>{data.post?.title ?? 'Post Not Found'} - Brian Schwabauer</title>
 	{#if summary}
 		<meta name="description" content={summary} />
+	{/if}
+	{#if data.post}
+		<meta property="og:title" content={data.post.title} />
+		{#if summary}
+			<meta property="og:description" content={summary} />
+		{/if}
+		<meta property="og:type" content="article" />
+		{#if ogImage}
+			<meta property="og:image" content={ogImage} />
+			<meta name="twitter:card" content="summary_large_image" />
+			<meta name="twitter:image" content={ogImage} />
+		{/if}
 	{/if}
 </svelte:head>
 
@@ -48,12 +63,23 @@
 			{/if}
 		</header>
 
+		{#if featured}
+			<figure
+				class="post-featured"
+				style={bgStyle(featured)}
+				style:aspect-ratio={featured.aspect_ratio || 16 / 9}>
+				<img
+					src={`/cdn/image/${featured.path}/default`}
+					alt={featured.alt_text ?? ''}
+					width={featured.width || undefined}
+					height={featured.height || undefined}
+					loading="eager"
+					decoding="async" />
+			</figure>
+		{/if}
+
 		<div class="post-content prose">
-			{#if data.post.contentHtml}
-				{@html data.post.contentHtml}
-			{:else}
-				<p>{data.post.content}</p>
-			{/if}
+			{@html data.contentHtml}
 		</div>
 
 		<footer class="post-footer">
@@ -75,8 +101,15 @@
 </article>
 
 <style>
+	/* ── Page shell + Medium-style layout ────────────────────────────────
+	   The page uses a "text column" CSS variable that's wider on desktop
+	   (~80ch) but reflows on mobile. Inline images can break out of this
+	   column via their own data-width-mode attributes.
+	*/
 	.post-page {
-		max-width: var(--container-md);
+		--text-col-width: min(80ch, calc(100vw - 2rem));
+		--wide-width: min(1100px, calc(100vw - 2rem));
+		max-width: var(--wide-width);
 		margin: 0 auto;
 		padding: var(--space-12) var(--space-4) var(--space-24);
 	}
@@ -88,7 +121,8 @@
 	}
 
 	.post-header {
-		margin-bottom: var(--space-12);
+		max-width: var(--text-col-width);
+		margin: 0 auto var(--space-8);
 	}
 
 	.post-meta {
@@ -142,16 +176,34 @@
 		color: var(--color-text-secondary);
 	}
 
+	.post-featured {
+		margin: 0 auto var(--space-12);
+		max-width: var(--wide-width);
+		overflow: hidden;
+		border-radius: var(--radius-lg);
+	}
+
+	.post-featured img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
 	.post-content {
-		margin-bottom: var(--space-12);
+		max-width: var(--text-col-width);
+		margin: 0 auto var(--space-12);
 	}
 
 	.post-footer {
+		max-width: var(--text-col-width);
+		margin: 0 auto;
 		padding-top: var(--space-8);
 		border-top: 1px solid var(--color-border);
 	}
 
 	.not-found {
+		max-width: var(--text-col-width);
+		margin: 0 auto;
 		text-align: center;
 		padding: var(--space-24) 0;
 	}
@@ -164,5 +216,54 @@
 	.not-found p {
 		color: var(--color-text-secondary);
 		margin-bottom: var(--space-8);
+	}
+
+	/* ── BlogImage rendering ────────────────────────────────────────────── */
+
+	.post-content :global(figure.blog-img) {
+		margin: var(--space-8) auto;
+		display: block;
+	}
+
+	.post-content :global(figure.blog-img[data-width-mode='normal']) {
+		width: var(--blog-img-pct, 100%);
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.post-content :global(figure.blog-img[data-width-mode='wide']) {
+		/* Break out beyond the 80ch text column up to the page's wide width */
+		width: var(--wide-width, min(1100px, calc(100vw - 2rem)));
+		max-width: calc(100vw - 2rem);
+		margin-left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.post-content :global(figure.blog-img[data-width-mode='full']) {
+		/* Full viewport bleed */
+		width: 100vw;
+		max-width: 100vw;
+		margin-left: 50%;
+		transform: translateX(-50%);
+		border-radius: 0;
+	}
+
+	.post-content :global(figure.blog-img img) {
+		display: block;
+		width: 100%;
+		height: auto;
+		background: var(--blog-img-bg, var(--color-bg-secondary));
+		border-radius: var(--radius-md);
+	}
+
+	.post-content :global(figure.blog-img[data-width-mode='full'] img) {
+		border-radius: 0;
+	}
+
+	.post-content :global(figure.blog-img figcaption) {
+		text-align: center;
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
+		margin-top: var(--space-2);
 	}
 </style>

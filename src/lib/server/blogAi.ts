@@ -33,7 +33,7 @@ export async function augmentWithAi(
 	const summaryReason =
 		!existing?.aiSummary ||
 		existing.contentHash !== newHash ||
-		(existing.content && lengthDrift(existing.content, input.content) >= DRIFT_THRESHOLD);
+		(existing.contentText && lengthDrift(existing.contentText, input.content) >= DRIFT_THRESHOLD);
 
 	let aiSummary = existing?.aiSummary ?? null;
 	if (summaryReason && env.ANTHROPIC_API_KEY) {

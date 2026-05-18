@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { BlogPostMeta } from '$lib/server/blog';
+	import { bgStyle, thumbnailURL } from '$lib/client/images';
 
 	interface Props {
 		post: BlogPostMeta;
@@ -21,34 +22,47 @@
 
 <article class="post-card">
 	<a href="/blog/{post.slug}" class="post-link">
-		<div class="post-meta">
-			{#if post.category}
-				<span class="post-category">{post.category}</span>
-			{/if}
-			<time class="post-date">{formatDate(post.publishedAt)}</time>
-		</div>
-
-		<h2 class="post-title">{post.title}</h2>
-
-		{#if summary}
-			<p class="post-excerpt">{summary}</p>
-		{/if}
-
-		{#if post.tags.length > 0}
-			<div class="post-tags">
-				{#each post.tags as tag}
-					<span class="tag">{tag}</span>
-				{/each}
+		{#if post.featuredImage}
+			<div
+				class="post-image"
+				style={bgStyle(post.featuredImage)}
+				style:aspect-ratio={post.featuredImage.aspect_ratio || 16 / 9}>
+				<img
+					src={thumbnailURL(post.featuredImage)}
+					alt={post.featuredImage.alt_text ?? ''}
+					loading="lazy" />
 			</div>
 		{/if}
+		<div class="post-body">
+			<div class="post-meta">
+				{#if post.category}
+					<span class="post-category">{post.category}</span>
+				{/if}
+				<time class="post-date">{formatDate(post.publishedAt)}</time>
+			</div>
 
-		<span class="read-more">
-			Read article
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-				<line x1="5" y1="12" x2="19" y2="12" />
-				<polyline points="12 5 19 12 12 19" />
-			</svg>
-		</span>
+			<h2 class="post-title">{post.title}</h2>
+
+			{#if summary}
+				<p class="post-excerpt">{summary}</p>
+			{/if}
+
+			{#if post.tags.length > 0}
+				<div class="post-tags">
+					{#each post.tags as tag}
+						<span class="tag">{tag}</span>
+					{/each}
+				</div>
+			{/if}
+
+			<span class="read-more">
+				Read article
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<line x1="5" y1="12" x2="19" y2="12" />
+					<polyline points="12 5 19 12 12 19" />
+				</svg>
+			</span>
+		</div>
 	</a>
 </article>
 
@@ -71,10 +85,29 @@
 	.post-link {
 		display: flex;
 		flex-direction: column;
-		padding: var(--space-6);
 		text-decoration: none;
 		color: inherit;
 		height: 100%;
+	}
+
+	.post-image {
+		width: 100%;
+		overflow: hidden;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.post-image img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.post-body {
+		display: flex;
+		flex-direction: column;
+		padding: var(--space-6);
+		flex: 1;
 	}
 
 	.post-meta {

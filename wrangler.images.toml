@@ -1,0 +1,32 @@
+# Standalone image-processing worker. Deployed independently and called from
+# the main brianschwabauer worker via the IMAGE_PROCESSOR service binding.
+#
+# Local dev: `pnpm dev:images` runs this worker on :8787. The main vite dev
+# server proxies /api/images/* and /cdn/image/* here (see vite.config.ts).
+#
+# Production: deploy with `wrangler deploy --config wrangler.images.toml`.
+# The main worker references it via [[services]] binding name.
+
+name = "brianschwabauer-images"
+main = "image-worker/src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+account_id = "92cb4bb9b2a55d24f5688f2f61864079"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "brianschwabauer"
+
+[[containers]]
+class_name = "ImageProcessorContainer"
+image = "./delightstack/packages/images/container/Dockerfile"
+max_instances = 5
+instance_type = "standard-1"
+
+[[durable_objects.bindings]]
+name = "IMAGE_PROCESSOR"
+class_name = "ImageProcessorContainer"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ImageProcessorContainer"]
