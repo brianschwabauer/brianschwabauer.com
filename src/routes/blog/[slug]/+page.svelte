@@ -101,15 +101,14 @@
 </article>
 
 <style>
-	/* ── Page shell + Medium-style layout ────────────────────────────────
-	   The page uses a "text column" CSS variable that's wider on desktop
-	   (~80ch) but reflows on mobile. Inline images can break out of this
-	   column via their own data-width-mode attributes.
+	/* ── Page shell — Medium-style two-tier width ────────────────────────
+	   The page itself is bounded by --prose-wide so wide images can
+	   actually appear at their natural size. Text is bounded by --measure
+	   (~80ch) via the shared .prose rules in app.css; only block-level
+	   figures opt out and span up to --prose-wide.
 	*/
 	.post-page {
-		--text-col-width: min(80ch, calc(100vw - 2rem));
-		--wide-width: min(1100px, calc(100vw - 2rem));
-		max-width: var(--wide-width);
+		max-width: var(--prose-wide);
 		margin: 0 auto;
 		padding: var(--space-12) var(--space-4) var(--space-24);
 	}
@@ -121,8 +120,8 @@
 	}
 
 	.post-header {
-		max-width: var(--text-col-width);
-		margin: 0 auto var(--space-8);
+		max-width: var(--measure);
+		margin: 0 auto var(--space-10);
 	}
 
 	.post-meta {
@@ -136,6 +135,7 @@
 	.post-category {
 		color: var(--color-accent);
 		font-weight: 500;
+		letter-spacing: 0.02em;
 	}
 
 	.post-date {
@@ -143,23 +143,26 @@
 	}
 
 	.post-title {
-		font-size: var(--text-4xl);
+		font-size: 2.5rem;
 		font-weight: 700;
-		line-height: var(--leading-tight);
+		line-height: 1.15;
+		letter-spacing: -0.02em;
+		color: var(--color-text);
 		margin-bottom: var(--space-6);
 	}
 
 	@media (min-width: 768px) {
 		.post-title {
-			font-size: var(--text-5xl);
+			font-size: 3rem;
 		}
 	}
 
 	.post-excerpt {
-		font-size: var(--text-xl);
+		font-size: 1.25rem;
 		color: var(--color-text-secondary);
-		line-height: var(--leading-relaxed);
+		line-height: 1.5;
 		margin-bottom: var(--space-6);
+		font-weight: 400;
 	}
 
 	.post-tags {
@@ -178,7 +181,7 @@
 
 	.post-featured {
 		margin: 0 auto var(--space-12);
-		max-width: var(--wide-width);
+		max-width: var(--measure);
 		overflow: hidden;
 		border-radius: var(--radius-lg);
 	}
@@ -189,20 +192,22 @@
 		height: auto;
 	}
 
+	/* The .prose class (defined in app.css) handles the inner text-column
+	   width and typography. We keep the wrapper full --prose-wide so any
+	   wide/full-bleed figure inside can break out beyond --measure. */
 	.post-content {
-		max-width: var(--text-col-width);
 		margin: 0 auto var(--space-12);
 	}
 
 	.post-footer {
-		max-width: var(--text-col-width);
+		max-width: var(--measure);
 		margin: 0 auto;
 		padding-top: var(--space-8);
 		border-top: 1px solid var(--color-border);
 	}
 
 	.not-found {
-		max-width: var(--text-col-width);
+		max-width: var(--measure);
 		margin: 0 auto;
 		text-align: center;
 		padding: var(--space-24) 0;
@@ -218,29 +223,32 @@
 		margin-bottom: var(--space-8);
 	}
 
-	/* ── BlogImage rendering ────────────────────────────────────────────── */
-
+	/* ── BlogImage rendering ──────────────────────────────────────────────
+	   Three width modes set on the saved figure:
+	     normal  — sits inside the text column (clamped to --measure)
+	     wide    — breaks out up to --prose-wide (centered via 50% trick)
+	     full    — full viewport bleed
+	*/
 	.post-content :global(figure.blog-img) {
-		margin: var(--space-8) auto;
+		margin: var(--space-10) auto;
 		display: block;
 	}
 
 	.post-content :global(figure.blog-img[data-width-mode='normal']) {
 		width: var(--blog-img-pct, 100%);
+		max-width: var(--measure);
 		margin-left: auto;
 		margin-right: auto;
 	}
 
 	.post-content :global(figure.blog-img[data-width-mode='wide']) {
-		/* Break out beyond the 80ch text column up to the page's wide width */
-		width: var(--wide-width, min(1100px, calc(100vw - 2rem)));
+		width: var(--prose-wide);
 		max-width: calc(100vw - 2rem);
 		margin-left: 50%;
 		transform: translateX(-50%);
 	}
 
 	.post-content :global(figure.blog-img[data-width-mode='full']) {
-		/* Full viewport bleed */
 		width: 100vw;
 		max-width: 100vw;
 		margin-left: 50%;
@@ -262,7 +270,7 @@
 
 	.post-content :global(figure.blog-img figcaption) {
 		text-align: center;
-		font-size: var(--text-sm);
+		font-size: 0.875rem;
 		color: var(--color-text-muted);
 		margin-top: var(--space-2);
 	}

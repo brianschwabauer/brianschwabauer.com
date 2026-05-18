@@ -39,7 +39,7 @@
 	}
 
 	.admin-main {
-		max-width: 960px;
+		max-width: var(--prose-wide);
 		margin: 0 auto;
 		padding: var(--space-8) var(--space-6);
 	}
