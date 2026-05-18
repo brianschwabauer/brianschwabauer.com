@@ -41,10 +41,27 @@
 				attributes: { class: 'prose' },
 			},
 			onUpdate: ({ editor }) => {
-				onUpdate?.(editor.getJSON(), editor.getText());
+				// Strip in-flight upload placeholders (blob URLs + transient ids) so
+				// callers / save flows never see them — they're purely UI state.
+				onUpdate?.(stripUploadingPlaceholders(editor.getJSON()), editor.getText());
 			},
 		});
 	});
+
+	/** Remove blogImage nodes that are still uploading from the doc JSON. */
+	function stripUploadingPlaceholders(doc: JSONContent): JSONContent {
+		function walk(node: JSONContent): JSONContent | null {
+			if (node.type === 'blogImage' && node.attrs?.uploading) return null;
+			if (!node.content) return node;
+			const next: JSONContent[] = [];
+			for (const child of node.content) {
+				const kept = walk(child);
+				if (kept) next.push(kept);
+			}
+			return { ...node, content: next };
+		}
+		return walk(doc) ?? { type: 'doc', content: [] };
+	}
 
 	onDestroy(() => editor?.destroy());
 
@@ -76,7 +93,8 @@
 	}
 
 	export function getJSON(): JSONContent {
-		return editor?.getJSON() ?? { type: 'doc', content: [] };
+		const raw = editor?.getJSON() ?? { type: 'doc', content: [] };
+		return stripUploadingPlaceholders(raw);
 	}
 
 	export function getText(): string {
@@ -293,12 +311,55 @@
 		background: var(--blog-img-bg, var(--color-bg-secondary));
 		border-radius: var(--radius-sm);
 		overflow: hidden;
+		aspect-ratio: var(--blog-img-aspect, auto);
 	}
 
 	.editor-content :global(figure.blog-img img) {
 		display: block;
 		width: 100%;
 		height: auto;
+	}
+
+	/* While an upload is in flight: dim the local preview and show a spinner. */
+	.editor-content :global(figure.blog-img.is-uploading img) {
+		filter: brightness(0.85);
+	}
+
+	.editor-content :global(figure.blog-img .blog-img-spinner) {
+		position: absolute;
+		inset: 0;
+		display: none;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: var(--space-2);
+		background: rgba(0, 0, 0, 0.18);
+		color: white;
+		font-size: var(--text-sm);
+		font-weight: 500;
+		pointer-events: none;
+		z-index: 3;
+	}
+
+	.editor-content :global(figure.blog-img.is-uploading .blog-img-spinner) {
+		display: flex;
+	}
+
+	.editor-content :global(figure.blog-img .blog-img-spinner-ring) {
+		width: 36px;
+		height: 36px;
+		border: 3px solid rgba(255, 255, 255, 0.3);
+		border-top-color: white;
+		border-radius: 50%;
+		animation: blog-img-spin 800ms linear infinite;
+	}
+
+	.editor-content :global(figure.blog-img .blog-img-spinner-label) {
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+	}
+
+	@keyframes blog-img-spin {
+		to { transform: rotate(360deg); }
 	}
 
 	.editor-content :global(figure.blog-img .blog-img-handle) {

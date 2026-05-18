@@ -44,6 +44,13 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 		handleRight.setAttribute('aria-hidden', 'true');
 		inner.appendChild(handleRight);
 
+		// Spinner overlay shown only while attrs.uploading === true.
+		const spinner = document.createElement('div');
+		spinner.className = 'blog-img-spinner';
+		spinner.setAttribute('aria-hidden', 'true');
+		spinner.innerHTML = '<div class="blog-img-spinner-ring"></div><div class="blog-img-spinner-label">Uploading…</div>';
+		inner.appendChild(spinner);
+
 		const toolbar = document.createElement('div');
 		toolbar.className = 'blog-img-toolbar';
 		toolbar.setAttribute('contenteditable', 'false');
@@ -72,6 +79,14 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 				dom.style.removeProperty('--blog-img-bg');
 			}
 			dom.style.setProperty('--blog-img-pct', `${attrs.widthPct ?? 100}%`);
+			// Hint the figure's aspect-ratio while uploading so the page doesn't reflow
+			// when the real image swaps in. Without this, a tall image looks square.
+			if (attrs.width && attrs.height) {
+				dom.style.setProperty('--blog-img-aspect', `${attrs.width} / ${attrs.height}`);
+			} else {
+				dom.style.removeProperty('--blog-img-aspect');
+			}
+			dom.classList.toggle('is-uploading', Boolean(attrs.uploading));
 
 			// Toolbar active state
 			for (const btn of toolbar.querySelectorAll<HTMLButtonElement>('[data-mode]')) {
