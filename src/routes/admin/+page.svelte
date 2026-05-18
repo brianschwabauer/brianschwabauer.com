@@ -128,7 +128,15 @@
 
 <div class="page-header">
 	<h1>Blog Posts</h1>
-	<Button href="/admin/blog/new">New Post</Button>
+	<div class="page-actions">
+		<Button href="/" transparent>
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="back-icon">
+				<polyline points="15 18 9 12 15 6" />
+			</svg>
+			Back to Website
+		</Button>
+		<Button href="/admin/blog/new">New Post</Button>
+	</div>
 </div>
 
 <div class="controls">
@@ -206,11 +214,25 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: var(--space-3);
 		margin-bottom: var(--space-6);
 	}
 
 	.page-header h1 {
 		font-size: var(--text-2xl);
+	}
+
+	.page-actions {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	.back-icon {
+		width: 16px;
+		height: 16px;
+		margin-right: var(--space-1);
+		vertical-align: -2px;
 	}
 
 	.controls {
