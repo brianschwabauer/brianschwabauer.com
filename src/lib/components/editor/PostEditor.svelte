@@ -91,6 +91,13 @@
 	// available — `hasChanges` would otherwise be false for an empty draft.
 	const hasChanges = $derived(mode === 'new' ? true : savedSnapshot !== currentSnapshot);
 
+	const saveLabel = $derived.by(() => {
+		const willPublish = status === 'published';
+		if (mode === 'new') return willPublish ? 'Publish Post' : 'Create Draft';
+		if (hasChanges) return willPublish ? 'Publish Changes' : 'Save Changes';
+		return willPublish ? 'Published' : 'Saved';
+	});
+
 	function handleBodyUpdate(json: JSONContent, text: string) {
 		content = json;
 		contentText = text;
@@ -266,13 +273,7 @@
 			</svg>
 		</button>
 		<Button onclick={handleSave} loading={saving} disabled={mode === 'edit' && !hasChanges}>
-			{#if mode === 'new'}
-				Save Draft
-			{:else if hasChanges}
-				Save Changes
-			{:else}
-				Saved
-			{/if}
+			{saveLabel}
 		</Button>
 	</div>
 </header>
