@@ -267,9 +267,17 @@
 		flex: 1;
 	}
 
+	/* The editor wrapper is sized by its parent (the admin page sets
+	   max-width: var(--prose-wide)). overflow: visible lets wide images
+	   inside ProseMirror visually escape the editor's border to mirror the
+	   public post page's wide breakouts. */
+	.editor-wrapper {
+		overflow: visible;
+	}
+
 	.editor-content {
 		min-height: 300px;
-		padding: var(--space-4);
+		padding: var(--space-8) var(--space-4);
 	}
 
 	.editor-content :global(.ProseMirror) {
@@ -285,25 +293,37 @@
 		height: 0;
 	}
 
-	/* ── BlogImage node view (in-editor) ────────────────────────────────── */
-
+	/* ── BlogImage node view (in-editor) ────────────────────────────────────
+	   Mirrors the public blog page so the editor is a true WYSIWYG.
+	   normal — clamped to --measure inside the text column
+	   wide   — breaks out up to --prose-wide (escapes the editor border)
+	   full   — full viewport bleed
+	*/
 	.editor-content :global(figure.blog-img) {
 		position: relative;
-		margin: var(--space-6) auto;
-		max-width: 100%;
+		margin: var(--space-8) auto;
+		display: block;
 	}
 
 	.editor-content :global(figure.blog-img[data-width-mode='normal']) {
 		width: var(--blog-img-pct, 100%);
+		max-width: var(--measure);
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	.editor-content :global(figure.blog-img[data-width-mode='wide']) {
-		width: min(100%, 1100px);
-		max-width: none;
+		width: var(--prose-wide);
+		max-width: calc(100vw - 2rem);
+		margin-left: 50%;
+		transform: translateX(-50%);
 	}
 
 	.editor-content :global(figure.blog-img[data-width-mode='full']) {
-		width: 100%;
+		width: 100vw;
+		max-width: 100vw;
+		margin-left: 50%;
+		transform: translateX(-50%);
 	}
 
 	.editor-content :global(figure.blog-img .blog-img-inner) {

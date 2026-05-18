@@ -210,6 +210,17 @@
 {/if}
 
 <style>
+	/* Constrain the admin index to the reading column so it doesn't sprawl
+	   inside the (now wider) admin layout container. */
+	.page-header,
+	.controls,
+	.posts-list,
+	.empty-state {
+		max-width: var(--measure);
+		margin-left: auto;
+		margin-right: auto;
+	}
+
 	.page-header {
 		display: flex;
 		align-items: center;

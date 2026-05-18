@@ -328,8 +328,23 @@
 {/if}
 
 <style>
+	/* Match the public blog post's two-tier width: the page is bounded by
+	   --prose-wide so wide images can break out, while form inputs and the
+	   editor's text column stay clamped to --measure (~80ch). */
 	.edit-post {
-		max-width: 1000px;
+		max-width: var(--prose-wide);
+		margin: 0 auto;
+	}
+
+	/* Keep every form row (title, featured, advanced, summary, editor)
+	   constrained to the text column so the editor's border matches the
+	   form-input width and the text inside fills it cleanly. Wide images
+	   inside the editor escape this column via their own breakout rules. */
+	.edit-form > *,
+	.error {
+		max-width: var(--measure);
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	.page-header {
