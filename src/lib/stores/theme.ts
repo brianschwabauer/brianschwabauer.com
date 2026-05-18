@@ -1,51 +1,44 @@
-import { writable, get } from 'svelte/store';
+import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
 type Theme = 'light' | 'dark';
 
+function readStoredPreference(): Theme {
+	const stored = localStorage.getItem('theme') as Theme | null;
+	if (stored === 'light' || stored === 'dark') return stored;
+	return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
 function createThemeStore() {
-	const defaultTheme: Theme = 'dark';
+	// Initial value comes from the DOM, which the bootstrap script in app.html
+	// has already set for the current route. Don't touch the DOM here — that
+	// would race with the bootstrap and any beforeNavigate-driven theme swap.
+	const initial: Theme = browser
+		? ((document.documentElement.dataset.theme as Theme | undefined) ?? 'light')
+		: 'light';
 
-	const stored = browser ? localStorage.getItem('theme') as Theme | null : null;
-	const prefersDark = browser ? window.matchMedia('(prefers-color-scheme: dark)').matches : true;
-	const initial: Theme = stored ?? (prefersDark ? 'dark' : 'light');
-
-	const { subscribe, set, update } = writable<Theme>(initial);
-
-	if (browser) {
-		// Apply theme to document immediately
-		document.documentElement.dataset.theme = initial;
-	}
+	const { subscribe, set } = writable<Theme>(initial);
 
 	return {
 		subscribe,
 		toggle() {
-			update((current) => {
-				const next = current === 'light' ? 'dark' : 'light';
-				if (browser) {
-					localStorage.setItem('theme', next);
-					document.documentElement.dataset.theme = next;
-				}
-				return next;
-			});
+			if (!browser) return;
+			const next: Theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+			localStorage.setItem('theme', next);
+			document.documentElement.dataset.theme = next;
+			set(next);
 		},
 		set(value: Theme) {
+			if (!browser) return;
+			localStorage.setItem('theme', value);
+			document.documentElement.dataset.theme = value;
 			set(value);
-			if (browser) {
-				localStorage.setItem('theme', value);
-				document.documentElement.dataset.theme = value;
-			}
 		},
 		forceTheme(value: Theme | null) {
-			// For pages that need a specific theme (like the space-themed about page)
-			if (browser) {
-				if (value) {
-					document.documentElement.dataset.theme = value;
-				} else {
-					// Restore original theme
-					document.documentElement.dataset.theme = get({ subscribe });
-				}
-			}
+			if (!browser) return;
+			const applied: Theme = value ?? readStoredPreference();
+			document.documentElement.dataset.theme = applied;
+			set(applied);
 		}
 	};
 }
