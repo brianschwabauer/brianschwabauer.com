@@ -41,11 +41,15 @@
 </svelte:head>
 
 <div class="app">
-	<Header showThemeToggle={isAdminPage} invertLogo={isRootPage} />
-	<main class:flush={isRootPage}>
+	{#if !isAdminPage}
+		<Header invertLogo={isRootPage} />
+	{/if}
+	<main class:flush={isRootPage} class:admin={isAdminPage}>
 		{@render children()}
 	</main>
-	<Footer />
+	{#if !isAdminPage}
+		<Footer />
+	{/if}
 </div>
 
 <style>
@@ -61,5 +65,8 @@
 	}
 	main.flush {
 		padding-top: 0; /* root page hero handles its own top spacing */
+	}
+	main.admin {
+		padding-top: 0; /* admin has its own chrome */
 	}
 </style>
