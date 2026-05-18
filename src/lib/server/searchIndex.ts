@@ -23,7 +23,10 @@ function blogEntry(post: BlogPost | BlogPostMeta): SearchEntry {
 		category: post.category ?? '',
 		tags: post.tags,
 		date: post.publishedAt ?? post.createdAt,
-		url: `/blog/${post.slug}`
+		url: `/blog/${post.slug}`,
+		featuredImage: post.featuredImage ?? null,
+		coverFocalX: post.coverFocalX ?? 50,
+		coverFocalY: post.coverFocalY ?? 50
 	};
 }
 
@@ -78,7 +81,10 @@ export async function rebuildVectorIndex(kv: KVNamespace): Promise<void> {
 			tags: p.tags,
 			date: p.publishedAt ?? p.createdAt,
 			url: `/blog/${p.slug}`,
-			embedding: p.embedding as number[]
+			embedding: p.embedding as number[],
+			featuredImage: p.featuredImage ?? null,
+			coverFocalX: p.coverFocalX ?? 50,
+			coverFocalY: p.coverFocalY ?? 50
 		}));
 	if (entries.length > 0) {
 		await insertMultiple(db, entries as unknown as Record<string, unknown>[]);
