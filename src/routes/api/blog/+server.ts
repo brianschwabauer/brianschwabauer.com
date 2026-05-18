@@ -25,7 +25,8 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	if (!platform?.env?.KV) throw error(500, 'KV not available');
 
 	const data = await request.json();
-	const { title, content, contentHtml, summary, category, tags, status, slug } = data;
+	const { title, content, contentHtml, summary, category, tags, status, slug, publishedAt } =
+		data;
 
 	if (!title || typeof title !== 'string') throw error(400, 'Title is required');
 	if (typeof content !== 'string') throw error(400, 'Content is required');
@@ -61,6 +62,12 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			category: category || null,
 			tags: Array.isArray(tags) ? tags : [],
 			status: status || 'draft',
+			publishedAt:
+				typeof publishedAt === 'number'
+					? publishedAt
+					: publishedAt === null
+						? null
+						: undefined,
 			contentHash,
 			embedding
 		});

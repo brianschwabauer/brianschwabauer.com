@@ -76,6 +76,14 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 		category: data.category !== undefined ? data.category : existing.category,
 		tags: Array.isArray(data.tags) ? data.tags : existing.tags,
 		status: data.status ?? existing.status,
+		publishedAt:
+			data.publishedAt === undefined
+				? undefined
+				: typeof data.publishedAt === 'number'
+					? data.publishedAt
+					: data.publishedAt === null
+						? null
+						: undefined,
 		contentHash,
 		embedding
 	});

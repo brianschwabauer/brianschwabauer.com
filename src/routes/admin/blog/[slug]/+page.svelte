@@ -18,6 +18,7 @@
 	);
 	let contentHtml = $state(initialPost?.contentHtml ?? '');
 	let slug = $state(initialPost?.slug ?? '');
+	let publishedAtInput = $state(toLocalDateTimeInput(initialPost?.publishedAt ?? null));
 
 	let saving = $state(false);
 	let deleting = $state(false);
@@ -26,6 +27,19 @@
 	let advancedOpen = $state(false);
 
 	let editor: TipTapEditor;
+
+	function toLocalDateTimeInput(ts: number | null): string {
+		if (ts == null) return '';
+		const d = new Date(ts);
+		const pad = (n: number) => String(n).padStart(2, '0');
+		return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+	}
+
+	function fromLocalDateTimeInput(value: string): number | null {
+		if (!value) return null;
+		const ts = new Date(value).getTime();
+		return Number.isFinite(ts) ? ts : null;
+	}
 
 	$effect(() => {
 		const cleaned = slug.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
@@ -47,6 +61,7 @@
 		status: string;
 		contentHtml: string;
 		slug: string;
+		publishedAt: number | null;
 	}): string {
 		return JSON.stringify(values);
 	}
@@ -59,7 +74,8 @@
 			tags: initialPost?.tags ?? [],
 			status: initialPost?.status === 'published' ? 'published' : 'draft',
 			contentHtml: initialPost?.contentHtml ?? '',
-			slug: initialPost?.slug ?? ''
+			slug: initialPost?.slug ?? '',
+			publishedAt: initialPost?.publishedAt ?? null
 		})
 	);
 
@@ -71,7 +87,8 @@
 			tags: normalizedTags,
 			status,
 			contentHtml,
-			slug
+			slug,
+			publishedAt: fromLocalDateTimeInput(publishedAtInput)
 		})
 	);
 
@@ -111,7 +128,8 @@
 					content: editor?.getText() || '',
 					contentHtml,
 					status,
-					slug
+					slug,
+					publishedAt: fromLocalDateTimeInput(publishedAtInput)
 				})
 			});
 
@@ -240,6 +258,16 @@
 								bind:value={slug}
 								placeholder="my-post-slug"
 								prefix="/blog/" />
+						</div>
+					</div>
+
+					<div class="form-row">
+						<div class="field full">
+							<Input
+								type="datetime-local"
+								label="Publish Date"
+								bind:value={publishedAtInput}
+								helper="Leave blank to clear. Set when publishing if empty." />
 						</div>
 					</div>
 

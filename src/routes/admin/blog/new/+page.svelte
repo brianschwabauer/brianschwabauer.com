@@ -14,6 +14,7 @@
 	let content = $state('');
 	let contentHtml = $state('');
 	let slug = $state('');
+	let publishedAtInput = $state('');
 
 	let saving = $state(false);
 	let error = $state('');
@@ -21,6 +22,12 @@
 	let advancedOpen = $state(false);
 
 	let editor: TipTapEditor;
+
+	function fromLocalDateTimeInput(value: string): number | null {
+		if (!value) return null;
+		const ts = new Date(value).getTime();
+		return Number.isFinite(ts) ? ts : null;
+	}
 
 	$effect(() => {
 		const cleaned = slug.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
@@ -61,7 +68,8 @@
 					content: content || '',
 					contentHtml: contentHtml || '',
 					status,
-					slug: slug.trim() || undefined
+					slug: slug.trim() || undefined,
+					publishedAt: fromLocalDateTimeInput(publishedAtInput)
 				})
 			});
 
@@ -168,6 +176,16 @@
 							bind:value={slug}
 							placeholder="auto-generated from title"
 							prefix="/blog/" />
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="field full">
+						<Input
+							type="datetime-local"
+							label="Publish Date"
+							bind:value={publishedAtInput}
+							helper="Leave blank to use the current time when publishing." />
 					</div>
 				</div>
 

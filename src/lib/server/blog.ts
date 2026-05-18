@@ -124,6 +124,7 @@ export interface SavePostInput {
 	category?: string | null;
 	tags?: string[];
 	status?: BlogStatus;
+	publishedAt?: number | null;
 	contentHash?: string | null;
 	embedding?: number[] | null;
 }
@@ -151,7 +152,11 @@ export async function savePost(kv: KVNamespace, input: SavePostInput): Promise<B
 		tags: input.tags ?? existing?.tags ?? [],
 		status,
 		publishedAt:
-			status === 'published' ? existing?.publishedAt ?? now : existing?.publishedAt ?? null,
+			input.publishedAt !== undefined
+				? input.publishedAt
+				: status === 'published'
+					? (existing?.publishedAt ?? now)
+					: (existing?.publishedAt ?? null),
 		createdAt: existing?.createdAt ?? now,
 		updatedAt: now,
 		contentHash: input.contentHash ?? existing?.contentHash ?? null,
