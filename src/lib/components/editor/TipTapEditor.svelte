@@ -1,12 +1,37 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { Editor, type JSONContent } from '@tiptap/core';
+	import { Editor, textblockTypeInputRule, type JSONContent } from '@tiptap/core';
 	import StarterKit from '@tiptap/starter-kit';
+	import Heading from '@tiptap/extension-heading';
 	import Link from '@tiptap/extension-link';
 	import { BlogImage } from './extensions/BlogImage';
 	import { imageDropHandler, recordToBlogImageAttrs } from './extensions/imageDropHandler';
 	import MediaLibrary from '$lib/components/media/MediaLibrary.svelte';
 	import type { ImageRecord } from '$lib/client/images';
+
+	/**
+	 * Heading with shifted markdown shortcuts: `#` → H2, `##` → H3, … `#####` → H6.
+	 *
+	 * The post page already renders the post title as the document's <h1>, so
+	 * reserving H1 for that keeps the heading outline clean for screen readers
+	 * and SEO. Authors who type `#` get the largest in-content heading (H2).
+	 *
+	 * The schema still allows H1 so any pre-existing H1 content keeps round-
+	 * tripping cleanly — the shift only governs the markdown input rules.
+	 */
+	const SHIFTED_HEADING_LEVELS = [2, 3, 4, 5, 6] as const;
+	const ShiftedHeading = Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }).extend({
+		addInputRules() {
+			return SHIFTED_HEADING_LEVELS.map((level) => {
+				const hashes = level - 1;
+				return textblockTypeInputRule({
+					find: new RegExp(`^(#{${hashes}})\\s$`),
+					type: this.type,
+					getAttributes: { level },
+				});
+			});
+		},
+	});
 
 	interface Props {
 		content?: JSONContent | null;
@@ -24,9 +49,14 @@
 		editor = new Editor({
 			element: editorElement,
 			extensions: [
-				StarterKit.configure({
-					heading: { levels: [2, 3, 4] },
-				}),
+				// StarterKit's other extensions already register input rules
+				// for **bold**, *italic*, ~~strike~~, `code`, > blockquote,
+				// - / * / + bullet lists, 1. ordered lists, ``` code blocks,
+				// and --- horizontal rules. Heading is supplied separately
+				// below so we can shift `#` markdown shortcuts down by one
+				// level (reserving H1 for the post title).
+				StarterKit.configure({ heading: false }),
+				ShiftedHeading,
 				Link.configure({ openOnClick: false }),
 				BlogImage,
 				imageDropHandler.configure({
@@ -118,9 +148,12 @@
 		<div class="toolbar-separator"></div>
 
 		<div class="toolbar-group">
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('heading', { level: 2 })} onclick={() => toggleHeading(2)} title="Heading 2">H2</button>
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('heading', { level: 3 })} onclick={() => toggleHeading(3)} title="Heading 3">H3</button>
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('heading', { level: 4 })} onclick={() => toggleHeading(4)} title="Heading 4">H4</button>
+			<!-- Display labels are the author-facing heading rank ("H1" = biggest
+			     in-content heading). The actual node level is shifted by one
+			     because the post title owns the document's real <h1>. -->
+			<button type="button" class="toolbar-btn" class:active={editor?.isActive('heading', { level: 2 })} onclick={() => toggleHeading(2)} title="Heading 1">H1</button>
+			<button type="button" class="toolbar-btn" class:active={editor?.isActive('heading', { level: 3 })} onclick={() => toggleHeading(3)} title="Heading 2">H2</button>
+			<button type="button" class="toolbar-btn" class:active={editor?.isActive('heading', { level: 4 })} onclick={() => toggleHeading(4)} title="Heading 3">H3</button>
 		</div>
 
 		<div class="toolbar-separator"></div>
