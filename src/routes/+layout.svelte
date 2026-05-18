@@ -5,33 +5,24 @@
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import { theme } from '$lib/stores/theme';
 	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
+	import { beforeNavigate } from '$app/navigation';
 
 	let { children } = $props();
 
 	const isRootPage = $derived($page.url.pathname === '/');
 	const isAdminPage = $derived($page.url.pathname.startsWith('/admin'));
 
-	// Force theme based on page:
-	// - Admin pages: respect user preference (no force)
-	// - Root page (long scrolly page): force dark
-	// - Other public pages: force light
-	$effect(() => {
-		if (isAdminPage) {
+	// Swap theme BEFORE the new page mounts so the first paint is correct.
+	// Initial load is handled by the bootstrap script in app.html.
+	beforeNavigate(({ to }) => {
+		if (!to) return;
+		const path = to.url.pathname;
+		if (path === '/admin' || path.startsWith('/admin/')) {
 			theme.forceTheme(null);
-		} else if (isRootPage) {
+		} else if (path === '/') {
 			theme.forceTheme('dark');
 		} else {
 			theme.forceTheme('light');
-		}
-	});
-
-	onMount(() => {
-		if (isAdminPage) {
-			const stored = localStorage.getItem('theme');
-			if (stored === 'light' || stored === 'dark') {
-				document.documentElement.dataset.theme = stored;
-			}
 		}
 	});
 </script>

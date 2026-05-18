@@ -90,7 +90,4 @@
 		scroll-behavior: smooth;
 		scroll-padding-top: 80px;
 	}
-	:global(body) {
-		background: #06060a;
-	}
 </style>
