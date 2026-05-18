@@ -37,6 +37,8 @@
 	let content = $state<JSONContent>(initialContent);
 	let contentText = $state(initial?.contentText ?? '');
 	let featuredImage = $state<ImageRecord | null>(initial?.featuredImage ?? null);
+	let coverFocalX = $state<number>(initial?.coverFocalX ?? 50);
+	let coverFocalY = $state<number>(initial?.coverFocalY ?? 50);
 	let slug = $state(initial?.slug ?? '');
 	let publishedAt = $state<number | null>(initial?.publishedAt ?? null);
 
@@ -62,6 +64,8 @@
 			content: initialContent,
 			featuredImagePath: initial?.featuredImage?.path ?? null,
 			featuredImageAlt: initial?.featuredImage?.alt_text ?? null,
+			coverFocalX: initial?.coverFocalX ?? 50,
+			coverFocalY: initial?.coverFocalY ?? 50,
 			slug: initial?.slug ?? '',
 			publishedAt: initial?.publishedAt ?? null,
 		})
@@ -76,6 +80,8 @@
 			content,
 			featuredImagePath: featuredImage?.path ?? null,
 			featuredImageAlt: featuredImage?.alt_text ?? null,
+			coverFocalX,
+			coverFocalY,
 			slug,
 			publishedAt,
 		})
@@ -131,6 +137,8 @@
 						content,
 						contentText,
 						featuredImage,
+						coverFocalX,
+						coverFocalY,
 						status,
 						// Only send slug if the user explicitly set one; otherwise the
 						// API derives it from the title.
@@ -159,6 +167,8 @@
 					content,
 					contentText,
 					featuredImage,
+					coverFocalX,
+					coverFocalY,
 					status,
 					slug,
 					publishedAt,
@@ -285,7 +295,18 @@
 
 	<FeaturedImagePicker
 		image={featuredImage}
-		onChange={(img) => (featuredImage = img)} />
+		focalX={coverFocalX}
+		focalY={coverFocalY}
+		onChange={(img) => {
+			featuredImage = img;
+			// Reset focal when the underlying image changes.
+			coverFocalX = 50;
+			coverFocalY = 50;
+		}}
+		onFocalChange={(x, y) => {
+			coverFocalX = x;
+			coverFocalY = y;
+		}} />
 
 	<BodyEditor
 		bind:this={bodyEditor}

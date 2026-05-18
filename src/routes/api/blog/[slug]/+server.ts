@@ -28,6 +28,8 @@ interface UpdateBody {
 	slug?: string;
 	publishedAt?: number | null;
 	featuredImage?: ImageRecord | null;
+	coverFocalX?: number;
+	coverFocalY?: number;
 }
 
 export const GET: RequestHandler = async ({ params, platform, locals }) => {
@@ -96,6 +98,10 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 		status: data.status ?? existing.status,
 		featuredImage:
 			data.featuredImage === undefined ? existing.featuredImage : data.featuredImage,
+		coverFocalX:
+			data.coverFocalX === undefined ? existing.coverFocalX : data.coverFocalX,
+		coverFocalY:
+			data.coverFocalY === undefined ? existing.coverFocalY : data.coverFocalY,
 		publishedAt:
 			data.publishedAt === undefined
 				? undefined

@@ -21,6 +21,10 @@ export interface BlogPost {
 	tags: string[];
 	status: BlogStatus;
 	featuredImage: ImageRecord | null;
+	/** Horizontal focal point (0–100 %) for the 2.35:1 cover crop. Default 50. */
+	coverFocalX: number;
+	/** Vertical focal point (0–100 %) for the 2.35:1 cover crop. Default 50. */
+	coverFocalY: number;
 	publishedAt: number | null;
 	createdAt: number;
 	updatedAt: number;
@@ -37,6 +41,8 @@ export interface BlogPostMeta {
 	tags: string[];
 	status: BlogStatus;
 	featuredImage: ImageRecord | null;
+	coverFocalX: number;
+	coverFocalY: number;
 	publishedAt: number | null;
 	createdAt: number;
 	updatedAt: number;
@@ -67,10 +73,17 @@ function toMeta(post: BlogPost): BlogPostMeta {
 		tags: post.tags,
 		status: post.status,
 		featuredImage: post.featuredImage,
+		coverFocalX: post.coverFocalX,
+		coverFocalY: post.coverFocalY,
 		publishedAt: post.publishedAt,
 		createdAt: post.createdAt,
 		updatedAt: post.updatedAt
 	};
+}
+
+function clampFocal(value: unknown, fallback: number): number {
+	const n = typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+	return Math.min(100, Math.max(0, n));
 }
 
 export async function getPost(kv: KVNamespace, slug: string): Promise<BlogPost | null> {
@@ -132,6 +145,8 @@ export interface SavePostInput {
 	tags?: string[];
 	status?: BlogStatus;
 	featuredImage?: ImageRecord | null;
+	coverFocalX?: number;
+	coverFocalY?: number;
 	publishedAt?: number | null;
 	contentHash?: string | null;
 	embedding?: number[] | null;
@@ -161,6 +176,8 @@ export async function savePost(kv: KVNamespace, input: SavePostInput): Promise<B
 		status,
 		featuredImage:
 			input.featuredImage === undefined ? existing?.featuredImage ?? null : input.featuredImage,
+		coverFocalX: clampFocal(input.coverFocalX, existing?.coverFocalX ?? 50),
+		coverFocalY: clampFocal(input.coverFocalY, existing?.coverFocalY ?? 50),
 		publishedAt:
 			input.publishedAt !== undefined
 				? input.publishedAt

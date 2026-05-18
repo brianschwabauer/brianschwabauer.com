@@ -33,6 +33,8 @@ interface CreateBody {
 	slug?: string;
 	publishedAt?: number | null;
 	featuredImage?: ImageRecord | null;
+	coverFocalX?: number;
+	coverFocalY?: number;
 }
 
 export const POST: RequestHandler = async ({ request, platform, locals }) => {
@@ -78,6 +80,8 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			tags: Array.isArray(tags) ? tags.filter((t): t is string => typeof t === 'string') : [],
 			status: status || 'draft',
 			featuredImage: data.featuredImage ?? null,
+			coverFocalX: data.coverFocalX,
+			coverFocalY: data.coverFocalY,
 			publishedAt:
 				typeof publishedAt === 'number'
 					? publishedAt
