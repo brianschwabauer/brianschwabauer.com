@@ -21,10 +21,14 @@ export async function listImages(year?: string, cursor?: string): Promise<ListRe
 	return res.json();
 }
 
-export async function uploadImage(file: File, alt?: string): Promise<ImageRecord> {
+export async function uploadImage(
+	file: File,
+	meta?: { alt?: string; caption?: string },
+): Promise<ImageRecord> {
 	const form = new FormData();
 	form.append('file', file);
-	if (alt) form.append('alt', alt);
+	if (meta?.alt) form.append('alt', meta.alt);
+	if (meta?.caption) form.append('caption', meta.caption);
 	const res = await fetch('/api/images', { method: 'POST', body: form });
 	if (!res.ok) {
 		const body = await res.json().catch(() => ({}) as { message?: string });
@@ -34,11 +38,14 @@ export async function uploadImage(file: File, alt?: string): Promise<ImageRecord
 	return image;
 }
 
-export async function updateImageAlt(path: string, alt: string): Promise<ImageRecord> {
+export async function updateImageMeta(
+	path: string,
+	patch: { alt?: string | null; caption?: string | null },
+): Promise<ImageRecord> {
 	const res = await fetch(`/api/images/${path}`, {
 		method: 'PATCH',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ alt }),
+		body: JSON.stringify(patch),
 	});
 	if (!res.ok) throw new Error(`Update failed (${res.status})`);
 	const { image } = (await res.json()) as { image: ImageRecord };

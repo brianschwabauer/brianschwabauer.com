@@ -181,7 +181,7 @@ function renderBlogImage(node: TipTapNode): string {
 	const widthPct = Number(attrs.widthPct) || 100;
 	const thumbhash = attrs.thumbhash ? String(attrs.thumbhash) : '';
 	const bgColor = attrs.bgColor ? String(attrs.bgColor) : '';
-	const fileName = attrs.fileName ? String(attrs.fileName) : '';
+	const caption = typeof attrs.caption === 'string' ? attrs.caption.trim() : '';
 
 	let variants: VariantInfo[] = [];
 	try {
@@ -210,8 +210,9 @@ function renderBlogImage(node: TipTapNode): string {
 	if (widthMode === 'normal') styleParts.push(`--blog-img-pct: ${widthPct}%`);
 	const styleAttr = styleParts.length > 0 ? ` style="${escapeAttr(styleParts.join('; '))}"` : '';
 
+	const figureClass = caption ? 'blog-img has-caption' : 'blog-img';
 	const figureAttrs = [
-		`class="blog-img"`,
+		`class="${figureClass}"`,
 		`data-width-mode="${escapeAttr(widthMode)}"`,
 		widthMode === 'normal' ? `data-width-pct="${widthPct}"` : '',
 		thumbhash ? `data-thumbhash="${escapeAttr(thumbhash)}"` : '',
@@ -234,8 +235,8 @@ function renderBlogImage(node: TipTapNode): string {
 		.filter(Boolean)
 		.join(' ');
 
-	const caption = fileName && !alt ? '' : '';
-	return `<figure ${figureAttrs}><img ${imgAttrs}>${caption}</figure>`;
+	const captionHTML = caption ? `<figcaption>${escapeHTML(caption)}</figcaption>` : '';
+	return `<figure ${figureAttrs}><img ${imgAttrs}>${captionHTML}</figure>`;
 }
 
 // ── plain text walker (for AI summary + search index) ───────────────────────
@@ -250,8 +251,13 @@ function walkText(node: TipTapDoc | TipTapNode, out: string[]): void {
 		return;
 	}
 	if (node.type === 'blogImage') {
-		const alt = (node as TipTapNode).attrs?.alt;
-		if (typeof alt === 'string' && alt) out.push(` ${alt} `);
+		const attrs = (node as TipTapNode).attrs;
+		const caption = attrs?.caption;
+		if (typeof caption === 'string' && caption) out.push(` ${caption} `);
+		else {
+			const alt = attrs?.alt;
+			if (typeof alt === 'string' && alt) out.push(` ${alt} `);
+		}
 		return;
 	}
 	const content = (node as TipTapNode).content;

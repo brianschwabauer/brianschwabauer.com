@@ -182,6 +182,10 @@ export function recordToBlogImageAttrs(record: ImageRecord) {
 		src: `/cdn/image/${record.path}/default`,
 		path: record.path,
 		alt: record.alt_text ?? null,
+		// Snapshot the caption onto the node so it travels with this post.
+		// Later edits to the image's caption in the Media Library don't
+		// retroactively change posts that already embed it.
+		caption: record.caption ?? null,
 		width: record.width,
 		height: record.height,
 		thumbhash: record.thumbhash,

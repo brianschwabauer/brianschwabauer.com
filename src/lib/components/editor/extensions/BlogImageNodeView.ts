@@ -34,6 +34,12 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 		img.loading = 'lazy';
 		inner.appendChild(img);
 
+		// Caption overlay — lives inside .blog-img-inner so it clips to the
+		// image's rounded corners. Hidden via CSS when there's no caption.
+		const captionEl = document.createElement('figcaption');
+		captionEl.className = 'blog-img-caption';
+		inner.appendChild(captionEl);
+
 		const handleLeft = document.createElement('span');
 		handleLeft.className = 'blog-img-handle blog-img-handle-left';
 		handleLeft.setAttribute('aria-hidden', 'true');
@@ -87,6 +93,13 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 					<path d="M15 11h4" />
 				</svg>
 			</button>
+			<button type="button" data-action="caption" title="Edit caption" aria-label="Edit caption">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<rect x="3" y="5" width="18" height="14" rx="2" />
+					<line x1="7" y1="14" x2="17" y2="14" />
+					<line x1="7" y1="17" x2="13" y2="17" />
+				</svg>
+			</button>
 		`;
 
 		dom.appendChild(inner);
@@ -118,6 +131,10 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 			}
 			dom.classList.toggle('is-uploading', Boolean(attrs.uploading));
 
+			const caption = (attrs.caption as string | null) ?? '';
+			captionEl.textContent = caption;
+			dom.classList.toggle('has-caption', Boolean(caption));
+
 			// Toolbar active state
 			for (const btn of toolbar.querySelectorAll<HTMLButtonElement>('[data-mode]')) {
 				btn.classList.toggle('is-active', btn.dataset.mode === attrs.widthMode);
@@ -141,6 +158,11 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 			if (btn.dataset.action === 'alt') {
 				const next = prompt('Alt text:', (node.attrs.alt as string) ?? '');
 				if (next !== null) updateAttrs({ alt: next.trim() || null });
+				return;
+			}
+			if (btn.dataset.action === 'caption') {
+				const next = prompt('Caption:', (node.attrs.caption as string) ?? '');
+				if (next !== null) updateAttrs({ caption: next.trim() || null });
 			}
 		});
 

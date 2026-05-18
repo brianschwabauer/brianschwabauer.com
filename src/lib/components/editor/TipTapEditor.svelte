@@ -373,6 +373,25 @@
 		height: auto;
 	}
 
+	.editor-content :global(figure.blog-img .blog-img-caption) {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		padding: var(--space-6) var(--space-4) var(--space-3);
+		color: white;
+		font-size: 0.875rem;
+		line-height: 1.4;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+		background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+		pointer-events: none;
+		display: none;
+	}
+
+	.editor-content :global(figure.blog-img.has-caption .blog-img-caption) {
+		display: block;
+	}
+
 	/* While an upload is in flight: dim the local preview and show a spinner. */
 	.editor-content :global(figure.blog-img.is-uploading img) {
 		filter: brightness(0.85);

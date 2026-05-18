@@ -4,7 +4,7 @@
 	import {
 		listImages,
 		uploadImage,
-		updateImageAlt,
+		updateImageMeta,
 		deleteImage,
 		thumbnailURL,
 		bgStyle,
@@ -30,6 +30,7 @@
 	let dragOver = $state(false);
 	let editingPath = $state<string | null>(null);
 	let editingAlt = $state('');
+	let editingCaption = $state('');
 	let fileInput = $state<HTMLInputElement | undefined>(undefined);
 
 	const years = $derived.by(() => {
@@ -46,6 +47,7 @@
 					return (
 						(img.file_name?.toLowerCase().includes(q) ?? false) ||
 						(img.alt_text?.toLowerCase().includes(q) ?? false) ||
+						(img.caption?.toLowerCase().includes(q) ?? false) ||
 						img.slug.toLowerCase().includes(q)
 					);
 				})
@@ -117,20 +119,29 @@
 		target.value = '';
 	}
 
-	function startEditAlt(image: ImageRecord) {
+	function startEditMeta(image: ImageRecord) {
 		editingPath = image.path;
 		editingAlt = image.alt_text ?? '';
+		editingCaption = image.caption ?? '';
 	}
 
-	async function saveAlt(image: ImageRecord) {
+	function cancelEditMeta() {
+		editingPath = null;
+		editingAlt = '';
+		editingCaption = '';
+	}
+
+	async function saveMeta(image: ImageRecord) {
 		try {
-			const updated = await updateImageAlt(image.path, editingAlt);
+			const updated = await updateImageMeta(image.path, {
+				alt: editingAlt,
+				caption: editingCaption,
+			});
 			images = images.map((i) => (i.path === image.path ? updated : i));
 		} catch (err) {
-			uploadError = err instanceof Error ? err.message : 'Failed to update alt';
+			uploadError = err instanceof Error ? err.message : 'Failed to update image';
 		} finally {
-			editingPath = null;
-			editingAlt = '';
+			cancelEditMeta();
 		}
 	}
 
@@ -246,12 +257,12 @@
 									<button
 										type="button"
 										class="overlay-btn"
-										title="Edit alt text"
+										title="Edit alt text and caption"
 										onclick={(e) => {
 											e.stopPropagation();
-											startEditAlt(image);
+											startEditMeta(image);
 										}}
-										aria-label="Edit alt text">
+										aria-label="Edit alt text and caption">
 										<svg
 											viewBox="0 0 24 24"
 											fill="none"
@@ -293,15 +304,10 @@
 									onkeydown={(e) => e.stopPropagation()}
 									role="presentation">
 									<Input bind:value={editingAlt} placeholder="Alt text" />
+									<Input bind:value={editingCaption} placeholder="Caption" />
 									<div class="alt-edit-actions">
-										<Button size="0" onclick={() => saveAlt(image)}>Save</Button>
-										<Button
-											size="0"
-											transparent
-											onclick={() => {
-												editingPath = null;
-												editingAlt = '';
-											}}>Cancel</Button>
+										<Button size="0" onclick={() => saveMeta(image)}>Save</Button>
+										<Button size="0" transparent onclick={cancelEditMeta}>Cancel</Button>
 									</div>
 								</div>
 							{/if}
