@@ -1,7 +1,9 @@
 import type { Ai } from '@cloudflare/workers-types';
 
+import { EMBEDDING_DIM } from '$lib/search';
+
 export const EMBEDDING_MODEL = '@cf/baai/bge-base-en-v1.5';
-export const EMBEDDING_DIM = 768;
+export { EMBEDDING_DIM };
 
 interface EmbeddingResponse {
 	data: number[][];

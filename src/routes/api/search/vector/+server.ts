@@ -1,7 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { searchVector, type AnyOrama } from '@orama/orama';
-import { readPersistedVectorIndex, restore } from '$lib/server/searchIndex';
+import { searchVector } from '@orama/orama';
+import { readPersistedVectorIndex, restoreVectorIndex } from '$lib/server/searchIndex';
 import { embedText } from '$lib/server/embeddings';
 
 export const GET: RequestHandler = async ({ url, platform }) => {
@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 	);
 
 	const queryVector = await embedText(platform.env.AI, q);
-	const db = (await restore('json', persisted)) as AnyOrama;
+	const db = restoreVectorIndex(persisted);
 
 	const results = await searchVector(db, {
 		mode: 'vector',

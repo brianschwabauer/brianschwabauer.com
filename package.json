@@ -27,7 +27,6 @@
     "@auth/sveltekit": "^1.7.0",
     "@delightstack/components": "workspace:*",
     "@orama/orama": "^3.0.0",
-    "@orama/plugin-data-persistence": "^3.0.0",
     "@tiptap/core": "^2.10.0",
     "@tiptap/extension-image": "^2.10.0",
     "@tiptap/extension-link": "^2.10.0",
