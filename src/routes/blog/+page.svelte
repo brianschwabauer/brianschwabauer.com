@@ -1,5 +1,6 @@
 <script lang="ts">
 	import PostCard from '$lib/components/blog/PostCard.svelte';
+	import FeaturedPostCard from '$lib/components/blog/FeaturedPostCard.svelte';
 	import PostFilters from '$lib/components/blog/PostFilters.svelte';
 
 	let { data } = $props();
@@ -9,6 +10,14 @@
 	const filteredPosts = $derived(
 		activeCategory ? data.posts.filter((p) => p.category === activeCategory) : data.posts
 	);
+
+	const pinnedPosts = $derived(
+		[...filteredPosts]
+			.filter((p) => p.pinned)
+			.sort((a, b) => (b.publishedAt ?? b.createdAt) - (a.publishedAt ?? a.createdAt))
+	);
+
+	const regularPosts = $derived(filteredPosts.filter((p) => !p.pinned));
 
 	const categories = $derived([...new Set(data.posts.map((p) => p.category).filter(Boolean))] as string[]);
 </script>
@@ -33,13 +42,23 @@
 		</div>
 	{/if}
 
-	{#if filteredPosts.length > 0}
+	{#if pinnedPosts.length > 0}
+		<section class="featured-section" aria-label="Featured posts">
+			<div class="featured-grid" class:single={pinnedPosts.length === 1}>
+				{#each pinnedPosts as post (post.slug)}
+					<FeaturedPostCard {post} />
+				{/each}
+			</div>
+		</section>
+	{/if}
+
+	{#if regularPosts.length > 0}
 		<div class="posts-grid">
-			{#each filteredPosts as post (post.slug)}
+			{#each regularPosts as post (post.slug)}
 				<PostCard {post} />
 			{/each}
 		</div>
-	{:else}
+	{:else if pinnedPosts.length === 0}
 		<div class="empty-state">
 			<p>No posts yet. Check back soon!</p>
 		</div>
@@ -87,6 +106,26 @@
 		display: flex;
 		justify-content: center;
 		margin-bottom: var(--space-12);
+	}
+
+	.featured-section {
+		margin-bottom: var(--space-12);
+	}
+
+	.featured-grid {
+		display: grid;
+		gap: var(--space-6);
+	}
+
+	@media (min-width: 1024px) {
+		.featured-grid {
+			grid-template-columns: repeat(2, 1fr);
+			gap: var(--space-8);
+		}
+
+		.featured-grid.single {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	.posts-grid {

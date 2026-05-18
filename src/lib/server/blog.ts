@@ -25,6 +25,7 @@ export interface BlogPost {
 	coverFocalX: number;
 	/** Vertical focal point (0–100 %) for the 2.35:1 cover crop. Default 50. */
 	coverFocalY: number;
+	pinned: boolean;
 	publishedAt: number | null;
 	createdAt: number;
 	updatedAt: number;
@@ -43,6 +44,7 @@ export interface BlogPostMeta {
 	featuredImage: ImageRecord | null;
 	coverFocalX: number;
 	coverFocalY: number;
+	pinned: boolean;
 	publishedAt: number | null;
 	createdAt: number;
 	updatedAt: number;
@@ -75,6 +77,7 @@ function toMeta(post: BlogPost): BlogPostMeta {
 		featuredImage: post.featuredImage,
 		coverFocalX: post.coverFocalX,
 		coverFocalY: post.coverFocalY,
+		pinned: post.pinned ?? false,
 		publishedAt: post.publishedAt,
 		createdAt: post.createdAt,
 		updatedAt: post.updatedAt
@@ -147,6 +150,7 @@ export interface SavePostInput {
 	featuredImage?: ImageRecord | null;
 	coverFocalX?: number;
 	coverFocalY?: number;
+	pinned?: boolean;
 	publishedAt?: number | null;
 	contentHash?: string | null;
 	embedding?: number[] | null;
@@ -178,6 +182,7 @@ export async function savePost(kv: KVNamespace, input: SavePostInput): Promise<B
 			input.featuredImage === undefined ? existing?.featuredImage ?? null : input.featuredImage,
 		coverFocalX: clampFocal(input.coverFocalX, existing?.coverFocalX ?? 50),
 		coverFocalY: clampFocal(input.coverFocalY, existing?.coverFocalY ?? 50),
+		pinned: input.pinned ?? existing?.pinned ?? false,
 		publishedAt:
 			input.publishedAt !== undefined
 				? input.publishedAt
