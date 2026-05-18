@@ -7,13 +7,7 @@
 	const isAdmin = $derived((data.session?.user as { role?: string })?.role === 'admin');
 </script>
 
-{#if !data.session}
-	<div class="auth-required">
-		<h1>Sign In Required</h1>
-		<p>You need to sign in to access the admin area.</p>
-		<Button href="/auth/signin">Sign In</Button>
-	</div>
-{:else if !isAdmin}
+{#if !isAdmin}
 	<div class="auth-required">
 		<h1>Access Denied</h1>
 		<p>You don't have permission to access the admin area.</p>
