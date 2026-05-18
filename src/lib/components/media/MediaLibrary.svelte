@@ -1,6 +1,9 @@
 <script lang="ts">
-	import { Modal, Button } from '@delightstack/components/actions';
+	import { Modal, Button, alert } from '@delightstack/components/actions';
 	import { Input } from '@delightstack/components/form';
+	import ImageDetailsForm, {
+		type ImageDetailsValues,
+	} from './ImageDetailsForm.svelte';
 	import {
 		listImages,
 		uploadImage,
@@ -28,9 +31,8 @@
 	let uploading = $state<File[]>([]);
 	let uploadError = $state<string | null>(null);
 	let dragOver = $state(false);
-	let editingPath = $state<string | null>(null);
-	let editingAlt = $state('');
-	let editingCaption = $state('');
+	let editingImage = $state<ImageRecord | null>(null);
+	let savingMeta = $state(false);
 	let fileInput = $state<HTMLInputElement | undefined>(undefined);
 
 	const years = $derived.by(() => {
@@ -120,33 +122,40 @@
 	}
 
 	function startEditMeta(image: ImageRecord) {
-		editingPath = image.path;
-		editingAlt = image.alt_text ?? '';
-		editingCaption = image.caption ?? '';
+		editingImage = image;
 	}
 
 	function cancelEditMeta() {
-		editingPath = null;
-		editingAlt = '';
-		editingCaption = '';
+		if (savingMeta) return;
+		editingImage = null;
 	}
 
-	async function saveMeta(image: ImageRecord) {
+	async function saveMeta(values: ImageDetailsValues) {
+		if (!editingImage) return;
+		const target = editingImage;
+		savingMeta = true;
 		try {
-			const updated = await updateImageMeta(image.path, {
-				alt: editingAlt,
-				caption: editingCaption,
+			const updated = await updateImageMeta(target.path, {
+				alt: values.alt,
+				caption: values.caption,
 			});
-			images = images.map((i) => (i.path === image.path ? updated : i));
+			images = images.map((i) => (i.path === target.path ? updated : i));
+			editingImage = null;
 		} catch (err) {
 			uploadError = err instanceof Error ? err.message : 'Failed to update image';
 		} finally {
-			cancelEditMeta();
+			savingMeta = false;
 		}
 	}
 
 	async function remove(image: ImageRecord) {
-		if (!confirm(`Delete "${image.file_name ?? image.slug}"? This cannot be undone.`)) return;
+		const ok = await alert({
+			title: 'Delete image?',
+			message: `“${image.file_name ?? image.slug}” will be removed from your library. This can’t be undone.`,
+			continueText: 'Delete',
+			destructive: true,
+		});
+		if (!ok) return;
 		try {
 			await deleteImage(image.path);
 			images = images.filter((i) => i.path !== image.path);
@@ -168,8 +177,9 @@
 	height="min(80vh, 760px)"
 	maxWidth="100vw"
 	maxHeight="100svh">
-	<div class="library">
-		<div class="toolbar">
+	<div class="library" class:has-side={!!editingImage}>
+		<div class="library-main">
+			<div class="toolbar">
 			<div class="toolbar-left">
 				<label class="year-label" for="media-year">Year</label>
 				<select id="media-year" bind:value={year} class="year-select">
@@ -297,20 +307,6 @@
 									</button>
 								</div>
 							</div>
-							{#if editingPath === image.path}
-								<div
-									class="alt-edit"
-									onclick={(e) => e.stopPropagation()}
-									onkeydown={(e) => e.stopPropagation()}
-									role="presentation">
-									<Input bind:value={editingAlt} placeholder="Alt text" />
-									<Input bind:value={editingCaption} placeholder="Caption" />
-									<div class="alt-edit-actions">
-										<Button size="0" onclick={() => saveMeta(image)}>Save</Button>
-										<Button size="0" transparent onclick={cancelEditMeta}>Cancel</Button>
-									</div>
-								</div>
-							{/if}
 						</div>
 					{/each}
 				</div>
@@ -318,17 +314,67 @@
 					<div class="drop-hint" aria-hidden="true">Drop images to upload</div>
 				{/if}
 			{/if}
+			</div>
 		</div>
+
+		{#if editingImage}
+			<aside class="library-side" aria-label="Image details">
+				<ImageDetailsForm
+					previewSrc={thumbnailURL(editingImage)}
+					previewAlt={editingImage.alt_text}
+					previewStyle={bgStyle(editingImage)}
+					alt={editingImage.alt_text ?? ''}
+					caption={editingImage.caption ?? ''}
+					saving={savingMeta}
+					showBack
+					onSave={saveMeta}
+					onCancel={cancelEditMeta} />
+			</aside>
+		{/if}
 	</div>
 </Modal>
 
 <style>
 	.library {
+		display: grid;
+		grid-template-columns: 1fr;
+		grid-template-rows: 100%;
+		height: 100%;
+		min-height: 0;
+		gap: var(--space-4);
+	}
+
+	.library-main {
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-3);
-		height: 100%;
 		min-height: 0;
+		min-width: 0;
+	}
+
+	.library-side {
+		min-height: 0;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		padding-left: var(--space-4);
+		border-left: 1px solid var(--color-border);
+	}
+
+	@media (min-width: 768px) {
+		.library.has-side {
+			grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+		}
+	}
+
+	@media (max-width: 767px) {
+		.library.has-side .library-main {
+			display: none;
+		}
+		.library-side {
+			padding-left: 0;
+			border-left: none;
+		}
 	}
 
 	.toolbar {
@@ -517,24 +563,6 @@
 
 	.overlay-btn.danger:hover {
 		background: var(--color-error);
-	}
-
-	.alt-edit {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		flex-direction: column;
-		justify-content: end;
-		padding: var(--space-2);
-		gap: var(--space-2);
-		background: color-mix(in oklch, var(--color-surface) 92%, transparent);
-		backdrop-filter: blur(8px);
-	}
-
-	.alt-edit-actions {
-		display: flex;
-		justify-content: end;
-		gap: var(--space-1);
 	}
 
 	.drop-hint {
