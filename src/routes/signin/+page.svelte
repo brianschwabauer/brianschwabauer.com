@@ -1,6 +1,14 @@
 <script lang="ts">
 	import { signIn } from '@auth/sveltekit/client';
+	import { page } from '$app/stores';
 	import { Button } from '@delightstack/components/actions';
+
+	const callbackUrl = $derived.by(() => {
+		const raw = $page.url.searchParams.get('redirect');
+		// Only accept same-origin relative paths to prevent open-redirect.
+		if (raw && raw.startsWith('/') && !raw.startsWith('//')) return raw;
+		return '/admin';
+	});
 </script>
 
 <svelte:head>
@@ -13,7 +21,7 @@
 		<p class="description">Sign in to access the admin area.</p>
 
 		<div class="providers">
-			<button class="provider-btn google" onclick={() => signIn('google', { callbackUrl: '/admin' })}>
+			<button class="provider-btn google" onclick={() => signIn('google', { callbackUrl })}>
 				<svg viewBox="0 0 24 24">
 					<path
 						fill="#4285F4"

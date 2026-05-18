@@ -26,10 +26,12 @@ export function createAuth(platform: App.Platform | undefined) {
 
 	return SvelteKitAuth({
 		session: { strategy: 'jwt' },
+		pages: { signIn: '/signin' },
 		providers: [
 			Google({
 				clientId: env.AUTH_GOOGLE_ID,
-				clientSecret: env.AUTH_GOOGLE_SECRET
+				clientSecret: env.AUTH_GOOGLE_SECRET,
+				authorization: { params: { prompt: 'select_account' } }
 			})
 		],
 		secret: env.AUTH_SECRET,
