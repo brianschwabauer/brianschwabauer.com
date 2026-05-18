@@ -284,6 +284,7 @@
 	     full    — full viewport bleed
 	*/
 	.post-content :global(figure.blog-img) {
+		position: relative;
 		margin: var(--space-10) auto;
 		display: block;
 	}
@@ -322,10 +323,28 @@
 		border-radius: 0;
 	}
 
+	/* Caption overlay — only emitted when the figure has a caption. Sits over
+	   the bottom of the image with a black gradient so light/dark images both
+	   stay readable. The figure itself doesn't clip (so wide-mode breakouts
+	   keep working); the figcaption uses the image's bounds via absolute
+	   positioning at the figure root. */
 	.post-content :global(figure.blog-img figcaption) {
-		text-align: center;
-		font-size: 0.875rem;
-		color: var(--color-text-muted);
-		margin-top: var(--space-2);
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		padding: var(--space-8) var(--space-4) var(--space-3);
+		color: white;
+		font-size: 0.9375rem;
+		line-height: 1.4;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+		background: linear-gradient(to top, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0));
+		border-bottom-left-radius: var(--radius-md);
+		border-bottom-right-radius: var(--radius-md);
+		pointer-events: none;
+	}
+
+	.post-content :global(figure.blog-img[data-width-mode='full'] figcaption) {
+		border-radius: 0;
 	}
 </style>

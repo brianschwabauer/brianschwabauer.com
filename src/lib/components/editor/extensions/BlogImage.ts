@@ -27,6 +27,13 @@ export interface BlogImageAttrs {
 	src: string;
 	path: string;
 	alt: string | null;
+	/**
+	 * Caption shown over the bottom of the image on the public post. Stored on
+	 * the node (not just R2) so each post can carry its own caption — the value
+	 * is snapshotted from R2 at insertion time and editing it here doesn't
+	 * affect other posts that use the same image.
+	 */
+	caption: string | null;
 	width: number;
 	height: number;
 	thumbhash: string | null;
@@ -70,6 +77,14 @@ export const BlogImage = Node.create({
 			src: { default: '' },
 			path: { default: '' },
 			alt: { default: null },
+			caption: {
+				default: null,
+				parseHTML: (el) => {
+					const fig = el.querySelector('figcaption');
+					return fig?.textContent?.trim() || el.dataset.caption || null;
+				},
+				renderHTML: (attrs) => (attrs.caption ? { 'data-caption': attrs.caption } : {}),
+			},
 			width: {
 				default: 0,
 				parseHTML: (el) => Number(el.getAttribute('width')) || Number(el.dataset.width) || 0,
@@ -141,12 +156,7 @@ export const BlogImage = Node.create({
 
 	renderHTML({ HTMLAttributes, node }) {
 		const attrs = node.attrs as BlogImageAttrs;
-		return [
-			'figure',
-			mergeAttributes(HTMLAttributes, {
-				class: 'blog-img',
-				'data-path': attrs.path,
-			}),
+		const children: unknown[] = [
 			[
 				'img',
 				{
@@ -156,6 +166,17 @@ export const BlogImage = Node.create({
 					height: attrs.height || null,
 				},
 			],
+		];
+		if (attrs.caption) {
+			children.push(['figcaption', {}, attrs.caption]);
+		}
+		return [
+			'figure',
+			mergeAttributes(HTMLAttributes, {
+				class: 'blog-img',
+				'data-path': attrs.path,
+			}),
+			...children,
 		];
 	},
 
@@ -170,6 +191,7 @@ export const BlogImage = Node.create({
 							widthMode: 'normal',
 							widthPct: 100,
 							alt: null,
+							caption: null,
 							thumbhash: null,
 							bgColor: null,
 							fileName: null,

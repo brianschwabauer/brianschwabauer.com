@@ -27,6 +27,7 @@ export interface ImageRecord {
 	slug: string;
 	file_name: string | null;
 	alt_text: string | null;
+	caption: string | null;
 	mime_type: string;
 	width: number;
 	height: number;

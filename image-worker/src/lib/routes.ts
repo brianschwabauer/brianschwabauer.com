@@ -85,6 +85,7 @@ export async function getImage(env: ImageEnv, path: string): Promise<ImageRecord
 export interface UploadInput {
 	file: File;
 	alt?: string;
+	caption?: string;
 }
 
 export async function uploadImage(env: ImageEnv, input: UploadInput): Promise<ImageRecord> {
@@ -125,6 +126,7 @@ export async function uploadImage(env: ImageEnv, input: UploadInput): Promise<Im
 		slug,
 		file_name: input.file.name || null,
 		alt_text: input.alt?.trim() || null,
+		caption: input.caption?.trim() || null,
 		mime_type: result.metadata.mime_type,
 		width: result.metadata.width,
 		height: result.metadata.height,
@@ -173,12 +175,12 @@ export async function uploadImage(env: ImageEnv, input: UploadInput): Promise<Im
 	return record;
 }
 
-// ── Update (alt text) ───────────────────────────────────────────────────────
+// ── Update (alt text / caption) ─────────────────────────────────────────────
 
 export async function updateImage(
 	env: ImageEnv,
 	path: string,
-	patch: { alt?: string | null },
+	patch: { alt?: string | null; caption?: string | null },
 ): Promise<ImageRecord | null> {
 	const safe = sanitizePath(path);
 	if (!safe) return null;
@@ -192,6 +194,7 @@ export async function updateImage(
 	const updated: ImageRecord = {
 		...existing,
 		alt_text: patch.alt === undefined ? existing.alt_text : (patch.alt?.trim() || null),
+		caption: patch.caption === undefined ? existing.caption : (patch.caption?.trim() || null),
 		updated_at: new Date().toISOString(),
 	};
 

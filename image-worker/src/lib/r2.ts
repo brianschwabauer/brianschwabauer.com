@@ -88,6 +88,7 @@ export function serializeRecord(
 	const meta: Record<string, string> = {
 		file_name: record.file_name ?? '',
 		alt_text: record.alt_text ?? '',
+		caption: record.caption ?? '',
 		mime_type: record.mime_type,
 		width: String(record.width),
 		height: String(record.height),
@@ -138,6 +139,7 @@ export function deserializeRecord(
 		slug,
 		file_name: customMetadata.file_name || null,
 		alt_text: customMetadata.alt_text || null,
+		caption: customMetadata.caption || null,
 		mime_type: customMetadata.mime_type || 'image/avif',
 		width,
 		height,

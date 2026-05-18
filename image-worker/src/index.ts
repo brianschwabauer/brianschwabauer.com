@@ -53,10 +53,11 @@ export default {
 					const form = await request.formData();
 					const file = form.get('file');
 					const alt = (form.get('alt') as string | null) ?? undefined;
+					const caption = (form.get('caption') as string | null) ?? undefined;
 					if (!(file instanceof File) || file.size === 0) {
 						return jsonResponse({ message: 'No file provided' }, 400);
 					}
-					const record = await uploadImage(env, { file, alt });
+					const record = await uploadImage(env, { file, alt, caption });
 					return jsonResponse({ image: record });
 				}
 				return new Response('Method Not Allowed', { status: 405 });
@@ -71,8 +72,11 @@ export default {
 					return jsonResponse({ image: record });
 				}
 				if (request.method === 'PATCH') {
-					const body = (await request.json().catch(() => ({}))) as { alt?: string | null };
-					const updated = await updateImage(env, path, { alt: body.alt });
+					const body = (await request.json().catch(() => ({}))) as {
+						alt?: string | null;
+						caption?: string | null;
+					};
+					const updated = await updateImage(env, path, { alt: body.alt, caption: body.caption });
 					if (!updated) return jsonResponse({ message: 'Not found' }, 404);
 					return jsonResponse({ image: updated });
 				}
