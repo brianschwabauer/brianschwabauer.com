@@ -36,8 +36,8 @@ export interface SearchEntry {
 	date: number;
 	url: string;
 	featuredImage?: ImageRecord | null;
-	coverFocalX?: number;
-	coverFocalY?: number;
+	/** Plain image URL — used by home sections that aren't backed by an ImageRecord. */
+	imageUrl?: string;
 }
 
 export interface VectorSearchEntry {
@@ -50,8 +50,6 @@ export interface VectorSearchEntry {
 	url: string;
 	embedding: number[];
 	featuredImage?: ImageRecord | null;
-	coverFocalX?: number;
-	coverFocalY?: number;
 }
 
 /** Short label shown above the title in a search result. */
