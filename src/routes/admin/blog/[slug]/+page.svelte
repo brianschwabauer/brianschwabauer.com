@@ -9,6 +9,7 @@
 	<PostEditor
 		mode="edit"
 		initialPost={data.post}
+		initialContentHtml={data.contentHtml}
 		tagSuggestions={data.adminData?.tags ?? []} />
 {:else}
 	<div class="not-found">

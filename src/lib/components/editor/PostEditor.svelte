@@ -17,11 +17,20 @@
 		    on save and uses `initialPost.slug` for delete/preview links. */
 		mode: 'new' | 'edit';
 		initialPost?: BlogPost | null;
+		/** Server-rendered HTML of `initialPost.content`. Painted into the body
+		    editor mount point so SSR shows real content immediately — TipTap
+		    clears it and takes over on hydration. */
+		initialContentHtml?: string;
 		/** Pool of previously-used tags, surfaced as autocomplete suggestions. */
 		tagSuggestions?: string[];
 	}
 
-	let { mode, initialPost = null, tagSuggestions = [] }: Props = $props();
+	let {
+		mode,
+		initialPost = null,
+		initialContentHtml = '',
+		tagSuggestions = [],
+	}: Props = $props();
 
 	// Snapshot the post at mount so the unsaved-changes diff has a stable
 	// reference point (the prop itself stays reactive).
@@ -321,6 +330,7 @@
 	<BodyEditor
 		bind:this={bodyEditor}
 		content={initialContent}
+		{initialContentHtml}
 		onUpdate={handleBodyUpdate}
 		onAiAction={handleAiAction} />
 </article>
