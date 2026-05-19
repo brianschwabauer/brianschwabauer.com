@@ -42,6 +42,9 @@
 	});
 
 	const onRootPage = $derived($page.url.pathname === "/");
+	const onBlogPage = $derived(
+		$page.url.pathname === "/blog" || $page.url.pathname.startsWith("/blog/"),
+	);
 	const logoHidden = $derived($hideHeaderLogo);
 
 	function handleLogoClick(e: MouseEvent) {
@@ -71,10 +74,21 @@
 		</a>
 
 		<div class="header-actions">
+			{#if !onRootPage}
+				<a href="/" class="nav-link" class:on-dark={invertLogo}>Home</a>
+			{/if}
 			{#if showThemeToggle}
 				<ThemeToggle />
 			{/if}
-			<a href="/blog" class="blog-link" class:on-dark={invertLogo}>Blog</a>
+			<a
+				href="/blog"
+				class="nav-link"
+				class:on-dark={invertLogo}
+				class:active={onBlogPage}
+				aria-current={onBlogPage ? "page" : undefined}
+			>
+				Blog
+			</a>
 			<button
 				type="button"
 				class="search-btn"
@@ -174,7 +188,7 @@
 		margin-left: auto;
 	}
 
-	.blog-link {
+	.nav-link {
 		font-family: var(--font-mono, ui-monospace, monospace);
 		font-size: 0.78rem;
 		font-weight: 700;
@@ -189,17 +203,29 @@
 			background-color var(--transition-fast),
 			border-color var(--transition-fast);
 	}
-	.blog-link:hover {
+	.nav-link:hover {
 		color: var(--color-text);
 		background: var(--color-surface);
 	}
-	.blog-link.on-dark {
+	.nav-link.on-dark {
 		color: rgba(255, 255, 255, 0.78);
 		border-color: rgba(255, 255, 255, 0.22);
 	}
-	.blog-link.on-dark:hover {
+	.nav-link.on-dark:hover {
 		color: #fff;
 		background: rgba(255, 255, 255, 0.08);
+		border-color: rgba(0, 242, 195, 0.45);
+	}
+	.nav-link.active,
+	.nav-link.active:hover {
+		color: var(--color-accent);
+		background: var(--color-accent-light);
+		border-color: var(--color-accent);
+	}
+	.nav-link.active.on-dark,
+	.nav-link.active.on-dark:hover {
+		color: #fff;
+		background: rgba(0, 242, 195, 0.15);
 		border-color: rgba(0, 242, 195, 0.45);
 	}
 
