@@ -161,79 +161,10 @@
 				</g>
 			</g>
 
-			<!-- PUMP — back layer (cylinder + gauge). Sibling of upper-pose, so
-				 it stays anchored to the floor while the mascot dips and the
-				 handle (inside upper-pose) moves with him. -->
-			<g class="pump-back" class:compressed={armDown}>
-				<rect
-					x="92"
-					y="232"
-					width="56"
-					height="62"
-					rx="6"
-					fill="url(#pump-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2"
-				/>
-				<rect
-					x="86"
-					y="226"
-					width="68"
-					height="10"
-					rx="3"
-					fill="#0a0e15"
-					stroke="#1a1a1a"
-					stroke-width="2"
-				/>
-				<line
-					x1="100"
-					y1="248"
-					x2="140"
-					y2="248"
-					stroke="rgba(255,255,255,0.08)"
-					stroke-width="1"
-				/>
-				<line
-					x1="100"
-					y1="254"
-					x2="140"
-					y2="254"
-					stroke="rgba(255,255,255,0.08)"
-					stroke-width="1"
-				/>
-				<!-- pressure gauge on the front face -->
-				<g class="gauge">
-					<circle
-						cx="120"
-						cy="270"
-						r="11"
-						fill="#0a0e15"
-						stroke="#1a1a1a"
-						stroke-width="1.8"
-					/>
-					<circle
-						cx="120"
-						cy="270"
-						r="10"
-						fill="url(#gauge-grad)"
-						style:opacity={gaugeGlow}
-					/>
-					<line
-						class="needle"
-						x1="120"
-						y1="270"
-						x2="120"
-						y2="262"
-						stroke="#ff5a3c"
-						stroke-width="2.2"
-						stroke-linecap="round"
-						style:transform-origin="120px 270px"
-					/>
-				</g>
-			</g>
-
 			<!-- UPPER BODY (torso, head, pump handle, arms) — translates down on
-				 the down stroke. The pump-back above stays put. -->
+				 the down stroke. The pump-back below stays anchored to the
+				 ground and renders LAST so it sits in front of the torso (no
+				 clipping) and visually swallows the bottom of the rod. -->
 			<g class="upper-pose" class:dip={armDown}>
 				<!-- TORSO -->
 				<g class="torso">
@@ -463,11 +394,13 @@
 					</g>
 				</g>
 
-				<!-- PUMP — handle bar (in front of torso/head so the bar visibly
-					 sits between the chest and the fists) -->
+				<!-- PUMP — T-handle (bar + tall rod). The rod extends down to the
+					 pump body which now sits on the ground. The cap of the
+					 cylinder visually covers the lower portion of this rod so it
+					 looks like the rod slides into the cylinder on each stroke. -->
 				<g class="pump-handle" class:down={armDown}>
-					<!-- vertical rod connecting the bar into the cap -->
-					<rect x="117" y="216" width="6" height="14" rx="2" fill="#1a2230" />
+					<!-- tall vertical rod from just below the bar down into the cap -->
+					<rect x="117" y="218" width="6" height="58" rx="2" fill="#1a2230" />
 					<!-- the horizontal bar both fists grip -->
 					<rect
 						x="88"
@@ -560,6 +493,51 @@
 						stroke="#1a1a1a"
 						stroke-width="1.5"
 						stroke-linecap="round"
+					/>
+				</g>
+			</g>
+
+			<!-- PUMP — body (cylinder + cap + gauge). Sits on the ground (bottom
+				 aligned with the boots) and renders AFTER everything else so it
+				 sits in front of the torso and visibly swallows the rod. -->
+			<g class="pump-back" class:compressed={armDown}>
+				<!-- cap covers the rod bottom — rod slides into the cap on a stroke -->
+				<rect
+					x="86"
+					y="264"
+					width="68"
+					height="10"
+					rx="3"
+					fill="#0a0e15"
+					stroke="#1a1a1a"
+					stroke-width="2"
+				/>
+				<!-- main cylinder, bottom at the feet/floor level -->
+				<rect
+					x="92"
+					y="270"
+					width="56"
+					height="50"
+					rx="6"
+					fill="url(#pump-grad)"
+					stroke="#1a1a1a"
+					stroke-width="2"
+				/>
+				<line x1="100" y1="286" x2="140" y2="286" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+				<line x1="100" y1="292" x2="140" y2="292" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+				<g class="gauge">
+					<circle cx="120" cy="300" r="11" fill="#0a0e15" stroke="#1a1a1a" stroke-width="1.8" />
+					<circle cx="120" cy="300" r="10" fill="url(#gauge-grad)" style:opacity={gaugeGlow} />
+					<line
+						class="needle"
+						x1="120"
+						y1="300"
+						x2="120"
+						y2="292"
+						stroke="#ff5a3c"
+						stroke-width="2.2"
+						stroke-linecap="round"
+						style:transform-origin="120px 300px"
 					/>
 				</g>
 			</g>
@@ -770,11 +748,13 @@
 		transform: translateY(4px);
 	}
 	.pump-back {
-		transform-origin: 120px 294px;
+		/* origin at the bottom of the cylinder (floor) so the squash compresses
+		   downward into the ground rather than floating off it. */
+		transform-origin: 120px 320px;
 		transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
 	}
 	.pump-back.compressed {
-		transform: scaleY(0.97) scaleX(1.02);
+		transform: scaleY(0.94) scaleX(1.03);
 	}
 
 	.needle {
