@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { flushSync, onMount, onDestroy, untrack } from 'svelte';
 	import { Editor, Extension } from '@tiptap/core';
 	import StarterKit from '@tiptap/starter-kit';
 
@@ -20,6 +20,12 @@
 
 	let element: HTMLElement;
 	let editor: Editor | null = $state(null);
+	// Snapshot the value at construction so the SSR fallback paints the right
+	// title text even if `value` changes before TipTap mounts.
+	const initialValue = untrack(() => value);
+	// Flipped right before TipTap mounts so the {#if !mounted} SSR fallback is
+	// removed synchronously and the swap doesn't double-paint the title.
+	let mounted = $state(false);
 	let isEmpty = $state(value.trim().length === 0);
 
 	// A title is a single paragraph: pressing Enter (or Shift-Enter) never
@@ -45,6 +51,12 @@
 	});
 
 	onMount(() => {
+		// Flip `mounted` first and flush so Svelte removes the SSR fallback
+		// before TipTap claims the same host.
+		mounted = true;
+		flushSync();
+		// Defensive: clear any stray content in case the host wasn't empty.
+		element.innerHTML = '';
 		editor = new Editor({
 			element,
 			extensions: [
@@ -102,7 +114,11 @@
 </script>
 
 <div class="title-editor" class:is-empty={isEmpty}>
-	<div bind:this={element} class="title-host"></div>
+	<div bind:this={element} class="title-host">
+		{#if !mounted && initialValue}
+			<div class="title-pm" aria-hidden="true"><p>{initialValue}</p></div>
+		{/if}
+	</div>
 	{#if isEmpty}
 		<div class="title-placeholder" aria-hidden="true">{placeholder}</div>
 	{/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { flushSync, onMount, onDestroy, untrack } from 'svelte';
 	import { Editor, textblockTypeInputRule, type JSONContent } from '@tiptap/core';
 	import StarterKit from '@tiptap/starter-kit';
 	import Heading from '@tiptap/extension-heading';
@@ -36,6 +36,11 @@
 
 	interface Props {
 		content?: JSONContent | null;
+		/** Server-rendered HTML of `content`. Painted into the editor mount
+		    point so SSR shows real content immediately — TipTap clears it and
+		    takes over on hydration. Captured once at construction; later
+		    changes to the prop are ignored to avoid clobbering TipTap's DOM. */
+		initialContentHtml?: string;
 		placeholder?: string;
 		onUpdate?: (json: JSONContent, text: string) => void;
 		onAiAction?: (selectedText: string) => void;
@@ -43,15 +48,39 @@
 
 	let {
 		content = null,
+		initialContentHtml = '',
 		placeholder = 'Tell your story…',
 		onUpdate,
 		onAiAction,
 	}: Props = $props();
 
+	// Snapshot at construction so reactive changes don't re-set innerHTML
+	// after TipTap has mounted into the same element.
+	const initialHtml = untrack(() => initialContentHtml);
+
 	let editorElement: HTMLElement;
 	let editor: Editor | null = $state(null);
+	// Flipped right before TipTap mounts so the {#if !mounted} SSR preview is
+	// removed synchronously (via flushSync) — keeps the swap from briefly
+	// stacking both previews and shifting the page height.
+	let mounted = $state(false);
 	let libraryOpen = $state(false);
-	let isDocEmpty = $state(true);
+	// Seed from the initial content so the SSR'd output isn't covered by the
+	// placeholder before TipTap mounts.
+	let isDocEmpty = $state(untrack(() => isJsonDocEmpty(content)));
+
+	function isJsonDocEmpty(doc: JSONContent | null | undefined): boolean {
+		if (!doc) return true;
+		const children = doc.content ?? [];
+		if (children.length === 0) return true;
+		if (children.length === 1) {
+			const only = children[0];
+			if (only.type === 'paragraph' && (!only.content || only.content.length === 0)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	// Plain mutable ref shared with EditorSlashMenu — the SlashCommand
 	// extension calls `.onKeyDown` to give the menu a chance to intercept
 	// navigation keys before ProseMirror processes them.
@@ -60,7 +89,18 @@
 	};
 
 	onMount(() => {
-		editor = new Editor({
+		// Flip `mounted` first and flush so Svelte removes the SSR preview
+		// before TipTap claims the same host — otherwise both previews would
+		// briefly stack and the page would shift.
+		mounted = true;
+		flushSync();
+		editor = createEditor();
+	});
+
+	function createEditor(): Editor {
+		// Defensive: clear any stray content in case the host wasn't empty.
+		editorElement.innerHTML = '';
+		const next = new Editor({
 			element: editorElement,
 			extensions: [
 				StarterKit.configure({ heading: false }),
@@ -93,7 +133,8 @@
 			},
 			onCreate: ({ editor }) => updateEmptyState(editor),
 		});
-	});
+		return next;
+	}
 
 	function updateEmptyState(ed: Editor) {
 		const doc = ed.state.doc;
@@ -179,7 +220,11 @@
 		onmousedown={handleHostPointerDown}
 		role="presentation"
 	>
-		<div bind:this={editorElement}></div>
+		<div bind:this={editorElement}>
+			{#if !mounted && initialHtml}
+				<div class="body-pm prose body-ssr" aria-hidden="true">{@html initialHtml}</div>
+			{/if}
+		</div>
 	</div>
 </div>
 
@@ -332,6 +377,23 @@
 		height: 100%;
 		object-fit: cover;
 		object-position: var(--blog-img-focal-x, 50%) var(--blog-img-focal-y, 50%);
+	}
+
+	/* SSR fallback: renderDoc emits <figure><img></figure> directly (matching
+	   the public post page), so it has no .blog-img-inner wrapper to carry the
+	   cropped aspect-ratio. Mirror that styling onto the figure itself — but
+	   only inside .body-ssr — so the SSR'd post lays out at the right height
+	   and the page doesn't reflow when TipTap hydrates and inserts the inner
+	   wrapper. Scoping to .body-ssr keeps the editor's figure free of
+	   overflow:hidden (which would clip the hover toolbar / resize handles
+	   that sit outside the figure bounds). */
+	.body-host :global(.body-ssr figure.blog-img.is-cropped) {
+		aspect-ratio: var(--blog-img-crop-aspect);
+		overflow: hidden;
+		border-radius: var(--radius-sm);
+	}
+	.body-host :global(.body-ssr figure.blog-img.is-cropped[data-width-mode='full']) {
+		border-radius: 0;
 	}
 
 	/* Caption overlay — only visible when the figure carries a caption. The
