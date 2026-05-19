@@ -38,8 +38,14 @@
 	function jump(id: string) {
 		const el = document.getElementById(id);
 		if (!el) return;
-		const top = el.getBoundingClientRect().top + window.scrollY - 80;
-		window.scrollTo({ top, behavior: 'smooth' });
+		const scrollTo = () => {
+			const top = el.getBoundingClientRect().top + window.scrollY - 80;
+			window.scrollTo({ top });
+		};
+		scrollTo();
+		activeId = id;
+		// Re-snap after layout settles (lazy images, reveal animations above).
+		requestAnimationFrame(() => requestAnimationFrame(scrollTo));
 	}
 </script>
 
