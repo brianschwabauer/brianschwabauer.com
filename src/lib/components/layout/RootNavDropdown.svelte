@@ -64,14 +64,14 @@
 	});
 
 	const scrollToTop = () => {
-		window.scrollTo({ top: 0, behavior: 'smooth' });
+		window.scrollTo({ top: 0 });
 	};
 
 	const jumpTo = (id: string) => {
 		const el = document.getElementById(id);
 		if (!el) return;
 		const top = el.getBoundingClientRect().top + window.scrollY - 72;
-		window.scrollTo({ top, behavior: 'smooth' });
+		window.scrollTo({ top });
 		open = false;
 		buttonEl?.focus();
 	};

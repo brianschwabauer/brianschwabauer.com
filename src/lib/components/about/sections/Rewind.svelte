@@ -55,7 +55,7 @@
 		const el = document.getElementById('humble-beginnings');
 		if (!el) return;
 		const top = el.getBoundingClientRect().top + window.scrollY - 64;
-		window.scrollTo({ top, behavior: 'smooth' });
+		window.scrollTo({ top });
 	}
 
 	const percent = $derived(((currentYear - displayYear) / (currentYear - START_YEAR)) * 100);

@@ -87,7 +87,6 @@
 		isolation: isolate;
 	}
 	:global(html) {
-		scroll-behavior: smooth;
 		scroll-padding-top: 80px;
 	}
 </style>
