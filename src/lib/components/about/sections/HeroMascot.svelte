@@ -1,11 +1,11 @@
 <script lang="ts">
-	type Phase = 'idle' | 'awake' | 'pumping' | 'boom' | 'aftermath';
+	type Phase = "idle" | "awake" | "pumping" | "boom" | "aftermath";
 
 	let {
-		phase = 'idle',
+		phase = "idle",
 		pumpCount = 0,
 		pumpStroke = 0,
-		buttonScale = 1
+		buttonScale = 1,
 	}: {
 		phase?: Phase;
 		pumpCount?: number;
@@ -13,9 +13,11 @@
 		buttonScale?: number;
 	} = $props();
 
-	const onStage = $derived(phase === 'awake' || phase === 'pumping' || phase === 'boom');
-	const panicking = $derived(phase === 'boom');
-	const armDown = $derived(phase === 'pumping' && pumpStroke === 1);
+	const onStage = $derived(
+		phase === "awake" || phase === "pumping" || phase === "boom",
+	);
+	const panicking = $derived(phase === "boom");
+	const armDown = $derived(phase === "pumping" && pumpStroke === 1);
 	const gaugeGlow = $derived(Math.min(1, pumpCount / 4));
 	void buttonScale;
 </script>
@@ -24,7 +26,7 @@
 	class="mascot-root"
 	class:on-stage={onStage}
 	class:panic={panicking}
-	class:gone={phase === 'aftermath'}
+	class:gone={phase === "aftermath"}
 	aria-hidden="true"
 >
 	<svg
@@ -75,7 +77,14 @@
 		</defs>
 
 		<!-- ground shadow (sits on the floor, doesn't move with the dipping body) -->
-		<ellipse class="ground-shadow" cx="120" cy="328" rx="68" ry="7" fill="rgba(0,0,0,0.55)" />
+		<ellipse
+			class="ground-shadow"
+			cx="120"
+			cy="328"
+			rx="68"
+			ry="7"
+			fill="rgba(0,0,0,0.55)"
+		/>
 
 		<!-- BODY: breathing layer (subtle scale loop) -->
 		<g class="body">
@@ -83,8 +92,26 @@
 			<g class="body-pose" class:dip={armDown}>
 				<!-- BOOTS (back) -->
 				<g class="boots">
-					<rect x="80" y="282" width="32" height="10" rx="3" fill="#d5d5d5" stroke="#1a1a1a" stroke-width="2" />
-					<rect x="128" y="282" width="32" height="10" rx="3" fill="#d5d5d5" stroke="#1a1a1a" stroke-width="2" />
+					<rect
+						x="80"
+						y="282"
+						width="32"
+						height="10"
+						rx="3"
+						fill="#d5d5d5"
+						stroke="#1a1a1a"
+						stroke-width="2"
+					/>
+					<rect
+						x="128"
+						y="282"
+						width="32"
+						height="10"
+						rx="3"
+						fill="#d5d5d5"
+						stroke="#1a1a1a"
+						stroke-width="2"
+					/>
 					<path
 						d="M78 292 L114 292 L114 310 Q114 320 104 320 L78 320 Q70 320 70 312 Z"
 						fill="url(#boot-grad)"
@@ -99,8 +126,20 @@
 						stroke-width="2.5"
 						stroke-linejoin="round"
 					/>
-					<rect x="70" y="313" width="44" height="3" fill="rgba(255,255,255,0.15)" />
-					<rect x="126" y="313" width="44" height="3" fill="rgba(255,255,255,0.15)" />
+					<rect
+						x="70"
+						y="313"
+						width="44"
+						height="3"
+						fill="rgba(255,255,255,0.15)"
+					/>
+					<rect
+						x="126"
+						y="313"
+						width="44"
+						height="3"
+						fill="rgba(255,255,255,0.15)"
+					/>
 				</g>
 
 				<!-- LEGS -->
@@ -121,49 +160,7 @@
 					/>
 				</g>
 
-				<!-- PUMP — back layer (cylinder + gauge), in front of legs, behind torso -->
-				<g class="pump-back" class:compressed={armDown}>
-					<rect
-						x="92"
-						y="232"
-						width="56"
-						height="62"
-						rx="6"
-						fill="url(#pump-grad)"
-						stroke="#1a1a1a"
-						stroke-width="2"
-					/>
-					<rect
-						x="86"
-						y="226"
-						width="68"
-						height="10"
-						rx="3"
-						fill="#0a0e15"
-						stroke="#1a1a1a"
-						stroke-width="2"
-					/>
-					<line x1="100" y1="248" x2="140" y2="248" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
-					<line x1="100" y1="254" x2="140" y2="254" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
-					<!-- pressure gauge on the front face -->
-					<g class="gauge">
-						<circle cx="120" cy="270" r="11" fill="#0a0e15" stroke="#1a1a1a" stroke-width="1.8" />
-						<circle cx="120" cy="270" r="10" fill="url(#gauge-grad)" style:opacity={gaugeGlow} />
-						<line
-							class="needle"
-							x1="120"
-							y1="270"
-							x2="120"
-							y2="262"
-							stroke="#ff5a3c"
-							stroke-width="2.2"
-							stroke-linecap="round"
-							style:transform-origin="120px 270px"
-						/>
-					</g>
-				</g>
-
-				<!-- TORSO (sits over the top of the pump back so the upper body is in front) -->
+				<!-- TORSO -->
 				<g class="torso">
 					<path
 						d="M76 168 Q120 158 164 168 L168 200 Q120 196 72 200 Z"
@@ -193,8 +190,22 @@
 						stroke-width="2"
 						stroke-linejoin="round"
 					/>
-					<circle cx="100" cy="200" r="3.5" fill="#ffd954" stroke="#1a1a1a" stroke-width="1.2" />
-					<circle cx="140" cy="200" r="3.5" fill="#ffd954" stroke="#1a1a1a" stroke-width="1.2" />
+					<circle
+						cx="100"
+						cy="200"
+						r="3.5"
+						fill="#ffd954"
+						stroke="#1a1a1a"
+						stroke-width="1.2"
+					/>
+					<circle
+						cx="140"
+						cy="200"
+						r="3.5"
+						fill="#ffd954"
+						stroke="#1a1a1a"
+						stroke-width="1.2"
+					/>
 					<line
 						x1="120"
 						y1="208"
@@ -207,12 +218,111 @@
 					/>
 				</g>
 
+				<!-- PUMP — back layer (cylinder + gauge), in front of legs, torso -->
+				<g class="pump-back" class:compressed={armDown}>
+					<rect
+						x="92"
+						y="232"
+						width="56"
+						height="62"
+						rx="6"
+						fill="url(#pump-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2"
+					/>
+					<rect
+						x="86"
+						y="226"
+						width="68"
+						height="10"
+						rx="3"
+						fill="#0a0e15"
+						stroke="#1a1a1a"
+						stroke-width="2"
+					/>
+					<line
+						x1="100"
+						y1="248"
+						x2="140"
+						y2="248"
+						stroke="rgba(255,255,255,0.08)"
+						stroke-width="1"
+					/>
+					<line
+						x1="100"
+						y1="254"
+						x2="140"
+						y2="254"
+						stroke="rgba(255,255,255,0.08)"
+						stroke-width="1"
+					/>
+					<!-- pressure gauge on the front face -->
+					<g class="gauge">
+						<circle
+							cx="120"
+							cy="270"
+							r="11"
+							fill="#0a0e15"
+							stroke="#1a1a1a"
+							stroke-width="1.8"
+						/>
+						<circle
+							cx="120"
+							cy="270"
+							r="10"
+							fill="url(#gauge-grad)"
+							style:opacity={gaugeGlow}
+						/>
+						<line
+							class="needle"
+							x1="120"
+							y1="270"
+							x2="120"
+							y2="262"
+							stroke="#ff5a3c"
+							stroke-width="2.2"
+							stroke-linecap="round"
+							style:transform-origin="120px 270px"
+						/>
+					</g>
+				</g>
+
 				<!-- HEAD -->
 				<g class="head">
-					<ellipse cx="63" cy="118" rx="7" ry="11" fill="url(#skin-grad)" stroke="#1a1a1a" stroke-width="2" />
-					<ellipse cx="177" cy="118" rx="7" ry="11" fill="url(#skin-grad)" stroke="#1a1a1a" stroke-width="2" />
-					<ellipse cx="64" cy="118" rx="3" ry="6" fill="#b87a55" opacity="0.7" />
-					<ellipse cx="176" cy="118" rx="3" ry="6" fill="#b87a55" opacity="0.7" />
+					<ellipse
+						cx="63"
+						cy="118"
+						rx="7"
+						ry="11"
+						fill="url(#skin-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2"
+					/>
+					<ellipse
+						cx="177"
+						cy="118"
+						rx="7"
+						ry="11"
+						fill="url(#skin-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2"
+					/>
+					<ellipse
+						cx="64"
+						cy="118"
+						rx="3"
+						ry="6"
+						fill="#b87a55"
+						opacity="0.7"
+					/>
+					<ellipse
+						cx="176"
+						cy="118"
+						rx="3"
+						ry="6"
+						fill="#b87a55"
+						opacity="0.7"
+					/>
 
 					<path
 						class="face"
@@ -223,8 +333,14 @@
 						stroke-linejoin="round"
 					/>
 
-					<path d="M70 90 Q80 78 92 84 L92 100 Q80 102 70 100 Z" fill="#1a1a1a" />
-					<path d="M170 90 Q160 78 148 84 L148 100 Q160 102 170 100 Z" fill="#1a1a1a" />
+					<path
+						d="M70 90 Q80 78 92 84 L92 100 Q80 102 70 100 Z"
+						fill="#1a1a1a"
+					/>
+					<path
+						d="M170 90 Q160 78 148 84 L148 100 Q160 102 170 100 Z"
+						fill="#1a1a1a"
+					/>
 
 					<path
 						class="brow brow-left"
@@ -244,13 +360,41 @@
 					/>
 
 					<g class="eye eye-left">
-						<ellipse cx="96" cy="118" rx="10" ry="11" fill="#ffffff" stroke="#1a1a1a" stroke-width="2.2" />
-						<circle class="pupil pupil-left" cx="98" cy="120" r="5" fill="#1a1a1a" />
+						<ellipse
+							cx="96"
+							cy="118"
+							rx="10"
+							ry="11"
+							fill="#ffffff"
+							stroke="#1a1a1a"
+							stroke-width="2.2"
+						/>
+						<circle
+							class="pupil pupil-left"
+							cx="98"
+							cy="120"
+							r="5"
+							fill="#1a1a1a"
+						/>
 						<circle cx="100" cy="117" r="2" fill="#ffffff" />
 					</g>
 					<g class="eye eye-right">
-						<ellipse cx="144" cy="118" rx="10" ry="11" fill="#ffffff" stroke="#1a1a1a" stroke-width="2.2" />
-						<circle class="pupil pupil-right" cx="146" cy="120" r="5" fill="#1a1a1a" />
+						<ellipse
+							cx="144"
+							cy="118"
+							rx="10"
+							ry="11"
+							fill="#ffffff"
+							stroke="#1a1a1a"
+							stroke-width="2.2"
+						/>
+						<circle
+							class="pupil pupil-right"
+							cx="146"
+							cy="120"
+							r="5"
+							fill="#1a1a1a"
+						/>
 						<circle cx="148" cy="117" r="2" fill="#ffffff" />
 					</g>
 
@@ -302,10 +446,6 @@
 							stroke-width="3"
 						/>
 						<path
-							d="M108 44 Q120 38 132 44 L132 78 Q120 76 108 78 Z"
-							fill="rgba(255,255,255,0.65)"
-						/>
-						<path
 							d="M64 88 Q78 60 96 54"
 							fill="none"
 							stroke="rgba(255,255,255,0.45)"
@@ -333,7 +473,14 @@
 						stroke="#1a1a1a"
 						stroke-width="1.8"
 					/>
-					<rect x="92" y="208" width="56" height="3" rx="1.5" fill="rgba(255,255,255,0.22)" />
+					<rect
+						x="92"
+						y="208"
+						width="56"
+						height="3"
+						rx="1.5"
+						fill="rgba(255,255,255,0.22)"
+					/>
 				</g>
 
 				<!-- ARMS — both come straight down from the shoulders and grip the
@@ -358,7 +505,14 @@
 						stroke-linejoin="round"
 					/>
 					<!-- fist gripping the left side of the bar -->
-					<circle cx="102" cy="215" r="9" fill="url(#skin-grad)" stroke="#1a1a1a" stroke-width="2" />
+					<circle
+						cx="102"
+						cy="215"
+						r="9"
+						fill="url(#skin-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2"
+					/>
 					<!-- thumb curl -->
 					<path
 						d="M97 208 Q100 205 105 208"
@@ -386,7 +540,14 @@
 						stroke-width="2.2"
 						stroke-linejoin="round"
 					/>
-					<circle cx="138" cy="215" r="9" fill="url(#skin-grad)" stroke="#1a1a1a" stroke-width="2" />
+					<circle
+						cx="138"
+						cy="215"
+						r="9"
+						fill="url(#skin-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2"
+					/>
 					<path
 						d="M133 208 Q136 205 141 208"
 						fill="none"
@@ -456,8 +617,13 @@
 		animation: breathe 3.6s ease-in-out infinite;
 	}
 	@keyframes breathe {
-		0%, 100% { transform: scaleY(1) scaleX(1); }
-		50% { transform: scaleY(1.012) scaleX(0.994); }
+		0%,
+		100% {
+			transform: scaleY(1) scaleX(1);
+		}
+		50% {
+			transform: scaleY(1.012) scaleX(0.994);
+		}
 	}
 
 	/* POSE: dips the whole body on the down stroke (knee bend). Compounds
@@ -477,8 +643,13 @@
 		animation: head-bob 3.6s ease-in-out infinite;
 	}
 	@keyframes head-bob {
-		0%, 100% { transform: translateY(0) rotate(-0.6deg); }
-		50% { transform: translateY(-1.4px) rotate(0.6deg); }
+		0%,
+		100% {
+			transform: translateY(0) rotate(-0.6deg);
+		}
+		50% {
+			transform: translateY(-1.4px) rotate(0.6deg);
+		}
 	}
 
 	/* HELMET wobble (follow-through) */
@@ -487,8 +658,13 @@
 		animation: helmet-wobble 3.6s ease-in-out infinite;
 	}
 	@keyframes helmet-wobble {
-		0%, 100% { transform: rotate(-1.4deg); }
-		50% { transform: rotate(1.4deg); }
+		0%,
+		100% {
+			transform: rotate(-1.4deg);
+		}
+		50% {
+			transform: rotate(1.4deg);
+		}
 	}
 
 	/* EYES: glance side to side */
@@ -497,32 +673,58 @@
 		animation: pupil-glance 4.2s ease-in-out infinite;
 	}
 	@keyframes pupil-glance {
-		0%, 30% { transform: translate(0, 0); }
-		38% { transform: translate(-2.5px, 0); }
-		55% { transform: translate(-2.5px, 0); }
-		60% { transform: translate(0, 0); }
-		70% { transform: translate(2px, 0); }
-		85% { transform: translate(2px, 0); }
-		100% { transform: translate(0, 0); }
+		0%,
+		30% {
+			transform: translate(0, 0);
+		}
+		38% {
+			transform: translate(-2.5px, 0);
+		}
+		55% {
+			transform: translate(-2.5px, 0);
+		}
+		60% {
+			transform: translate(0, 0);
+		}
+		70% {
+			transform: translate(2px, 0);
+		}
+		85% {
+			transform: translate(2px, 0);
+		}
+		100% {
+			transform: translate(0, 0);
+		}
 	}
 
 	/* MOUTH swap based on pressure */
-	.mouth { transition: opacity 280ms ease; }
-	.mouth-strain { opacity: 0; }
-	.mascot[style*='--pump-count: 3'] .mouth-strain,
-	.mascot[style*='--pump-count: 4'] .mouth-strain {
+	.mouth {
+		transition: opacity 280ms ease;
+	}
+	.mouth-strain {
+		opacity: 0;
+	}
+	.mascot[style*="--pump-count: 3"] .mouth-strain,
+	.mascot[style*="--pump-count: 4"] .mouth-strain {
 		opacity: 1;
 	}
-	.mascot[style*='--pump-count: 3'] .mouth-smirk,
-	.mascot[style*='--pump-count: 4'] .mouth-smirk {
+	.mascot[style*="--pump-count: 3"] .mouth-smirk,
+	.mascot[style*="--pump-count: 4"] .mouth-smirk {
 		opacity: 0;
 	}
 
 	/* LED pulse */
-	.led { animation: led-pulse 2.4s ease-in-out infinite; }
+	.led {
+		animation: led-pulse 2.4s ease-in-out infinite;
+	}
 	@keyframes led-pulse {
-		0%, 100% { opacity: 0.6; }
-		50% { opacity: 1; }
+		0%,
+		100% {
+			opacity: 0.6;
+		}
+		50% {
+			opacity: 1;
+		}
 	}
 
 	/* ARMS — both pivot at the shoulder, swinging slightly down on the stroke.
@@ -531,12 +733,16 @@
 		transform-origin: 92px 180px;
 		transition: transform 160ms cubic-bezier(0.7, 0, 0.3, 1);
 	}
-	.arm-left.down { transform: rotate(6deg); }
+	.arm-left.down {
+		transform: rotate(6deg);
+	}
 	.arm-right {
 		transform-origin: 148px 180px;
 		transition: transform 160ms cubic-bezier(0.7, 0, 0.3, 1);
 	}
-	.arm-right.down { transform: rotate(-6deg); }
+	.arm-right.down {
+		transform: rotate(-6deg);
+	}
 
 	/* PUMP — handle bar travels down on the stroke; cylinder squashes slightly */
 	.pump-handle {
@@ -566,28 +772,50 @@
 		animation: panic-shake 420ms ease both;
 	}
 	@keyframes panic-shake {
-		0% { transform: translate(0, 0) rotate(0); }
-		25% { transform: translate(-3px, -2px) rotate(-2deg); }
-		60% { transform: translate(8px, 3px) rotate(6deg); }
-		100% { transform: translate(14px, 14px) rotate(10deg); }
+		0% {
+			transform: translate(0, 0) rotate(0);
+		}
+		25% {
+			transform: translate(-3px, -2px) rotate(-2deg);
+		}
+		60% {
+			transform: translate(8px, 3px) rotate(6deg);
+		}
+		100% {
+			transform: translate(14px, 14px) rotate(10deg);
+		}
 	}
 	.mascot-root.panic .helmet {
 		animation: helmet-fly 600ms ease-out forwards;
 	}
 	@keyframes helmet-fly {
-		0% { transform: translate(0,0) rotate(0); }
-		100% { transform: translate(40px, -70px) rotate(140deg); }
+		0% {
+			transform: translate(0, 0) rotate(0);
+		}
+		100% {
+			transform: translate(40px, -70px) rotate(140deg);
+		}
 	}
 	.mascot-root.panic .pump-back,
 	.mascot-root.panic .pump-handle {
 		animation: pump-drop 500ms ease-in forwards;
 	}
 	@keyframes pump-drop {
-		0% { transform: translate(0,0) rotate(0); }
-		100% { transform: translate(-18px, 30px) rotate(-22deg); }
+		0% {
+			transform: translate(0, 0) rotate(0);
+		}
+		100% {
+			transform: translate(-18px, 30px) rotate(-22deg);
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.body, .head, .helmet, .pupil, .led { animation: none; }
+		.body,
+		.head,
+		.helmet,
+		.pupil,
+		.led {
+			animation: none;
+		}
 	}
 </style>
