@@ -8,7 +8,6 @@ export const indexSchema = {
 	title: 'string',
 	summary: 'string',
 	body: 'string',
-	category: 'string',
 	tags: 'string[]',
 	date: 'number',
 	url: 'string'
@@ -19,7 +18,6 @@ export const vectorIndexSchema = {
 	type: 'string',
 	title: 'string',
 	summary: 'string',
-	category: 'string',
 	tags: 'string[]',
 	date: 'number',
 	url: 'string',
@@ -34,7 +32,6 @@ export interface SearchEntry {
 	title: string;
 	summary: string;
 	body: string;
-	category: string;
 	tags: string[];
 	date: number;
 	url: string;
@@ -48,7 +45,6 @@ export interface VectorSearchEntry {
 	type: 'blog';
 	title: string;
 	summary: string;
-	category: string;
 	tags: string[];
 	date: number;
 	url: string;
@@ -58,8 +54,9 @@ export interface VectorSearchEntry {
 	coverFocalY?: number;
 }
 
-export function categoryLabel(entry: { type: SearchEntryType; category: string }): string {
+/** Short label shown above the title in a search result. */
+export function entryLabel(entry: { type: SearchEntryType; tags?: string[] }): string {
 	if (entry.type === 'blog') return 'Blog Post';
-	if (!entry.category) return 'Page';
-	return entry.category;
+	if (entry.tags && entry.tags.length > 0) return entry.tags[0];
+	return 'Page';
 }

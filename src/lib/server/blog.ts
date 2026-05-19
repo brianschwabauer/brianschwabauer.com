@@ -1,6 +1,7 @@
 import type { KVNamespace } from '@cloudflare/workers-types';
 import type { TipTapDoc } from './renderDoc';
 import type { ImageRecord } from '$lib/types/images';
+import { normalizeTagList } from '$lib/utils/tags';
 
 const LATEST_INDEX_KEY = '/blog.json';
 const ALL_INDEX_KEY = '/blog/all.json';
@@ -17,7 +18,6 @@ export interface BlogPost {
 	contentText: string;
 	/** TipTap JSON document — the source of truth for the post body. */
 	content: TipTapDoc;
-	category: string | null;
 	tags: string[];
 	status: BlogStatus;
 	featuredImage: ImageRecord | null;
@@ -38,7 +38,6 @@ export interface BlogPostMeta {
 	title: string;
 	summary: string | null;
 	aiSummary: string | null;
-	category: string | null;
 	tags: string[];
 	status: BlogStatus;
 	featuredImage: ImageRecord | null;
@@ -71,7 +70,6 @@ function toMeta(post: BlogPost): BlogPostMeta {
 		title: post.title,
 		summary: post.summary ?? post.aiSummary,
 		aiSummary: post.aiSummary,
-		category: post.category,
 		tags: post.tags,
 		status: post.status,
 		featuredImage: post.featuredImage,
@@ -144,7 +142,6 @@ export interface SavePostInput {
 	contentText: string;
 	summary?: string | null;
 	aiSummary?: string | null;
-	category?: string | null;
 	tags?: string[];
 	status?: BlogStatus;
 	featuredImage?: ImageRecord | null;
@@ -175,8 +172,7 @@ export async function savePost(kv: KVNamespace, input: SavePostInput): Promise<B
 		aiSummary: input.aiSummary ?? existing?.aiSummary ?? null,
 		contentText: input.contentText,
 		content: input.content,
-		category: input.category ?? existing?.category ?? null,
-		tags: input.tags ?? existing?.tags ?? [],
+		tags: normalizeTagList(input.tags ?? existing?.tags ?? []),
 		status,
 		featuredImage:
 			input.featuredImage === undefined ? existing?.featuredImage ?? null : input.featuredImage,

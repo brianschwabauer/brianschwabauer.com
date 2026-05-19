@@ -42,9 +42,6 @@
 					</svg>
 					Featured
 				</span>
-				{#if post.category}
-					<span class="featured-category">{post.category}</span>
-				{/if}
 				<time class="featured-date">{formatDate(post.publishedAt)}</time>
 			</div>
 
@@ -150,11 +147,6 @@
 	.featured-pin svg {
 		width: 12px;
 		height: 12px;
-	}
-
-	.featured-category {
-		color: var(--color-accent);
-		font-weight: 500;
 	}
 
 	.featured-date {

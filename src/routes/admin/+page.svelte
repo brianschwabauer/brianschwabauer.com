@@ -14,7 +14,6 @@
 		id: 'string',
 		title: 'string',
 		summary: 'string',
-		category: 'string',
 		tags: 'string[]'
 	} as const;
 
@@ -22,12 +21,12 @@
 		id: string;
 		title: string;
 		summary: string;
-		category: string;
 		tags: string[];
 	}
 
 	let query = $state('');
 	let statusFilter = $state<StatusFilter>('all');
+	let tagFilter = $state<string>('');
 	let sortKey = $state<SortKey>('updated-desc');
 	let busySlug = $state<string | null>(null);
 	let actionError = $state<string | null>(null);
@@ -41,7 +40,6 @@
 			id: p.slug,
 			title: p.title,
 			summary: p.summary ?? p.aiSummary ?? '',
-			category: p.category ?? '',
 			tags: p.tags ?? []
 		}));
 		if (docs.length > 0) {
@@ -62,7 +60,7 @@
 			try {
 				const r = (await search(local, {
 					term,
-					properties: ['title', 'summary', 'category', 'tags'],
+					properties: ['title', 'summary', 'tags'],
 					limit: 200,
 					tolerance: 1
 				})) as Results<AdminSearchDoc>;
@@ -75,10 +73,16 @@
 		})();
 	});
 
+	const allTags = $derived(data.adminData?.tags ?? []);
+
 	const visiblePosts = $derived.by(() => {
 		let list: BlogPostMeta[] = data.posts;
 		if (statusFilter !== 'all') {
 			list = list.filter((p) => p.status === statusFilter);
+		}
+		if (tagFilter) {
+			const key = tagFilter.toLowerCase();
+			list = list.filter((p) => p.tags?.some((t) => t.toLowerCase() === key));
 		}
 		if (matchedIds) {
 			list = list.filter((p) => matchedIds!.has(p.slug));
@@ -188,7 +192,7 @@
 		<input
 			type="search"
 			bind:value={query}
-			placeholder="Search title, summary, category, tags…"
+			placeholder="Search title, summary, tags…"
 			autocomplete="off"
 			spellcheck="false"
 			aria-label="Search posts"
@@ -204,6 +208,17 @@
 				<option value="archived">Archived ({counts.archived})</option>
 			</select>
 		</label>
+		{#if allTags.length > 0}
+			<label class="control">
+				<span class="control-label">Tag</span>
+				<select bind:value={tagFilter}>
+					<option value="">All tags</option>
+					{#each allTags as tag (tag)}
+						<option value={tag}>{tag}</option>
+					{/each}
+				</select>
+			</label>
+		{/if}
 		<label class="control">
 			<span class="control-label">Sort</span>
 			<select bind:value={sortKey}>
@@ -242,8 +257,15 @@
 								{post.status}
 							</span>
 							<span class="post-date">{formatDate(post.publishedAt ?? post.updatedAt)}</span>
-							{#if post.category}
-								<span class="post-category">{post.category}</span>
+							{#if post.tags && post.tags.length > 0}
+								<span class="post-tags">
+									{#each post.tags.slice(0, 3) as tag (tag)}
+										<span class="post-tag">{tag}</span>
+									{/each}
+									{#if post.tags.length > 3}
+										<span class="post-tag-more">+{post.tags.length - 3}</span>
+									{/if}
+								</span>
 							{/if}
 						</div>
 					</div>
@@ -527,8 +549,23 @@
 		color: var(--color-text-muted);
 	}
 
-	.post-category {
+	.post-tags {
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: var(--space-1);
+	}
+
+	.post-tag {
+		padding: 2px var(--space-2);
+		border-radius: var(--radius-full);
+		background: var(--color-bg-secondary);
 		color: var(--color-text-secondary);
+		font-size: 0.7rem;
+	}
+
+	.post-tag-more {
+		color: var(--color-text-muted);
+		font-size: 0.7rem;
 	}
 
 	.post-actions {

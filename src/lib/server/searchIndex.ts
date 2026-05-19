@@ -20,7 +20,6 @@ function blogEntry(post: BlogPost | BlogPostMeta): SearchEntry {
 		title: post.title,
 		summary: post.summary ?? post.aiSummary ?? '',
 		body,
-		category: post.category ?? '',
 		tags: post.tags,
 		date: post.publishedAt ?? post.createdAt,
 		url: `/blog/${post.slug}`,
@@ -31,22 +30,22 @@ function blogEntry(post: BlogPost | BlogPostMeta): SearchEntry {
 }
 
 const HOME_SECTIONS: SearchEntry[] = [
-	{ id: 'home:hero', type: 'home', title: 'Today', summary: 'The current chapter — what I am working on right now.', body: '', category: 'About', tags: ['intro', 'today'], date: Date.now(), url: '/#hero' },
-	{ id: 'home:what-im-up-to', type: 'home', title: "What I'm up to", summary: "What I'm building, learning, and shipping right now.", body: '', category: 'About', tags: ['current'], date: Date.now(), url: '/#what-im-up-to' },
-	{ id: 'home:humble-beginnings', type: 'home', title: 'Humble Beginnings', summary: 'A miniDV camera, a bedroom green screen, and a friend named Kevin.', body: '', category: 'Film', tags: ['film', '2006'], date: new Date('2006-01-01').getTime(), url: '/#humble-beginnings' },
-	{ id: 'home:green-screen', type: 'home', title: 'Green Screen', summary: 'Painting a wall green and learning compositing.', body: '', category: 'Film', tags: ['film', 'vfx', '2007'], date: new Date('2007-01-01').getTime(), url: '/#green-screen' },
-	{ id: 'home:power-rangers', type: 'home', title: 'Power Rangers', summary: 'Backyard fight choreography, costumes, and the Power Rangers fan film phase.', body: '', category: 'Film', tags: ['film', 'fan-film', '2008'], date: new Date('2008-01-01').getTime(), url: '/#power-rangers' },
-	{ id: 'home:taking-it-seriously', type: 'home', title: 'First Websites', summary: 'The first websites — taking the work seriously.', body: '', category: 'Web', tags: ['web', '2009'], date: new Date('2009-01-01').getTime(), url: '/#taking-it-seriously' },
-	{ id: 'home:music-videos', type: 'home', title: 'Music Videos', summary: 'Shooting and editing music videos.', body: '', category: 'Film', tags: ['film', 'music-video', '2010'], date: new Date('2010-01-01').getTime(), url: '/#music-videos' },
-	{ id: 'home:animation', type: 'home', title: 'Animation & VFX', summary: 'Compositing, motion graphics, and visual effects.', body: '', category: 'Film', tags: ['animation', 'vfx', '2011'], date: new Date('2011-01-01').getTime(), url: '/#animation' },
-	{ id: 'home:festivals-ksms', type: 'home', title: 'Festivals & KSMS', summary: 'Film festivals and Kalamazoo School for the Arts.', body: '', category: 'Film', tags: ['film', 'festival', '2011'], date: new Date('2011-06-01').getTime(), url: '/#festivals-ksms' },
-	{ id: 'home:spunksters', type: 'home', title: 'The Spunksters', summary: 'The Spunksters — short films and creative experiments.', body: '', category: 'Film', tags: ['film', '2013'], date: new Date('2013-01-01').getTime(), url: '/#spunksters' },
-	{ id: 'home:college', type: 'home', title: 'College', summary: 'College years — film school and finding my voice.', body: '', category: 'About', tags: ['college', '2014'], date: new Date('2014-01-01').getTime(), url: '/#college' },
-	{ id: 'home:what-makes-us-human', type: 'home', title: 'Senior Thesis: What Makes Us Human', summary: 'Senior thesis film — what makes us human.', body: '', category: 'Film', tags: ['film', 'thesis', '2015'], date: new Date('2015-01-01').getTime(), url: '/#what-makes-us-human' },
-	{ id: 'home:freelancer', type: 'home', title: 'Freelancer', summary: 'Freelance work — film, web, and design.', body: '', category: 'Work', tags: ['freelance', '2017'], date: new Date('2017-01-01').getTime(), url: '/#freelancer' },
-	{ id: 'home:entrepreneurship', type: 'home', title: 'Entrepreneurship', summary: 'Starting things — the entrepreneurial chapter.', body: '', category: 'Work', tags: ['startup', '2019'], date: new Date('2019-01-01').getTime(), url: '/#entrepreneurship' },
-	{ id: 'home:showandtour', type: 'home', title: 'Show&Tour', summary: 'Building Show&Tour — the company.', body: '', category: 'Work', tags: ['showandtour', 'startup', '2024'], date: new Date('2024-01-01').getTime(), url: '/#showandtour' },
-	{ id: 'home:side-projects', type: 'home', title: 'Side Projects', summary: 'Side projects and personal experiments.', body: '', category: 'Work', tags: ['side-projects', '2026'], date: new Date('2026-01-01').getTime(), url: '/#side-projects' }
+	{ id: 'home:hero', type: 'home', title: 'Today', summary: 'The current chapter — what I am working on right now.', body: '', tags: ['About', 'Intro', 'Today'], date: Date.now(), url: '/#hero' },
+	{ id: 'home:what-im-up-to', type: 'home', title: "What I'm up to", summary: "What I'm building, learning, and shipping right now.", body: '', tags: ['About', 'Current'], date: Date.now(), url: '/#what-im-up-to' },
+	{ id: 'home:humble-beginnings', type: 'home', title: 'Humble Beginnings', summary: 'A miniDV camera, a bedroom green screen, and a friend named Kevin.', body: '', tags: ['Film', '2006'], date: new Date('2006-01-01').getTime(), url: '/#humble-beginnings' },
+	{ id: 'home:green-screen', type: 'home', title: 'Green Screen', summary: 'Painting a wall green and learning compositing.', body: '', tags: ['Film', 'VFX', '2007'], date: new Date('2007-01-01').getTime(), url: '/#green-screen' },
+	{ id: 'home:power-rangers', type: 'home', title: 'Power Rangers', summary: 'Backyard fight choreography, costumes, and the Power Rangers fan film phase.', body: '', tags: ['Film', 'Fan Film', '2008'], date: new Date('2008-01-01').getTime(), url: '/#power-rangers' },
+	{ id: 'home:taking-it-seriously', type: 'home', title: 'First Websites', summary: 'The first websites — taking the work seriously.', body: '', tags: ['Web', '2009'], date: new Date('2009-01-01').getTime(), url: '/#taking-it-seriously' },
+	{ id: 'home:music-videos', type: 'home', title: 'Music Videos', summary: 'Shooting and editing music videos.', body: '', tags: ['Film', 'Music Video', '2010'], date: new Date('2010-01-01').getTime(), url: '/#music-videos' },
+	{ id: 'home:animation', type: 'home', title: 'Animation & VFX', summary: 'Compositing, motion graphics, and visual effects.', body: '', tags: ['Film', 'Animation', 'VFX', '2011'], date: new Date('2011-01-01').getTime(), url: '/#animation' },
+	{ id: 'home:festivals-ksms', type: 'home', title: 'Festivals & KSMS', summary: 'Film festivals and Kalamazoo School for the Arts.', body: '', tags: ['Film', 'Festival', '2011'], date: new Date('2011-06-01').getTime(), url: '/#festivals-ksms' },
+	{ id: 'home:spunksters', type: 'home', title: 'The Spunksters', summary: 'The Spunksters — short films and creative experiments.', body: '', tags: ['Film', '2013'], date: new Date('2013-01-01').getTime(), url: '/#spunksters' },
+	{ id: 'home:college', type: 'home', title: 'College', summary: 'College years — film school and finding my voice.', body: '', tags: ['About', 'College', '2014'], date: new Date('2014-01-01').getTime(), url: '/#college' },
+	{ id: 'home:what-makes-us-human', type: 'home', title: 'Senior Thesis: What Makes Us Human', summary: 'Senior thesis film — what makes us human.', body: '', tags: ['Film', 'Thesis', '2015'], date: new Date('2015-01-01').getTime(), url: '/#what-makes-us-human' },
+	{ id: 'home:freelancer', type: 'home', title: 'Freelancer', summary: 'Freelance work — film, web, and design.', body: '', tags: ['Work', 'Freelance', '2017'], date: new Date('2017-01-01').getTime(), url: '/#freelancer' },
+	{ id: 'home:entrepreneurship', type: 'home', title: 'Entrepreneurship', summary: 'Starting things — the entrepreneurial chapter.', body: '', tags: ['Work', 'Startup', '2019'], date: new Date('2019-01-01').getTime(), url: '/#entrepreneurship' },
+	{ id: 'home:showandtour', type: 'home', title: 'Show&Tour', summary: 'Building Show&Tour — the company.', body: '', tags: ['Work', 'Showandtour', 'Startup', '2024'], date: new Date('2024-01-01').getTime(), url: '/#showandtour' },
+	{ id: 'home:side-projects', type: 'home', title: 'Side Projects', summary: 'Side projects and personal experiments.', body: '', tags: ['Work', 'Side Projects', '2026'], date: new Date('2026-01-01').getTime(), url: '/#side-projects' }
 ];
 
 async function loadFullPosts(kv: KVNamespace): Promise<BlogPost[]> {
@@ -77,7 +76,6 @@ export async function rebuildVectorIndex(kv: KVNamespace): Promise<void> {
 			type: 'blog',
 			title: p.title,
 			summary: p.summary ?? p.aiSummary ?? '',
-			category: p.category ?? '',
 			tags: p.tags,
 			date: p.publishedAt ?? p.createdAt,
 			url: `/blog/${p.slug}`,

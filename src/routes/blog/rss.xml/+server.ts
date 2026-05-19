@@ -14,6 +14,9 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 			const enclosure = img
 				? `<enclosure url="${siteUrl}/cdn/image/${img.path}/default" type="${escapeAttr(img.mime_type)}" length="0" />`
 				: '';
+			const categories = (post.tags ?? [])
+				.map((t) => `<category><![CDATA[${t}]]></category>`)
+				.join('\n\t\t\t');
 			return `
 		<item>
 			<title><![CDATA[${post.title}]]></title>
@@ -21,7 +24,7 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 			<guid isPermaLink="true">${siteUrl}/blog/${post.slug}</guid>
 			${desc ? `<description><![CDATA[${desc}]]></description>` : ''}
 			${pubDate ? `<pubDate>${pubDate}</pubDate>` : ''}
-			${post.category ? `<category>${post.category}</category>` : ''}
+			${categories}
 			${enclosure}
 		</item>`;
 		})

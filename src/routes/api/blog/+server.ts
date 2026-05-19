@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listLatest, listAllAdmin, savePost, getPost, slugify } from '$lib/server/blog';
 import { rebuildIndex, rebuildVectorIndex } from '$lib/server/searchIndex';
+import { refreshAdminTags } from '$lib/server/adminData';
 import { augmentWithAi } from '$lib/server/blogAi';
 import type { TipTapDoc } from '$lib/server/renderDoc';
 import type { ImageRecord } from '$lib/types/images';
@@ -27,7 +28,6 @@ interface CreateBody {
 	content?: TipTapDoc;
 	contentText?: string;
 	summary?: string | null;
-	category?: string | null;
 	tags?: unknown;
 	status?: 'draft' | 'published';
 	slug?: string;
@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	if (!platform?.env?.KV) throw error(500, 'KV not available');
 
 	const data = (await request.json()) as CreateBody;
-	const { title, content, contentText, summary, category, tags, status, slug, publishedAt } = data;
+	const { title, content, contentText, summary, tags, status, slug, publishedAt } = data;
 
 	if (!title || typeof title !== 'string') throw error(400, 'Title is required');
 	if (!content || typeof content !== 'object') throw error(400, 'Content (JSON doc) is required');
@@ -76,7 +76,6 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			contentText,
 			summary: summary || null,
 			aiSummary,
-			category: category || null,
 			tags: Array.isArray(tags) ? tags.filter((t): t is string => typeof t === 'string') : [],
 			status: status || 'draft',
 			featuredImage: data.featuredImage ?? null,
@@ -91,7 +90,11 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			contentHash,
 			embedding
 		});
-		await Promise.all([rebuildIndex(env.KV), rebuildVectorIndex(env.KV)]);
+		await Promise.all([
+			rebuildIndex(env.KV),
+			rebuildVectorIndex(env.KV),
+			refreshAdminTags(env.KV)
+		]);
 		return json({ post });
 	} catch (err) {
 		console.error('Failed to create blog post:', err);

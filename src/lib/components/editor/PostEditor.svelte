@@ -17,9 +17,11 @@
 		    on save and uses `initialPost.slug` for delete/preview links. */
 		mode: 'new' | 'edit';
 		initialPost?: BlogPost | null;
+		/** Pool of previously-used tags, surfaced as autocomplete suggestions. */
+		tagSuggestions?: string[];
 	}
 
-	let { mode, initialPost = null }: Props = $props();
+	let { mode, initialPost = null, tagSuggestions = [] }: Props = $props();
 
 	// Snapshot the post at mount so the unsaved-changes diff has a stable
 	// reference point (the prop itself stays reactive).
@@ -298,7 +300,8 @@
 	<PillsBar
 		bind:status
 		bind:publishedAt
-		bind:tags />
+		bind:tags
+		{tagSuggestions} />
 
 	<FeaturedImagePicker
 		image={featuredImage}

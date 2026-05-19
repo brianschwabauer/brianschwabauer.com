@@ -1,8 +1,13 @@
 <script lang="ts">
+	import { tick } from 'svelte';
+	import { normalizeTag, sanitizeTagInputChar } from '$lib/utils/tags';
+
 	interface Props {
 		status: 'draft' | 'published';
 		publishedAt: number | null;
 		tags: string[];
+		/** Pool of previously-used tags shown as autocomplete suggestions. */
+		tagSuggestions?: string[];
 		onStatusChange?: (s: 'draft' | 'published') => void;
 		onPublishedAtChange?: (ts: number | null) => void;
 		onTagsChange?: (tags: string[]) => void;
@@ -12,6 +17,7 @@
 		status = $bindable('draft'),
 		publishedAt = $bindable(null),
 		tags = $bindable([]),
+		tagSuggestions = [],
 		onStatusChange,
 		onPublishedAtChange,
 		onTagsChange,
@@ -20,11 +26,12 @@
 	let tagInput = $state('');
 	let tagInputEl: HTMLInputElement | undefined = $state();
 	let dateInputEl: HTMLInputElement | undefined = $state();
+	let showSuggestions = $state(false);
+	let activeSuggestion = $state(0);
 
 	function toggleStatus() {
 		const next = status === 'draft' ? 'published' : 'draft';
 		status = next;
-		// Default publishedAt to today when first publishing.
 		if (next === 'published' && publishedAt == null) {
 			const now = Date.now();
 			publishedAt = now;
@@ -47,9 +54,7 @@
 	function openDatePicker() {
 		const el = dateInputEl;
 		if (!el) return;
-		// Make sure the input shows today by default if unset.
 		if (!el.value) el.value = toDateInputValue(publishedAt);
-		// Native showPicker; fallback to focus+click for older browsers.
 		const withPicker = el as HTMLInputElement & { showPicker?: () => void };
 		if (typeof withPicker.showPicker === 'function') withPicker.showPicker();
 		else {
@@ -71,33 +76,104 @@
 		onPublishedAtChange?.(ts);
 	}
 
-	function commitTag(raw: string) {
-		const cleaned = raw.trim().replace(/^#+/, '').toLowerCase();
-		if (!cleaned) return;
-		if (tags.includes(cleaned)) return;
+	function tagsIncludes(tag: string): boolean {
+		const key = tag.toLowerCase();
+		return tags.some((t) => t.toLowerCase() === key);
+	}
+
+	function commitTag(raw: string): boolean {
+		const cleaned = normalizeTag(raw.replace(/^#+/, ''));
+		if (!cleaned) return false;
+		if (tagsIncludes(cleaned)) return false;
 		const next = [...tags, cleaned];
 		tags = next;
 		onTagsChange?.(next);
+		return true;
 	}
 
 	function removeTag(tag: string) {
 		const next = tags.filter((t) => t !== tag);
 		tags = next;
 		onTagsChange?.(next);
-		// Refocus the input so the user can keep typing/deleting.
 		tagInputEl?.focus();
+	}
+
+	const filteredSuggestions = $derived.by(() => {
+		if (!tagSuggestions || tagSuggestions.length === 0) return [];
+		const term = tagInput.trim().toLowerCase();
+		const usedKeys = new Set(tags.map((t) => t.toLowerCase()));
+		const available = tagSuggestions.filter((s) => !usedKeys.has(s.toLowerCase()));
+		if (!term) return available.slice(0, 8);
+		const starts: string[] = [];
+		const contains: string[] = [];
+		for (const s of available) {
+			const lower = s.toLowerCase();
+			if (lower.startsWith(term)) starts.push(s);
+			else if (lower.includes(term)) contains.push(s);
+		}
+		return [...starts, ...contains].slice(0, 8);
+	});
+
+	$effect(() => {
+		// Clamp the highlighted suggestion when the list shrinks.
+		if (activeSuggestion >= filteredSuggestions.length) {
+			activeSuggestion = Math.max(0, filteredSuggestions.length - 1);
+		}
+	});
+
+	function onTagInput(e: Event) {
+		const el = e.target as HTMLInputElement;
+		// Only allow alphanumeric, hyphen, and space as the user types.
+		const cleaned = el.value.replace(/[^A-Za-z0-9\- ]/g, '');
+		if (cleaned !== el.value) {
+			el.value = cleaned;
+		}
+		tagInput = cleaned;
+		activeSuggestion = 0;
+		showSuggestions = true;
+	}
+
+	function onTagBeforeInput(e: InputEvent) {
+		const data = e.data;
+		if (!data) return;
+		// Strip disallowed characters at the source so they never appear.
+		const filtered = sanitizeTagInputChar(data);
+		if (filtered !== data) e.preventDefault();
 	}
 
 	function onTagKeyDown(e: KeyboardEvent) {
 		const value = tagInput;
-		if (e.key === 'Enter' || e.key === ',') {
+		if (e.key === 'ArrowDown') {
+			if (filteredSuggestions.length === 0) return;
 			e.preventDefault();
-			commitTag(value);
-			tagInput = '';
-		} else if (e.key === ' ' && value.trim().length > 0) {
+			showSuggestions = true;
+			activeSuggestion = Math.min(activeSuggestion + 1, filteredSuggestions.length - 1);
+		} else if (e.key === 'ArrowUp') {
+			if (filteredSuggestions.length === 0) return;
 			e.preventDefault();
-			commitTag(value);
-			tagInput = '';
+			showSuggestions = true;
+			activeSuggestion = Math.max(activeSuggestion - 1, 0);
+		} else if (e.key === 'Escape') {
+			if (showSuggestions) {
+				e.preventDefault();
+				showSuggestions = false;
+			}
+		} else if (e.key === 'Enter' || e.key === ',' || e.key === 'Tab') {
+			// Tab/Enter/comma commit. If a suggestion is highlighted and the user
+			// hasn't typed anything that diverges from it, accept it; otherwise
+			// commit whatever they typed.
+			const hasSuggestion =
+				showSuggestions &&
+				filteredSuggestions.length > 0 &&
+				activeSuggestion < filteredSuggestions.length;
+			const picked = hasSuggestion ? filteredSuggestions[activeSuggestion] : value;
+			// Tab without any text and no highlighted suggestion → let Tab move focus.
+			if (e.key === 'Tab' && !picked.trim()) return;
+			e.preventDefault();
+			if (commitTag(picked)) {
+				tagInput = '';
+				activeSuggestion = 0;
+			}
 		} else if (e.key === 'Backspace' && value === '' && tags.length > 0) {
 			e.preventDefault();
 			const next = tags.slice(0, -1);
@@ -106,7 +182,15 @@
 		}
 	}
 
+	function onTagFocus() {
+		showSuggestions = true;
+	}
+
 	function onTagBlur() {
+		// Slight delay so a click on a suggestion fires before the list hides.
+		setTimeout(() => {
+			showSuggestions = false;
+		}, 120);
 		if (tagInput.trim()) {
 			commitTag(tagInput);
 			tagInput = '';
@@ -115,6 +199,16 @@
 
 	function focusTagInput() {
 		tagInputEl?.focus();
+	}
+
+	async function pickSuggestion(tag: string) {
+		if (commitTag(tag)) {
+			tagInput = '';
+			activeSuggestion = 0;
+		}
+		await tick();
+		tagInputEl?.focus();
+		showSuggestions = true;
 	}
 </script>
 
@@ -126,7 +220,6 @@
 		onclick={toggleStatus}
 		title={status === 'draft' ? 'Currently a draft — click to publish' : 'Currently published — click to revert to draft'}>
 		{#if status === 'published'}
-			<!-- Rocket — signals it's gone live. -->
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
 				<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
 				<path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
@@ -135,7 +228,6 @@
 			</svg>
 			Published
 		{:else}
-			<!-- Pencil over a page — signals work-in-progress. -->
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
 				<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
 				<polyline points="14 2 14 8 20 8" />
@@ -183,14 +275,34 @@
 	<div class="tag-input-wrap" onclick={focusTagInput} role="presentation">
 		<input
 			bind:this={tagInputEl}
-			bind:value={tagInput}
+			value={tagInput}
 			type="text"
 			class="tag-input"
 			placeholder="Add tags…"
 			autocomplete="off"
 			spellcheck="false"
+			oninput={onTagInput}
+			onbeforeinput={onTagBeforeInput}
 			onkeydown={onTagKeyDown}
+			onfocus={onTagFocus}
 			onblur={onTagBlur} />
+		{#if showSuggestions && filteredSuggestions.length > 0}
+			<div class="suggestions" role="listbox">
+				{#each filteredSuggestions as suggestion, i (suggestion)}
+					<button
+						type="button"
+						class="suggestion"
+						class:active={i === activeSuggestion}
+						role="option"
+						aria-selected={i === activeSuggestion}
+						onmouseenter={() => (activeSuggestion = i)}
+						onmousedown={(e) => e.preventDefault()}
+						onclick={() => pickSuggestion(suggestion)}>
+						{suggestion}
+					</button>
+				{/each}
+			</div>
+		{/if}
 	</div>
 </div>
 
@@ -258,8 +370,6 @@
 		cursor: pointer;
 		transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
 	}
-	/* Whole pill is the click target; on hover make the destructive intent
-	   clear by turning the chip and × red. */
 	.tag-pill:hover {
 		background: color-mix(in oklch, var(--color-error) 14%, transparent);
 		color: var(--color-error);
@@ -282,8 +392,9 @@
 	}
 
 	.tag-input-wrap {
-		flex: 1 1 120px;
-		min-width: 120px;
+		position: relative;
+		flex: 1 1 160px;
+		min-width: 160px;
 		display: flex;
 	}
 
@@ -302,5 +413,42 @@
 	}
 	.tag-input:focus {
 		box-shadow: none;
+	}
+
+	.suggestions {
+		position: absolute;
+		top: calc(100% + 4px);
+		left: 0;
+		z-index: 4;
+		min-width: 180px;
+		max-width: 280px;
+		max-height: 240px;
+		overflow-y: auto;
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-md);
+		box-shadow: var(--shadow-md);
+		padding: var(--space-1);
+		display: flex;
+		flex-direction: column;
+	}
+
+	.suggestion {
+		display: block;
+		width: 100%;
+		text-align: left;
+		padding: var(--space-2) var(--space-3);
+		border: none;
+		background: transparent;
+		color: var(--color-text);
+		font-size: var(--text-sm);
+		border-radius: var(--radius-sm);
+		cursor: pointer;
+	}
+
+	.suggestion:hover,
+	.suggestion.active {
+		background: var(--color-bg-secondary);
+		color: var(--color-accent);
 	}
 </style>
