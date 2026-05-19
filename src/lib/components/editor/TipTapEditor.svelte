@@ -367,10 +367,20 @@
 		aspect-ratio: var(--blog-img-aspect, auto);
 	}
 
+	.editor-content :global(figure.blog-img.is-cropped .blog-img-inner) {
+		aspect-ratio: var(--blog-img-crop-aspect);
+	}
+
 	.editor-content :global(figure.blog-img img) {
 		display: block;
 		width: 100%;
 		height: auto;
+	}
+
+	.editor-content :global(figure.blog-img.is-cropped img) {
+		height: 100%;
+		object-fit: cover;
+		object-position: var(--blog-img-focal-x, 50%) var(--blog-img-focal-y, 50%);
 	}
 
 	.editor-content :global(figure.blog-img .blog-img-caption) {
@@ -467,9 +477,32 @@
 		right: 6px;
 	}
 
+	.editor-content :global(figure.blog-img .blog-img-handle-bottom) {
+		top: auto;
+		bottom: 6px;
+		left: 50%;
+		width: 60px;
+		height: 14px;
+		transform: translateX(-50%);
+		cursor: ns-resize;
+	}
+	.editor-content :global(figure.blog-img .blog-img-handle-bottom::before) {
+		width: 24px;
+		height: 2px;
+	}
+
 	.editor-content :global(figure.blog-img:hover .blog-img-handle),
 	.editor-content :global(figure.blog-img.is-selected .blog-img-handle) {
 		opacity: 1;
+	}
+
+	.editor-content :global(figure.blog-img.is-repositioning .blog-img-handle) {
+		opacity: 0 !important;
+		pointer-events: none;
+	}
+
+	.editor-content :global(figure.blog-img.is-dragging-bottom .blog-img-inner) {
+		aspect-ratio: var(--blog-img-crop-aspect);
 	}
 
 	.editor-content :global(figure.blog-img .blog-img-toolbar) {
@@ -527,6 +560,103 @@
 		height: 16px;
 		background: var(--color-border);
 		margin: 0 2px;
+	}
+
+	.editor-content :global(figure.blog-img .blog-img-repos-btn) {
+		display: none !important;
+	}
+	.editor-content :global(figure.blog-img.is-cropped .blog-img-repos-btn) {
+		display: inline-flex !important;
+	}
+
+	.editor-content :global(figure.blog-img.is-repositioning .blog-img-toolbar) {
+		opacity: 0 !important;
+		pointer-events: none !important;
+	}
+
+	.editor-content :global(figure.blog-img .blog-img-repos-overlay) {
+		position: absolute;
+		inset: 0;
+		display: none;
+		flex-direction: column;
+		justify-content: space-between;
+		padding: var(--space-3) var(--space-4);
+		pointer-events: none;
+		background: linear-gradient(
+			to bottom,
+			rgba(0, 0, 0, 0.35) 0%,
+			rgba(0, 0, 0, 0) 25%,
+			rgba(0, 0, 0, 0) 75%,
+			rgba(0, 0, 0, 0.35) 100%
+		);
+		z-index: 4;
+	}
+	.editor-content :global(figure.blog-img.is-repositioning .blog-img-repos-overlay) {
+		display: flex;
+	}
+	.editor-content :global(figure.blog-img .blog-img-repos-hint) {
+		color: white;
+		font-size: var(--text-xs);
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+	}
+	.editor-content :global(figure.blog-img .blog-img-repos-readout) {
+		align-self: flex-end;
+		color: white;
+		font-size: var(--text-xs);
+		font-variant-numeric: tabular-nums;
+		padding: 2px var(--space-2);
+		background: rgba(0, 0, 0, 0.45);
+		border-radius: var(--radius-full);
+		backdrop-filter: blur(4px);
+	}
+	.editor-content :global(figure.blog-img.is-repositioning .blog-img-inner) {
+		cursor: grab;
+		touch-action: none;
+	}
+
+	.editor-content :global(figure.blog-img .blog-img-repos-toolbar) {
+		position: absolute;
+		top: var(--space-3);
+		right: var(--space-3);
+		display: none;
+		gap: 2px;
+		padding: 4px;
+		background: rgba(0, 0, 0, 0.55);
+		border-radius: var(--radius-md);
+		backdrop-filter: blur(8px);
+		z-index: 5;
+	}
+	.editor-content :global(figure.blog-img.is-repositioning .blog-img-repos-toolbar) {
+		display: flex;
+	}
+	.editor-content :global(figure.blog-img .blog-img-repos-toolbar button) {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 4px 8px;
+		background: transparent;
+		border: none;
+		border-radius: var(--radius-sm);
+		color: white;
+		font-size: var(--text-xs);
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.editor-content :global(figure.blog-img .blog-img-repos-toolbar button svg) {
+		width: 14px;
+		height: 14px;
+	}
+	.editor-content :global(figure.blog-img .blog-img-repos-toolbar button:hover) {
+		background: rgba(255, 255, 255, 0.18);
+	}
+	.editor-content :global(figure.blog-img .blog-img-repos-toolbar button.primary) {
+		background: var(--color-accent);
+	}
+	.editor-content :global(figure.blog-img .blog-img-repos-toolbar button.primary:hover) {
+		background: var(--color-accent);
+		filter: brightness(1.1);
 	}
 
 	.editor-content :global(figure.blog-img.is-selected) {

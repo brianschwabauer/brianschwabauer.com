@@ -12,6 +12,12 @@
  *   fileName       original filename
  *   widthMode      'normal' | 'wide' | 'full'
  *   widthPct       30-100 (percentage of text column, only meaningful in 'normal')
+ *   cropAspect     displayed width/height ratio when the bottom handle has
+ *                  shortened the figure (null = use the image's natural ratio).
+ *                  Always >= natural aspect ratio — the bottom handle can only
+ *                  shorten, never grow taller than native.
+ *   focalX/focalY  0-100 % focal point inside a cropped frame (only meaningful
+ *                  when cropAspect is set); drives object-position.
  *   variants       JSON-encoded array of {name,width,height,mime_type} for srcset
  *
  * The editor uses createBlogImageNodeView() for inline display + resize.
@@ -41,6 +47,9 @@ export interface BlogImageAttrs {
 	fileName: string | null;
 	widthMode: WidthMode;
 	widthPct: number;
+	cropAspect: number | null;
+	focalX: number;
+	focalY: number;
 	variants: string;
 	/**
 	 * Transient flag for the optimistic upload placeholder. Only ever true
@@ -117,6 +126,33 @@ export const BlogImage = Node.create({
 				default: 100,
 				parseHTML: (el) => Number(el.dataset.widthPct) || 100,
 				renderHTML: (attrs) => ({ 'data-width-pct': String(attrs.widthPct) }),
+			},
+			cropAspect: {
+				default: null,
+				parseHTML: (el) => {
+					const v = Number(el.dataset.cropAspect);
+					return Number.isFinite(v) && v > 0 ? v : null;
+				},
+				renderHTML: (attrs) =>
+					attrs.cropAspect ? { 'data-crop-aspect': String(attrs.cropAspect) } : {},
+			},
+			focalX: {
+				default: 50,
+				parseHTML: (el) => {
+					const v = Number(el.dataset.focalX);
+					return Number.isFinite(v) ? v : 50;
+				},
+				renderHTML: (attrs) =>
+					attrs.cropAspect ? { 'data-focal-x': String(attrs.focalX) } : {},
+			},
+			focalY: {
+				default: 50,
+				parseHTML: (el) => {
+					const v = Number(el.dataset.focalY);
+					return Number.isFinite(v) ? v : 50;
+				},
+				renderHTML: (attrs) =>
+					attrs.cropAspect ? { 'data-focal-y': String(attrs.focalY) } : {},
 			},
 			variants: {
 				default: '[]',
@@ -195,6 +231,9 @@ export const BlogImage = Node.create({
 							thumbhash: null,
 							bgColor: null,
 							fileName: null,
+							cropAspect: null,
+							focalX: 50,
+							focalY: 50,
 							variants: '[]',
 							width: 0,
 							height: 0,

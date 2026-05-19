@@ -318,6 +318,25 @@
 		border-radius: 0;
 	}
 
+	/* Crop mode: the figure forces an aspect-ratio (always wider/shorter than
+	   the image's natural ratio) and the img fills it via object-fit:cover
+	   using the saved focal point. */
+	.post-content :global(figure.blog-img.is-cropped) {
+		aspect-ratio: var(--blog-img-crop-aspect);
+		overflow: hidden;
+		border-radius: var(--radius-md);
+	}
+	.post-content :global(figure.blog-img.is-cropped[data-width-mode='full']) {
+		border-radius: 0;
+	}
+	.post-content :global(figure.blog-img.is-cropped img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: var(--blog-img-focal-x, 50%) var(--blog-img-focal-y, 50%);
+		border-radius: 0;
+	}
+
 	/* Caption overlay — only emitted when the figure has a caption. Sits over
 	   the bottom of the image with a black gradient so light/dark images both
 	   stay readable. The figure itself doesn't clip (so wide-mode breakouts

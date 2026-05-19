@@ -280,10 +280,23 @@
 		aspect-ratio: var(--blog-img-aspect, auto);
 	}
 
+	/* Crop mode: inner takes a forced aspect-ratio (always wider/shorter than
+	   natural) and the img fills it via object-fit:cover. Focal point drives
+	   object-position so the user can pick what part of the original shows. */
+	.body-host :global(figure.blog-img.is-cropped .blog-img-inner) {
+		aspect-ratio: var(--blog-img-crop-aspect);
+	}
+
 	.body-host :global(figure.blog-img img) {
 		display: block;
 		width: 100%;
 		height: auto;
+	}
+
+	.body-host :global(figure.blog-img.is-cropped img) {
+		height: 100%;
+		object-fit: cover;
+		object-position: var(--blog-img-focal-x, 50%) var(--blog-img-focal-y, 50%);
 	}
 
 	/* Caption overlay — only visible when the figure carries a caption. The
@@ -377,9 +390,37 @@
 	.body-host :global(figure.blog-img .blog-img-handle-left) { left: 6px; }
 	.body-host :global(figure.blog-img .blog-img-handle-right) { right: 6px; }
 
+	/* Bottom handle: horizontal bar at the bottom-center for resizing height. */
+	.body-host :global(figure.blog-img .blog-img-handle-bottom) {
+		top: auto;
+		bottom: 6px;
+		left: 50%;
+		width: 60px;
+		height: 14px;
+		transform: translateX(-50%);
+		cursor: ns-resize;
+	}
+	.body-host :global(figure.blog-img .blog-img-handle-bottom::before) {
+		width: 24px;
+		height: 2px;
+	}
+
 	.body-host :global(figure.blog-img:hover .blog-img-handle),
 	.body-host :global(figure.blog-img.is-selected .blog-img-handle) {
 		opacity: 1;
+	}
+
+	/* Hide all handles while the user is panning the focal point. */
+	.body-host :global(figure.blog-img.is-repositioning .blog-img-handle) {
+		opacity: 0 !important;
+		pointer-events: none;
+	}
+
+	/* While dragging the bottom handle, drive the inner's aspect-ratio from a
+	   custom property so the figure tracks the cursor (the same var stays set
+	   after release because applyAttrs writes it from cropAspect). */
+	.body-host :global(figure.blog-img.is-dragging-bottom .blog-img-inner) {
+		aspect-ratio: var(--blog-img-crop-aspect);
 	}
 
 	.body-host :global(figure.blog-img .blog-img-toolbar) {
@@ -440,6 +481,111 @@
 		height: 16px;
 		background: var(--color-border);
 		margin: 0 2px;
+	}
+
+	/* Reposition button: hidden until a crop is active (no overflow to pan). */
+	.body-host :global(figure.blog-img .blog-img-repos-btn) {
+		display: none !important;
+	}
+	.body-host :global(figure.blog-img.is-cropped .blog-img-repos-btn) {
+		display: inline-flex !important;
+	}
+
+	/* Hide the regular toolbar while in repos mode so it doesn't compete with
+	   the repos-toolbar that takes over the same area. */
+	.body-host :global(figure.blog-img.is-repositioning .blog-img-toolbar) {
+		opacity: 0 !important;
+		pointer-events: none !important;
+	}
+
+	/* Repos overlay (only visible while panning). Dark vignette + hint text +
+	   focal % readout. pointer-events:none so the pan handlers on .blog-img-inner
+	   still receive the drag. */
+	.body-host :global(figure.blog-img .blog-img-repos-overlay) {
+		position: absolute;
+		inset: 0;
+		display: none;
+		flex-direction: column;
+		justify-content: space-between;
+		padding: var(--space-3) var(--space-4);
+		pointer-events: none;
+		background: linear-gradient(
+			to bottom,
+			rgba(0, 0, 0, 0.35) 0%,
+			rgba(0, 0, 0, 0) 25%,
+			rgba(0, 0, 0, 0) 75%,
+			rgba(0, 0, 0, 0.35) 100%
+		);
+		z-index: 4;
+	}
+	.body-host :global(figure.blog-img.is-repositioning .blog-img-repos-overlay) {
+		display: flex;
+	}
+	.body-host :global(figure.blog-img .blog-img-repos-hint) {
+		color: white;
+		font-size: var(--text-xs);
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+	}
+	.body-host :global(figure.blog-img .blog-img-repos-readout) {
+		align-self: flex-end;
+		color: white;
+		font-size: var(--text-xs);
+		font-variant-numeric: tabular-nums;
+		padding: 2px var(--space-2);
+		background: rgba(0, 0, 0, 0.45);
+		border-radius: var(--radius-full);
+		backdrop-filter: blur(4px);
+	}
+	.body-host :global(figure.blog-img.is-repositioning .blog-img-inner) {
+		cursor: grab;
+		touch-action: none;
+	}
+
+	/* Repos toolbar (Center / Cancel / Done) — sits on top of the inner during
+	   repos mode, replacing the width-mode toolbar. */
+	.body-host :global(figure.blog-img .blog-img-repos-toolbar) {
+		position: absolute;
+		top: var(--space-3);
+		right: var(--space-3);
+		display: none;
+		gap: 2px;
+		padding: 4px;
+		background: rgba(0, 0, 0, 0.55);
+		border-radius: var(--radius-md);
+		backdrop-filter: blur(8px);
+		z-index: 5;
+	}
+	.body-host :global(figure.blog-img.is-repositioning .blog-img-repos-toolbar) {
+		display: flex;
+	}
+	.body-host :global(figure.blog-img .blog-img-repos-toolbar button) {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 4px 8px;
+		background: transparent;
+		border: none;
+		border-radius: var(--radius-sm);
+		color: white;
+		font-size: var(--text-xs);
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.body-host :global(figure.blog-img .blog-img-repos-toolbar button svg) {
+		width: 14px;
+		height: 14px;
+	}
+	.body-host :global(figure.blog-img .blog-img-repos-toolbar button:hover) {
+		background: rgba(255, 255, 255, 0.18);
+	}
+	.body-host :global(figure.blog-img .blog-img-repos-toolbar button.primary) {
+		background: var(--color-accent);
+	}
+	.body-host :global(figure.blog-img .blog-img-repos-toolbar button.primary:hover) {
+		background: var(--color-accent);
+		filter: brightness(1.1);
 	}
 
 	.body-host :global(figure.blog-img.is-selected) {
