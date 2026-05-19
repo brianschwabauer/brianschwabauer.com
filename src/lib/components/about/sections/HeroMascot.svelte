@@ -565,8 +565,7 @@
 	.mascot-root {
 		position: absolute;
 		bottom: 0;
-		left: 50%;
-		/* ~20% smaller than before */
+		left: 10%;
 		width: clamp(144px, 19vw, 288px);
 		height: clamp(184px, 26vw, 352px);
 		transform: translate(80%, 110%);
