@@ -81,6 +81,12 @@
 		}
 	}
 
+	function parseYearQuery(q: string): number | null {
+		if (!/^\d{4}$/.test(q)) return null;
+		const n = Number(q);
+		return n >= 1900 && n <= 2100 ? n : null;
+	}
+
 	async function runKeywordSearch(q: string) {
 		if (!db) {
 			keywordResults = [];
@@ -92,6 +98,22 @@
 			return;
 		}
 		try {
+			const year = parseYearQuery(term);
+			if (year !== null) {
+				const start = Date.UTC(year, 0, 1);
+				const end = Date.UTC(year + 1, 0, 1) - 1;
+				const yr = (await search(db, {
+					term: '',
+					where: { date: { between: [start, end] } },
+					limit: 20
+				})) as Results<SearchEntry>;
+				if (yr.hits.length > 0) {
+					keywordResults = yr.hits
+						.map((h) => ({ ...h.document, score: h.score }))
+						.sort((a, b) => b.date - a.date);
+					return;
+				}
+			}
 			const r = (await search(db, {
 				term,
 				properties: ['title', 'summary', 'body', 'tags'],
@@ -119,7 +141,7 @@
 			vectorResults = data.results.map((r) => ({ ...r.doc, score: r.score }));
 		} catch (err) {
 			console.error('Vector search failed:', err);
-			vectorError = 'Full-content search unavailable.';
+			vectorError = 'Deep search unavailable.';
 			vectorResults = [];
 		} finally {
 			vectorLoading = false;
@@ -159,15 +181,28 @@
 		if (e.key === 'Escape') {
 			e.preventDefault();
 			close();
-		} else if (e.key === 'ArrowDown') {
+			return;
+		}
+		const count = visibleResults.length;
+		if (e.key === 'ArrowDown') {
 			e.preventDefault();
-			if (visibleResults.length === 0) return;
-			activeIndex = Math.min(activeIndex + 1, visibleResults.length - 1);
+			if (count === 0) return;
+			activeIndex = (activeIndex + 1) % count;
 			scrollActiveIntoView();
 		} else if (e.key === 'ArrowUp') {
 			e.preventDefault();
-			if (visibleResults.length === 0) return;
-			activeIndex = Math.max(activeIndex - 1, 0);
+			if (count === 0) return;
+			activeIndex = (activeIndex - 1 + count) % count;
+			scrollActiveIntoView();
+		} else if (e.key === 'Home') {
+			if (count === 0) return;
+			e.preventDefault();
+			activeIndex = 0;
+			scrollActiveIntoView();
+		} else if (e.key === 'End') {
+			if (count === 0) return;
+			e.preventDefault();
+			activeIndex = count - 1;
 			scrollActiveIntoView();
 		} else if (e.key === 'Enter') {
 			const hit = visibleResults[activeIndex];
@@ -261,17 +296,15 @@
 					<div class="state error">{indexError}</div>
 				{:else if visibleResults.length === 0 && query.trim()}
 					<div class="state">
-						No quick matches. Try
+						No quick matches. Try a
 						<button class="inline-link" type="button" onclick={runVectorSearch}>
-							searching post contents
+							deep search
 						</button>.
 					</div>
 				{:else}
 					{#if vectorResults !== null}
-						<div class="section-label">Full-content results</div>
-					{:else if query.trim()}
-						<div class="section-label">Quick matches</div>
-					{:else}
+						<div class="section-label">Deep Search Results</div>
+					{:else if !query.trim()}
 						<div class="section-label">Latest posts</div>
 					{/if}
 
@@ -286,11 +319,11 @@
 						>
 							{#if hit.featuredImage}
 								<div class="result-thumb" style={bgStyle(hit.featuredImage)}>
-									<img
-										src={thumbnailURL(hit.featuredImage)}
-										alt=""
-										loading="lazy"
-										style:object-position="{hit.coverFocalX ?? 50}% {hit.coverFocalY ?? 50}%" />
+									<img src={thumbnailURL(hit.featuredImage)} alt="" loading="lazy" />
+								</div>
+							{:else if hit.imageUrl}
+								<div class="result-thumb">
+									<img src={hit.imageUrl} alt="" loading="lazy" />
 								</div>
 							{/if}
 							<div class="result-body">
@@ -323,18 +356,18 @@
 
 			<div class="footer">
 				{#if vectorLoading}
-					<span class="footer-status">Searching post contents…</span>
+					<span class="footer-status">Searching deeper…</span>
 				{:else if showFullResultsButton}
 					<button class="full-btn" type="button" onclick={runVectorSearch}>
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 							<path d="M4 19V5a2 2 0 0 1 2-2h11l3 3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" />
 							<path d="M8 10h8M8 14h5" />
 						</svg>
-						Search post contents
+						Deep Search
 					</button>
 				{:else if vectorResults !== null}
 					<button class="full-btn ghost" type="button" onclick={() => (vectorResults = null)}>
-						Back to quick matches
+						Back
 					</button>
 				{/if}
 				<span class="hint">
@@ -467,10 +500,11 @@
 
 	.result {
 		display: flex;
+		align-items: center;
 		gap: var(--space-3);
 		width: 100%;
 		text-align: left;
-		padding: var(--space-3) var(--space-4);
+		padding: var(--space-2) var(--space-3);
 		border-radius: var(--radius-md);
 		color: inherit;
 		background: transparent;
@@ -484,8 +518,8 @@
 
 	.result-thumb {
 		flex-shrink: 0;
-		width: 96px;
-		aspect-ratio: 3 / 2;
+		width: 160px;
+		aspect-ratio: 16 / 9;
 		overflow: hidden;
 		border-radius: var(--radius-sm);
 		border: 1px solid var(--color-border);
@@ -507,8 +541,8 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-3);
-		margin-bottom: var(--space-1);
-		font-size: 0.7rem;
+		margin-bottom: 2px;
+		font-size: 0.66rem;
 		font-family: var(--font-mono);
 		letter-spacing: 0.14em;
 		text-transform: uppercase;
@@ -524,16 +558,16 @@
 	}
 
 	.result-title {
-		font-size: var(--text-base);
+		font-size: 0.95rem;
 		font-weight: 600;
 		line-height: 1.3;
-		margin-bottom: var(--space-1);
+		margin-bottom: 2px;
 	}
 
 	.result-summary {
-		font-size: var(--text-sm);
+		font-size: 0.82rem;
 		color: var(--color-text-secondary);
-		line-height: 1.45;
+		line-height: 1.4;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		line-clamp: 2;
@@ -544,13 +578,13 @@
 	.result-tags {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--space-2);
-		margin-top: var(--space-2);
+		gap: var(--space-1);
+		margin-top: var(--space-1);
 	}
 
 	.tag {
-		font-size: 0.68rem;
-		padding: 2px var(--space-2);
+		font-size: 0.62rem;
+		padding: 1px var(--space-2);
 		border-radius: var(--radius-full);
 		background: var(--color-bg-secondary);
 		color: var(--color-text-muted);
