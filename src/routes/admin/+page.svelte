@@ -171,14 +171,10 @@
 </svelte:head>
 
 <div class="page-header">
-	<h1>Blog Posts</h1>
+	<a href="/" class="brand" aria-label="Brian Schwabauer — back to website">
+		<img src="/logo.svg" alt="Brian Schwabauer" class="brand-img" />
+	</a>
 	<div class="page-actions">
-		<Button href="/" transparent>
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="back-icon">
-				<polyline points="15 18 9 12 15 6" />
-			</svg>
-			Back to Website
-		</Button>
 		<Button href="/admin/blog/new">New Post</Button>
 	</div>
 </div>
@@ -342,21 +338,32 @@
 		margin-bottom: var(--space-6);
 	}
 
-	.page-header h1 {
-		font-size: var(--text-2xl);
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		text-decoration: none;
+		border-radius: var(--radius-sm);
+		transition: opacity var(--transition-fast);
+	}
+
+	.brand:hover {
+		opacity: 0.75;
+	}
+
+	.brand-img {
+		height: 32px;
+		width: auto;
+		display: block;
+	}
+
+	:global([data-theme='dark']) .brand-img {
+		filter: brightness(0) invert(1);
 	}
 
 	.page-actions {
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
-	}
-
-	.back-icon {
-		width: 16px;
-		height: 16px;
-		margin-right: var(--space-1);
-		vertical-align: -2px;
 	}
 
 	.controls {
