@@ -132,7 +132,7 @@
 
 	.edit-post-fab {
 		position: fixed;
-		top: 96px;
+		bottom: var(--space-4);
 		right: var(--space-4);
 		z-index: 30;
 		display: inline-flex;
