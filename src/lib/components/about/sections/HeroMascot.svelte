@@ -88,10 +88,8 @@
 
 		<!-- BODY: breathing layer (subtle scale loop) -->
 		<g class="body">
-			<!-- POSE: knee-bend layer (compresses on the down stroke) -->
-			<g class="body-pose" class:dip={armDown}>
-				<!-- BOOTS (back) -->
-				<g class="boots">
+			<!-- BOOTS — stay planted on the floor, no dip transform -->
+			<g class="boots">
 					<rect
 						x="80"
 						y="282"
@@ -142,7 +140,9 @@
 					/>
 				</g>
 
-				<!-- LEGS -->
+			<!-- LEGS — squash on the down stroke so the knees bend while the
+				 boots stay planted. -->
+			<g class="leg-pose" class:dip={armDown}>
 				<g class="legs">
 					<path
 						d="M84 230 L114 230 L114 285 Q114 290 108 290 L84 290 Q78 290 78 284 Z"
@@ -159,7 +159,82 @@
 						stroke-linejoin="round"
 					/>
 				</g>
+			</g>
 
+			<!-- PUMP — back layer (cylinder + gauge). Sibling of upper-pose, so
+				 it stays anchored to the floor while the mascot dips and the
+				 handle (inside upper-pose) moves with him. -->
+			<g class="pump-back" class:compressed={armDown}>
+				<rect
+					x="92"
+					y="232"
+					width="56"
+					height="62"
+					rx="6"
+					fill="url(#pump-grad)"
+					stroke="#1a1a1a"
+					stroke-width="2"
+				/>
+				<rect
+					x="86"
+					y="226"
+					width="68"
+					height="10"
+					rx="3"
+					fill="#0a0e15"
+					stroke="#1a1a1a"
+					stroke-width="2"
+				/>
+				<line
+					x1="100"
+					y1="248"
+					x2="140"
+					y2="248"
+					stroke="rgba(255,255,255,0.08)"
+					stroke-width="1"
+				/>
+				<line
+					x1="100"
+					y1="254"
+					x2="140"
+					y2="254"
+					stroke="rgba(255,255,255,0.08)"
+					stroke-width="1"
+				/>
+				<!-- pressure gauge on the front face -->
+				<g class="gauge">
+					<circle
+						cx="120"
+						cy="270"
+						r="11"
+						fill="#0a0e15"
+						stroke="#1a1a1a"
+						stroke-width="1.8"
+					/>
+					<circle
+						cx="120"
+						cy="270"
+						r="10"
+						fill="url(#gauge-grad)"
+						style:opacity={gaugeGlow}
+					/>
+					<line
+						class="needle"
+						x1="120"
+						y1="270"
+						x2="120"
+						y2="262"
+						stroke="#ff5a3c"
+						stroke-width="2.2"
+						stroke-linecap="round"
+						style:transform-origin="120px 270px"
+					/>
+				</g>
+			</g>
+
+			<!-- UPPER BODY (torso, head, pump handle, arms) — translates down on
+				 the down stroke. The pump-back above stays put. -->
+			<g class="upper-pose" class:dip={armDown}>
 				<!-- TORSO -->
 				<g class="torso">
 					<path
@@ -216,75 +291,6 @@
 						stroke-linecap="round"
 						opacity="0.7"
 					/>
-				</g>
-
-				<!-- PUMP — back layer (cylinder + gauge), in front of legs, torso -->
-				<g class="pump-back" class:compressed={armDown}>
-					<rect
-						x="92"
-						y="232"
-						width="56"
-						height="62"
-						rx="6"
-						fill="url(#pump-grad)"
-						stroke="#1a1a1a"
-						stroke-width="2"
-					/>
-					<rect
-						x="86"
-						y="226"
-						width="68"
-						height="10"
-						rx="3"
-						fill="#0a0e15"
-						stroke="#1a1a1a"
-						stroke-width="2"
-					/>
-					<line
-						x1="100"
-						y1="248"
-						x2="140"
-						y2="248"
-						stroke="rgba(255,255,255,0.08)"
-						stroke-width="1"
-					/>
-					<line
-						x1="100"
-						y1="254"
-						x2="140"
-						y2="254"
-						stroke="rgba(255,255,255,0.08)"
-						stroke-width="1"
-					/>
-					<!-- pressure gauge on the front face -->
-					<g class="gauge">
-						<circle
-							cx="120"
-							cy="270"
-							r="11"
-							fill="#0a0e15"
-							stroke="#1a1a1a"
-							stroke-width="1.8"
-						/>
-						<circle
-							cx="120"
-							cy="270"
-							r="10"
-							fill="url(#gauge-grad)"
-							style:opacity={gaugeGlow}
-						/>
-						<line
-							class="needle"
-							x1="120"
-							y1="270"
-							x2="120"
-							y2="262"
-							stroke="#ff5a3c"
-							stroke-width="2.2"
-							stroke-linecap="round"
-							style:transform-origin="120px 270px"
-						/>
-					</g>
 				</g>
 
 				<!-- HEAD -->
@@ -625,15 +631,25 @@
 		}
 	}
 
-	/* POSE: dips the whole body on the down stroke (knee bend). Compounds
-	   with the breathing transform thanks to nested transforms. The legs
-	   then visibly squash with the body since they share the transform. */
-	.body-pose {
+	/* POSE: the down stroke bends the knees. Boots stay planted on the
+	   ground, the legs squash from the boot top, and the upper body
+	   (torso/head/handle/arms) translates straight down so it follows
+	   the hips. The pump cylinder is a sibling, untouched, so it stays
+	   anchored to the floor while the handle (inside upper-pose) is
+	   pushed down with the mascot's hands. */
+	.leg-pose {
 		transform-origin: 120px 290px;
 		transition: transform 220ms cubic-bezier(0.7, 0, 0.4, 1);
 	}
-	.body-pose.dip {
-		transform: translateY(18px) scaleY(0.88);
+	.leg-pose.dip {
+		transform: scaleY(0.7);
+	}
+	.upper-pose {
+		transform-origin: 120px 230px;
+		transition: transform 220ms cubic-bezier(0.7, 0, 0.4, 1);
+	}
+	.upper-pose.dip {
+		transform: translateY(18px);
 	}
 
 	/* HEAD bobs subtly */
