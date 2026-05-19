@@ -14,6 +14,10 @@
 	let left = $state(0);
 	let menuOpen = $state(false);
 
+	// Must match .plus-btn's width/height in the CSS below — used to center
+	// the button on the cursor line rather than top-aligning it.
+	const BTN_SIZE = 30;
+
 	function update() {
 		const ed = editor;
 		if (!ed) {
@@ -34,15 +38,23 @@
 			return;
 		}
 		const coords = ed.view.coordsAtPos(resolved.pos);
-		const editorRect = ed.view.dom.getBoundingClientRect();
+		// Anchor to the LEFT edge of the current top-level block (the <p> /
+		// <h2> / etc. that .prose constrains to --measure and centers) rather
+		// than the editor surface — otherwise on wide screens the + sits
+		// hundreds of pixels away from the cursor on an empty line.
+		const blockDom = ed.view.nodeDOM(resolved.before(1)) as HTMLElement | null;
+		const anchorRect = (blockDom ?? ed.view.dom).getBoundingClientRect();
 		const scrollX = window.scrollX;
 		const scrollY = window.scrollY;
-		// Park the button to the LEFT of the text column, vertically aligned to the line.
-		top = coords.top + scrollY - 2;
-		left = editorRect.left + scrollX - 40;
+		// Center the button vertically on the cursor's line — coords.top/bottom
+		// reflect the rendered line height, so this works for paragraphs and
+		// headings alike without per-block-type tuning.
+		const cursorMid = (coords.top + coords.bottom) / 2;
+		top = cursorMid + scrollY - BTN_SIZE / 2;
+		left = anchorRect.left + scrollX - 40;
 		// If there's not enough room on the left (small screens), tuck it inside.
 		if (left < scrollX + 4) {
-			left = editorRect.left + scrollX + 4;
+			left = anchorRect.left + scrollX + 4;
 		}
 		visible = true;
 	}
