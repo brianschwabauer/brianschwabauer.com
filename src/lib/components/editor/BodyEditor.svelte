@@ -7,6 +7,7 @@
 	import { BlogImage } from './extensions/BlogImage';
 	import { imageDropHandler, recordToBlogImageAttrs } from './extensions/imageDropHandler';
 	import { SlashCommand } from './extensions/slashCommand';
+	import { TrailingParagraph } from './extensions/trailingParagraph';
 	import MediaLibrary from '$lib/components/media/MediaLibrary.svelte';
 	import { notify } from '$lib/components/dialogs';
 	import EditorBubbleMenu from './EditorBubbleMenu.svelte';
@@ -66,6 +67,7 @@
 				ShiftedHeading,
 				Link.configure({ openOnClick: false }),
 				BlogImage,
+				TrailingParagraph,
 				imageDropHandler.configure({
 					onUploadError: (err, file) => {
 						console.error(`Failed to upload ${file.name}:`, err);
@@ -146,10 +148,37 @@
 	export function focus() {
 		editor?.commands.focus('end');
 	}
+
+	/**
+	 * Catch clicks that land in the empty space below the editable surface
+	 * (most often when the last block is an image and the user wants to add
+	 * content after it) and bounce the cursor to the end of the document so
+	 * they can immediately type or open the slash menu.
+	 */
+	function handleHostPointerDown(event: MouseEvent) {
+		if (!editor) return;
+		// Only act on primary mouse / touch — leave right-click etc. alone.
+		if (event.button !== 0) return;
+		const view = editor.view;
+		const pmRect = view.dom.getBoundingClientRect();
+		// Below the editable surface: always bounce to end.
+		if (event.clientY <= pmRect.bottom) {
+			// Inside PM: let ProseMirror handle hit-testing normally.
+			if ((view.dom as HTMLElement).contains(event.target as Node)) return;
+		}
+		event.preventDefault();
+		editor.chain().focus('end').run();
+	}
 </script>
 
 <div class="body-editor">
-	<div class="body-host" class:is-empty={isDocEmpty} data-placeholder={placeholder}>
+	<div
+		class="body-host"
+		class:is-empty={isDocEmpty}
+		data-placeholder={placeholder}
+		onmousedown={handleHostPointerDown}
+		role="presentation"
+	>
 		<div bind:this={editorElement}></div>
 	</div>
 </div>
@@ -170,6 +199,12 @@
 	.body-host {
 		position: relative;
 		min-height: 200px;
+		/* Generous clickable runway below the last block — the mousedown
+		   handler on this element bounces clicks here to the document end so
+		   the user can always extend the post by clicking under the content
+		   (especially after an image). */
+		padding-bottom: 30vh;
+		cursor: text;
 	}
 
 	/* Layout/typography on the editable surface — kept separate from the
