@@ -21,8 +21,9 @@
 	--color-warning: #f59e0b;
 	--color-error: #ef4444;
 
-	/* Typography */
-	--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	/* Typography — overrides delightstack defaults (loaded earlier in +layout.svelte). */
+	--font-sans: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	--font-serif: 'Merriweather', ui-serif, Georgia, serif;
 	--font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
 	--text-xs: 0.75rem;
