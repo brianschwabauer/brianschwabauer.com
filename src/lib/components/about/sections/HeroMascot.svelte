@@ -17,7 +17,6 @@
 	const panicking = $derived(phase === 'boom');
 	const armDown = $derived(phase === 'pumping' && pumpStroke === 1);
 	const gaugeGlow = $derived(Math.min(1, pumpCount / 4));
-	const hosePulse = $derived(pumpStroke === 1 ? 1 : 0);
 	void buttonScale;
 </script>
 
@@ -28,33 +27,6 @@
 	class:gone={phase === 'aftermath'}
 	aria-hidden="true"
 >
-	<svg class="hose" viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true">
-		<defs>
-			<linearGradient id="hose-grad" x1="0" x2="1" y1="0" y2="0">
-				<stop offset="0%" stop-color="#1a1a1a" />
-				<stop offset="60%" stop-color="#2c2c2c" />
-				<stop offset="100%" stop-color="#0e0e0e" />
-			</linearGradient>
-		</defs>
-		<path
-			class="hose-tube"
-			d="M 10 40 C 60 40 100 18 195 22"
-			fill="none"
-			stroke="url(#hose-grad)"
-			stroke-width="12"
-			stroke-linecap="round"
-			style:--pulse={hosePulse}
-		/>
-		<path
-			class="hose-highlight"
-			d="M 10 36 C 60 36 100 14 195 18"
-			fill="none"
-			stroke="rgba(255,255,255,0.18)"
-			stroke-width="2"
-			stroke-linecap="round"
-		/>
-	</svg>
-
 	<svg
 		class="mascot"
 		viewBox="0 0 240 340"
@@ -102,372 +74,328 @@
 			</radialGradient>
 		</defs>
 
-		<!-- ground shadow -->
+		<!-- ground shadow (sits on the floor, doesn't move with the dipping body) -->
 		<ellipse class="ground-shadow" cx="120" cy="328" rx="68" ry="7" fill="rgba(0,0,0,0.55)" />
 
+		<!-- BODY: breathing layer (subtle scale loop) -->
 		<g class="body">
-			<!-- BOOTS -->
-			<g class="boots">
-				<!-- cuffs (light gray sock visible at the boot top) -->
-				<rect x="80" y="282" width="32" height="10" rx="3" fill="#d5d5d5" stroke="#1a1a1a" stroke-width="2" />
-				<rect x="128" y="282" width="32" height="10" rx="3" fill="#d5d5d5" stroke="#1a1a1a" stroke-width="2" />
-				<!-- boots -->
-				<path
-					d="M78 292 L114 292 L114 310 Q114 320 104 320 L78 320 Q70 320 70 312 Z"
-					fill="url(#boot-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2.5"
-					stroke-linejoin="round"
-				/>
-				<path
-					d="M126 292 L162 292 L170 312 Q170 320 162 320 L136 320 Q126 320 126 310 Z"
-					fill="url(#boot-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2.5"
-					stroke-linejoin="round"
-				/>
-				<!-- sole highlight -->
-				<rect x="70" y="313" width="44" height="3" fill="rgba(255,255,255,0.15)" />
-				<rect x="126" y="313" width="44" height="3" fill="rgba(255,255,255,0.15)" />
-			</g>
-
-			<!-- LEGS (overall pant legs) -->
-			<g class="legs">
-				<path
-					d="M84 230 L114 230 L114 285 Q114 290 108 290 L84 290 Q78 290 78 284 Z"
-					fill="url(#overalls-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2.5"
-					stroke-linejoin="round"
-				/>
-				<path
-					d="M126 230 L156 230 L162 284 Q162 290 156 290 L132 290 Q126 290 126 285 Z"
-					fill="url(#overalls-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2.5"
-					stroke-linejoin="round"
-				/>
-			</g>
-
-			<!-- TORSO -->
-			<g class="torso">
-				<!-- yellow shirt visible at the neckline + sleeve caps -->
-				<path
-					d="M76 168 Q120 158 164 168 L168 200 Q120 196 72 200 Z"
-					fill="url(#shirt-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2.5"
-					stroke-linejoin="round"
-				/>
-				<!-- blue overalls bib -->
-				<path
-					d="M74 192 Q120 184 166 192 L170 238 Q120 244 70 238 Z"
-					fill="url(#overalls-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2.5"
-					stroke-linejoin="round"
-				/>
-				<!-- shoulder straps -->
-				<path
-					d="M96 168 L92 195 L100 198 L104 172 Z"
-					fill="url(#overalls-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2"
-					stroke-linejoin="round"
-				/>
-				<path
-					d="M144 172 L148 198 L156 195 L152 168 Z"
-					fill="url(#overalls-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2"
-					stroke-linejoin="round"
-				/>
-				<!-- pocket buttons -->
-				<circle cx="100" cy="200" r="3.5" fill="#ffd954" stroke="#1a1a1a" stroke-width="1.2" />
-				<circle cx="140" cy="200" r="3.5" fill="#ffd954" stroke="#1a1a1a" stroke-width="1.2" />
-				<!-- center seam -->
-				<line
-					x1="120"
-					y1="208"
-					x2="120"
-					y2="238"
-					stroke="#0a1c36"
-					stroke-width="1.5"
-					stroke-linecap="round"
-					opacity="0.7"
-				/>
-				<!-- belt -->
-				<rect
-					x="74"
-					y="236"
-					width="92"
-					height="8"
-					fill="#1a1a1a"
-					stroke="#1a1a1a"
-					stroke-width="1"
-				/>
-				<!-- belt buckle -->
-				<rect
-					x="113"
-					y="234"
-					width="14"
-					height="12"
-					rx="1.5"
-					fill="#c8c8c8"
-					stroke="#1a1a1a"
-					stroke-width="1.5"
-				/>
-				<rect x="116" y="237" width="8" height="6" fill="#9a9a9a" />
-			</g>
-
-			<!-- HEAD -->
-			<g class="head">
-				<!-- ears -->
-				<ellipse cx="63" cy="118" rx="7" ry="11" fill="url(#skin-grad)" stroke="#1a1a1a" stroke-width="2" />
-				<ellipse cx="177" cy="118" rx="7" ry="11" fill="url(#skin-grad)" stroke="#1a1a1a" stroke-width="2" />
-				<!-- ear inner -->
-				<ellipse cx="64" cy="118" rx="3" ry="6" fill="#b87a55" opacity="0.7" />
-				<ellipse cx="176" cy="118" rx="3" ry="6" fill="#b87a55" opacity="0.7" />
-
-				<!-- face (slightly squarish-round) -->
-				<path
-					class="face"
-					d="M70 95 Q70 70 120 65 Q170 70 170 95 L170 138 Q170 168 120 172 Q70 168 70 138 Z"
-					fill="url(#skin-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2.5"
-					stroke-linejoin="round"
-				/>
-
-				<!-- hair tufts visible under helmet brim -->
-				<path
-					d="M70 90 Q80 78 92 84 L92 100 Q80 102 70 100 Z"
-					fill="#1a1a1a"
-				/>
-				<path
-					d="M170 90 Q160 78 148 84 L148 100 Q160 102 170 100 Z"
-					fill="#1a1a1a"
-				/>
-
-				<!-- eyebrows -->
-				<path
-					class="brow brow-left"
-					d="M82 102 Q98 96 110 102"
-					fill="none"
-					stroke="#1a1a1a"
-					stroke-width="5"
-					stroke-linecap="round"
-				/>
-				<path
-					class="brow brow-right"
-					d="M130 102 Q142 96 158 102"
-					fill="none"
-					stroke="#1a1a1a"
-					stroke-width="5"
-					stroke-linecap="round"
-				/>
-
-				<!-- eyes -->
-				<g class="eye eye-left">
-					<ellipse cx="96" cy="118" rx="10" ry="11" fill="#ffffff" stroke="#1a1a1a" stroke-width="2.2" />
-					<circle class="pupil pupil-left" cx="98" cy="120" r="5" fill="#1a1a1a" />
-					<circle cx="100" cy="117" r="2" fill="#ffffff" />
-				</g>
-				<g class="eye eye-right">
-					<ellipse cx="144" cy="118" rx="10" ry="11" fill="#ffffff" stroke="#1a1a1a" stroke-width="2.2" />
-					<circle class="pupil pupil-right" cx="146" cy="120" r="5" fill="#1a1a1a" />
-					<circle cx="148" cy="117" r="2" fill="#ffffff" />
-				</g>
-
-				<!-- nose -->
-				<path
-					d="M114 132 Q120 142 126 132 Q124 138 120 138 Q116 138 114 132 Z"
-					fill="#c89770"
-					stroke="#1a1a1a"
-					stroke-width="1.6"
-					stroke-linejoin="round"
-				/>
-
-				<!-- mouth — smirk (default) -->
-				<path
-					class="mouth mouth-smirk"
-					d="M106 152 Q120 162 134 152"
-					fill="none"
-					stroke="#1a1a1a"
-					stroke-width="3"
-					stroke-linecap="round"
-				/>
-				<!-- mouth — strained (high-pressure pumping) -->
-				<path
-					class="mouth mouth-strain"
-					d="M106 156 Q120 146 134 156 Q120 162 106 156 Z"
-					fill="#5a1818"
-					stroke="#1a1a1a"
-					stroke-width="2"
-					stroke-linejoin="round"
-				/>
-
-				<!-- HELMET -->
-				<g class="helmet">
-					<!-- main dome -->
+			<!-- POSE: knee-bend layer (compresses on the down stroke) -->
+			<g class="body-pose" class:dip={armDown}>
+				<!-- BOOTS (back) -->
+				<g class="boots">
+					<rect x="80" y="282" width="32" height="10" rx="3" fill="#d5d5d5" stroke="#1a1a1a" stroke-width="2" />
+					<rect x="128" y="282" width="32" height="10" rx="3" fill="#d5d5d5" stroke="#1a1a1a" stroke-width="2" />
 					<path
-						class="helmet-dome"
-						d="M52 92 Q60 38 120 32 Q180 38 188 92 Q188 96 184 98 L56 98 Q52 96 52 92 Z"
-						fill="url(#helmet-grad)"
+						d="M78 292 L114 292 L114 310 Q114 320 104 320 L78 320 Q70 320 70 312 Z"
+						fill="url(#boot-grad)"
 						stroke="#1a1a1a"
-						stroke-width="3"
+						stroke-width="2.5"
 						stroke-linejoin="round"
 					/>
-					<!-- inside-of-brim shadow strip (showing under the helmet) -->
 					<path
-						d="M58 92 Q70 84 120 84 Q170 84 182 92 L180 100 Q120 102 60 100 Z"
-						fill="url(#helmet-shadow)"
-					/>
-					<!-- brim -->
-					<ellipse
-						cx="120"
-						cy="98"
-						rx="72"
-						ry="10"
-						fill="url(#helmet-grad)"
+						d="M126 292 L162 292 L170 312 Q170 320 162 320 L136 320 Q126 320 126 310 Z"
+						fill="url(#boot-grad)"
 						stroke="#1a1a1a"
-						stroke-width="3"
+						stroke-width="2.5"
+						stroke-linejoin="round"
 					/>
-					<!-- glossy top highlight (rectangular like the reference) -->
+					<rect x="70" y="313" width="44" height="3" fill="rgba(255,255,255,0.15)" />
+					<rect x="126" y="313" width="44" height="3" fill="rgba(255,255,255,0.15)" />
+				</g>
+
+				<!-- LEGS -->
+				<g class="legs">
 					<path
-						d="M108 44 Q120 38 132 44 L132 78 Q120 76 108 78 Z"
-						fill="rgba(255,255,255,0.65)"
+						d="M84 230 L114 230 L114 285 Q114 290 108 290 L84 290 Q78 290 78 284 Z"
+						fill="url(#overalls-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2.5"
+						stroke-linejoin="round"
 					/>
-					<!-- side highlight -->
 					<path
-						d="M64 88 Q78 60 96 54"
+						d="M126 230 L156 230 L162 284 Q162 290 156 290 L132 290 Q126 290 126 285 Z"
+						fill="url(#overalls-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2.5"
+						stroke-linejoin="round"
+					/>
+				</g>
+
+				<!-- PUMP — back layer (cylinder + gauge), in front of legs, behind torso -->
+				<g class="pump-back" class:compressed={armDown}>
+					<rect
+						x="92"
+						y="232"
+						width="56"
+						height="62"
+						rx="6"
+						fill="url(#pump-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2"
+					/>
+					<rect
+						x="86"
+						y="226"
+						width="68"
+						height="10"
+						rx="3"
+						fill="#0a0e15"
+						stroke="#1a1a1a"
+						stroke-width="2"
+					/>
+					<line x1="100" y1="248" x2="140" y2="248" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+					<line x1="100" y1="254" x2="140" y2="254" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+					<!-- pressure gauge on the front face -->
+					<g class="gauge">
+						<circle cx="120" cy="270" r="11" fill="#0a0e15" stroke="#1a1a1a" stroke-width="1.8" />
+						<circle cx="120" cy="270" r="10" fill="url(#gauge-grad)" style:opacity={gaugeGlow} />
+						<line
+							class="needle"
+							x1="120"
+							y1="270"
+							x2="120"
+							y2="262"
+							stroke="#ff5a3c"
+							stroke-width="2.2"
+							stroke-linecap="round"
+							style:transform-origin="120px 270px"
+						/>
+					</g>
+				</g>
+
+				<!-- TORSO (sits over the top of the pump back so the upper body is in front) -->
+				<g class="torso">
+					<path
+						d="M76 168 Q120 158 164 168 L168 200 Q120 196 72 200 Z"
+						fill="url(#shirt-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2.5"
+						stroke-linejoin="round"
+					/>
+					<path
+						d="M74 192 Q120 184 166 192 L170 238 Q120 244 70 238 Z"
+						fill="url(#overalls-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2.5"
+						stroke-linejoin="round"
+					/>
+					<path
+						d="M96 168 L92 195 L100 198 L104 172 Z"
+						fill="url(#overalls-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2"
+						stroke-linejoin="round"
+					/>
+					<path
+						d="M144 172 L148 198 L156 195 L152 168 Z"
+						fill="url(#overalls-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2"
+						stroke-linejoin="round"
+					/>
+					<circle cx="100" cy="200" r="3.5" fill="#ffd954" stroke="#1a1a1a" stroke-width="1.2" />
+					<circle cx="140" cy="200" r="3.5" fill="#ffd954" stroke="#1a1a1a" stroke-width="1.2" />
+					<line
+						x1="120"
+						y1="208"
+						x2="120"
+						y2="232"
+						stroke="#0a1c36"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						opacity="0.7"
+					/>
+				</g>
+
+				<!-- HEAD -->
+				<g class="head">
+					<ellipse cx="63" cy="118" rx="7" ry="11" fill="url(#skin-grad)" stroke="#1a1a1a" stroke-width="2" />
+					<ellipse cx="177" cy="118" rx="7" ry="11" fill="url(#skin-grad)" stroke="#1a1a1a" stroke-width="2" />
+					<ellipse cx="64" cy="118" rx="3" ry="6" fill="#b87a55" opacity="0.7" />
+					<ellipse cx="176" cy="118" rx="3" ry="6" fill="#b87a55" opacity="0.7" />
+
+					<path
+						class="face"
+						d="M70 95 Q70 70 120 65 Q170 70 170 95 L170 138 Q170 168 120 172 Q70 168 70 138 Z"
+						fill="url(#skin-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2.5"
+						stroke-linejoin="round"
+					/>
+
+					<path d="M70 90 Q80 78 92 84 L92 100 Q80 102 70 100 Z" fill="#1a1a1a" />
+					<path d="M170 90 Q160 78 148 84 L148 100 Q160 102 170 100 Z" fill="#1a1a1a" />
+
+					<path
+						class="brow brow-left"
+						d="M82 102 Q98 96 110 102"
 						fill="none"
-						stroke="rgba(255,255,255,0.45)"
+						stroke="#1a1a1a"
+						stroke-width="5"
+						stroke-linecap="round"
+					/>
+					<path
+						class="brow brow-right"
+						d="M130 102 Q142 96 158 102"
+						fill="none"
+						stroke="#1a1a1a"
+						stroke-width="5"
+						stroke-linecap="round"
+					/>
+
+					<g class="eye eye-left">
+						<ellipse cx="96" cy="118" rx="10" ry="11" fill="#ffffff" stroke="#1a1a1a" stroke-width="2.2" />
+						<circle class="pupil pupil-left" cx="98" cy="120" r="5" fill="#1a1a1a" />
+						<circle cx="100" cy="117" r="2" fill="#ffffff" />
+					</g>
+					<g class="eye eye-right">
+						<ellipse cx="144" cy="118" rx="10" ry="11" fill="#ffffff" stroke="#1a1a1a" stroke-width="2.2" />
+						<circle class="pupil pupil-right" cx="146" cy="120" r="5" fill="#1a1a1a" />
+						<circle cx="148" cy="117" r="2" fill="#ffffff" />
+					</g>
+
+					<path
+						d="M114 132 Q120 142 126 132 Q124 138 120 138 Q116 138 114 132 Z"
+						fill="#c89770"
+						stroke="#1a1a1a"
+						stroke-width="1.6"
+						stroke-linejoin="round"
+					/>
+
+					<path
+						class="mouth mouth-smirk"
+						d="M106 152 Q120 162 134 152"
+						fill="none"
+						stroke="#1a1a1a"
 						stroke-width="3"
 						stroke-linecap="round"
 					/>
-					<!-- LED -->
-					<circle cx="120" cy="42" r="9" fill="url(#led-grad)" class="led" />
-					<circle cx="120" cy="42" r="3" fill="#fffbe0" />
+					<path
+						class="mouth mouth-strain"
+						d="M106 156 Q120 146 134 156 Q120 162 106 156 Z"
+						fill="#5a1818"
+						stroke="#1a1a1a"
+						stroke-width="2"
+						stroke-linejoin="round"
+					/>
+
+					<g class="helmet">
+						<path
+							class="helmet-dome"
+							d="M52 92 Q60 38 120 32 Q180 38 188 92 Q188 96 184 98 L56 98 Q52 96 52 92 Z"
+							fill="url(#helmet-grad)"
+							stroke="#1a1a1a"
+							stroke-width="3"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M58 92 Q70 84 120 84 Q170 84 182 92 L180 100 Q120 102 60 100 Z"
+							fill="url(#helmet-shadow)"
+						/>
+						<ellipse
+							cx="120"
+							cy="98"
+							rx="72"
+							ry="10"
+							fill="url(#helmet-grad)"
+							stroke="#1a1a1a"
+							stroke-width="3"
+						/>
+						<path
+							d="M108 44 Q120 38 132 44 L132 78 Q120 76 108 78 Z"
+							fill="rgba(255,255,255,0.65)"
+						/>
+						<path
+							d="M64 88 Q78 60 96 54"
+							fill="none"
+							stroke="rgba(255,255,255,0.45)"
+							stroke-width="3"
+							stroke-linecap="round"
+						/>
+						<circle cx="120" cy="42" r="9" fill="url(#led-grad)" class="led" />
+						<circle cx="120" cy="42" r="3" fill="#fffbe0" />
+					</g>
+				</g>
+
+				<!-- PUMP — handle bar (in front of torso/head so the bar visibly
+					 sits between the chest and the fists) -->
+				<g class="pump-handle" class:down={armDown}>
+					<!-- vertical rod connecting the bar into the cap -->
+					<rect x="117" y="216" width="6" height="14" rx="2" fill="#1a2230" />
+					<!-- the horizontal bar both fists grip -->
+					<rect
+						x="88"
+						y="206"
+						width="64"
+						height="12"
+						rx="4"
+						fill="url(#pump-grad)"
+						stroke="#1a1a1a"
+						stroke-width="1.8"
+					/>
+					<rect x="92" y="208" width="56" height="3" rx="1.5" fill="rgba(255,255,255,0.22)" />
+				</g>
+
+				<!-- ARMS — both come straight down from the shoulders and grip the
+					 bar with little fists, then rotate slightly on the down stroke. -->
+				<g class="arm arm-left" class:down={armDown}>
+					<!-- yellow shirt sleeve cap (at the shoulder) -->
+					<ellipse
+						cx="92"
+						cy="180"
+						rx="14"
+						ry="12"
+						fill="url(#shirt-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2"
+					/>
+					<!-- forearm dropping down to the handle -->
+					<path
+						d="M82 190 Q86 195 88 200 L96 218 Q104 220 110 218 L106 198 Q104 192 102 188 Z"
+						fill="url(#skin-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2.2"
+						stroke-linejoin="round"
+					/>
+					<!-- fist gripping the left side of the bar -->
+					<circle cx="102" cy="215" r="9" fill="url(#skin-grad)" stroke="#1a1a1a" stroke-width="2" />
+					<!-- thumb curl -->
+					<path
+						d="M97 208 Q100 205 105 208"
+						fill="none"
+						stroke="#1a1a1a"
+						stroke-width="1.5"
+						stroke-linecap="round"
+					/>
+				</g>
+
+				<g class="arm arm-right" class:down={armDown}>
+					<ellipse
+						cx="148"
+						cy="180"
+						rx="14"
+						ry="12"
+						fill="url(#shirt-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2"
+					/>
+					<path
+						d="M138 188 Q136 192 134 198 L130 218 Q136 220 144 218 L152 200 Q154 195 158 190 Z"
+						fill="url(#skin-grad)"
+						stroke="#1a1a1a"
+						stroke-width="2.2"
+						stroke-linejoin="round"
+					/>
+					<circle cx="138" cy="215" r="9" fill="url(#skin-grad)" stroke="#1a1a1a" stroke-width="2" />
+					<path
+						d="M133 208 Q136 205 141 208"
+						fill="none"
+						stroke="#1a1a1a"
+						stroke-width="1.5"
+						stroke-linecap="round"
+					/>
 				</g>
 			</g>
-
-			<!-- ARMS — both reach toward the pump handle and push together -->
-			<g class="arm arm-left" class:down={armDown}>
-				<!-- yellow sleeve cap -->
-				<path
-					d="M78 178 Q86 168 100 170 L102 190 Q90 196 80 192 Z"
-					fill="url(#shirt-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2"
-					stroke-linejoin="round"
-				/>
-				<!-- forearm extending toward the pump -->
-				<path
-					d="M84 188 Q104 192 134 178 Q150 174 158 178 L160 188 Q142 196 116 200 Q98 202 86 200 Z"
-					fill="url(#skin-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2.2"
-					stroke-linejoin="round"
-				/>
-				<!-- left fist gripping the handle -->
-				<circle cx="160" cy="182" r="8.5" fill="url(#skin-grad)" stroke="#1a1a1a" stroke-width="2" />
-				<!-- thumb wrap -->
-				<path
-					d="M156 175 Q162 173 164 178"
-					fill="none"
-					stroke="#1a1a1a"
-					stroke-width="1.5"
-					stroke-linecap="round"
-				/>
-			</g>
-
-			<g class="arm arm-right" class:down={armDown}>
-				<!-- yellow sleeve cap -->
-				<path
-					d="M140 170 Q156 168 162 178 L160 192 Q150 196 138 190 Z"
-					fill="url(#shirt-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2"
-					stroke-linejoin="round"
-				/>
-				<!-- forearm reaching slightly higher to the other side of the handle -->
-				<path
-					d="M150 180 Q172 174 192 178 Q200 180 200 188 Q186 196 172 198 Q156 198 148 192 Z"
-					fill="url(#skin-grad)"
-					stroke="#1a1a1a"
-					stroke-width="2.2"
-					stroke-linejoin="round"
-				/>
-				<!-- right fist gripping the other side of the handle -->
-				<circle cx="198" cy="186" r="8.5" fill="url(#skin-grad)" stroke="#1a1a1a" stroke-width="2" />
-				<path
-					d="M194 178 Q200 177 202 182"
-					fill="none"
-					stroke="#1a1a1a"
-					stroke-width="1.5"
-					stroke-linecap="round"
-				/>
-			</g>
-		</g>
-
-		<!-- PUMP (in front of mascot, slightly to the right) -->
-		<g class="pump" class:compressed={armDown}>
-			<!-- handle bar (gripped by both fists) -->
-			<g class="handle">
-				<rect x="178" y="178" width="6" height="46" rx="2" fill="#1a2230" />
-				<rect
-					x="156"
-					y="172"
-					width="48"
-					height="10"
-					rx="3"
-					fill="url(#pump-grad)"
-					stroke="#1a1a1a"
-					stroke-width="1.6"
-				/>
-				<rect
-					x="158"
-					y="173"
-					width="44"
-					height="3"
-					rx="1.5"
-					fill="rgba(255,255,255,0.22)"
-				/>
-			</g>
-			<!-- cylinder -->
-			<rect
-				x="160"
-				y="222"
-				width="44"
-				height="58"
-				rx="6"
-				fill="url(#pump-grad)"
-				stroke="#1a1a1a"
-				stroke-width="2"
-			/>
-			<rect x="156" y="218" width="52" height="8" rx="3" fill="#0a0e15" stroke="#1a1a1a" stroke-width="1.5" />
-			<!-- vent stripes -->
-			<line x1="168" y1="234" x2="196" y2="234" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
-			<line x1="168" y1="240" x2="196" y2="240" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
-			<!-- pressure gauge -->
-			<g class="gauge">
-				<circle cx="182" cy="256" r="10" fill="#0a0e15" stroke="#1a1a1a" stroke-width="1.5" />
-				<circle cx="182" cy="256" r="9" fill="url(#gauge-grad)" style:opacity={gaugeGlow} />
-				<line
-					class="needle"
-					x1="182"
-					y1="256"
-					x2="182"
-					y2="249"
-					stroke="#ff5a3c"
-					stroke-width="2"
-					stroke-linecap="round"
-					style:transform-origin="182px 256px"
-				/>
-			</g>
-			<!-- nozzle exiting top-right toward the hose -->
-			<rect x="200" y="224" width="10" height="6" rx="1.5" fill="#0a0e15" stroke="#1a1a1a" stroke-width="1.2" />
 		</g>
 	</svg>
 </div>
@@ -477,8 +405,9 @@
 		position: absolute;
 		bottom: 0;
 		left: 50%;
-		width: clamp(180px, 24vw, 360px);
-		height: clamp(230px, 32vw, 440px);
+		/* ~20% smaller than before */
+		width: clamp(144px, 19vw, 288px);
+		height: clamp(184px, 26vw, 352px);
 		transform: translate(80%, 110%);
 		opacity: 0;
 		pointer-events: none;
@@ -515,36 +444,13 @@
 		overflow: visible;
 	}
 
-	.hose {
-		position: absolute;
-		left: -42%;
-		bottom: 36%;
-		width: 70%;
-		height: 22%;
-		transform-origin: right center;
-		opacity: 0;
-		transition:
-			opacity 380ms ease 240ms,
-			transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
-		z-index: 3;
-		overflow: visible;
-	}
-	.mascot-root.on-stage .hose { opacity: 1; }
-	.mascot-root.panic .hose {
-		opacity: 0;
-		transition: opacity 200ms ease;
-	}
-	.hose-tube {
-		stroke-width: calc(12 + 4 * var(--pulse, 0));
-		transition: stroke-width 160ms ease;
-	}
-
 	.ground-shadow {
 		transform-origin: 120px 328px;
 		transition: transform 220ms ease;
 	}
 
-	/* BODY: subtle breathing + squash on pump */
+	/* BODY: subtle breathing (constant loop). The pose layer below handles
+	   the snappy knee-bend that happens during a pump stroke. */
 	.body {
 		transform-origin: 120px 290px;
 		animation: breathe 3.6s ease-in-out infinite;
@@ -552,6 +458,17 @@
 	@keyframes breathe {
 		0%, 100% { transform: scaleY(1) scaleX(1); }
 		50% { transform: scaleY(1.012) scaleX(0.994); }
+	}
+
+	/* POSE: dips the whole body on the down stroke (knee bend). Compounds
+	   with the breathing transform thanks to nested transforms. The legs
+	   then visibly squash with the body since they share the transform. */
+	.body-pose {
+		transform-origin: 120px 290px;
+		transition: transform 220ms cubic-bezier(0.7, 0, 0.4, 1);
+	}
+	.body-pose.dip {
+		transform: translateY(18px) scaleY(0.88);
 	}
 
 	/* HEAD bobs subtly */
@@ -608,35 +525,34 @@
 		50% { opacity: 1; }
 	}
 
-	/* ARMS — both grip the handle and push down together */
+	/* ARMS — both pivot at the shoulder, swinging slightly down on the stroke.
+	   The body dip carries them further down so the fists track the handle. */
 	.arm-left {
-		transform-origin: 88px 186px;
+		transform-origin: 92px 180px;
 		transition: transform 160ms cubic-bezier(0.7, 0, 0.3, 1);
 	}
-	.arm-left.down {
-		transform: rotate(8deg) translate(2px, 12px);
-	}
+	.arm-left.down { transform: rotate(6deg); }
 	.arm-right {
-		transform-origin: 152px 186px;
+		transform-origin: 148px 180px;
 		transition: transform 160ms cubic-bezier(0.7, 0, 0.3, 1);
 	}
-	.arm-right.down {
-		transform: rotate(-6deg) translate(-2px, 12px);
-	}
+	.arm-right.down { transform: rotate(-6deg); }
 
-	/* PUMP handle pushes down on stroke */
-	.handle {
-		transform-origin: 180px 220px;
+	/* PUMP — handle bar travels down on the stroke; cylinder squashes slightly */
+	.pump-handle {
+		transform-origin: 120px 220px;
 		transition: transform 160ms cubic-bezier(0.7, 0, 0.3, 1);
 	}
-	.pump.compressed .handle {
-		transform: translateY(16px);
+	.pump-handle.down {
+		/* small extra travel on top of the body dip — both fists and bar end up
+		   in roughly the same place at the bottom of the stroke. */
+		transform: translateY(4px);
 	}
-	.pump {
-		transform-origin: 180px 280px;
+	.pump-back {
+		transform-origin: 120px 294px;
 		transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
 	}
-	.pump.compressed {
+	.pump-back.compressed {
 		transform: scaleY(0.97) scaleX(1.02);
 	}
 
@@ -662,7 +578,8 @@
 		0% { transform: translate(0,0) rotate(0); }
 		100% { transform: translate(40px, -70px) rotate(140deg); }
 	}
-	.mascot-root.panic .pump {
+	.mascot-root.panic .pump-back,
+	.mascot-root.panic .pump-handle {
 		animation: pump-drop 500ms ease-in forwards;
 	}
 	@keyframes pump-drop {
