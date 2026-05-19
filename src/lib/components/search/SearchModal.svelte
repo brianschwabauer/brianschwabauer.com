@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { create, load, search, type AnyOrama, type Results } from '@orama/orama';
-	import { categoryLabel, indexSchema, type SearchEntry } from '$lib/search';
+	import { entryLabel, indexSchema, type SearchEntry } from '$lib/search';
 	import { bgStyle, thumbnailURL } from '$lib/client/images';
 
 	interface Props {
@@ -94,7 +94,7 @@
 		try {
 			const r = (await search(db, {
 				term,
-				properties: ['title', 'summary', 'body', 'category', 'tags'],
+				properties: ['title', 'summary', 'body', 'tags'],
 				limit: 20,
 				tolerance: 1
 			})) as Results<SearchEntry>;
@@ -295,7 +295,7 @@
 							{/if}
 							<div class="result-body">
 								<div class="result-head">
-									<span class="result-category">{categoryLabel(hit)}</span>
+									<span class="result-category">{entryLabel(hit)}</span>
 									{#if hit.date && hit.type === 'blog'}
 										<time class="result-date">{formatDate(hit.date)}</time>
 									{/if}

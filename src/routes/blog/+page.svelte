@@ -5,10 +5,12 @@
 
 	let { data } = $props();
 
-	let activeCategory = $state<string | null>(null);
+	let activeTag = $state<string | null>(null);
 
 	const filteredPosts = $derived(
-		activeCategory ? data.posts.filter((p) => p.category === activeCategory) : data.posts
+		activeTag
+			? data.posts.filter((p) => p.tags?.some((t) => t.toLowerCase() === activeTag!.toLowerCase()))
+			: data.posts
 	);
 
 	const pinnedPosts = $derived(
@@ -19,7 +21,16 @@
 
 	const regularPosts = $derived(filteredPosts.filter((p) => !p.pinned));
 
-	const categories = $derived([...new Set(data.posts.map((p) => p.category).filter(Boolean))] as string[]);
+	const allTags = $derived.by(() => {
+		const seen = new Map<string, string>();
+		for (const p of data.posts) {
+			for (const t of p.tags ?? []) {
+				const key = t.toLowerCase();
+				if (!seen.has(key)) seen.set(key, t);
+			}
+		}
+		return [...seen.values()].sort((a, b) => a.localeCompare(b));
+	});
 </script>
 
 <svelte:head>
@@ -36,9 +47,9 @@
 		<p class="blog-subtitle">Thoughts on development, creativity, and the journey of building things.</p>
 	</div>
 
-	{#if categories.length > 0}
+	{#if allTags.length > 0}
 		<div class="blog-filters">
-			<PostFilters {categories} {activeCategory} onChange={(c) => (activeCategory = c)} />
+			<PostFilters tags={allTags} {activeTag} onChange={(t) => (activeTag = t)} />
 		</div>
 	{/if}
 

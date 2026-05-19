@@ -61,9 +61,6 @@
 		{/if}
 		<header class="post-header">
 			<div class="post-meta">
-				{#if data.post.category}
-					<span class="post-category">{data.post.category}</span>
-				{/if}
 				<time class="post-date">{formatDate(data.post.publishedAt)}</time>
 			</div>
 
@@ -186,12 +183,6 @@
 		gap: var(--space-3);
 		margin-bottom: var(--space-4);
 		font-size: var(--text-sm);
-	}
-
-	.post-category {
-		color: var(--color-accent);
-		font-weight: 500;
-		letter-spacing: 0.02em;
 	}
 
 	.post-date {

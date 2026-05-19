@@ -9,6 +9,7 @@ import {
 	SlugConflictError
 } from '$lib/server/blog';
 import { rebuildIndex, rebuildVectorIndex } from '$lib/server/searchIndex';
+import { refreshAdminTags } from '$lib/server/adminData';
 import { augmentWithAi } from '$lib/server/blogAi';
 import type { TipTapDoc } from '$lib/server/renderDoc';
 import type { ImageRecord } from '$lib/types/images';
@@ -22,7 +23,6 @@ interface UpdateBody {
 	content?: TipTapDoc;
 	contentText?: string;
 	summary?: string | null;
-	category?: string | null;
 	tags?: unknown;
 	status?: 'draft' | 'published';
 	slug?: string;
@@ -92,7 +92,6 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 		contentText: nextContentText,
 		summary: userSummary,
 		aiSummary,
-		category: data.category !== undefined ? data.category : existing.category,
 		tags: Array.isArray(data.tags)
 			? data.tags.filter((t): t is string => typeof t === 'string')
 			: existing.tags,
@@ -115,7 +114,11 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 		contentHash,
 		embedding
 	});
-	await Promise.all([rebuildIndex(env.KV), rebuildVectorIndex(env.KV)]);
+	await Promise.all([
+		rebuildIndex(env.KV),
+		rebuildVectorIndex(env.KV),
+		refreshAdminTags(env.KV)
+	]);
 
 	return json({ post: updated });
 };
@@ -125,6 +128,10 @@ export const DELETE: RequestHandler = async ({ params, platform, locals }) => {
 	if (!platform?.env?.KV) throw error(500, 'KV not available');
 
 	await deletePost(platform.env.KV, params.slug);
-	await Promise.all([rebuildIndex(platform.env.KV), rebuildVectorIndex(platform.env.KV)]);
+	await Promise.all([
+		rebuildIndex(platform.env.KV),
+		rebuildVectorIndex(platform.env.KV),
+		refreshAdminTags(platform.env.KV)
+	]);
 	return json({ success: true });
 };

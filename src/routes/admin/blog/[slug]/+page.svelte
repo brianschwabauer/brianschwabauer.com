@@ -6,7 +6,10 @@
 </script>
 
 {#if data.post}
-	<PostEditor mode="edit" initialPost={data.post} />
+	<PostEditor
+		mode="edit"
+		initialPost={data.post}
+		tagSuggestions={data.adminData?.tags ?? []} />
 {:else}
 	<div class="not-found">
 		<h1>Post Not Found</h1>

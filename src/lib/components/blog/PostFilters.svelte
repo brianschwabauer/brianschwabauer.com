@@ -1,24 +1,24 @@
 <script lang="ts">
 	interface Props {
-		categories: string[];
-		activeCategory: string | null;
-		onChange: (category: string | null) => void;
+		tags: string[];
+		activeTag: string | null;
+		onChange: (tag: string | null) => void;
 	}
 
-	let { categories, activeCategory, onChange }: Props = $props();
+	let { tags, activeTag, onChange }: Props = $props();
 </script>
 
 <div class="filters">
-	<button class="filter-btn" class:active={activeCategory === null} onclick={() => onChange(null)}>
+	<button class="filter-btn" class:active={activeTag === null} onclick={() => onChange(null)}>
 		All Posts
 	</button>
-	{#each categories as category}
+	{#each tags as tag (tag)}
 		<button
 			class="filter-btn"
-			class:active={activeCategory === category}
-			onclick={() => onChange(category)}
+			class:active={activeTag === tag}
+			onclick={() => onChange(tag)}
 		>
-			{category}
+			{tag}
 		</button>
 	{/each}
 </div>
@@ -28,6 +28,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-2);
+		justify-content: center;
 	}
 
 	.filter-btn {
