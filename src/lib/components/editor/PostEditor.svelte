@@ -53,7 +53,6 @@
 	let slug = $state(initial?.slug ?? '');
 	let publishedAt = $state<number | null>(initial?.publishedAt ?? null);
 
-	let saving = $state(false);
 	let deleting = $state(false);
 	let error = $state('');
 	let generatorOpen = $state(false);
@@ -109,6 +108,11 @@
 		return willPublish ? 'Published' : 'Saved';
 	});
 
+	// Shown inside <Button>'s loading state so the label tracks the spinner
+	// (instead of flipping to "Published" the moment the PATCH resolves while
+	// the spinner is still winding down).
+	const savingLabel = $derived(status === 'published' ? 'Publishing…' : 'Saving…');
+
 	function handleBodyUpdate(json: JSONContent, text: string) {
 		content = json;
 		contentText = text;
@@ -127,20 +131,21 @@
 	}
 
 	async function handleSave() {
+		// Validation failures throw so <Button>'s onclick-promise tracker
+		// resets the spinner without flashing the success checkmark.
 		if (!title.trim()) {
 			error = 'A title is required before saving.';
 			titleEditor?.focus();
-			return;
+			throw new Error(error);
 		}
 		// Slug is only required at save time in edit mode; in new mode the API
 		// derives one from the title.
 		if (mode === 'edit' && !slug.trim()) {
 			error = 'A slug is required (open Settings to set one).';
 			settingsOpen = true;
-			return;
+			throw new Error(error);
 		}
 
-		saving = true;
 		error = '';
 
 		try {
@@ -201,11 +206,9 @@
 			if (post?.slug && post.slug !== initial?.slug) {
 				goto(`/admin/blog/${post.slug}`, { invalidateAll: true });
 			}
-			error = '';
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Something went wrong';
-		} finally {
-			saving = false;
+			throw err;
 		}
 	}
 
@@ -289,8 +292,10 @@
 				<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.18.41.5.74.91.91l.09.03a2 2 0 0 1 0 4l-.09.03a1.65 1.65 0 0 0-1 1.03z" />
 			</svg>
 		</button>
-		<Button onclick={handleSave} loading={saving} disabled={mode === 'edit' && !hasChanges}>
-			{saveLabel}
+		<Button onclick={handleSave} disabled={mode === 'edit' && !hasChanges}>
+			{#snippet children({ isLoading })}
+				{isLoading ? savingLabel : saveLabel}
+			{/snippet}
 		</Button>
 	</div>
 </header>
