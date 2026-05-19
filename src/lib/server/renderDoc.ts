@@ -182,6 +182,10 @@ function renderBlogImage(node: TipTapNode): string {
 	const thumbhash = attrs.thumbhash ? String(attrs.thumbhash) : '';
 	const bgColor = attrs.bgColor ? String(attrs.bgColor) : '';
 	const caption = typeof attrs.caption === 'string' ? attrs.caption.trim() : '';
+	const cropAspectRaw = Number(attrs.cropAspect);
+	const cropAspect = Number.isFinite(cropAspectRaw) && cropAspectRaw > 0 ? cropAspectRaw : 0;
+	const focalX = Number(attrs.focalX);
+	const focalY = Number(attrs.focalY);
 
 	let variants: VariantInfo[] = [];
 	try {
@@ -208,9 +212,19 @@ function renderBlogImage(node: TipTapNode): string {
 	const styleParts: string[] = [];
 	if (bgColor) styleParts.push(`--blog-img-bg: ${bgColor}`);
 	if (widthMode === 'normal') styleParts.push(`--blog-img-pct: ${widthPct}%`);
+	if (cropAspect) {
+		styleParts.push(`--blog-img-crop-aspect: ${cropAspect}`);
+		const fx = Number.isFinite(focalX) ? focalX : 50;
+		const fy = Number.isFinite(focalY) ? focalY : 50;
+		styleParts.push(`--blog-img-focal-x: ${fx}%`);
+		styleParts.push(`--blog-img-focal-y: ${fy}%`);
+	}
 	const styleAttr = styleParts.length > 0 ? ` style="${escapeAttr(styleParts.join('; '))}"` : '';
 
-	const figureClass = caption ? 'blog-img has-caption' : 'blog-img';
+	const classes = ['blog-img'];
+	if (caption) classes.push('has-caption');
+	if (cropAspect) classes.push('is-cropped');
+	const figureClass = classes.join(' ');
 	const figureAttrs = [
 		`class="${figureClass}"`,
 		`data-width-mode="${escapeAttr(widthMode)}"`,
