@@ -14,6 +14,10 @@
 			const handleScroll = () => {
 				scrolled = window.scrollY > 50;
 			};
+			// Seed from the current scroll position so a reload that lands
+			// mid-page (via browser scroll restoration) renders the scrolled
+			// chrome immediately instead of waiting for the first scroll event.
+			handleScroll();
 			window.addEventListener("scroll", handleScroll);
 			return () => window.removeEventListener("scroll", handleScroll);
 		});
