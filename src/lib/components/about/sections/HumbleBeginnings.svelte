@@ -225,7 +225,7 @@
 			<div class="karate">
 				<div class="karate-text">
 					<h3 class="subtle">
-						<span class="caret">▌</span> Pre-school engineering, on Ninja Men
+						<span class="caret">▌</span> Pre-school special effects
 					</h3>
 					<p>
 						A year after The Fight Scene we made <strong>Ninja Men</strong>. We
@@ -398,7 +398,8 @@
 		margin: 0 0 2rem;
 	}
 	.rec {
-		display: inline-flex;
+		display: flex;
+		width: fit-content;
 		align-items: center;
 		gap: 0.5rem;
 		font-family: var(--font-mono);
