@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import { hideHeaderLogo } from '$lib/stores/navState';
+	import { ripple } from '@delightstack/utilities';
+	import { hideHeaderLogo, searchOpen } from '$lib/stores/navState';
+
+	// material-style ripple for the bar buttons — gated to the mobile bottom
+	// bar (the desktop top bar is left as it was)
+	const navRipple = () =>
+		ripple({ enabled: window.innerWidth <= 768, zIndex: 1 });
 
 	type Stop = { id: string; year: string; label: string };
 
@@ -153,6 +159,7 @@
 			class="up"
 			onclick={scrollToTop}
 			aria-label="Scroll to top of page"
+			{@attach navRipple()}
 		>
 			<svg viewBox="0 0 24 24" aria-hidden="true">
 				<path
@@ -176,6 +183,7 @@
 				aria-haspopup="listbox"
 				aria-expanded={open}
 				aria-label="Jump to section"
+				{@attach navRipple()}
 			>
 				{#if active}
 					<span class="year">{active.year || '—'}</span>
@@ -223,6 +231,28 @@
 				</ul>
 			{/if}
 		</div>
+
+		<div class="mobile-actions">
+			<a href="/blog" class="action-link" {@attach navRipple()}>Blog</a>
+			<button
+				type="button"
+				class="action-icon"
+				onclick={() => ($searchOpen = true)}
+				aria-label="Search the site"
+				{@attach navRipple()}
+			>
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					aria-hidden="true"
+				>
+					<circle cx="11" cy="11" r="7" />
+					<path d="m20 20-3.5-3.5" />
+				</svg>
+			</button>
+		</div>
 	</div>
 {/if}
 
@@ -240,14 +270,19 @@
 		max-width: var(--container-xl);
 		margin: 0 auto;
 		pointer-events: none;
+		/* feedback on press is the squish + ripple — no blue tap flash */
+		-webkit-tap-highlight-color: transparent;
 	}
 	@media (min-width: 768px) {
 		.bar { padding: 0 var(--space-8); }
 	}
 
 	.up,
-	.trigger {
+	.trigger,
+	.action-link,
+	.action-icon {
 		pointer-events: auto;
+		position: relative; /* contains the ripple overlay */
 		font-family: var(--font-mono, ui-monospace, monospace);
 		font-size: 0.78rem;
 		letter-spacing: 0.06em;
@@ -261,26 +296,52 @@
 		transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
 	}
 	.up:hover,
-	.trigger:hover {
+	.trigger:hover,
+	.action-link:hover,
+	.action-icon:hover {
 		background: rgba(20, 24, 36, 0.9);
 		border-color: rgba(0, 242, 195, 0.45);
 	}
 	.up:focus-visible,
-	.trigger:focus-visible {
+	.trigger:focus-visible,
+	.action-link:focus-visible,
+	.action-icon:focus-visible {
 		outline: 2px solid #00f2c3;
 		outline-offset: 2px;
 	}
 
-	.up {
+	.up,
+	.action-icon {
 		width: 44px;
 		height: 44px;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		padding: 0;
+		flex-shrink: 0;
 	}
 	.up svg { width: 18px; height: 18px; }
-	.up:hover { transform: translateY(-2px); }
+	.action-icon svg { width: 17px; height: 17px; }
+	.up:hover,
+	.action-icon:hover { transform: translateY(-2px); }
+
+	/* Blog + search for the mobile bottom bar — hidden on desktop, where the
+	   header carries them. */
+	.mobile-actions {
+		display: none;
+	}
+	.action-link {
+		display: inline-flex;
+		align-items: center;
+		height: 44px;
+		padding: 0 0.95rem;
+		text-transform: uppercase;
+		font-weight: 700;
+		font-size: 0.72rem;
+		letter-spacing: 0.1em;
+		text-decoration: none;
+		white-space: nowrap;
+	}
 
 	.trigger {
 		display: inline-flex;
@@ -339,6 +400,11 @@
 		from { opacity: 0; transform: translateY(-6px); }
 		to { opacity: 1; transform: translateY(0); }
 	}
+	/* the mobile bottom bar slides up + fades in when it first appears */
+	@keyframes bar-in {
+		from { opacity: 0; transform: translateY(16px); }
+		to { opacity: 1; transform: translateY(0); }
+	}
 	.dropdown-root {
 		position: relative;
 		pointer-events: auto;
@@ -394,6 +460,57 @@
 		.menu {
 			min-width: calc(100vw - 1.5rem);
 			max-width: calc(100vw - 1.5rem);
+		}
+	}
+
+	/* On mobile the bar drops to the bottom of the screen: within easy thumb
+	   reach. It carries the up arrow + section dropdown on the left and blog +
+	   search on the right; the dropdown takes the middle and truncates so it
+	   all fits on one row. The menu becomes a panel above the bar. */
+	@media (max-width: 768px) {
+		.bar {
+			top: auto;
+			bottom: 12px;
+			animation: bar-in 280ms cubic-bezier(0.16, 1, 0.3, 1);
+		}
+		/* press feedback to match the delightstack Button: a 3D push-back
+		   squish (the ripple is attached in markup) */
+		.up:active,
+		.trigger:active,
+		.action-link:active,
+		.action-icon:active {
+			transform: perspective(120px) translate3d(0, 1px, -10px);
+		}
+		.mobile-actions {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+			flex-shrink: 0;
+		}
+		.dropdown-root {
+			flex: 1;
+			min-width: 0;
+		}
+		.trigger {
+			width: 100%;
+			max-width: 100%;
+			min-width: 0;
+		}
+		.trigger .year,
+		.trigger .sep {
+			flex-shrink: 0;
+		}
+		.trigger .label {
+			min-width: 0;
+		}
+		.menu {
+			position: fixed;
+			top: auto;
+			bottom: 68px;
+			left: 0.75rem;
+			right: 0.75rem;
+			min-width: 0;
+			max-width: none;
 		}
 	}
 
