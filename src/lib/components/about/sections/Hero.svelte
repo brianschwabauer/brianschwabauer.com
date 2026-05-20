@@ -20,6 +20,12 @@
 	// deep space, so fresh work zooms toward you.
 	const STAR_COUNT = 24;
 
+	// Extra tiles spawned from deep space while scrolling *down* through the
+	// pinned section, on top of the STAR_COUNT already in the field. Higher =
+	// the field stays populated deeper into the pin before it empties; 0 = it
+	// just drains the initial tiles. Tune to taste.
+	const SCROLL_EXTRA = 50;
+
 	// the warp tunnel in px of translateZ. Z_NEAR stays well inside the
 	// `perspective` distance so a tile never reaches the projection
 	// singularity (where scale blows up to infinity).
@@ -149,8 +155,8 @@
 		seededU.push(seededRand());
 	}
 	let stars = $state<Star[]>(seededStars);
-	// inline styles the SSR HTML ships with; the rAF loop takes over on the
-	// client, so these only need to make the very first paint flicker-free.
+	// static fallback styles — shown as-is under reduced motion (no animation),
+	// and harmlessly overridden by the CSS idle drift / JS warp loop otherwise.
 	const seedStyles = seededStars.map((s, i) => starVisual(seededU[i], s.rot));
 
 	let pinRef: HTMLDivElement | undefined;
@@ -174,15 +180,17 @@
 		let pendingScroll = 0; // signed px scrolled since the last frame
 		let refillBudget = 0; // fractional count of parked tiles owed re-entry
 		let pinTop = 0;
+		let pinDist = 1; // scroll distance the hero stays pinned for
 		let scrollGain = 0; // px scrolled → u advanced (a whole pin drains the field)
 		let refillGain = 0; // px scrolled up → parked tiles drawn back in
+		let activeCount = STAR_COUNT; // tiles currently in the field (not parked)
 
 		// pin geometry only shifts on resize — measure it then, not per frame
 		function measure() {
 			const hero = document.getElementById("hero");
 			if (!pinRef || !hero) return;
 			pinTop = pinRef.getBoundingClientRect().top + window.scrollY;
-			const pinDist = Math.max(1, pinRef.offsetHeight - hero.offsetHeight);
+			pinDist = Math.max(1, pinRef.offsetHeight - hero.offsetHeight);
 			scrollGain = 1.15 / pinDist;
 			refillGain = (STAR_COUNT + 4) / pinDist;
 		}
@@ -204,8 +212,16 @@
 		}
 
 		function tick(now: number) {
-			// once the button is pushed, hand the field to the boom blast
+			// once the button is pushed, release the tiles to the CSS blast
+			// animation (clear the inline `animation: none`) and stop the loop
 			if (phase === "boom" || phase === "aftermath") {
+				const blasting = warpRef?.children;
+				if (blasting) {
+					for (let i = 0; i < STAR_COUNT; i++) {
+						const el = blasting[i] as HTMLElement | undefined;
+						if (el) el.style.animation = "";
+					}
+				}
 				raf = 0;
 				return;
 			}
@@ -218,18 +234,37 @@
 			const up = d < 0;
 			const down = d > 0;
 
+			// how far down the pin we are. The field thins from full to empty
+			// across it, but holds STAR_COUNT + SCROLL_EXTRA tiles' worth of
+			// work, so fresh tiles keep arriving instead of going blank early.
+			const progress = Math.min(
+				1,
+				Math.max(0, (window.scrollY - pinTop) / pinDist),
+			);
+			const target = Math.min(
+				STAR_COUNT,
+				(STAR_COUNT + SCROLL_EXTRA) * (1 - progress),
+			);
+
 			// advance every live tile in lockstep: gentle idle drift + scroll
 			for (let i = 0; i < STAR_COUNT; i++) {
 				if (parked[i]) continue;
 				u[i] += dt / (stars[i].drift * 1000) + advance;
 				if (u[i] >= 1) {
-					if (down) {
-						// swept away for good — park it, and load its next image
-						// now so it is ready by the time scrolling brings it back
+					if (down && activeCount > target) {
+						// the field is fuller than this point in the pin calls
+						// for — sweep this tile away for good, and preload its
+						// next image for when scrolling draws it back
 						parked[i] = true;
+						activeCount--;
 						swapContent(i);
+					} else if (down) {
+						// an extra tile keeping the down-scroll zoom stocked —
+						// recycle the very same image and element: the zoom is
+						// fast enough to hide the repeat, and it spares a load
+						u[i] -= 1;
 					} else {
-						// idle drift / up-scroll flow → recycle into deep space
+						// idle drift / up-scroll flow → a fresh, unseen image
 						u[i] -= 1;
 						swapContent(i);
 					}
@@ -248,6 +283,7 @@
 						break;
 					}
 					parked[p] = false;
+					activeCount++;
 					u[p] = -Math.random() * 0.04;
 					refillBudget -= 1;
 				}
@@ -262,6 +298,7 @@
 						u[i] = Math.random();
 					}
 				}
+				activeCount = STAR_COUNT;
 			}
 
 			const tiles = warpRef?.children;
@@ -319,6 +356,29 @@
 				})
 			: undefined;
 		io?.observe(hero!);
+
+		// hand off from the pre-hydration CSS idle drift: read where each tile
+		// sits right now, then disable its CSS animation so the loop can take
+		// over without a jump
+		const handoff = warpRef?.children;
+		if (handoff) {
+			for (let i = 0; i < STAR_COUNT; i++) {
+				const el = handoff[i] as HTMLElement | undefined;
+				if (!el) continue;
+				// the CSS animation's current iteration progress IS the tile's
+				// warp position (delay and all) — pick it up exactly so there
+				// is no jump and the seeded spread is preserved
+				const prog = el
+					.getAnimations()[0]
+					?.effect?.getComputedTiming()?.progress;
+				if (typeof prog === "number") u[i] = prog;
+				el.style.animation = "none";
+				const v = starVisual(u[i], stars[i].rot);
+				el.style.transform = v.transform;
+				el.style.opacity = v.opacity;
+				el.style.filter = v.filter;
+			}
+		}
 
 		pump();
 
@@ -486,6 +546,8 @@
 						style:--y="{star.y}%"
 						style:--w={star.w}
 						style:--rot="{star.rot}deg"
+						style:--u0={seededU[i]}
+						style:--drift={star.drift}
 						style:transform={seedStyles[i].transform}
 						style:opacity={seedStyles[i].opacity}
 						style:filter={seedStyles[i].filter}
@@ -772,12 +834,45 @@
 		box-shadow:
 			0 0 34px rgba(0, 244, 195, 0.22),
 			0 10px 32px rgba(0, 0, 0, 0.5);
-		/* transform / opacity / filter are driven per-frame by the JS warp
-		   loop — the seeded inline styles cover the first paint until it runs */
 		transform: translate(-50%, -50%);
 		transform-origin: center;
 		will-change: transform, opacity, filter;
 		opacity: 0;
+		/* Before hydration this CSS animation runs the idle drift, so the field
+		   is alive the instant the page paints — no waiting for JS. --u0 (the
+		   seeded warp position) offsets each tile via a negative delay. Once
+		   the JS warp loop mounts it reads each tile's progress, sets
+		   `animation: none`, and drives transform/opacity/filter itself. */
+		animation: star-warp-idle calc(var(--drift, 20) * 1s) linear infinite;
+		animation-delay: calc(var(--u0, 0) * var(--drift, 20) * -1s);
+	}
+	/* the idle drift, kept in exact step with starVisual() in the script (same
+	   breakpoints, linear between) so the JS loop can take over mid-stream */
+	@keyframes star-warp-idle {
+		0% {
+			transform: translate(-50%, -50%) translateZ(-260px)
+				rotate(var(--rot, 0deg));
+			opacity: 0;
+			filter: blur(5px) saturate(0.45) brightness(0.7);
+		}
+		12% {
+			transform: translate(-50%, -50%) translateZ(-190.4px)
+				rotate(var(--rot, 0deg));
+			opacity: 0.9;
+			filter: blur(0px) saturate(1.1) brightness(0.766);
+		}
+		72% {
+			transform: translate(-50%, -50%) translateZ(157.6px)
+				rotate(var(--rot, 0deg));
+			opacity: 0.9;
+			filter: blur(0px) saturate(1.1) brightness(1.096);
+		}
+		100% {
+			transform: translate(-50%, -50%) translateZ(320px)
+				rotate(var(--rot, 0deg));
+			opacity: 0;
+			filter: blur(1.5px) saturate(1.1) brightness(1.25);
+		}
 	}
 	/* when boom triggers, kill the warp loop and blast each star outward */
 	.starfield.scattering .star {
@@ -1374,10 +1469,13 @@
 
 	@media (prefers-reduced-motion: reduce) {
 		/* nothing animates to linger for — let the page scroll normally. The
-		   warp loop never starts, so the field stays as its seeded first
-		   paint: a calm, static starfield. */
+		   warp loop never starts and the idle drift is off, so the field is a
+		   calm, static starfield at its seeded positions. */
 		.hero-pin {
 			min-height: 0;
+		}
+		.star {
+			animation: none;
 		}
 		.boom-btn {
 			animation: none;
