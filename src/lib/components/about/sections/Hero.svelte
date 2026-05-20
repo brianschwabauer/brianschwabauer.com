@@ -504,13 +504,12 @@
 					<span class="avatar" aria-hidden="true">
 						<img
 							src="/profile_picture2.webp"
-							alt=""
+							alt="Selfie of Brian Schwabauer"
 							loading="eager"
 							decoding="async"
 						/>
-						<span class="avatar-ring"></span>
 					</span>
-					<span>👋 Hi, I'm Brian Schwabauer</span>
+					<span>Hi, I'm Brian Schwabauer</span>
 				</div>
 
 				<h1 data-frag>
@@ -843,13 +842,12 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.6rem;
-		padding: 0.35rem 0.95rem 0.35rem 0.35rem;
+		padding: 0.5rem 0.95rem 0.5rem 0.35rem;
 		border-radius: 999px;
 		background: rgba(255, 255, 255, 0.08);
 		border: 1px solid rgba(255, 255, 255, 0.16);
 		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.12em;
+		font-size: 0.9rem;
 		text-transform: uppercase;
 		color: rgba(255, 255, 255, 0.85);
 		backdrop-filter: blur(8px);
@@ -857,33 +855,19 @@
 	.avatar {
 		position: relative;
 		display: inline-block;
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
+		border-bottom-left-radius: 20px;
 		overflow: hidden;
 		flex-shrink: 0;
 		isolation: isolate;
+		width: 52px;
+		height: 52px;
+		margin: -20px 0 -10px -4px;
 	}
 	.avatar img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		display: block;
-		filter: saturate(0.85);
-		transition: filter 350ms ease;
-	}
-	.badge:hover .avatar img {
-		filter: saturate(1.15);
-	}
-	.avatar-ring {
-		position: absolute;
-		inset: 0;
-		border-radius: 50%;
-		box-shadow:
-			inset 0 0 0 1px rgba(255, 255, 255, 0.35),
-			0 0 12px rgba(0, 242, 195, 0.4);
-		pointer-events: none;
-		z-index: 1;
 	}
 	h1 {
 		font-family: "Nunito Sans", sans-serif;
