@@ -1,70 +1,124 @@
 <script lang="ts">
-	import { media } from '../media';
-	import HeroMascot from './HeroMascot.svelte';
-	import HeroExplosion from './HeroExplosion.svelte';
+	import { media } from "../media";
+	import { STARFIELD_IMAGES } from "../starfield-images";
+	import HeroMascot from "./HeroMascot.svelte";
+	import HeroExplosion from "./HeroExplosion.svelte";
 
-	const projectStars = [
-		'2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_list.avif',
-		'2026-01-01_show_and_tour-legacy_delivery_page_screenshot-963_n1950_rd.avif',
-		'2024-01-01_remarkably_organized_app-home_page_screenshot.avif',
-		'2015-08-24_brian_demo_reel_2015-wedding_footage_of_bride_in_dress_smiling.avif',
-		'2015-08-04_adpi_recruitment_video_2015-women_jumping_off_fountain_ledge_in_slowmo.avif',
-		'2015-02-08_engage_mobile_5_logo_animation.avif',
-		'2014-10-05_decisionfx_logo_animation.avif',
-		'2014-06-04_what_makes_us_human-main_character_stuck_in_high_tech_jail_cell_visual_effect.avif',
-		'2013-06-22_the_spunksters-logo_animation.avif',
-		'2011-04-14_this_is_ksms-basketball_trick_shot_with_vfx.avif',
-		'2011-03-18_xyz_news_special_report-weather_report.avif',
-		'2011-03-01_exposure-animated_on_transparent_background_camera_robot_transforms_from_camera_to_robot.avif',
-		'2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-replay_animation.avif',
-		'2010-03-25_do_da_flava_g-whole_family_dances_in_back_yard.avif',
-		'2010-03-25_do_da_flava_g-caleb_dances_with_his_bling.avif',
-		'2010-03-25_do_da_flava_g-caleb_dances_on_virtual_stage.avif',
-		'2009-12-25_calamity-airplane_fly_through_city_first_person.avif',
-		'2009-12-25_new_hunky_spunky_productions_logo_animation_long.avif',
-		'2009-03-22_yard_sale-close_up_on_brian_as_animals_attack.avif',
-		'2009-03-22_yard_sale-matthew_hides_in_stuff_animal_pile.avif',
-		'2009-02-13_sideline_huddler-band_plays_to_song.avif',
-		'2009-01-01_hunky_spunky_productions_website_scroll.avif',
-		'2008-12-24_the_ape-brian_in_ape_suit_pounds_his_chest.avif',
-		'2008-08-21_nuisance-b-gone-product_makes_chair_disappear_visual_effect.avif',
-		'2008-08-21_nuisance-b-gone-product_makes_shoe_disappear_visual_effect.avif',
-		'2008-08-21_nuisance-b-gone-brian_explains_the_product.avif',
-		'2008-06-22_take_one_films_logo_animation.avif',
-		'2008-02-23_rush_for_an_idea-split_screen_effect_kevin_and_emma_talk.avif',
-		'2007-09-09_ninja_men-grant_punches_brian_from_behind.avif',
-		'2007-09-09_ninja_men-grant_is_repeately_punched_in_the_stomach.avif',
-		'2007-09-06_spatula_story-emma_intensely_plays_video_game.avif',
-		'2007-08-26_flashlight-brian_plays_guitar.avif',
-		'2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif',
-		'2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen.avif',
-		'2007-07-26_power_rangers_360-vino_disappears_visual_effect.avif',
-		'2007-07-26_power_rangers_360-logo_animation.avif',
-		'2006-11-27_the_fight_scene_ii-kevin_and_brian_fight_with_brooms_and_shovels_3.avif',
-		'2006-11-27_the_fight_scene_ii-brian_and_kevin_frolic_in_snow.avif',
-		'2006-08-30_bobby_mcqueen-kevin_and_brian_fight_with_brooms.avif'
-	];
+	// ---- starfield ---------------------------------------------------------
+	// A 3D "warp" field of past-work thumbnails. The first frame is generated
+	// from a fixed seed so the whole field is present the instant the SSR HTML
+	// paints — no waiting for hydration. After that, every tile re-randomises
+	// its image, position and tilt each time it completes a warp pass, so the
+	// field keeps evolving with fresh work pulled from the curated pool.
+	const STAR_COUNT = 24;
 
-	const stars = projectStars.map((src, i) => {
-		const seed = (i + 1) * 9301 + 49297;
-		const r = (n: number) => (Math.sin(seed * n) + 1) / 2;
-		return {
-			src,
-			x: 5 + r(1.7) * 90,
-			y: 5 + r(2.3) * 90,
-			delay: r(3.1) * 14,
-			duration: 12 + r(4.7) * 10,
-			scale: 0.35 + r(5.9) * 0.55,
-			rotate: (r(7.3) - 0.5) * 24
+	type Star = {
+		id: number;
+		src: string;
+		x: number; // % across the hero — the tile's anchor / direction from centre
+		y: number; // % down the hero
+		w: number; // width factor (~0.7–1.5)
+		rot: number; // flat in-plane rotation (deg) — no 3D skew
+		duration: number; // seconds for one warp pass
+		delay: number; // negative offset so seeded tiles begin mid-flight
+	};
+
+	// deterministic PRNG (mulberry32) — the seeded field must be byte-identical
+	// on the server and the client so hydration never flickers.
+	function mulberry32(seed: number) {
+		let a = seed >>> 0;
+		return () => {
+			a = (a + 0x6d2b79f5) | 0;
+			let t = Math.imul(a ^ (a >>> 15), 1 | a);
+			t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 		};
-	});
+	}
+
+	// A raw anchor that stays clear of the central column the headline owns.
+	function randomAnchor(rand: () => number): { x: number; y: number } {
+		let x = 4 + rand() * 92;
+		let y = 6 + rand() * 88;
+		for (let i = 0; i < 12; i++) {
+			if (Math.abs(x - 50) > 23 || Math.abs(y - 50) > 34) break;
+			x = 4 + rand() * 92;
+			y = 6 + rand() * 88;
+		}
+		return { x, y };
+	}
+
+	// Best-candidate sampling: try a handful of anchors and keep the one
+	// sitting furthest from every other tile, so a new star drops into the
+	// emptiest gap instead of piling onto its neighbours.
+	function placeStar(
+		rand: () => number,
+		others: Star[],
+	): { x: number; y: number } {
+		let best = { x: 50, y: 50 };
+		let bestDist = -1;
+		for (let c = 0; c < 9; c++) {
+			const cand = randomAnchor(rand);
+			let nearest = Infinity;
+			for (const o of others) {
+				const dx = cand.x - o.x;
+				const dy = cand.y - o.y;
+				const d = dx * dx + dy * dy;
+				if (d < nearest) nearest = d;
+			}
+			if (nearest > bestDist) {
+				bestDist = nearest;
+				best = cand;
+			}
+		}
+		return best;
+	}
+
+	let starId = 0;
+
+	function makeStar(rand: () => number, seeded: boolean, others: Star[]): Star {
+		const { x, y } = placeStar(rand, others);
+		const duration = 15 + rand() * 13;
+		return {
+			id: starId++,
+			src: STARFIELD_IMAGES[Math.floor(rand() * STARFIELD_IMAGES.length)],
+			x,
+			y,
+			w: 0.7 + rand() * 0.8,
+			rot: (rand() - 0.5) * 22,
+			duration,
+			// seeded tiles start somewhere mid-flight (negative delay) so the
+			// field looks alive on first paint; respawned tiles start fresh.
+			delay: seeded ? -rand() * duration : 0,
+		};
+	}
+
+	// SSR-stable seed → identical field on server and client. Each tile is
+	// placed against the ones already chosen, so the opening field is spread.
+	const seededRand = mulberry32(0x5742_2026);
+	const seededStars: Star[] = [];
+	for (let i = 0; i < STAR_COUNT; i++) {
+		seededStars.push(makeStar(seededRand, true, seededStars));
+	}
+	let stars = $state<Star[]>(seededStars);
+
+	// A tile fires this at the boundary of each warp loop — the exact moment it
+	// is fully faded out. Swapping it for a brand-new random tile then is
+	// invisible: a fresh image warps in from deep space in an empty gap.
+	function respawnStar(i: number) {
+		if (phase === "boom" || phase === "aftermath") return;
+		stars[i] = makeStar(
+			Math.random,
+			false,
+			stars.filter((_, j) => j !== i),
+		);
+	}
 
 	const currentYear = new Date().getFullYear();
 
 	// ---- destruction sequence ----------------------------------------------
-	type Phase = 'idle' | 'awake' | 'pumping' | 'boom' | 'aftermath';
+	type Phase = "idle" | "awake" | "pumping" | "boom" | "aftermath";
 
-	let phase = $state<Phase>('idle');
+	let phase = $state<Phase>("idle");
 	let pumpCount = $state(0);
 	let pumpStroke = $state(0); // 0 = up, 1 = down
 	let explosionTick = $state(0);
@@ -76,17 +130,17 @@
 	const buttonScale = $derived(1 + pumpCount * 0.55);
 
 	const buttonLabel = $derived(
-		phase === 'idle' && !warned
+		phase === "idle" && !warned
 			? "Don't push this button"
-			: phase === 'idle' && warned
-				? 'Seriously, don’t.'
-				: phase === 'awake'
-					? 'uh oh'
-					: phase === 'pumping' && pumpCount < 3
-						? 'hey, stop'
-						: phase === 'pumping'
-							? 'HELP'
-							: ''
+			: phase === "idle" && warned
+				? "Seriously, don’t."
+				: phase === "awake"
+					? "uh oh"
+					: phase === "pumping" && pumpCount < 3
+						? "hey, stop"
+						: phase === "pumping"
+							? "HELP"
+							: "",
 	);
 
 	function sleep(ms: number) {
@@ -94,13 +148,13 @@
 	}
 
 	async function startDestruction() {
-		if (phase !== 'idle') return;
+		if (phase !== "idle") return;
 
 		const reduce =
-			typeof window !== 'undefined' &&
-			window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			typeof window !== "undefined" &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 		if (reduce) {
-			phase = 'aftermath';
+			phase = "aftermath";
 			explosionTick++;
 			return;
 		}
@@ -110,11 +164,11 @@
 		await sleep(180);
 		prePress = false;
 
-		phase = 'awake';
+		phase = "awake";
 		// mascot springs up + settles
 		await sleep(1500);
 
-		phase = 'pumping';
+		phase = "pumping";
 		const pumps = 4;
 		for (let i = 0; i < pumps; i++) {
 			// stroke down (arm pushes pump handle)
@@ -131,49 +185,49 @@
 		// pre-boom held breath — button shudders
 		await sleep(420);
 
-		phase = 'boom';
+		phase = "boom";
 		explosionTick++;
 		await sleep(1500);
 
-		phase = 'aftermath';
+		phase = "aftermath";
 	}
 
 	// ---- contact form ------------------------------------------------------
-	let name = $state('');
-	let email = $state('');
-	let message = $state('');
-	let formState = $state<'idle' | 'sending' | 'sent' | 'error'>('idle');
-	let formError = $state('');
+	let name = $state("");
+	let email = $state("");
+	let message = $state("");
+	let formState = $state<"idle" | "sending" | "sent" | "error">("idle");
+	let formError = $state("");
 
 	async function submitContact(e: SubmitEvent) {
 		e.preventDefault();
-		if (formState === 'sending') return;
+		if (formState === "sending") return;
 		if (!name.trim() || !email.trim() || !message.trim()) {
-			formError = 'Please fill in every field.';
-			formState = 'error';
+			formError = "Please fill in every field.";
+			formState = "error";
 			return;
 		}
-		formState = 'sending';
-		formError = '';
+		formState = "sending";
+		formError = "";
 		try {
-			const res = await fetch('/api/contact', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name, email, message })
+			const res = await fetch("/api/contact", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ name, email, message }),
 			});
 			if (!res.ok) {
-				const txt = await res.text().catch(() => '');
+				const txt = await res.text().catch(() => "");
 				throw new Error(txt || `Send failed (${res.status})`);
 			}
-			formState = 'sent';
+			formState = "sent";
 		} catch (err) {
-			formState = 'error';
-			formError = err instanceof Error ? err.message : 'Send failed';
+			formState = "error";
+			formError = err instanceof Error ? err.message : "Send failed";
 		}
 	}
 
 	function scrollNext() {
-		const hero = document.getElementById('hero');
+		const hero = document.getElementById("hero");
 		const next = hero?.nextElementSibling as HTMLElement | null;
 		const target = next ?? hero;
 		if (!target) return;
@@ -188,42 +242,48 @@
 	data-section
 	data-section-label="Today"
 	data-section-year={currentYear}
-	class:shake={phase === 'boom'}
+	class:shake={phase === "boom"}
 	data-phase={phase}
 >
 	<div
 		class="starfield"
-		class:scattering={phase === 'boom' || phase === 'aftermath'}
+		class:scattering={phase === "boom" || phase === "aftermath"}
 		aria-hidden="true"
 	>
-		{#each stars as star, i (i)}
-			<img
-				class="star"
-				src={media(star.src)}
-				alt=""
-				loading={i < 6 ? 'eager' : 'lazy'}
-				decoding="async"
-				style:--x="{star.x}%"
-				style:--y="{star.y}%"
-				style:--delay="-{star.delay}s"
-				style:--duration="{star.duration}s"
-				style:--scale={star.scale}
-				style:--rotate="{star.rotate}deg"
-				style:--blast-dx="{star.x - 50}%"
-				style:--blast-dy="{star.y - 50}%"
-				style:--blast-spin="{star.rotate * 8}deg"
-				style:--blast-delay="{(i % 9) * 20}ms"
-			/>
-		{/each}
+		<div class="star-warp">
+			{#each stars as star, i (star.id)}
+				<img
+					class="star"
+					src={media(star.src)}
+					alt=""
+					loading={i < 8 ? "eager" : "lazy"}
+					decoding="async"
+					onanimationiteration={() => respawnStar(i)}
+					style:--x="{star.x}%"
+					style:--y="{star.y}%"
+					style:--w={star.w}
+					style:--rot="{star.rot}deg"
+					style:--duration="{star.duration}s"
+					style:--delay="{star.delay}s"
+					style:--blast-spin="{star.rot * 8}deg"
+					style:--blast-delay="{(i % 9) * 22}ms"
+				/>
+			{/each}
+		</div>
 		<div class="vignette"></div>
 	</div>
 
 	<!-- BEFORE: the original content (badge, headline, lede, button) -->
-	{#if phase !== 'aftermath'}
-		<div class="hero-inner before" class:exploding={phase === 'boom'}>
+	{#if phase !== "aftermath"}
+		<div class="hero-inner before" class:exploding={phase === "boom"}>
 			<div class="badge" data-frag>
 				<span class="avatar" aria-hidden="true">
-					<img src="/profile_picture2.webp" alt="" loading="eager" decoding="async" />
+					<img
+						src="/profile_picture2.webp"
+						alt=""
+						loading="eager"
+						decoding="async"
+					/>
 					<span class="avatar-ring"></span>
 				</span>
 				<span>👋 Hi, I'm Brian Schwabauer</span>
@@ -235,8 +295,9 @@
 			</h1>
 
 			<p class="lede" data-frag>
-				For as long as I have lived, I have loved to create. I've built startups, developed apps,
-				and produced videos. I live to create. I work to delight.
+				For as long as I have lived, I have loved to create. I've built
+				startups, developed apps, and produced videos. I live to create. I work
+				to delight.
 			</p>
 
 			<div class="button-stage" data-frag>
@@ -244,16 +305,18 @@
 					class="boom-btn"
 					class:warn={warned}
 					class:pre-press={prePress}
-					class:wobble={phase === 'pumping' && pumpCount > 0}
-					class:shudder={phase === 'pumping' && pumpCount >= 4}
-					class:popped={phase === 'boom'}
+					class:wobble={phase === "pumping" && pumpCount > 0}
+					class:shudder={phase === "pumping" && pumpCount >= 4}
+					class:popped={phase === "boom"}
 					type="button"
 					onmouseenter={() => (warned = true)}
-					onmouseleave={() => (warned = phase !== 'idle')}
+					onmouseleave={() => (warned = phase !== "idle")}
 					onfocus={() => (warned = true)}
 					onclick={startDestruction}
-					disabled={phase !== 'idle'}
-					aria-label={phase === 'idle' ? "Don't push this button" : 'Boom in progress'}
+					disabled={phase !== "idle"}
+					aria-label={phase === "idle"
+						? "Don't push this button"
+						: "Boom in progress"}
 					style:--scale={buttonScale}
 				>
 					<span class="boom-btn-skin"></span>
@@ -272,25 +335,26 @@
 	<HeroExplosion trigger={explosionTick} origin={{ x: 0.5, y: 0.62 }} />
 
 	<!-- AFTERMATH: shown after the dust settles -->
-	{#if phase === 'aftermath'}
+	{#if phase === "aftermath"}
 		<div class="hero-inner aftermath">
 			<h1 class="aftermath-h1">
 				<span class="line line-1">You destroyed</span>
 				<span class="line line-2">my site.</span>
 			</h1>
 			<p class="aftermath-lede">
-				Well&hellip; that escalated. Since you went and blew the place up, the least you can do is
-				stick around. Tell me your name and what you want to build together — I'll get back to you
-				faster than my poor mascot can find his helmet.
+				Well&hellip; that escalated. Since you went and blew the place up, the
+				least you can do is stick around. Tell me your name and what you want to
+				build together — I'll get back to you faster than my poor mascot can
+				find his helmet.
 			</p>
 
 			<form
 				class="contact-form"
 				onsubmit={submitContact}
-				class:sent={formState === 'sent'}
-				class:err={formState === 'error'}
+				class:sent={formState === "sent"}
+				class:err={formState === "error"}
 			>
-				{#if formState === 'sent'}
+				{#if formState === "sent"}
 					<div class="form-success">
 						<svg viewBox="0 0 24 24" aria-hidden="true" class="success-check">
 							<path
@@ -303,7 +367,7 @@
 							/>
 						</svg>
 						<h3>Message received.</h3>
-						<p>Thanks, {name || 'friend'}. I'll be in touch soon.</p>
+						<p>Thanks, {name || "friend"}. I'll be in touch soon.</p>
 					</div>
 				{:else}
 					<label class="field">
@@ -315,7 +379,7 @@
 							maxlength="100"
 							autocomplete="name"
 							placeholder="Jane Builder"
-							disabled={formState === 'sending'}
+							disabled={formState === "sending"}
 						/>
 					</label>
 					<label class="field">
@@ -327,7 +391,7 @@
 							maxlength="200"
 							autocomplete="email"
 							placeholder="jane@example.com"
-							disabled={formState === 'sending'}
+							disabled={formState === "sending"}
 						/>
 					</label>
 					<label class="field">
@@ -338,7 +402,7 @@
 							maxlength="5000"
 							rows="4"
 							placeholder="Tell me about the project, the dream, or just say hi."
-							disabled={formState === 'sending'}
+							disabled={formState === "sending"}
 						></textarea>
 					</label>
 
@@ -346,8 +410,12 @@
 						<div class="form-error" role="alert">{formError}</div>
 					{/if}
 
-					<button class="send-btn" type="submit" disabled={formState === 'sending'}>
-						{formState === 'sending' ? 'Sending…' : 'Send it'}
+					<button
+						class="send-btn"
+						type="submit"
+						disabled={formState === "sending"}
+					>
+						{formState === "sending" ? "Sending…" : "Send it"}
 						<svg viewBox="0 0 24 24" aria-hidden="true">
 							<path
 								d="M5 12h14M13 6l6 6-6 6"
@@ -366,7 +434,7 @@
 
 	<button
 		class="scroll-cue"
-		class:hidden={phase === 'boom'}
+		class:hidden={phase === "boom"}
 		type="button"
 		onclick={scrollNext}
 		aria-label="Scroll to next section"
@@ -404,16 +472,36 @@
 		animation: cam-shake 720ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 	}
 	@keyframes cam-shake {
-		0% { transform: translate(0, 0); }
-		10% { transform: translate(-6px, 3px) rotate(-0.4deg); }
-		20% { transform: translate(8px, -4px) rotate(0.5deg); }
-		30% { transform: translate(-9px, 6px) rotate(-0.6deg); }
-		40% { transform: translate(7px, 5px) rotate(0.4deg); }
-		50% { transform: translate(-5px, -3px) rotate(-0.3deg); }
-		60% { transform: translate(4px, 4px) rotate(0.3deg); }
-		70% { transform: translate(-3px, -2px); }
-		80% { transform: translate(2px, 2px); }
-		100% { transform: translate(0, 0); }
+		0% {
+			transform: translate(0, 0);
+		}
+		10% {
+			transform: translate(-6px, 3px) rotate(-0.4deg);
+		}
+		20% {
+			transform: translate(8px, -4px) rotate(0.5deg);
+		}
+		30% {
+			transform: translate(-9px, 6px) rotate(-0.6deg);
+		}
+		40% {
+			transform: translate(7px, 5px) rotate(0.4deg);
+		}
+		50% {
+			transform: translate(-5px, -3px) rotate(-0.3deg);
+		}
+		60% {
+			transform: translate(4px, 4px) rotate(0.3deg);
+		}
+		70% {
+			transform: translate(-3px, -2px);
+		}
+		80% {
+			transform: translate(2px, 2px);
+		}
+		100% {
+			transform: translate(0, 0);
+		}
 	}
 
 	.starfield {
@@ -422,68 +510,109 @@
 		overflow: hidden;
 		z-index: 0;
 	}
+	/* the 3D stage. perspective + a single centred vanishing point make every
+	   tile stream straight out from behind the headline; preserve-3d depth-
+	   sorts the tiles so a nearer (larger) one always paints over a farther
+	   one. overflow MUST stay off this element — any clip flattens the 3D. */
+	.star-warp {
+		position: absolute;
+		inset: 0;
+		perspective: 28rem;
+		perspective-origin: 50% 50%;
+		transform-style: preserve-3d;
+	}
 	.star {
 		position: absolute;
 		left: var(--x);
 		top: var(--y);
-		width: clamp(80px, 11vw, 200px);
+		display: block;
+		width: calc(var(--w, 1) * clamp(62px, 9vw, 132px));
+		/* a global `img { max-width: 100% }` would otherwise fight the
+		   explicit width as perspective scales the tile up */
+		max-width: none;
 		height: auto;
 		object-fit: cover;
-		border-radius: 6px;
-		box-shadow: 0 0 30px rgba(0, 244, 195, 0.25);
-		transform: translate(-50%, -50%) scale(0) rotate(0deg);
-		animation: warp var(--duration, 18s) linear infinite;
+		border-radius: 7px;
+		box-shadow:
+			0 0 34px rgba(0, 244, 195, 0.22),
+			0 10px 32px rgba(0, 0, 0, 0.5);
+		transform: translate(-50%, -50%);
+		transform-origin: center;
+		animation: warp var(--duration, 20s) linear infinite;
 		animation-delay: var(--delay, 0s);
-		will-change: transform, opacity;
+		will-change: transform, opacity, filter;
 		opacity: 0;
 	}
+	/* deep space → past the camera. translateZ does the depth work; the shared
+	   perspective pulls each tile out radially from the centre. The tile face
+	   stays parallel to the screen (only a flat in-plane rotation) so it
+	   scales cleanly without any 3D skew. */
 	@keyframes warp {
 		0% {
-			transform: translate(-50%, -50%) scale(0.04) rotate(var(--rotate));
 			opacity: 0;
-			filter: blur(2px) saturate(0.4);
+			transform: translate(-50%, -50%) translateZ(-480px)
+				rotate(var(--rot, 0deg));
+			filter: blur(5px) saturate(0.45) brightness(0.7);
 		}
-		8% { opacity: 0.85; filter: blur(0) saturate(1); }
-		70% { opacity: 0.75; }
+		12% {
+			opacity: 0.9;
+			filter: blur(0) saturate(1) brightness(1);
+		}
+		72% {
+			opacity: 0.9;
+			filter: blur(0) saturate(1.05) brightness(1.1);
+		}
 		100% {
-			transform: translate(-50%, -50%) scale(var(--scale, 0.7)) rotate(var(--rotate));
 			opacity: 0;
-			filter: blur(0) saturate(1);
+			transform: translate(-50%, -50%) translateZ(320px)
+				rotate(var(--rot, 0deg));
+			filter: blur(1.5px) saturate(1.1) brightness(1.25);
 		}
 	}
 	/* when boom triggers, kill the warp loop and blast each star outward */
 	.starfield.scattering .star {
-		animation: star-blast 1100ms cubic-bezier(0.34, 1.2, 0.5, 1) forwards;
+		animation: star-blast 1150ms cubic-bezier(0.34, 1.15, 0.5, 1) forwards;
 		animation-delay: var(--blast-delay, 0ms);
 	}
 	@keyframes star-blast {
 		0% {
-			opacity: 0.85;
-			transform: translate(-50%, -50%) scale(1) rotate(var(--rotate));
-			filter: brightness(1.6) saturate(1.4);
+			opacity: 0.9;
+			transform: translate(-50%, -50%) translateZ(0) rotate(var(--rot, 0deg));
+			filter: brightness(1.7) saturate(1.4);
 		}
-		35% {
+		30% {
 			opacity: 1;
-			transform: translate(-50%, -50%) scale(1.35) rotate(var(--rotate));
+			transform: translate(-50%, -50%) translateZ(150px)
+				rotate(var(--rot, 0deg));
 			filter: brightness(2.6) saturate(1.6);
 		}
 		100% {
 			opacity: 0;
-			transform:
-				translate(-50%, -50%)
-				translate(calc(var(--blast-dx, 0%) * 2.4), calc(var(--blast-dy, 0%) * 2.4))
-				scale(2.6)
-				rotate(calc(var(--rotate) + var(--blast-spin, 0deg)));
-			filter: brightness(3) saturate(0.6) blur(2px);
+			transform: translate(-50%, -50%) translateZ(540px)
+				rotate(calc(var(--rot, 0deg) + var(--blast-spin, 0deg)));
+			filter: brightness(3) saturate(0.6) blur(3px);
 		}
 	}
 	.vignette {
 		position: absolute;
 		inset: 0;
 		background:
-			radial-gradient(ellipse at center, transparent 0%, rgba(8, 8, 14, 0.78) 65%, #06060a 100%),
-			radial-gradient(circle at 20% 30%, rgba(108, 99, 255, 0.18), transparent 55%),
-			radial-gradient(circle at 80% 70%, rgba(0, 244, 195, 0.16), transparent 55%);
+			radial-gradient(
+				ellipse at center,
+				transparent 0%,
+				rgba(8, 8, 14, 0.78) 65%,
+				#06060a 100%
+			),
+			radial-gradient(
+				circle at 20% 30%,
+				rgba(108, 99, 255, 0.18),
+				transparent 55%
+			),
+			radial-gradient(
+				circle at 80% 70%,
+				rgba(0, 244, 195, 0.16),
+				transparent 55%
+			);
 		pointer-events: none;
 	}
 
@@ -532,17 +661,21 @@
 		filter: saturate(0.85);
 		transition: filter 350ms ease;
 	}
-	.badge:hover .avatar img { filter: saturate(1.15); }
+	.badge:hover .avatar img {
+		filter: saturate(1.15);
+	}
 	.avatar-ring {
 		position: absolute;
 		inset: 0;
 		border-radius: 50%;
-		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 12px rgba(0, 242, 195, 0.4);
+		box-shadow:
+			inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+			0 0 12px rgba(0, 242, 195, 0.4);
 		pointer-events: none;
 		z-index: 1;
 	}
 	h1 {
-		font-family: 'Nunito Sans', sans-serif;
+		font-family: "Nunito Sans", sans-serif;
 		font-size: clamp(3rem, 13vw, 5rem);
 		font-weight: 900;
 		line-height: 0.9;
@@ -553,7 +686,9 @@
 		gap: 0;
 	}
 	@media (min-width: 768px) {
-		h1 { font-size: clamp(6rem, 11vw, 9rem); }
+		h1 {
+			font-size: clamp(6rem, 11vw, 9rem);
+		}
 	}
 	.grad {
 		padding-bottom: 0.18em;
@@ -562,7 +697,9 @@
 		background-clip: text;
 		color: transparent;
 	}
-	.grad + .grad { margin-top: -0.18em; }
+	.grad + .grad {
+		margin-top: -0.18em;
+	}
 	.grad.accent {
 		background: linear-gradient(95deg, #00f2c3, #6c63ff 80%);
 		-webkit-background-clip: text;
@@ -619,13 +756,19 @@
 			color 220ms ease;
 		will-change: transform;
 	}
-	.boom-btn:disabled { cursor: default; }
+	.boom-btn:disabled {
+		cursor: default;
+	}
 	.boom-btn-skin {
 		position: absolute;
 		inset: 0;
 		border-radius: 999px;
-		background:
-			radial-gradient(circle at 30% 25%, #aaffe8 0%, #00f2c3 35%, #6c63ff 90%);
+		background: radial-gradient(
+			circle at 30% 25%,
+			#aaffe8 0%,
+			#00f2c3 35%,
+			#6c63ff 90%
+		);
 		box-shadow:
 			inset 0 -6px 16px rgba(20, 10, 40, 0.4),
 			inset 0 4px 12px rgba(255, 255, 255, 0.45),
@@ -651,9 +794,21 @@
 		animation: label-swap 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
 	}
 	@keyframes label-swap {
-		0% { opacity: 0; transform: translateY(110%); filter: blur(4px); }
-		60% { opacity: 1; transform: translateY(-6%); filter: blur(0); }
-		100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+		0% {
+			opacity: 0;
+			transform: translateY(110%);
+			filter: blur(4px);
+		}
+		60% {
+			opacity: 1;
+			transform: translateY(-6%);
+			filter: blur(0);
+		}
+		100% {
+			opacity: 1;
+			transform: translateY(0);
+			filter: blur(0);
+		}
 	}
 
 	/* idle invitation pulse */
@@ -661,13 +816,22 @@
 		animation: invite 2.6s ease-in-out infinite;
 	}
 	@keyframes invite {
-		0%, 100% { transform: scale(var(--scale)) translateY(0); }
-		50% { transform: scale(calc(var(--scale) * 1.03)) translateY(-2px); }
+		0%,
+		100% {
+			transform: scale(var(--scale)) translateY(0);
+		}
+		50% {
+			transform: scale(calc(var(--scale) * 1.03)) translateY(-2px);
+		}
 	}
 
 	.boom-btn:hover:not(:disabled) .boom-btn-skin {
-		background:
-			radial-gradient(circle at 30% 25%, #d9fff5 0%, #00f2c3 30%, #8a82ff 95%);
+		background: radial-gradient(
+			circle at 30% 25%,
+			#d9fff5 0%,
+			#00f2c3 30%,
+			#8a82ff 95%
+		);
 		box-shadow:
 			inset 0 -6px 16px rgba(20, 10, 40, 0.45),
 			inset 0 4px 14px rgba(255, 255, 255, 0.6),
@@ -688,19 +852,36 @@
 		animation: btn-wobble 480ms cubic-bezier(0.36, 1.4, 0.4, 1) 1;
 	}
 	@keyframes btn-wobble {
-		0% { transform: scale(calc(var(--scale) * 0.85)) translateY(4px); }
-		40% { transform: scale(calc(var(--scale) * 1.12)) translateY(-4px); }
-		70% { transform: scale(calc(var(--scale) * 0.96)) translateY(2px); }
-		100% { transform: scale(var(--scale)) translateY(0); }
+		0% {
+			transform: scale(calc(var(--scale) * 0.85)) translateY(4px);
+		}
+		40% {
+			transform: scale(calc(var(--scale) * 1.12)) translateY(-4px);
+		}
+		70% {
+			transform: scale(calc(var(--scale) * 0.96)) translateY(2px);
+		}
+		100% {
+			transform: scale(var(--scale)) translateY(0);
+		}
 	}
 	.boom-btn.shudder {
 		animation: btn-shudder 220ms ease infinite;
 	}
 	@keyframes btn-shudder {
-		0%, 100% { transform: scale(var(--scale)) translate(0, 0); }
-		25% { transform: scale(var(--scale)) translate(-3px, -1px); }
-		50% { transform: scale(var(--scale)) translate(3px, 1px); }
-		75% { transform: scale(var(--scale)) translate(-2px, 2px); }
+		0%,
+		100% {
+			transform: scale(var(--scale)) translate(0, 0);
+		}
+		25% {
+			transform: scale(var(--scale)) translate(-3px, -1px);
+		}
+		50% {
+			transform: scale(var(--scale)) translate(3px, 1px);
+		}
+		75% {
+			transform: scale(var(--scale)) translate(-2px, 2px);
+		}
 	}
 
 	/* When it pops, the button vanishes (its mass becomes the canvas particles) */
@@ -709,9 +890,21 @@
 		pointer-events: none;
 	}
 	@keyframes btn-pop {
-		0% { transform: scale(var(--scale)) translateY(0); opacity: 1; filter: brightness(2); }
-		60% { transform: scale(calc(var(--scale) * 1.4)) translateY(-4px); opacity: 1; filter: brightness(3.5); }
-		100% { transform: scale(calc(var(--scale) * 0.1)) translateY(0); opacity: 0; filter: brightness(5); }
+		0% {
+			transform: scale(var(--scale)) translateY(0);
+			opacity: 1;
+			filter: brightness(2);
+		}
+		60% {
+			transform: scale(calc(var(--scale) * 1.4)) translateY(-4px);
+			opacity: 1;
+			filter: brightness(3.5);
+		}
+		100% {
+			transform: scale(calc(var(--scale) * 0.1)) translateY(0);
+			opacity: 0;
+			filter: brightness(5);
+		}
 	}
 
 	/* fragments fly outward on boom */
@@ -722,10 +915,29 @@
 		animation: frag-fly 1100ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
 		pointer-events: none;
 	}
-	.before.exploding [data-frag]:nth-child(1) { --fx: -260px; --fy: -180px; --fr: -18deg; }
-	.before.exploding [data-frag]:nth-child(2) { --fx: 80px; --fy: -360px; --fr: 12deg; animation-delay: 40ms; }
-	.before.exploding [data-frag]:nth-child(3) { --fx: -180px; --fy: 240px; --fr: -22deg; animation-delay: 80ms; }
-	.before.exploding [data-frag]:nth-child(4) { --fx: 280px; --fy: 200px; --fr: 26deg; animation-delay: 120ms; }
+	.before.exploding [data-frag]:nth-child(1) {
+		--fx: -260px;
+		--fy: -180px;
+		--fr: -18deg;
+	}
+	.before.exploding [data-frag]:nth-child(2) {
+		--fx: 80px;
+		--fy: -360px;
+		--fr: 12deg;
+		animation-delay: 40ms;
+	}
+	.before.exploding [data-frag]:nth-child(3) {
+		--fx: -180px;
+		--fy: 240px;
+		--fr: -22deg;
+		animation-delay: 80ms;
+	}
+	.before.exploding [data-frag]:nth-child(4) {
+		--fx: 280px;
+		--fy: 200px;
+		--fr: 26deg;
+		animation-delay: 120ms;
+	}
 	@keyframes frag-fly {
 		0% {
 			transform: translate(0, 0) rotate(0) scale(1);
@@ -737,7 +949,8 @@
 			opacity: 1;
 		}
 		100% {
-			transform: translate(var(--fx, 0), var(--fy, 0)) rotate(var(--fr, 0)) scale(0.6);
+			transform: translate(var(--fx, 0), var(--fy, 0)) rotate(var(--fr, 0))
+				scale(0.6);
 			opacity: 0;
 			filter: blur(4px);
 		}
@@ -749,11 +962,19 @@
 		animation: aftermath-in 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
 	}
 	@keyframes aftermath-in {
-		from { opacity: 0; transform: translateY(20px); filter: blur(8px); }
-		to { opacity: 1; transform: none; filter: blur(0); }
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+			filter: blur(8px);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+			filter: blur(0);
+		}
 	}
 	.aftermath-h1 {
-		font-family: 'Nunito Sans', sans-serif;
+		font-family: "Nunito Sans", sans-serif;
 		font-size: clamp(2.6rem, 10vw, 5.5rem);
 		font-weight: 900;
 		line-height: 0.95;
@@ -796,7 +1017,11 @@
 		backdrop-filter: blur(10px);
 		box-shadow: 0 18px 60px rgba(0, 0, 0, 0.4);
 	}
-	.field { display: flex; flex-direction: column; gap: 0.4rem; }
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
 	.field span {
 		font-family: var(--font-mono);
 		font-size: 0.7rem;
@@ -813,7 +1038,10 @@
 		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 10px;
 		padding: 0.75rem 0.95rem;
-		transition: border-color 200ms ease, background 200ms ease, box-shadow 200ms ease;
+		transition:
+			border-color 200ms ease,
+			background 200ms ease,
+			box-shadow 200ms ease;
 		resize: vertical;
 	}
 	.field input:focus,
@@ -842,14 +1070,23 @@
 		font-weight: 800;
 		cursor: pointer;
 		box-shadow: 0 10px 30px rgba(0, 242, 195, 0.3);
-		transition: transform 200ms ease, box-shadow 200ms ease, opacity 200ms ease;
+		transition:
+			transform 200ms ease,
+			box-shadow 200ms ease,
+			opacity 200ms ease;
 	}
 	.send-btn:hover:not(:disabled) {
 		transform: translateY(-2px);
 		box-shadow: 0 14px 40px rgba(0, 242, 195, 0.45);
 	}
-	.send-btn:disabled { opacity: 0.6; cursor: progress; }
-	.send-btn svg { width: 16px; height: 16px; }
+	.send-btn:disabled {
+		opacity: 0.6;
+		cursor: progress;
+	}
+	.send-btn svg {
+		width: 16px;
+		height: 16px;
+	}
 
 	.form-error {
 		color: #ffb1a1;
@@ -865,11 +1102,24 @@
 		animation: pop-in 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
 	@keyframes pop-in {
-		from { opacity: 0; transform: scale(0.85); }
-		to { opacity: 1; transform: scale(1); }
+		from {
+			opacity: 0;
+			transform: scale(0.85);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
 	}
-	.form-success h3 { font-size: 1.4rem; margin: 0.6rem 0 0.2rem; color: #00f2c3; }
-	.form-success p { margin: 0; color: rgba(255, 255, 255, 0.75); }
+	.form-success h3 {
+		font-size: 1.4rem;
+		margin: 0.6rem 0 0.2rem;
+		color: #00f2c3;
+	}
+	.form-success p {
+		margin: 0;
+		color: rgba(255, 255, 255, 0.75);
+	}
 	.success-check {
 		width: 56px;
 		height: 56px;
@@ -898,7 +1148,10 @@
 		text-transform: uppercase;
 		z-index: 2;
 		padding: 0.4rem 0.6rem;
-		transition: color 200ms ease, opacity 380ms ease, transform 380ms ease;
+		transition:
+			color 200ms ease,
+			opacity 380ms ease,
+			transform 380ms ease;
 	}
 	.scroll-cue:hover {
 		color: #00f2c3;
@@ -924,8 +1177,15 @@
 		height: 16px;
 	}
 	@keyframes cue-bob {
-		0%, 100% { transform: translateY(0); border-color: rgba(255, 255, 255, 0.25); }
-		50% { transform: translateY(6px); border-color: rgba(0, 242, 195, 0.65); }
+		0%,
+		100% {
+			transform: translateY(0);
+			border-color: rgba(255, 255, 255, 0.25);
+		}
+		50% {
+			transform: translateY(6px);
+			border-color: rgba(0, 242, 195, 0.65);
+		}
 	}
 	.scroll-cue:focus-visible {
 		outline: 2px solid #00f2c3;
@@ -933,10 +1193,22 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.star { animation: none; opacity: 0.45; }
-		.boom-btn { animation: none; }
-		.cue-arrow { animation: none; }
-		.hero.shake { animation: none; }
-		.aftermath { animation: none; }
+		.star {
+			animation: none;
+			opacity: 0.4;
+			transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+		}
+		.boom-btn {
+			animation: none;
+		}
+		.cue-arrow {
+			animation: none;
+		}
+		.hero.shake {
+			animation: none;
+		}
+		.aftermath {
+			animation: none;
+		}
 	}
 </style>
