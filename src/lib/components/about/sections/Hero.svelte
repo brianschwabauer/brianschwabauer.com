@@ -95,10 +95,13 @@
 		const duration = 15 + rand() * 13;
 		return {
 			id: starId++,
-			src: drawImage(rand, others.map((o) => o.src)),
+			src: drawImage(
+				rand,
+				others.map((o) => o.src),
+			),
 			x,
 			y,
-			w: 0.7 + rand() * 0.8,
+			w: 1.1 + rand() * 0.8,
 			rot: (rand() - 0.5) * 22,
 			duration,
 			// seeded tiles start somewhere mid-flight (negative delay) so the
