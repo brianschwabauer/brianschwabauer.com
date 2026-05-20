@@ -699,7 +699,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 9rem 1.5rem 6rem;
+		padding: 5rem 1.5rem 6rem;
 		overflow: hidden;
 		isolation: isolate;
 		color: #fff;
