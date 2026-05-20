@@ -1,16 +1,30 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import { media } from "../media";
 	import { STARFIELD_IMAGES } from "../starfield-images";
 	import HeroMascot from "./HeroMascot.svelte";
 	import HeroExplosion from "./HeroExplosion.svelte";
 
 	// ---- starfield ---------------------------------------------------------
-	// A 3D "warp" field of past-work thumbnails. The first frame is generated
-	// from a fixed seed so the whole field is present the instant the SSR HTML
-	// paints — no waiting for hydration. After that, every tile re-randomises
-	// its image, position and tilt each time it completes a warp pass, so the
-	// field keeps evolving with fresh work pulled from the curated pool.
+	// A 3D "warp" field of past-work thumbnails. A fixed seed renders the whole
+	// field into the SSR HTML, so it is present the instant the page paints.
+	// From then on one rAF loop drives every tile — and only runs while the
+	// hero is on screen.
+	//
+	// Each tile rides a warp position u: 0 = deep space (small, faded in), 1 =
+	// swept past the camera (faded out). Idle, every tile drifts u forward at
+	// its own gentle pace and recycles with fresh work. Scrolling advances
+	// *every* tile's u in lockstep — a real zoom-through: scrolling down sweeps
+	// tiles out and leaves them gone, so the field empties across the pin;
+	// scrolling up flows tiles on and also draws drained tiles back in from
+	// deep space, so fresh work zooms toward you.
 	const STAR_COUNT = 24;
+
+	// the warp tunnel in px of translateZ. Z_NEAR stays well inside the
+	// `perspective` distance so a tile never reaches the projection
+	// singularity (where scale blows up to infinity).
+	const Z_FAR = -260;
+	const Z_NEAR = 320;
 
 	type Star = {
 		id: number;
@@ -19,8 +33,7 @@
 		y: number; // % down the hero
 		w: number; // width factor (~0.7–1.5)
 		rot: number; // flat in-plane rotation (deg) — no 3D skew
-		duration: number; // seconds for one warp pass
-		delay: number; // negative offset so seeded tiles begin mid-flight
+		drift: number; // seconds for one idle (unscrolled) pass through the tunnel
 	};
 
 	// deterministic PRNG (mulberry32) — the seeded field must be byte-identical
@@ -90,9 +103,8 @@
 		return imageBag.splice(idx, 1)[0];
 	}
 
-	function makeStar(rand: () => number, seeded: boolean, others: Star[]): Star {
+	function makeStar(rand: () => number, others: Star[]): Star {
 		const { x, y } = placeStar(rand, others);
-		const duration = 15 + rand() * 13;
 		return {
 			id: starId++,
 			src: drawImage(
@@ -103,33 +115,220 @@
 			y,
 			w: 1.1 + rand() * 0.8,
 			rot: (rand() - 0.5) * 22,
-			duration,
-			// seeded tiles start somewhere mid-flight (negative delay) so the
-			// field looks alive on first paint; respawned tiles start fresh.
-			delay: seeded ? -rand() * duration : 0,
+			drift: 15 + rand() * 13,
 		};
 	}
 
-	// SSR-stable seed → identical field on server and client. Each tile is
-	// placed against the ones already chosen, so the opening field is spread.
+	// The look of a tile at warp position u — a pure function, so the server,
+	// the hydrated first paint and the rAF loop all agree exactly. u rides
+	// from 0 (deep space, small + faded) to 1 (swept past the camera, faded
+	// out again); outside that range the tile is invisible.
+	function starVisual(u: number, rot: number) {
+		const z = Z_FAR + u * (Z_NEAR - Z_FAR);
+		const fadeIn = Math.min(1, Math.max(0, u / 0.12));
+		const fadeOut = Math.min(1, Math.max(0, (1 - u) / 0.28));
+		const vis = u <= 0 || u >= 1 ? 0 : Math.min(fadeIn, fadeOut);
+		const blur = 5 * (1 - fadeIn) + 1.5 * (1 - fadeOut);
+		const sat = 0.45 + 0.65 * fadeIn;
+		const bright = 0.7 + 0.55 * u;
+		return {
+			transform: `translate(-50%, -50%) translateZ(${z.toFixed(1)}px) rotate(${rot}deg)`,
+			opacity: (0.9 * vis).toFixed(3),
+			filter: `blur(${blur.toFixed(2)}px) saturate(${sat.toFixed(2)}) brightness(${bright.toFixed(2)})`,
+		};
+	}
+
+	// SSR-stable seed → an identical field on server and client. Each tile is
+	// placed against the ones already chosen so the opening field is spread,
+	// and seeded with a warp position so the field looks alive on first paint.
 	const seededRand = mulberry32(0x5742_2026);
 	const seededStars: Star[] = [];
+	const seededU: number[] = [];
 	for (let i = 0; i < STAR_COUNT; i++) {
-		seededStars.push(makeStar(seededRand, true, seededStars));
+		seededStars.push(makeStar(seededRand, seededStars));
+		seededU.push(seededRand());
 	}
 	let stars = $state<Star[]>(seededStars);
+	// inline styles the SSR HTML ships with; the rAF loop takes over on the
+	// client, so these only need to make the very first paint flicker-free.
+	const seedStyles = seededStars.map((s, i) => starVisual(seededU[i], s.rot));
 
-	// A tile fires this at the boundary of each warp loop — the exact moment it
-	// is fully faded out. Swapping it for a brand-new random tile then is
-	// invisible: a fresh image warps in from deep space in an empty gap.
-	function respawnStar(i: number) {
-		if (phase === "boom" || phase === "aftermath") return;
-		stars[i] = makeStar(
-			Math.random,
-			false,
-			stars.filter((_, j) => j !== i),
-		);
-	}
+	let pinRef: HTMLDivElement | undefined;
+	let warpRef: HTMLDivElement | undefined;
+
+	// ---- the warp loop ------------------------------------------------------
+	// One rAF loop owns the field. It advances every tile's warp position,
+	// recycles tiles that reach the end, and writes transform/opacity/filter
+	// straight to the DOM. It runs only while the hero is on screen.
+	onMount(() => {
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+		// per-tile warp position, and whether it has been swept out and parked
+		const u = seededU.slice();
+		const parked: boolean[] = new Array(STAR_COUNT).fill(false);
+
+		let heroVisible = true;
+		let raf = 0;
+		let lastT = 0;
+		let lastY = window.scrollY;
+		let pendingScroll = 0; // signed px scrolled since the last frame
+		let refillBudget = 0; // fractional count of parked tiles owed re-entry
+		let pinTop = 0;
+		let scrollGain = 0; // px scrolled → u advanced (a whole pin drains the field)
+		let refillGain = 0; // px scrolled up → parked tiles drawn back in
+
+		// pin geometry only shifts on resize — measure it then, not per frame
+		function measure() {
+			const hero = document.getElementById("hero");
+			if (!pinRef || !hero) return;
+			pinTop = pinRef.getBoundingClientRect().top + window.scrollY;
+			const pinDist = Math.max(1, pinRef.offsetHeight - hero.offsetHeight);
+			scrollGain = 1.15 / pinDist;
+			refillGain = (STAR_COUNT + 4) / pinDist;
+		}
+
+		// give tile i fresh work (image, place, tilt) in place — its id stays,
+		// so the DOM element is reused. Only ever called while it is invisible.
+		function swapContent(i: number) {
+			const fresh = makeStar(
+				Math.random,
+				stars.filter((_, j) => j !== i),
+			);
+			const s = stars[i];
+			s.src = fresh.src;
+			s.x = fresh.x;
+			s.y = fresh.y;
+			s.w = fresh.w;
+			s.rot = fresh.rot;
+			s.drift = fresh.drift;
+		}
+
+		function tick(now: number) {
+			// once the button is pushed, hand the field to the boom blast
+			if (phase === "boom" || phase === "aftermath") {
+				raf = 0;
+				return;
+			}
+			const dt = Math.min(now - lastT, 50);
+			lastT = now;
+
+			const d = pendingScroll;
+			pendingScroll = 0;
+			const advance = Math.abs(d) * scrollGain;
+			const up = d < 0;
+			const down = d > 0;
+
+			// advance every live tile in lockstep: gentle idle drift + scroll
+			for (let i = 0; i < STAR_COUNT; i++) {
+				if (parked[i]) continue;
+				u[i] += dt / (stars[i].drift * 1000) + advance;
+				if (u[i] >= 1) {
+					if (down) {
+						// swept away for good — park it, and load its next image
+						// now so it is ready by the time scrolling brings it back
+						parked[i] = true;
+						swapContent(i);
+					} else {
+						// idle drift / up-scroll flow → recycle into deep space
+						u[i] -= 1;
+						swapContent(i);
+					}
+				}
+			}
+
+			// scrolling up also draws parked tiles back in from deep space,
+			// metered by distance so they zoom in one after another. Each kept
+			// the image it loaded while parked, so re-entry never flickers.
+			if (up) {
+				refillBudget += -d * refillGain;
+				while (refillBudget >= 1) {
+					const p = parked.indexOf(true);
+					if (p === -1) {
+						refillBudget = 0;
+						break;
+					}
+					parked[p] = false;
+					u[p] = -Math.random() * 0.04;
+					refillBudget -= 1;
+				}
+			}
+
+			// at rest at the very top the field is simply full — top up any
+			// stragglers, spread through the tunnel rather than bunched deep
+			if (window.scrollY <= pinTop + 4) {
+				for (let i = 0; i < STAR_COUNT; i++) {
+					if (parked[i]) {
+						parked[i] = false;
+						u[i] = Math.random();
+					}
+				}
+			}
+
+			const tiles = warpRef?.children;
+			if (tiles) {
+				for (let i = 0; i < STAR_COUNT; i++) {
+					const el = tiles[i] as HTMLElement | undefined;
+					if (!el) continue;
+					if (parked[i]) {
+						el.style.visibility = "hidden";
+						continue;
+					}
+					el.style.visibility = "visible";
+					const v = starVisual(u[i], stars[i].rot);
+					el.style.transform = v.transform;
+					el.style.opacity = v.opacity;
+					el.style.filter = v.filter;
+				}
+			}
+
+			raf = heroVisible ? requestAnimationFrame(tick) : 0;
+		}
+
+		function pump() {
+			if (raf || phase === "boom" || phase === "aftermath") return;
+			lastT = performance.now();
+			raf = requestAnimationFrame(tick);
+		}
+
+		function onScroll() {
+			const y = window.scrollY;
+			if (heroVisible) pendingScroll += y - lastY;
+			lastY = y;
+		}
+
+		measure();
+		window.addEventListener("scroll", onScroll, { passive: true });
+		window.addEventListener("resize", measure);
+
+		// pause the whole loop whenever the hero is off screen — no warp work,
+		// no graphics resources spent while the field can't be seen
+		const hero = document.getElementById("hero");
+		const io = hero
+			? new IntersectionObserver(([entry]) => {
+					heroVisible = entry.isIntersecting;
+					if (heroVisible) {
+						// re-entering: drop any scroll banked while away, resume
+						measure();
+						lastY = window.scrollY;
+						pendingScroll = 0;
+						pump();
+					} else if (raf) {
+						cancelAnimationFrame(raf);
+						raf = 0;
+					}
+				})
+			: undefined;
+		io?.observe(hero!);
+
+		pump();
+
+		return () => {
+			window.removeEventListener("scroll", onScroll);
+			window.removeEventListener("resize", measure);
+			io?.disconnect();
+			if (raf) cancelAnimationFrame(raf);
+		};
+	});
 
 	const currentYear = new Date().getFullYear();
 
@@ -246,236 +445,256 @@
 
 	function scrollNext() {
 		const hero = document.getElementById("hero");
-		const next = hero?.nextElementSibling as HTMLElement | null;
-		const target = next ?? hero;
+		// the hero is pinned inside .hero-pin — skip past the whole pin zone
+		const pin = hero?.closest(".hero-pin") ?? hero;
+		const next = pin?.nextElementSibling as HTMLElement | null;
+		const target = next ?? pin;
 		if (!target) return;
 		const top = target.getBoundingClientRect().top + window.scrollY - 64;
 		window.scrollTo({ top });
 	}
 </script>
 
-<section
-	class="hero"
-	id="hero"
-	data-section
-	data-section-label="Today"
-	data-section-year={currentYear}
-	class:shake={phase === "boom"}
-	data-phase={phase}
+<div
+	class="hero-pin"
+	class:unpinned={phase === "boom" || phase === "aftermath"}
+	bind:this={pinRef}
 >
-	<div
-		class="starfield"
-		class:scattering={phase === "boom" || phase === "aftermath"}
-		aria-hidden="true"
+	<section
+		class="hero"
+		id="hero"
+		data-section
+		data-section-label="Today"
+		data-section-year={currentYear}
+		class:shake={phase === "boom"}
+		data-phase={phase}
 	>
-		<div class="star-warp">
-			{#each stars as star, i (star.id)}
-				<img
-					class="star"
-					src={media(star.src)}
-					alt=""
-					loading={i < 8 ? "eager" : "lazy"}
-					decoding="async"
-					onanimationiteration={() => respawnStar(i)}
-					style:--x="{star.x}%"
-					style:--y="{star.y}%"
-					style:--w={star.w}
-					style:--rot="{star.rot}deg"
-					style:--duration="{star.duration}s"
-					style:--delay="{star.delay}s"
-					style:--blast-spin="{star.rot * 8}deg"
-					style:--blast-delay="{(i % 9) * 22}ms"
-				/>
-			{/each}
-		</div>
-		<div class="vignette"></div>
-	</div>
-
-	<!-- BEFORE: the original content (badge, headline, lede, button) -->
-	{#if phase !== "aftermath"}
-		<div class="hero-inner before" class:exploding={phase === "boom"}>
-			<div class="badge" data-frag>
-				<span class="avatar" aria-hidden="true">
+		<div
+			class="starfield"
+			class:scattering={phase === "boom" || phase === "aftermath"}
+			aria-hidden="true"
+		>
+			<div class="star-warp" bind:this={warpRef}>
+				{#each stars as star, i (star.id)}
 					<img
-						src="/profile_picture2.webp"
+						class="star"
+						src={media(star.src)}
 						alt=""
-						loading="eager"
+						loading={i < 8 ? "eager" : "lazy"}
 						decoding="async"
+						style:--x="{star.x}%"
+						style:--y="{star.y}%"
+						style:--w={star.w}
+						style:--rot="{star.rot}deg"
+						style:transform={seedStyles[i].transform}
+						style:opacity={seedStyles[i].opacity}
+						style:filter={seedStyles[i].filter}
+						style:--blast-spin="{star.rot * 8}deg"
+						style:--blast-delay="{(i % 9) * 22}ms"
 					/>
-					<span class="avatar-ring"></span>
-				</span>
-				<span>👋 Hi, I'm Brian Schwabauer</span>
+				{/each}
 			</div>
+			<div class="vignette"></div>
+		</div>
 
-			<h1 data-frag>
-				<span class="grad">Delivering</span>
-				<span class="grad accent">Delight</span>
-			</h1>
-
-			<p class="lede" data-frag>
-				For as long as I have lived, I have loved to create. I've built
-				startups, developed apps, and produced videos. I live to create. I work
-				to delight.
-			</p>
-
-			<div class="button-stage" data-frag>
-				<button
-					class="boom-btn"
-					class:warn={warned}
-					class:pre-press={prePress}
-					class:wobble={phase === "pumping" && pumpCount > 0}
-					class:shudder={phase === "pumping" && pumpCount >= 4}
-					class:popped={phase === "boom"}
-					type="button"
-					onmouseenter={() => (warned = true)}
-					onmouseleave={() => (warned = phase !== "idle")}
-					onfocus={() => (warned = true)}
-					onclick={startDestruction}
-					disabled={phase !== "idle"}
-					aria-label={phase === "idle"
-						? "Don't push this button"
-						: "Boom in progress"}
-					style:--scale={buttonScale}
-				>
-					<span class="boom-btn-skin"></span>
-					<span class="boom-btn-label" aria-live="polite">
-						{#key buttonLabel}
-							<span class="boom-btn-text">{buttonLabel}</span>
-						{/key}
+		<!-- BEFORE: the original content (badge, headline, lede, button) -->
+		{#if phase !== "aftermath"}
+			<div class="hero-inner before" class:exploding={phase === "boom"}>
+				<div class="badge" data-frag>
+					<span class="avatar" aria-hidden="true">
+						<img
+							src="/profile_picture2.webp"
+							alt=""
+							loading="eager"
+							decoding="async"
+						/>
+						<span class="avatar-ring"></span>
 					</span>
-				</button>
+					<span>👋 Hi, I'm Brian Schwabauer</span>
+				</div>
 
-				<HeroMascot {phase} {pumpCount} {pumpStroke} {buttonScale} />
-			</div>
-		</div>
-	{/if}
+				<h1 data-frag>
+					<span class="grad">Delivering</span>
+					<span class="grad accent">Delight</span>
+				</h1>
 
-	<HeroExplosion trigger={explosionTick} origin={{ x: 0.5, y: 0.62 }} />
+				<p class="lede" data-frag>
+					For as long as I have lived, I have loved to create. I've built
+					startups, developed apps, and produced videos. I live to create. I work
+					to delight.
+				</p>
 
-	<!-- AFTERMATH: shown after the dust settles -->
-	{#if phase === "aftermath"}
-		<div class="hero-inner aftermath">
-			<h1 class="aftermath-h1">
-				<span class="line line-1">You destroyed</span>
-				<span class="line line-2">my site.</span>
-			</h1>
-			<p class="aftermath-lede">
-				Well&hellip; that escalated. Since you went and blew the place up, the
-				least you can do is stick around. Tell me your name and what you want to
-				build together — I'll get back to you faster than my poor mascot can
-				find his helmet.
-			</p>
-
-			<form
-				class="contact-form"
-				onsubmit={submitContact}
-				class:sent={formState === "sent"}
-				class:err={formState === "error"}
-			>
-				{#if formState === "sent"}
-					<div class="form-success">
-						<svg viewBox="0 0 24 24" aria-hidden="true" class="success-check">
-							<path
-								d="M4 12 L10 18 L20 6"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="3"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
-						</svg>
-						<h3>Message received.</h3>
-						<p>Thanks, {name || "friend"}. I'll be in touch soon.</p>
-					</div>
-				{:else}
-					<label class="field">
-						<span>Your name</span>
-						<input
-							type="text"
-							bind:value={name}
-							required
-							maxlength="100"
-							autocomplete="name"
-							placeholder="Jane Builder"
-							disabled={formState === "sending"}
-						/>
-					</label>
-					<label class="field">
-						<span>Email</span>
-						<input
-							type="email"
-							bind:value={email}
-							required
-							maxlength="200"
-							autocomplete="email"
-							placeholder="jane@example.com"
-							disabled={formState === "sending"}
-						/>
-					</label>
-					<label class="field">
-						<span>What should we build?</span>
-						<textarea
-							bind:value={message}
-							required
-							maxlength="5000"
-							rows="4"
-							placeholder="Tell me about the project, the dream, or just say hi."
-							disabled={formState === "sending"}
-						></textarea>
-					</label>
-
-					{#if formError}
-						<div class="form-error" role="alert">{formError}</div>
-					{/if}
-
+				<div class="button-stage" data-frag>
 					<button
-						class="send-btn"
-						type="submit"
-						disabled={formState === "sending"}
+						class="boom-btn"
+						class:warn={warned}
+						class:pre-press={prePress}
+						class:wobble={phase === "pumping" && pumpCount > 0}
+						class:shudder={phase === "pumping" && pumpCount >= 4}
+						class:popped={phase === "boom"}
+						type="button"
+						onmouseenter={() => (warned = true)}
+						onmouseleave={() => (warned = phase !== "idle")}
+						onfocus={() => (warned = true)}
+						onclick={startDestruction}
+						disabled={phase !== "idle"}
+						aria-label={phase === "idle"
+							? "Don't push this button"
+							: "Boom in progress"}
+						style:--scale={buttonScale}
 					>
-						{formState === "sending" ? "Sending…" : "Send it"}
-						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<path
-								d="M5 12h14M13 6l6 6-6 6"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
-						</svg>
+						<span class="boom-btn-skin"></span>
+						<span class="boom-btn-label" aria-live="polite">
+							{#key buttonLabel}
+								<span class="boom-btn-text">{buttonLabel}</span>
+							{/key}
+						</span>
 					</button>
-				{/if}
-			</form>
-		</div>
-	{/if}
 
-	<button
-		class="scroll-cue"
-		class:hidden={phase === "boom"}
-		type="button"
-		onclick={scrollNext}
-		aria-label="Scroll to next section"
-	>
-		<span class="cue-label">More below</span>
-		<span class="cue-arrow" aria-hidden="true">
-			<svg viewBox="0 0 24 24">
-				<path
-					d="M6 9l6 6 6-6"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2.4"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				/>
-			</svg>
-		</span>
-	</button>
-</section>
+					<HeroMascot {phase} {pumpCount} {pumpStroke} {buttonScale} />
+				</div>
+			</div>
+		{/if}
+
+		<HeroExplosion trigger={explosionTick} origin={{ x: 0.5, y: 0.62 }} />
+
+		<!-- AFTERMATH: shown after the dust settles -->
+		{#if phase === "aftermath"}
+			<div class="hero-inner aftermath">
+				<h1 class="aftermath-h1">
+					<span class="line line-1">You destroyed</span>
+					<span class="line line-2">my site.</span>
+				</h1>
+				<p class="aftermath-lede">
+					Well&hellip; that escalated. Since you went and blew the place up, the
+					least you can do is stick around. Tell me your name and what you want to
+					build together — I'll get back to you faster than my poor mascot can
+					find his helmet.
+				</p>
+
+				<form
+					class="contact-form"
+					onsubmit={submitContact}
+					class:sent={formState === "sent"}
+					class:err={formState === "error"}
+				>
+					{#if formState === "sent"}
+						<div class="form-success">
+							<svg viewBox="0 0 24 24" aria-hidden="true" class="success-check">
+								<path
+									d="M4 12 L10 18 L20 6"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="3"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+							<h3>Message received.</h3>
+							<p>Thanks, {name || "friend"}. I'll be in touch soon.</p>
+						</div>
+					{:else}
+						<label class="field">
+							<span>Your name</span>
+							<input
+								type="text"
+								bind:value={name}
+								required
+								maxlength="100"
+								autocomplete="name"
+								placeholder="Jane Builder"
+								disabled={formState === "sending"}
+							/>
+						</label>
+						<label class="field">
+							<span>Email</span>
+							<input
+								type="email"
+								bind:value={email}
+								required
+								maxlength="200"
+								autocomplete="email"
+								placeholder="jane@example.com"
+								disabled={formState === "sending"}
+							/>
+						</label>
+						<label class="field">
+							<span>What should we build?</span>
+							<textarea
+								bind:value={message}
+								required
+								maxlength="5000"
+								rows="4"
+								placeholder="Tell me about the project, the dream, or just say hi."
+								disabled={formState === "sending"}
+							></textarea>
+						</label>
+
+						{#if formError}
+							<div class="form-error" role="alert">{formError}</div>
+						{/if}
+
+						<button
+							class="send-btn"
+							type="submit"
+							disabled={formState === "sending"}
+						>
+							{formState === "sending" ? "Sending…" : "Send it"}
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<path
+									d="M5 12h14M13 6l6 6-6 6"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</button>
+					{/if}
+				</form>
+			</div>
+		{/if}
+
+		<button
+			class="scroll-cue"
+			class:hidden={phase === "boom"}
+			type="button"
+			onclick={scrollNext}
+			aria-label="Scroll to next section"
+		>
+			<span class="cue-label">More below</span>
+			<span class="cue-arrow" aria-hidden="true">
+				<svg viewBox="0 0 24 24">
+					<path
+						d="M6 9l6 6 6-6"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.4"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
+				</svg>
+			</span>
+		</button>
+	</section>
+</div>
 
 <style>
+	/* The hero pins in place while the page scrolls under it for an extra
+	   --pin-scroll of distance, so the scroll-driven starfield surge has room
+	   to be felt before the page moves on to the next section. */
+	.hero-pin {
+		min-height: calc(100svh + var(--pin-scroll, 500px));
+	}
+	/* Once the button is pushed, release the pin so the (taller) aftermath
+	   content scrolls freely instead of being trapped behind the fold. */
+	.hero-pin.unpinned {
+		min-height: 0;
+	}
 	.hero {
-		position: relative;
+		position: sticky;
+		top: 0;
 		min-height: 100svh;
 		display: flex;
 		align-items: center;
@@ -554,41 +773,12 @@
 		box-shadow:
 			0 0 34px rgba(0, 244, 195, 0.22),
 			0 10px 32px rgba(0, 0, 0, 0.5);
+		/* transform / opacity / filter are driven per-frame by the JS warp
+		   loop — the seeded inline styles cover the first paint until it runs */
 		transform: translate(-50%, -50%);
 		transform-origin: center;
-		animation: warp var(--duration, 20s) linear infinite;
-		animation-delay: var(--delay, 0s);
 		will-change: transform, opacity, filter;
 		opacity: 0;
-	}
-	/* deep space → past the camera. translateZ does the depth work; the shared
-	   perspective pulls each tile out radially from the centre. The tile face
-	   stays parallel to the screen (only a flat in-plane rotation) so it
-	   scales cleanly without any 3D skew. */
-	@keyframes warp {
-		0% {
-			opacity: 0;
-			/* start only moderately deep — with a dramatic (low) perspective a
-			   very deep start would crush every fresh tile onto the vanishing
-			   point, so tiles instead appear already spread toward the edges */
-			transform: translate(-50%, -50%) translateZ(-260px)
-				rotate(var(--rot, 0deg));
-			filter: blur(5px) saturate(0.45) brightness(0.7);
-		}
-		12% {
-			opacity: 0.9;
-			filter: blur(0) saturate(1) brightness(1);
-		}
-		72% {
-			opacity: 0.9;
-			filter: blur(0) saturate(1.05) brightness(1.1);
-		}
-		100% {
-			opacity: 0;
-			transform: translate(-50%, -50%) translateZ(320px)
-				rotate(var(--rot, 0deg));
-			filter: blur(1.5px) saturate(1.1) brightness(1.25);
-		}
 	}
 	/* when boom triggers, kill the warp loop and blast each star outward */
 	.starfield.scattering .star {
@@ -784,17 +974,18 @@
 		position: absolute;
 		inset: 0;
 		border-radius: 999px;
-		background: radial-gradient(
+		background: white;
+		/*background: radial-gradient(
 			circle at 30% 25%,
 			#aaffe8 0%,
 			#00f2c3 35%,
 			#6c63ff 90%
-		);
-		box-shadow:
+		);*/
+		/*box-shadow:
 			inset 0 -6px 16px rgba(20, 10, 40, 0.4),
 			inset 0 4px 12px rgba(255, 255, 255, 0.45),
 			0 14px 36px rgba(0, 242, 195, 0.4),
-			0 4px 18px rgba(108, 99, 255, 0.35);
+			0 4px 18px rgba(108, 99, 255, 0.35);*/
 		transition:
 			background 320ms ease,
 			box-shadow 320ms ease;
@@ -1214,10 +1405,11 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.star {
-			animation: none;
-			opacity: 0.4;
-			transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+		/* nothing animates to linger for — let the page scroll normally. The
+		   warp loop never starts, so the field stays as its seeded first
+		   paint: a calm, static starfield. */
+		.hero-pin {
+			min-height: 0;
 		}
 		.boom-btn {
 			animation: none;
