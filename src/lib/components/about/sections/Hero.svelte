@@ -795,7 +795,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 5rem 1.5rem 6rem;
+		/* tight side gutters so the headline can run near the screen edges */
+		padding: 5rem 1rem 6rem;
 		overflow: hidden;
 		isolation: isolate;
 		color: #fff;
@@ -1001,7 +1002,7 @@
 	}
 	h1 {
 		font-family: "Nunito Sans", sans-serif;
-		font-size: clamp(3rem, 13vw, 5rem);
+		font-size: clamp(3rem, 19vw, 5.5rem);
 		font-weight: 900;
 		line-height: 0.9;
 		letter-spacing: -0.04em;
@@ -1068,12 +1069,16 @@
 		font-weight: 800;
 		font-size: 1rem;
 		letter-spacing: 0.02em;
-		/* fixed footprint so the label can swap without resizing */
-		width: clamp(220px, 24vw, 280px);
+		/* fixed footprint so the label can swap without resizing; wide enough
+		   for the longest label ("Don't push this button"), and capped to the
+		   viewport so it never overflows a narrow phone */
+		width: min(280px, 80vw);
 		height: 56px;
-		padding: 0 1.8rem;
+		padding: 0 1.4rem;
 		border-radius: 999px;
 		cursor: pointer;
+		/* other feedback (squish, label swap) covers the press — no tap flash */
+		-webkit-tap-highlight-color: transparent;
 		transform-origin: 50% 100%;
 		transform: scale(var(--scale));
 		transition:
