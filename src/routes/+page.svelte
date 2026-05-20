@@ -60,7 +60,7 @@
 <div class="root">
 	<YearScrubber {stops} />
 
-	<Hero />
+	<Hero isMobile={data.isMobile} />
 	<WhatImUpTo />
 	<Rewind />
 	<HumbleBeginnings {signedIn} />

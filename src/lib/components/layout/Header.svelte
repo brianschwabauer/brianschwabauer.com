@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { ThemeToggle } from "@delightstack/components/actions";
 	import { page } from "$app/stores";
-	import { hideHeaderLogo } from "$lib/stores/navState";
+	import { hideHeaderLogo, searchOpen } from "$lib/stores/navState";
 	import SearchModal from "$lib/components/search/SearchModal.svelte";
 
 	let { showThemeToggle = false, invertLogo = false } = $props();
 
 	let scrolled = $state(false);
-	let searchOpen = $state(false);
 
 	if (typeof window !== "undefined") {
 		$effect(() => {
@@ -27,14 +26,14 @@
 		function handleShortcut(e: KeyboardEvent) {
 			if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
 				e.preventDefault();
-				searchOpen = true;
-			} else if (e.key === "/" && !searchOpen) {
+				$searchOpen = true;
+			} else if (e.key === "/" && !$searchOpen) {
 				const t = e.target as HTMLElement | null;
 				const tag = t?.tagName;
 				if (tag === "INPUT" || tag === "TEXTAREA" || t?.isContentEditable)
 					return;
 				e.preventDefault();
-				searchOpen = true;
+				$searchOpen = true;
 			}
 		}
 		window.addEventListener("keydown", handleShortcut);
@@ -55,7 +54,7 @@
 	}
 </script>
 
-<header class="header" class:scrolled>
+<header class="header" class:scrolled class:root-page={onRootPage}>
 	<div class="header-inner">
 		<a
 			href="/"
@@ -93,7 +92,7 @@
 				type="button"
 				class="search-btn"
 				class:on-dark={invertLogo}
-				onclick={() => (searchOpen = true)}
+				onclick={() => ($searchOpen = true)}
 				aria-label="Search the site"
 				title="Search (⌘K)"
 			>
@@ -112,7 +111,7 @@
 	</div>
 </header>
 
-<SearchModal bind:open={searchOpen} />
+<SearchModal bind:open={$searchOpen} />
 
 <style>
 	.header {
@@ -131,6 +130,14 @@
 		background-color: color-mix(in srgb, var(--color-bg) 70%, transparent);
 		backdrop-filter: blur(12px);
 		border-bottom: 1px solid var(--color-border);
+	}
+
+	/* On mobile the home page's top bar isn't fixed — it scrolls away with the
+	   hero. The bottom nav (RootNavDropdown) takes over past the hero. */
+	@media (max-width: 768px) {
+		.header.root-page {
+			position: absolute;
+		}
 	}
 
 	.header-inner {

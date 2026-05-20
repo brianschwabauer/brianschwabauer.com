@@ -163,9 +163,9 @@
 	button.active {
 		color: #fff;
 	}
+	/* On mobile the rail crowds the section content — section jumping is
+	   handled by the bottom nav dropdown there instead. */
 	@media (max-width: 768px) {
-		.year-scrubber { right: 0.5rem; }
-		.label { display: none; }
-		.year { min-width: 2.4rem; font-size: 0.65rem; }
+		.year-scrubber { display: none; }
 	}
 </style>

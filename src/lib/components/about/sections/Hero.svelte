@@ -5,6 +5,10 @@
 	import HeroMascot from "./HeroMascot.svelte";
 	import HeroExplosion from "./HeroExplosion.svelte";
 
+	// `isMobile` comes from the server (User-Agent) so the seeded starfield is
+	// placed identically on server and client — see the anchor buffers below.
+	let { isMobile = false }: { isMobile?: boolean } = $props();
+
 	// ---- starfield ---------------------------------------------------------
 	// A 3D "warp" field of past-work thumbnails. A fixed seed renders the whole
 	// field into the SSR HTML, so it is present the instant the page paints.
@@ -65,12 +69,27 @@
 		};
 	}
 
+	// Centre exclusion half-extents (% from centre): an anchor landing inside
+	// this box is re-rolled, keeping tiles off the headline. Mobile widens the
+	// box — the hero text is proportionally far larger there. Set here, before
+	// the seed runs, off the server `isMobile` flag so the SSR and client
+	// fields are byte-identical (a viewport check would differ → hydration
+	// mismatch, the tiles popping out of the centre).
+	let anchorBufX = 23;
+	let anchorBufY = 34;
+	// a one-time read by design — isMobile is fixed for the page's lifetime
+	// svelte-ignore state_referenced_locally
+	if (isMobile) {
+		anchorBufX = 38;
+		anchorBufY = 36;
+	}
+
 	// A raw anchor that stays clear of the central column the headline owns.
 	function randomAnchor(rand: () => number): { x: number; y: number } {
 		let x = 4 + rand() * 92;
 		let y = 6 + rand() * 88;
 		for (let i = 0; i < 12; i++) {
-			if (Math.abs(x - 50) > 23 || Math.abs(y - 50) > 34) break;
+			if (Math.abs(x - 50) > anchorBufX || Math.abs(y - 50) > anchorBufY) break;
 			x = 4 + rand() * 92;
 			y = 6 + rand() * 88;
 		}
