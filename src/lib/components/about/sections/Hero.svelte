@@ -75,12 +75,27 @@
 
 	let starId = 0;
 
+	// A shuffle-bag of image names: every image is dealt exactly once before
+	// any repeat. When the bag empties it refills with the full pool minus
+	// whatever is on screen, so no two tiles ever show the same image and
+	// every image in the pool is guaranteed its turn.
+	let imageBag: string[] = [];
+
+	function drawImage(rand: () => number, onScreen: string[]): string {
+		if (imageBag.length === 0) {
+			imageBag = STARFIELD_IMAGES.filter((s) => !onScreen.includes(s));
+			if (imageBag.length === 0) imageBag = STARFIELD_IMAGES.slice();
+		}
+		const idx = Math.floor(rand() * imageBag.length);
+		return imageBag.splice(idx, 1)[0];
+	}
+
 	function makeStar(rand: () => number, seeded: boolean, others: Star[]): Star {
 		const { x, y } = placeStar(rand, others);
 		const duration = 15 + rand() * 13;
 		return {
 			id: starId++,
-			src: STARFIELD_IMAGES[Math.floor(rand() * STARFIELD_IMAGES.length)],
+			src: drawImage(rand, others.map((o) => o.src)),
 			x,
 			y,
 			w: 0.7 + rand() * 0.8,
@@ -550,7 +565,10 @@
 	@keyframes warp {
 		0% {
 			opacity: 0;
-			transform: translate(-50%, -50%) translateZ(-480px)
+			/* start only moderately deep — with a dramatic (low) perspective a
+			   very deep start would crush every fresh tile onto the vanishing
+			   point, so tiles instead appear already spread toward the edges */
+			transform: translate(-50%, -50%) translateZ(-260px)
 				rotate(var(--rot, 0deg));
 			filter: blur(5px) saturate(0.45) brightness(0.7);
 		}
