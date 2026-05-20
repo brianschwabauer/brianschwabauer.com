@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import SectionShell from '../primitives/SectionShell.svelte';
-	import Reveal from '../primitives/Reveal.svelte';
+	import { onMount } from "svelte";
+	import SectionShell from "../primitives/SectionShell.svelte";
+	import Reveal from "../primitives/Reveal.svelte";
 
 	const currentYear = new Date().getFullYear();
 	const START_YEAR = 2006;
@@ -12,7 +12,7 @@
 
 	onMount(() => {
 		if (!sectionEl) return;
-		if (typeof IntersectionObserver === 'undefined') {
+		if (typeof IntersectionObserver === "undefined") {
 			displayYear = START_YEAR;
 			return;
 		}
@@ -26,7 +26,7 @@
 					runRewind();
 				}
 			},
-			{ threshold: 0.4 }
+			{ threshold: 0.4 },
 		);
 		obs.observe(sectionEl);
 		return () => obs.disconnect();
@@ -40,7 +40,9 @@
 		const tick = (t: number) => {
 			const p = Math.min(1, (t - start) / dur);
 			const eased = 1 - Math.pow(1 - p, 3);
-			displayYear = Math.round(currentYear - (currentYear - START_YEAR) * eased);
+			displayYear = Math.round(
+				currentYear - (currentYear - START_YEAR) * eased,
+			);
 			if (p < 1) {
 				raf = requestAnimationFrame(tick);
 			} else {
@@ -52,16 +54,23 @@
 	}
 
 	function scrollToOrigin() {
-		const el = document.getElementById('humble-beginnings');
+		const el = document.getElementById("humble-beginnings");
 		if (!el) return;
 		const top = el.getBoundingClientRect().top + window.scrollY - 64;
 		window.scrollTo({ top });
 	}
 
-	const percent = $derived(((currentYear - displayYear) / (currentYear - START_YEAR)) * 100);
+	const percent = $derived(
+		((currentYear - displayYear) / (currentYear - START_YEAR)) * 100,
+	);
 </script>
 
-<SectionShell id="rewind" year={String(currentYear)} label="Rewind" theme="rewind">
+<SectionShell
+	id="rewind"
+	year={String(currentYear)}
+	label="Rewind"
+	theme="rewind"
+>
 	<div class="bg" aria-hidden="true">
 		<div class="grid-overlay"></div>
 		<div class="vignette"></div>
@@ -71,7 +80,14 @@
 		<Reveal>
 			<div class="eyebrow">
 				<svg viewBox="0 0 24 24" aria-hidden="true">
-					<path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+					<path
+						d="M11 17l-5-5 5-5M18 17l-5-5 5-5"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
 				</svg>
 				<span>Rewinding the tape</span>
 			</div>
@@ -80,14 +96,16 @@
 		<Reveal variant="up" delay={120}>
 			<h2 class="title">
 				But to understand <span class="grad">where I am now</span>,<br />
-				you have to go back to <span class="grad accent">where it all started</span>.
+				you have to go back to
+				<span class="grad accent">where it all started</span>.
 			</h2>
 		</Reveal>
 
 		<Reveal variant="up" delay={220}>
 			<p class="lede">
-				Before the startup, the apps, the company &mdash; there was a miniDV camera, a bedroom wall painted green,
-				and a friend named Kevin. Roll it back.
+				Before the startup, the apps, the company &mdash; there was a miniDV
+				camera, a bedroom wall painted green, and a friend named Kevin. Roll it
+				back.
 			</p>
 		</Reveal>
 
@@ -111,7 +129,14 @@
 			<button class="cta" type="button" onclick={scrollToOrigin}>
 				<span>Start at the beginning</span>
 				<svg viewBox="0 0 24 24" aria-hidden="true">
-					<path d="M12 4v16M6 14l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+					<path
+						d="M12 4v16M6 14l6 6 6-6"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
 				</svg>
 			</button>
 		</Reveal>
@@ -119,10 +144,18 @@
 </SectionShell>
 
 <style>
-	:global([data-theme='rewind']) {
+	:global([data-theme="rewind"]) {
 		background:
-			radial-gradient(circle at 50% 0%, rgba(108, 99, 255, 0.18), transparent 55%),
-			radial-gradient(circle at 50% 100%, rgba(255, 156, 74, 0.10), transparent 60%),
+			radial-gradient(
+				circle at 50% 0%,
+				rgba(108, 99, 255, 0.18),
+				transparent 55%
+			),
+			radial-gradient(
+				circle at 50% 100%,
+				rgba(255, 156, 74, 0.1),
+				transparent 60%
+			),
 			linear-gradient(180deg, #050a10, #0a0a12 50%, #100a06);
 		color: #fff;
 	}
@@ -134,15 +167,23 @@
 	.grid-overlay {
 		position: absolute;
 		inset: 0;
-		background-image:
-			repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 80px);
+		background-image: repeating-linear-gradient(
+			90deg,
+			rgba(255, 255, 255, 0.04) 0 2px,
+			transparent 2px 80px
+		);
 		mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
 		opacity: 0.6;
 	}
 	.vignette {
 		position: absolute;
 		inset: 0;
-		background: radial-gradient(ellipse at center, transparent 0%, rgba(5, 5, 10, 0.65) 75%, #050a10 100%);
+		background: radial-gradient(
+			ellipse at center,
+			transparent 0%,
+			rgba(5, 5, 10, 0.65) 75%,
+			#050a10 100%
+		);
 	}
 	.container {
 		position: relative;
@@ -177,8 +218,13 @@
 		animation: rewind-spin 1.4s ease-in-out infinite;
 	}
 	@keyframes rewind-spin {
-		0%, 100% { transform: translateX(0); }
-		50% { transform: translateX(-3px); }
+		0%,
+		100% {
+			transform: translateX(0);
+		}
+		50% {
+			transform: translateX(-3px);
+		}
 	}
 
 	.title {
@@ -241,8 +287,13 @@
 		animation: rew-pulse 700ms ease-in-out infinite;
 	}
 	@keyframes rew-pulse {
-		0%, 100% { opacity: 0.4; }
-		50% { opacity: 1; }
+		0%,
+		100% {
+			opacity: 0.4;
+		}
+		50% {
+			opacity: 1;
+		}
 	}
 	.counter-number {
 		font-family: var(--font-mono);
@@ -286,7 +337,10 @@
 		font: inherit;
 		font-weight: 600;
 		cursor: pointer;
-		transition: background 200ms ease, transform 200ms ease, border-color 200ms ease;
+		transition:
+			background 200ms ease,
+			transform 200ms ease,
+			border-color 200ms ease;
 	}
 	.cta:hover {
 		background: rgba(255, 255, 255, 0.12);
@@ -303,13 +357,20 @@
 		animation: bob 2.4s ease-in-out infinite;
 	}
 	@keyframes bob {
-		0%, 100% { transform: translateY(0); }
-		50% { transform: translateY(4px); }
+		0%,
+		100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(4px);
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.eyebrow svg,
 		.cta svg,
-		.rew { animation: none; }
+		.rew {
+			animation: none;
+		}
 	}
 </style>
