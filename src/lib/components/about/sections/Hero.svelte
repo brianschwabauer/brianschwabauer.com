@@ -20,11 +20,14 @@
 	// deep space, so fresh work zooms toward you.
 	const STAR_COUNT = 24;
 
-	// Extra tiles spawned from deep space while scrolling *down* through the
-	// pinned section, on top of the STAR_COUNT already in the field. Higher =
-	// the field stays populated deeper into the pin before it empties; 0 = it
-	// just drains the initial tiles. Tune to taste.
+	// How long the down-scroll keeps the field stocked — extra tiles cycled
+	// through on top of STAR_COUNT. It stretches the drain: the field thins
+	// from full to empty over (1 + SCROLL_EXTRA / STAR_COUNT) pin-lengths of
+	// scroll. 0 = empties exactly at the end of the pin; higher = it keeps
+	// streaming well past the pin (it never fully empties before you scroll
+	// the hero off screen). Tune to taste.
 	const SCROLL_EXTRA = 50;
+	const DRAIN_REACH = 1 + SCROLL_EXTRA / STAR_COUNT;
 
 	// the warp tunnel in px of translateZ. Z_NEAR stays well inside the
 	// `perspective` distance so a tile never reaches the projection
@@ -234,17 +237,12 @@
 			const up = d < 0;
 			const down = d > 0;
 
-			// how far down the pin we are. The field thins from full to empty
-			// across it, but holds STAR_COUNT + SCROLL_EXTRA tiles' worth of
-			// work, so fresh tiles keep arriving instead of going blank early.
-			const progress = Math.min(
-				1,
-				Math.max(0, (window.scrollY - pinTop) / pinDist),
-			);
-			const target = Math.min(
-				STAR_COUNT,
-				(STAR_COUNT + SCROLL_EXTRA) * (1 - progress),
-			);
+			// how far past the top of the pin we are, in pin-lengths —
+			// uncapped, so the drain is free to run on well past the pin. The
+			// field thins linearly from full to empty across DRAIN_REACH of
+			// these, so a bigger SCROLL_EXTRA literally stretches the drain.
+			const progress = Math.max(0, (window.scrollY - pinTop) / pinDist);
+			const target = Math.max(0, STAR_COUNT * (1 - progress / DRAIN_REACH));
 
 			// advance every live tile in lockstep: gentle idle drift + scroll
 			for (let i = 0; i < STAR_COUNT; i++) {
@@ -746,7 +744,7 @@
 	   --pin-scroll of distance, so the scroll-driven starfield surge has room
 	   to be felt before the page moves on to the next section. */
 	.hero-pin {
-		min-height: calc(100svh + var(--pin-scroll, 500px));
+		min-height: calc(100svh + var(--pin-scroll, 650px));
 	}
 	/* Once the button is pushed, release the pin so the (taller) aftermath
 	   content scrolls freely instead of being trapped behind the fold. */
