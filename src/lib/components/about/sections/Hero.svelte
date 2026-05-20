@@ -681,10 +681,10 @@
 					<span class="line line-2">my site.</span>
 				</h1>
 				<p class="aftermath-lede">
-					Well&hellip; that escalated. Since you went and blew the place up, the
-					least you can do is stick around. Tell me your name and what you want
-					to build together — I'll get back to you faster than my poor mascot
-					can find his helmet.
+					Well&hellip; that escalated. I told you not to press the button 🤣.
+					Anyway, now that you've completely destroyed my website, let's build
+					something new together. Let me know your name/email and I'll get back
+					to you.
 				</p>
 
 				<form
@@ -717,7 +717,7 @@
 								required
 								maxlength="100"
 								autocomplete="name"
-								placeholder="Jane Builder"
+								placeholder="Johnny Appleseed"
 								disabled={formState === "sending"}
 							/>
 						</label>
@@ -729,18 +729,18 @@
 								required
 								maxlength="200"
 								autocomplete="email"
-								placeholder="jane@example.com"
+								placeholder="johnny@example.com"
 								disabled={formState === "sending"}
 							/>
 						</label>
 						<label class="field">
-							<span>What should we build?</span>
+							<span>Message</span>
 							<textarea
 								bind:value={message}
 								required
 								maxlength="5000"
 								rows="4"
-								placeholder="Tell me about the project, the dream, or just say hi."
+								placeholder="Tell me about your idea, the dream, or just say hi."
 								disabled={formState === "sending"}
 							></textarea>
 						</label>
@@ -1400,8 +1400,9 @@
 		color: #052028;
 		border: none;
 		border-radius: 999px;
-		font: inherit;
+		font-family: var(--font-sans);
 		font-weight: 800;
+		font-size: 1.2rem;
 		cursor: pointer;
 		box-shadow: 0 10px 30px rgba(0, 242, 195, 0.3);
 		transition:
@@ -1411,7 +1412,6 @@
 	}
 	.send-btn:hover:not(:disabled) {
 		transform: translateY(-2px);
-		box-shadow: 0 14px 40px rgba(0, 242, 195, 0.45);
 	}
 	.send-btn:disabled {
 		opacity: 0.6;
