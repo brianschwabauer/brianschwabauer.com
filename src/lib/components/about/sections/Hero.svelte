@@ -520,8 +520,8 @@
 
 				<p class="lede" data-frag>
 					For as long as I have lived, I have loved to create. I've built
-					startups, developed apps, and produced videos. I live to create. I work
-					to delight.
+					startups, developed apps, and produced videos. I live to create. I
+					work to delight.
 				</p>
 
 				<div class="button-stage" data-frag>
@@ -567,9 +567,9 @@
 				</h1>
 				<p class="aftermath-lede">
 					Well&hellip; that escalated. Since you went and blew the place up, the
-					least you can do is stick around. Tell me your name and what you want to
-					build together — I'll get back to you faster than my poor mascot can
-					find his helmet.
+					least you can do is stick around. Tell me your name and what you want
+					to build together — I'll get back to you faster than my poor mascot
+					can find his helmet.
 				</p>
 
 				<form
@@ -974,18 +974,8 @@
 		position: absolute;
 		inset: 0;
 		border-radius: 999px;
-		background: white;
-		/*background: radial-gradient(
-			circle at 30% 25%,
-			#aaffe8 0%,
-			#00f2c3 35%,
-			#6c63ff 90%
-		);*/
-		/*box-shadow:
-			inset 0 -6px 16px rgba(20, 10, 40, 0.4),
-			inset 0 4px 12px rgba(255, 255, 255, 0.45),
-			0 14px 36px rgba(0, 242, 195, 0.4),
-			0 4px 18px rgba(108, 99, 255, 0.35);*/
+		background-color: rgb(255 255 255 / 0.8);
+		backdrop-filter: blur(10px);
 		transition:
 			background 320ms ease,
 			box-shadow 320ms ease;
@@ -1038,17 +1028,11 @@
 	}
 
 	.boom-btn:hover:not(:disabled) .boom-btn-skin {
-		background: radial-gradient(
-			circle at 30% 25%,
-			#d9fff5 0%,
-			#00f2c3 30%,
-			#8a82ff 95%
-		);
+		transition: none;
+		background-color: white;
 		box-shadow:
-			inset 0 -6px 16px rgba(20, 10, 40, 0.45),
-			inset 0 4px 14px rgba(255, 255, 255, 0.6),
-			0 20px 50px rgba(0, 242, 195, 0.55),
-			0 6px 22px rgba(108, 99, 255, 0.5);
+			0 20px 50px rgba(0, 242, 195, 0.35),
+			0 6px 22px rgba(108, 99, 255, 0.3);
 	}
 	.boom-btn.warn {
 		color: #052028;
