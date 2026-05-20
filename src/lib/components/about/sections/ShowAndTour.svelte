@@ -1,53 +1,131 @@
 <script lang="ts">
-	import SectionShell from '../primitives/SectionShell.svelte';
-	import YearMark from '../primitives/YearMark.svelte';
-	import Reveal from '../primitives/Reveal.svelte';
-	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import MediaGrid from '../primitives/MediaGrid.svelte';
-	import Expandable from '../primitives/Expandable.svelte';
+	import SectionShell from "../primitives/SectionShell.svelte";
+	import YearMark from "../primitives/YearMark.svelte";
+	import Reveal from "../primitives/Reveal.svelte";
+	import LazyMedia from "../primitives/LazyMedia.svelte";
+	import MediaGrid from "../primitives/MediaGrid.svelte";
+	import Expandable from "../primitives/Expandable.svelte";
 
 	const dashboardMockups = [
-		{ src: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_list.avif', caption: 'Project list · dark mode' },
-		{ src: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif', caption: 'Project detail' },
-		{ src: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_client_page.avif', caption: 'Project · client view' },
-		{ src: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_settings_page.avif', caption: 'Settings' },
-		{ src: '2026-01-01_show_and_tour-dashboard_mockup-clients_page_empty.avif', caption: 'Clients (empty state)' },
-		{ src: '2026-01-01_show_and_tour-dashboard_mockup-projects_page_empty.avif', caption: 'Projects (empty state)' },
-		{ src: '2026-01-01_show_and_tour-dashboard_mockup-delivery_page_dark.avif', caption: 'Delivery page · dark' },
-		{ src: '2026-01-01_show_and_tour-dashboard_mockup-media_player.avif', caption: 'Built-in media player' }
+		{
+			src: "2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_list.avif",
+			caption: "Project list · dark mode",
+		},
+		{
+			src: "2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif",
+			caption: "Project detail",
+		},
+		{
+			src: "2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_client_page.avif",
+			caption: "Project · client view",
+		},
+		{
+			src: "2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_settings_page.avif",
+			caption: "Settings",
+		},
+		{
+			src: "2026-01-01_show_and_tour-dashboard_mockup-clients_page_empty.avif",
+			caption: "Clients (empty state)",
+		},
+		{
+			src: "2026-01-01_show_and_tour-dashboard_mockup-projects_page_empty.avif",
+			caption: "Projects (empty state)",
+		},
+		{
+			src: "2026-01-01_show_and_tour-dashboard_mockup-delivery_page_dark.avif",
+			caption: "Delivery page · dark",
+		},
+		{
+			src: "2026-01-01_show_and_tour-dashboard_mockup-media_player.avif",
+			caption: "Built-in media player",
+		},
 	];
 
 	const deliveryPages = [
-		{ src: '2026-01-01_show_and_tour-legacy_delivery_page_screenshot-963_n1950_rd.avif', caption: '963 N 1950 RD · client delivery' },
-		{ src: '2026-01-01_show_and_tour-property_website_screenshot-8700leeboulevard.avif', caption: '8700 Lee Boulevard · property site' },
-		{ src: '2026-01-01_show_and_tour-property_website_screenshot-prairievillageestate.avif', caption: 'Prairie Village Estate · property site' }
+		{
+			src: "2026-01-01_show_and_tour-legacy_delivery_page_screenshot-963_n1950_rd.avif",
+			caption: "963 N 1950 RD · client delivery",
+		},
+		{
+			src: "2026-01-01_show_and_tour-property_website_screenshot-8700leeboulevard.avif",
+			caption: "8700 Lee Boulevard · property site",
+		},
+		{
+			src: "2026-01-01_show_and_tour-property_website_screenshot-prairievillageestate.avif",
+			caption: "Prairie Village Estate · property site",
+		},
 	];
 
 	const brand = [
-		{ src: '2026-01-01_show_and_tour-brand_style_guide-laptop_mockup.avif', caption: 'On a laptop' },
-		{ src: '2026-01-01_show_and_tour-brand_style_guide-app_icon_mockup.avif', caption: 'App icon' },
-		{ src: '2026-01-01_show_and_tour-brand_style_guide-website_mockup.avif', caption: 'Marketing site' },
-		{ src: '2026-01-01_show_and_tour-brand_style_guide-business_card_mockup.avif', caption: 'Business cards' },
-		{ src: '2026-01-01_show_and_tour-brand_style_guide-instagram_ad_mockup.avif', caption: 'Instagram ad' },
-		{ src: '2026-01-01_show_and_tour-brand_style_guide-first_page.avif', caption: 'Brand guide cover' }
+		{
+			src: "2026-01-01_show_and_tour-brand_style_guide-laptop_mockup.avif",
+			caption: "On a laptop",
+		},
+		{
+			src: "2026-01-01_show_and_tour-brand_style_guide-app_icon_mockup.avif",
+			caption: "App icon",
+		},
+		{
+			src: "2026-01-01_show_and_tour-brand_style_guide-website_mockup.avif",
+			caption: "Marketing site",
+		},
+		{
+			src: "2026-01-01_show_and_tour-brand_style_guide-business_card_mockup.avif",
+			caption: "Business cards",
+		},
+		{
+			src: "2026-01-01_show_and_tour-brand_style_guide-instagram_ad_mockup.avif",
+			caption: "Instagram ad",
+		},
+		{
+			src: "2026-01-01_show_and_tour-brand_style_guide-first_page.avif",
+			caption: "Brand guide cover",
+		},
 	];
 
 	const features = [
-		{ title: 'Delivery Pages', text: 'Premium project delivery experiences where clients can download files, pay invoices, and view licensing — all branded as the photographer.' },
-		{ title: 'Property Websites', text: 'MLS-compliant virtual tours and property sites with thoughtful, beautiful layouts.' },
-		{ title: 'Pay-to-Download', text: 'Optional gate that requires clients to pay the invoice before downloading the media. Never get paid late again.' },
-		{ title: 'White-labeled', text: 'Your brand, your domain, your SSL, your terms. We sit invisibly behind it.' },
-		{ title: 'Integrations', text: 'QuickBooks, Stripe, Square. Invoices stay synced across the tools photographers already use.' },
-		{ title: 'Unlimited', text: 'Unlimited property sites, deliveries, and clients. No per-seat math.' }
+		{
+			title: "Delivery Pages",
+			text: "Premium project delivery experiences where clients can download files, pay invoices, and view licensing — all branded as the photographer.",
+		},
+		{
+			title: "Property Websites",
+			text: "MLS-compliant virtual tours and property sites with thoughtful, beautiful layouts.",
+		},
+		{
+			title: "Pay-to-Download",
+			text: "Optional gate that requires clients to pay the invoice before downloading the media. Never get paid late again.",
+		},
+		{
+			title: "White-labeled",
+			text: "Your brand, your domain, your SSL, your terms. We sit invisibly behind it.",
+		},
+		{
+			title: "Integrations",
+			text: "QuickBooks, Stripe, Square. Invoices stay synced across the tools photographers already use.",
+		},
+		{
+			title: "Unlimited",
+			text: "Unlimited property sites, deliveries, and clients. No per-seat math.",
+		},
 	];
 </script>
 
-<SectionShell id="showandtour" year="2019-now" label="Show&Tour · Today" theme="snt">
+<SectionShell
+	id="showandtour"
+	year="2019-now"
+	label="Show&Tour · Today"
+	theme="snt"
+>
 	<div class="snt-bg" aria-hidden="true"></div>
 
 	<div class="container">
 		<Reveal>
-			<YearMark year="2019 → today" subtitle="What I'm building now" color="#00f2c3" />
+			<YearMark
+				year="2019 → today"
+				subtitle="What I'm building now"
+				color="#00f2c3"
+			/>
 		</Reveal>
 
 		<div class="lockup">
@@ -55,26 +133,42 @@
 				<div class="eyebrow">CURRENT FOCUS · CO-FOUNDER</div>
 				<h2 class="title">
 					<span class="snt-mark">
-						<span class="snt-symbol">S&amp;T</span>
+						<img
+							src="https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-logo-icon_flash.svg"
+							alt="Show&Tour Logo"
+						/>
 					</span>
 					Show&amp;Tour
 				</h2>
 				<p class="tagline">The best way to deliver real estate media.</p>
 				<p class="lede">
-					My friend <a href="https://joshmais.com" target="_blank" rel="noopener">Josh</a> and I started
-					Show&amp;Tour in 2019. It's a project delivery platform for real estate photographers — beautiful
-					property websites, branded delivery pages, smart invoicing, and a workflow built around how
-					photographers actually work.
+					<a href="https://joshmais.com" target="_blank" rel="noopener">Josh</a> and
+					I started Show&amp;Tour in 2019. It's a project delivery platform for real
+					estate photographers — beautiful property websites, branded delivery pages,
+					smart invoicing, and a workflow built around how photographers actually
+					work.
 				</p>
 				<p class="lede">
-					This is my full-time job now. We have thousands of users. I'm prouder of this than anything else on
-					this page.
+					This is my full-time job now. We have thousands of users. I'm
+					incredibly proud of what we've built.
 				</p>
 				<div class="cta-row">
-					<a class="cta-primary" href="https://showandtour.com" target="_blank" rel="noopener">
+					<a
+						class="cta-primary"
+						href="https://showandtour.com"
+						target="_blank"
+						rel="noopener"
+					>
 						showandtour.com
 						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+							<path
+								d="M5 12h14M13 6l6 6-6 6"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
 						</svg>
 					</a>
 				</div>
@@ -102,7 +196,7 @@
 				{#each features as f, i}
 					<Reveal variant="up" delay={50 + (i % 3) * 80}>
 						<div class="feature">
-							<div class="feature-num">{String(i + 1).padStart(2, '0')}</div>
+							<div class="feature-num">{String(i + 1).padStart(2, "0")}</div>
 							<div>
 								<h4>{f.title}</h4>
 								<p>{f.text}</p>
@@ -119,7 +213,13 @@
 				<p>Where photographers run their business day to day.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<MediaGrid items={dashboardMockups} min={260} gap={8} ratio="16 / 9" captions={true} />
+				<MediaGrid
+					items={dashboardMockups}
+					min={260}
+					gap={8}
+					ratio="16 / 9"
+					captions={true}
+				/>
 			</Reveal>
 		</div>
 
@@ -129,7 +229,13 @@
 				<p>What the photographer's clients actually see.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<MediaGrid items={deliveryPages} min={300} gap={8} ratio="16 / 9" captions={true} />
+				<MediaGrid
+					items={deliveryPages}
+					min={300}
+					gap={8}
+					ratio="16 / 9"
+					captions={true}
+				/>
 			</Reveal>
 		</div>
 
@@ -138,17 +244,31 @@
 				<h3 class="sub">Brand · the rest</h3>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<MediaGrid items={brand} min={220} gap={8} ratio="4 / 3" captions={true} />
+				<MediaGrid
+					items={brand}
+					min={220}
+					gap={8}
+					ratio="4 / 3"
+					captions={true}
+				/>
 			</Reveal>
 		</div>
 	</div>
 </SectionShell>
 
 <style>
-	:global([data-theme='snt']) {
+	:global([data-theme="snt"]) {
 		background:
-			radial-gradient(circle at 20% 20%, rgba(0, 242, 195, 0.1), transparent 50%),
-			radial-gradient(circle at 80% 80%, rgba(108, 99, 255, 0.08), transparent 50%),
+			radial-gradient(
+				circle at 20% 20%,
+				rgba(0, 242, 195, 0.1),
+				transparent 50%
+			),
+			radial-gradient(
+				circle at 80% 80%,
+				rgba(108, 99, 255, 0.08),
+				transparent 50%
+			),
 			linear-gradient(180deg, #050a0c, #08161a 50%, #050a10);
 		color: #e8faf6;
 	}
@@ -170,7 +290,10 @@
 		z-index: 1;
 	}
 
-	.lockup { margin-bottom: 3rem; max-width: 64rem; }
+	.lockup {
+		margin-bottom: 3rem;
+		max-width: 64rem;
+	}
 	.eyebrow {
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
@@ -194,17 +317,9 @@
 		place-items: center;
 		width: clamp(60px, 9vw, 100px);
 		height: clamp(60px, 9vw, 100px);
-		background: linear-gradient(135deg, #00f2c3, #00d6ff);
 		border-radius: 22px;
-		box-shadow:
-			0 14px 40px rgba(0, 242, 195, 0.4),
-			inset 0 -3px 0 rgba(0, 0, 0, 0.2);
-	}
-	.snt-symbol {
-		color: #052028;
-		font-size: clamp(1.4rem, 2.2vw, 2rem);
-		font-weight: 900;
-		letter-spacing: -0.04em;
+		flex-shrink: 0;
+		padding: 8px;
 	}
 	.tagline {
 		font-family: var(--font-mono);
@@ -241,14 +356,19 @@
 		font-weight: 800;
 		border-radius: 999px;
 		text-decoration: none;
-		transition: transform 200ms ease, box-shadow 200ms ease;
+		transition:
+			transform 200ms ease,
+			box-shadow 200ms ease;
 		box-shadow: 0 10px 30px rgba(0, 242, 195, 0.3);
 	}
 	.cta-primary:hover {
 		transform: translateY(-3px);
 		box-shadow: 0 14px 40px rgba(0, 242, 195, 0.45);
 	}
-	.cta-primary svg { width: 18px; height: 18px; }
+	.cta-primary svg {
+		width: 18px;
+		height: 18px;
+	}
 
 	.hero-shot {
 		position: relative;
@@ -263,17 +383,26 @@
 	.hero-glow {
 		position: absolute;
 		inset: 0;
-		background: radial-gradient(ellipse at center top, rgba(0, 242, 195, 0.16), transparent 60%);
+		background: radial-gradient(
+			ellipse at center top,
+			rgba(0, 242, 195, 0.16),
+			transparent 60%
+		);
 		pointer-events: none;
 	}
 
-	.features { margin: 5rem 0; }
+	.features {
+		margin: 5rem 0;
+	}
 	.sub {
 		font-size: clamp(1.6rem, 3vw, 2.2rem);
 		font-weight: 800;
 		margin: 0 0 0.5rem;
 	}
-	.features p { line-height: 1.55; opacity: 0.9; }
+	.features p {
+		line-height: 1.55;
+		opacity: 0.9;
+	}
 	.features-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -288,7 +417,9 @@
 		background: rgba(0, 242, 195, 0.05);
 		border: 1px solid rgba(0, 242, 195, 0.15);
 		border-radius: 12px;
-		transition: transform 200ms ease, border-color 200ms ease;
+		transition:
+			transform 200ms ease,
+			border-color 200ms ease;
 	}
 	.feature:hover {
 		transform: translateY(-3px);
@@ -312,5 +443,9 @@
 		margin: 0;
 	}
 
-	.dash-block, .delivery-block, .brand-block { margin: 4rem 0; }
+	.dash-block,
+	.delivery-block,
+	.brand-block {
+		margin: 4rem 0;
+	}
 </style>
