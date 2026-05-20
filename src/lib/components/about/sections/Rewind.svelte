@@ -77,35 +77,14 @@
 	</div>
 
 	<div class="container" bind:this={sectionEl}>
-		<Reveal>
-			<div class="eyebrow">
-				<svg viewBox="0 0 24 24" aria-hidden="true">
-					<path
-						d="M11 17l-5-5 5-5M18 17l-5-5 5-5"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-				</svg>
-				<span>Rewinding the tape</span>
-			</div>
-		</Reveal>
-
 		<Reveal variant="up" delay={120}>
-			<h2 class="title">
-				But to understand <span class="grad">where I am now</span>,<br />
-				you have to go back to
-				<span class="grad accent">where it all started</span>.
-			</h2>
+			<h2 class="title">Where it all started.</h2>
 		</Reveal>
 
 		<Reveal variant="up" delay={220}>
 			<p class="lede">
 				Before the startup, the apps, the company &mdash; there was a miniDV
-				camera, a bedroom wall painted green, and a friend named Kevin. Roll it
-				back.
+				camera, a bedroom wall painted green, and a friend named Kevin.
 			</p>
 		</Reveal>
 
@@ -123,22 +102,6 @@
 					<span>{START_YEAR}</span>
 				</div>
 			</div>
-		</Reveal>
-
-		<Reveal variant="up" delay={400}>
-			<button class="cta" type="button" onclick={scrollToOrigin}>
-				<span>Start at the beginning</span>
-				<svg viewBox="0 0 24 24" aria-hidden="true">
-					<path
-						d="M12 4v16M6 14l6 6 6-6"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-				</svg>
-			</button>
 		</Reveal>
 	</div>
 </SectionShell>
@@ -196,26 +159,6 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 1.4rem;
-	}
-	.eyebrow {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.4rem 0.95rem;
-		background: rgba(108, 99, 255, 0.12);
-		border: 1px solid rgba(108, 99, 255, 0.35);
-		border-radius: 999px;
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-		color: #c8c2ff;
-	}
-	.eyebrow svg {
-		width: 14px;
-		height: 14px;
-		color: #c8c2ff;
-		animation: rewind-spin 1.4s ease-in-out infinite;
 	}
 	@keyframes rewind-spin {
 		0%,
