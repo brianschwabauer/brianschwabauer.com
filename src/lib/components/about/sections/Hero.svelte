@@ -29,6 +29,14 @@
 	const SCROLL_EXTRA = 50;
 	const DRAIN_REACH = 1 + SCROLL_EXTRA / STAR_COUNT;
 
+	// Hero content (badge, headline, copy, CTA) parallax: as you scroll into
+	// the pin each item drifts up and fades — staggered, and each at its own
+	// rate so the column gently separates rather than leaving as a block.
+	const FRAG_LIFT = 250; // px the first item travels up before it is gone
+	const FRAG_LIFT_STEP = 0; // each item below travels a little less (parallax)
+	const FRAG_STAGGER = 0.14; // scroll-progress offset between items
+	const FRAG_SPAN = 2; // scroll-progress each item takes to depart
+
 	// the warp tunnel in px of translateZ. Z_NEAR stays well inside the
 	// `perspective` distance so a tile never reaches the projection
 	// singularity (where scale blows up to infinity).
@@ -164,6 +172,8 @@
 
 	let pinRef: HTMLDivElement | undefined;
 	let warpRef: HTMLDivElement | undefined;
+	// the BEFORE content is conditionally rendered, so this ref is reassigned
+	let beforeRef = $state<HTMLDivElement>();
 
 	// ---- the warp loop ------------------------------------------------------
 	// One rAF loop owns the field. It advances every tile's warp position,
@@ -212,6 +222,26 @@
 			s.w = fresh.w;
 			s.rot = fresh.rot;
 			s.drift = fresh.drift;
+		}
+
+		// the hero's badge, headline, copy and CTA drift up and fade as you
+		// scroll into the pin — each on its own stagger and at its own rate, so
+		// the column gently parallaxes apart rather than leaving as a block
+		function applyContentParallax(p: number) {
+			const items = beforeRef?.children;
+			if (!items) return;
+			for (let k = 0; k < items.length; k++) {
+				const el = items[k] as HTMLElement | undefined;
+				if (!el) continue;
+				const local = Math.min(
+					1,
+					Math.max(0, (p - k * FRAG_STAGGER) / FRAG_SPAN),
+				);
+				const e = local * local * (3 - 2 * local); // smoothstep
+				const lift = -e * (FRAG_LIFT - k * FRAG_LIFT_STEP);
+				el.style.transform = `translate3d(0, ${lift.toFixed(1)}px, 0) scale(${(1 - e * 0.04).toFixed(3)})`;
+				el.style.opacity = (1 - e).toFixed(3);
+			}
 		}
 
 		function tick(now: number) {
@@ -315,6 +345,9 @@
 					el.style.filter = v.filter;
 				}
 			}
+
+			// the headline, badge, copy and button parallax with the scroll
+			applyContentParallax(progress);
 
 			raf = heroVisible ? requestAnimationFrame(tick) : 0;
 		}
@@ -559,7 +592,11 @@
 
 		<!-- BEFORE: the original content (badge, headline, lede, button) -->
 		{#if phase !== "aftermath"}
-			<div class="hero-inner before" class:exploding={phase === "boom"}>
+			<div
+				class="hero-inner before"
+				class:exploding={phase === "boom"}
+				bind:this={beforeRef}
+			>
 				<div class="badge" data-frag>
 					<span class="avatar" aria-hidden="true">
 						<img
