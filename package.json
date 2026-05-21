@@ -6,7 +6,8 @@
     "dev": "vite dev",
     "dev:images": "DOCKER_HOST=${DOCKER_HOST:-unix:///var/run/docker.sock} wrangler dev --config wrangler.images.toml --port 8788 --persist-to .wrangler/state",
     "dev:all": "concurrently -n site,images -c cyan,magenta \"pnpm dev\" \"pnpm dev:images\"",
-    "build": "vite build",
+    "build:packages": "pnpm --filter @delightstack/utilities run build && pnpm --filter @delightstack/components run build",
+    "build": "pnpm build:packages && vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
