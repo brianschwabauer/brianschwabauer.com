@@ -2,14 +2,13 @@
  * Proxy /cdn/image/* to the brianschwabauer-images worker via the
  * IMAGE_PROCESSOR service binding. The image worker reads R2 and returns
  * the correct headers (Content-Type, Cache-Control, ETag).
+ *
+ * This route is public and skips auth (see hooks.server.ts) so responses
+ * stay cacheable — no Set-Cookie from a session refresh.
  */
-import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { forwardToImageWorker } from '$lib/server/imageProxy';
 
 export const GET: RequestHandler = async ({ request, platform }) => {
-	if (!platform?.env?.IMAGE_PROCESSOR) {
-		throw error(500, 'IMAGE_PROCESSOR service binding not configured');
-	}
-	const res = await (platform.env.IMAGE_PROCESSOR.fetch as unknown as (req: Request) => Promise<Response>)(request);
-	return res;
+	return forwardToImageWorker(request, platform);
 };
