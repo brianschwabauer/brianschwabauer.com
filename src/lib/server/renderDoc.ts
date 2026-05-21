@@ -112,6 +112,12 @@ function renderNode(node: TipTapNode): string {
 		case 'blogImage':
 			return renderBlogImage(node);
 
+		case 'blogVideo':
+			return renderBlogVideo(node);
+
+		case 'blogAudio':
+			return renderBlogAudio(node);
+
 		default:
 			// Unknown node — render children if any, otherwise drop
 			return renderChildren(node.content);
@@ -253,6 +259,53 @@ function renderBlogImage(node: TipTapNode): string {
 	return `<figure ${figureAttrs}><img ${imgAttrs}>${captionHTML}</figure>`;
 }
 
+// ── blogVideo / blogAudio renderers ─────────────────────────────────────────
+
+const MEDIA_BASE = 'https://cdn.brianschwabauer.com/media';
+
+/**
+ * Emit a `.blog-video` placeholder. The post page (blog/[slug]/+page.svelte)
+ * finds these on mount and hydrates `.blog-video-mount` into a video.js HLS
+ * player; before JS runs, the poster image stands in.
+ */
+function renderBlogVideo(node: TipTapNode): string {
+	const attrs = node.attrs ?? {};
+	const slug = String(attrs.videoSlug ?? '');
+	if (!slug) return '';
+	const title = typeof attrs.title === 'string' ? attrs.title : '';
+	const caption = typeof attrs.caption === 'string' ? attrs.caption.trim() : '';
+	const widthMode = (attrs.widthMode as string) || 'wide';
+	const poster = `${MEDIA_BASE}/${encodeURIComponent(slug)}/poster.jpg`;
+
+	const classes = ['blog-video'];
+	if (caption) classes.push('has-caption');
+	const captionHTML = caption ? `<figcaption>${escapeHTML(caption)}</figcaption>` : '';
+	return (
+		`<figure class="${classes.join(' ')}" data-width-mode="${escapeAttr(widthMode)}"` +
+		` data-video-slug="${escapeAttr(slug)}" data-video-title="${escapeAttr(title)}">` +
+		`<div class="blog-video-mount">` +
+		`<img class="blog-video-poster" src="${escapeAttr(poster)}" alt="${escapeAttr(title)}" loading="lazy" decoding="async">` +
+		`<span class="blog-video-play" aria-hidden="true"></span>` +
+		`</div>${captionHTML}</figure>`
+	);
+}
+
+/** Emit a native `<audio>` player — no hydration needed. */
+function renderBlogAudio(node: TipTapNode): string {
+	const attrs = node.attrs ?? {};
+	const src = String(attrs.src ?? '');
+	if (!src) return '';
+	const title = typeof attrs.title === 'string' ? attrs.title.trim() : '';
+	const caption = typeof attrs.caption === 'string' ? attrs.caption.trim() : '';
+	const titleHTML = title ? `<span class="blog-audio-title">${escapeHTML(title)}</span>` : '';
+	const captionHTML = caption ? `<figcaption>${escapeHTML(caption)}</figcaption>` : '';
+	return (
+		`<figure class="blog-audio">${titleHTML}` +
+		`<audio controls preload="metadata" src="${escapeAttr(src)}"></audio>` +
+		`${captionHTML}</figure>`
+	);
+}
+
 // ── plain text walker (for AI summary + search index) ───────────────────────
 
 function walkText(node: TipTapDoc | TipTapNode, out: string[]): void {
@@ -272,6 +325,14 @@ function walkText(node: TipTapDoc | TipTapNode, out: string[]): void {
 			const alt = attrs?.alt;
 			if (typeof alt === 'string' && alt) out.push(` ${alt} `);
 		}
+		return;
+	}
+	if (node.type === 'blogVideo' || node.type === 'blogAudio') {
+		const attrs = (node as TipTapNode).attrs;
+		const title = attrs?.title;
+		const caption = attrs?.caption;
+		if (typeof title === 'string' && title) out.push(` ${title} `);
+		if (typeof caption === 'string' && caption) out.push(` ${caption} `);
 		return;
 	}
 	const content = (node as TipTapNode).content;
