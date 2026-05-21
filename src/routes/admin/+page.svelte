@@ -27,7 +27,7 @@
 	let query = $state('');
 	let statusFilter = $state<StatusFilter>('all');
 	let tagFilter = $state<string>('');
-	let sortKey = $state<SortKey>('updated-desc');
+	let sortKey = $state<SortKey>('date-desc');
 	let busySlug = $state<string | null>(null);
 	let actionError = $state<string | null>(null);
 
