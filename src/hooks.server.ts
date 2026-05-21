@@ -8,8 +8,12 @@ import { sequence } from '@sveltejs/kit/hooks';
 // `cloudflare:workers` module — keeping Vite's SSR build clean.
 
 const authHandle: Handle = async ({ event, resolve }) => {
+	// Skip auth for public asset routes. /cdn/* in particular must not run
+	// Auth.js: a session refresh would add Set-Cookie and make image
+	// responses uncacheable (and previously 500'd on immutable headers).
 	if (
 		event.url.pathname.startsWith('/_app') ||
+		event.url.pathname.startsWith('/cdn/') ||
 		event.url.pathname.startsWith('/favicon') ||
 		event.url.pathname.startsWith('/brandmark') ||
 		event.url.pathname.startsWith('/logo')
