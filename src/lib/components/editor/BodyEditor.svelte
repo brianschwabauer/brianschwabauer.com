@@ -695,14 +695,18 @@
 		border-radius: 4px;
 	}
 
-	/* ── BlogVideo / BlogAudio (in-editor) ──────────────────────────────── */
-	.body-host :global(figure.blog-video),
-	.body-host :global(figure.blog-audio) {
+	/* ── BlogVideo (in-editor) — horizontal resize, mirrors BlogImage ────── */
+	.body-host :global(figure.blog-video) {
+		position: relative;
 		margin: var(--space-8) auto;
+		display: block;
 	}
 
 	.body-host :global(figure.blog-video[data-width-mode='normal']) {
+		width: var(--blog-video-pct, 100%);
 		max-width: var(--measure);
+		margin-left: auto;
+		margin-right: auto;
 	}
 	.body-host :global(figure.blog-video[data-width-mode='wide']) {
 		width: var(--prose-wide);
@@ -715,6 +719,21 @@
 		max-width: 100vw;
 		margin-left: 50%;
 		transform: translateX(-50%);
+	}
+
+	/* While dragging a side handle, width tracks the cursor via a pixel var. */
+	.body-host :global(figure.blog-video.is-dragging) {
+		width: var(--blog-video-drag-px) !important;
+		max-width: 100vw !important;
+		margin-left: 50% !important;
+		margin-right: 0 !important;
+		transform: translateX(-50%) !important;
+	}
+	.body-host :global(figure.blog-video.is-snapping) {
+		transition: width 280ms cubic-bezier(0.34, 1.2, 0.64, 1);
+		margin-left: 50% !important;
+		margin-right: 0 !important;
+		transform: translateX(-50%) !important;
 	}
 
 	.body-host :global(figure.blog-video .blog-video-mount) {
@@ -743,6 +762,7 @@
 		border-radius: 50%;
 		background: rgba(0, 0, 0, 0.55);
 		border: 1.5px solid rgba(255, 255, 255, 0.9);
+		pointer-events: none;
 	}
 	.body-host :global(figure.blog-video .blog-video-play::before) {
 		content: '';
@@ -754,16 +774,101 @@
 		border-width: 11px 0 11px 18px;
 		border-color: transparent transparent transparent #fff;
 	}
-	.body-host :global(figure.blog-video figcaption),
-	.body-host :global(figure.blog-audio figcaption) {
-		margin-top: var(--space-2);
-		font-size: var(--text-sm);
-		color: var(--color-text-muted);
-		text-align: center;
+
+	/* Side resize handles — shown on hover / selection. */
+	.body-host :global(figure.blog-video .blog-video-handle) {
+		position: absolute;
+		top: 50%;
+		width: 14px;
+		height: 60px;
+		transform: translateY(-50%);
+		background: rgba(0, 0, 0, 0.5);
+		border-radius: var(--radius-sm);
+		cursor: ew-resize;
+		opacity: 0;
+		transition: opacity 150ms ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		touch-action: none;
+		z-index: 2;
+	}
+	.body-host :global(figure.blog-video .blog-video-handle::before) {
+		content: '';
+		width: 2px;
+		height: 24px;
+		background: white;
+		border-radius: 1px;
+	}
+	.body-host :global(figure.blog-video .blog-video-handle-left) {
+		left: 6px;
+	}
+	.body-host :global(figure.blog-video .blog-video-handle-right) {
+		right: 6px;
+	}
+	.body-host :global(figure.blog-video:hover .blog-video-handle),
+	.body-host :global(figure.blog-video.is-selected .blog-video-handle) {
+		opacity: 1;
 	}
 
+	/* Width-mode toolbar — appears above the figure when selected. */
+	.body-host :global(figure.blog-video .blog-video-toolbar) {
+		position: absolute;
+		top: -40px;
+		left: 50%;
+		transform: translateX(-50%);
+		display: flex;
+		align-items: center;
+		gap: 2px;
+		padding: 4px;
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-md);
+		box-shadow: var(--shadow-lg);
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 150ms ease;
+		z-index: 3;
+	}
+	.body-host :global(figure.blog-video.is-selected .blog-video-toolbar) {
+		opacity: 1;
+		pointer-events: auto;
+	}
+	.body-host :global(figure.blog-video .blog-video-toolbar button) {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 26px;
+		padding: 0;
+		border: none;
+		border-radius: var(--radius-sm);
+		background: transparent;
+		color: var(--color-text);
+		cursor: pointer;
+	}
+	.body-host :global(figure.blog-video .blog-video-toolbar button svg) {
+		width: 18px;
+		height: 18px;
+	}
+	.body-host :global(figure.blog-video .blog-video-toolbar button:hover) {
+		background: var(--color-bg-secondary);
+	}
+	.body-host :global(figure.blog-video .blog-video-toolbar button.is-active) {
+		background: var(--color-accent);
+		color: white;
+	}
+
+	.body-host :global(figure.blog-video.is-selected) {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 4px;
+		border-radius: 4px;
+	}
+
+	/* ── BlogAudio (in-editor) ──────────────────────────────────────────── */
 	.body-host :global(figure.blog-audio) {
 		max-width: var(--measure);
+		margin: var(--space-8) auto;
 		padding: var(--space-4);
 		background: var(--color-bg-secondary);
 		border: 1px solid var(--color-border);
@@ -780,7 +885,14 @@
 		display: block;
 	}
 
-	.body-host :global(figure.blog-video.ProseMirror-selectednode),
+	.body-host :global(figure.blog-video figcaption),
+	.body-host :global(figure.blog-audio figcaption) {
+		margin-top: var(--space-2);
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
+		text-align: center;
+	}
+
 	.body-host :global(figure.blog-audio.ProseMirror-selectednode) {
 		outline: 2px solid var(--color-accent);
 		outline-offset: 4px;
