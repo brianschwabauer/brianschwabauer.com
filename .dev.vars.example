@@ -1,3 +1,7 @@
+# Copy this file to .dev.vars and fill in real values for local development.
+# .dev.vars is gitignored. In production these are set as Cloudflare secrets
+# (wrangler secret put NAME) or [vars] — see README.md.
+
 # Auth.js secret (generate with: openssl rand -base64 32)
 AUTH_SECRET=your-32-character-secret-here
 
@@ -7,3 +11,12 @@ AUTH_GOOGLE_SECRET=your-google-client-secret
 
 # Anthropic API (get at https://console.anthropic.com/settings/keys)
 ANTHROPIC_API_KEY=your-anthropic-api-key
+
+# Comma-separated list of emails allowed into the /admin dashboard.
+# If unset, nobody is treated as an admin.
+ADMIN_EMAILS=you@example.com
+
+# Contact form: the verified sender and the inbox that receives submissions.
+# Must be addresses configured for Cloudflare Email Routing on the domain.
+CONTACT_FROM_EMAIL=contact@brianschwabauer.com
+CONTACT_TO_EMAIL=brian@brianschwabauer.com
