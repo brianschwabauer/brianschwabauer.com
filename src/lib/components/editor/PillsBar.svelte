@@ -103,7 +103,7 @@
 		const term = tagInput.trim().toLowerCase();
 		const usedKeys = new Set(tags.map((t) => t.toLowerCase()));
 		const available = tagSuggestions.filter((s) => !usedKeys.has(s.toLowerCase()));
-		if (!term) return available.slice(0, 8);
+		if (!term) return available;
 		const starts: string[] = [];
 		const contains: string[] = [];
 		for (const s of available) {
@@ -111,7 +111,7 @@
 			if (lower.startsWith(term)) starts.push(s);
 			else if (lower.includes(term)) contains.push(s);
 		}
-		return [...starts, ...contains].slice(0, 8);
+		return [...starts, ...contains];
 	});
 
 	$effect(() => {
