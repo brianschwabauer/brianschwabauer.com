@@ -19,12 +19,13 @@ export async function forwardToImageWorker(
 	if (!platform?.env?.IMAGE_PROCESSOR) {
 		throw error(500, 'IMAGE_PROCESSOR service binding not configured');
 	}
-	// Cloudflare's Fetcher exposes its own Response type that's runtime-compatible
-	// with the global one but not assignable through TS. Cast through unknown.
-	const fetcher = platform.env.IMAGE_PROCESSOR.fetch as unknown as (
-		req: Request
-	) => Promise<Response>;
-	const upstream = await fetcher(request);
+	// Call .fetch inline as a method so `this` stays bound to the service
+	// binding. Assigning it to a variable first detaches `this` and throws
+	// "Illegal invocation" at runtime. Cloudflare's Fetcher Response type is
+	// not TS-assignable to the global one, so cast through unknown.
+	const upstream = await (
+		platform.env.IMAGE_PROCESSOR.fetch as unknown as (req: Request) => Promise<Response>
+	)(request);
 	return new Response(upstream.body, {
 		status: upstream.status,
 		statusText: upstream.statusText,
