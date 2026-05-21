@@ -275,14 +275,17 @@ function renderBlogVideo(node: TipTapNode): string {
 	const title = typeof attrs.title === 'string' ? attrs.title : '';
 	const caption = typeof attrs.caption === 'string' ? attrs.caption.trim() : '';
 	const widthMode = (attrs.widthMode as string) || 'wide';
+	const widthPct = Number(attrs.widthPct) || 100;
 	const poster = `${MEDIA_BASE}/${encodeURIComponent(slug)}/poster.jpg`;
 
 	const classes = ['blog-video'];
 	if (caption) classes.push('has-caption');
 	const captionHTML = caption ? `<figcaption>${escapeHTML(caption)}</figcaption>` : '';
+	const styleAttr = widthMode === 'normal' ? ` style="--blog-video-pct: ${widthPct}%"` : '';
 	return (
 		`<figure class="${classes.join(' ')}" data-width-mode="${escapeAttr(widthMode)}"` +
-		` data-video-slug="${escapeAttr(slug)}" data-video-title="${escapeAttr(title)}">` +
+		` data-width-pct="${widthPct}" data-video-slug="${escapeAttr(slug)}"` +
+		` data-video-title="${escapeAttr(title)}"${styleAttr}>` +
 		`<div class="blog-video-mount">` +
 		`<img class="blog-video-poster" src="${escapeAttr(poster)}" alt="${escapeAttr(title)}" loading="lazy" decoding="async">` +
 		`<span class="blog-video-play" aria-hidden="true"></span>` +

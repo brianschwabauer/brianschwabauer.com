@@ -399,6 +399,7 @@
 	}
 
 	.post-content :global(figure.blog-video[data-width-mode='normal']) {
+		width: var(--blog-video-pct, 100%);
 		max-width: var(--measure);
 		margin-left: auto;
 		margin-right: auto;

@@ -14,6 +14,7 @@
  * straight from renderHTML below (no node view needed — the node is an atom).
  */
 import { Node, mergeAttributes } from '@tiptap/core';
+import { createBlogVideoNodeView } from './BlogVideoNodeView';
 
 const MEDIA_BASE = 'https://cdn.brianschwabauer.com/media';
 
@@ -27,6 +28,8 @@ export interface BlogVideoAttrs {
 	title: string | null;
 	caption: string | null;
 	widthMode: VideoWidthMode;
+	/** 30–100 — percentage of the text column, only meaningful in 'normal' mode. */
+	widthPct: number;
 }
 
 declare module '@tiptap/core' {
@@ -54,6 +57,11 @@ export const BlogVideo = Node.create({
 				default: 'wide',
 				parseHTML: (el) => (el.dataset.widthMode as VideoWidthMode) || 'wide',
 				renderHTML: (attrs) => ({ 'data-width-mode': attrs.widthMode }),
+			},
+			widthPct: {
+				default: 100,
+				parseHTML: (el) => Number(el.dataset.widthPct) || 100,
+				renderHTML: (attrs) => ({ 'data-width-pct': String(attrs.widthPct ?? 100) }),
 			},
 		};
 	},
@@ -111,8 +119,12 @@ export const BlogVideo = Node.create({
 				({ commands }) =>
 					commands.insertContent({
 						type: this.name,
-						attrs: { title: null, caption: null, widthMode: 'wide', ...attrs },
+						attrs: { title: null, caption: null, widthMode: 'wide', widthPct: 100, ...attrs },
 					}),
 		};
+	},
+
+	addNodeView() {
+		return createBlogVideoNodeView();
 	},
 });
