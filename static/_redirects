@@ -1,0 +1,4 @@
+# Legacy blog URL scheme.
+# The pre-2026 brianschwabauer.com site served posts at /blog/YYYY/MM/slug;
+# the new site uses /blog/slug. Preserve inbound links / SEO with 301s.
+/blog/:year/:month/:slug  /blog/:slug  301

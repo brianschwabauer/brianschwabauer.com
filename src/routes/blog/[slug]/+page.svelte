@@ -1,9 +1,37 @@
 <script lang="ts">
+	import { onMount, mount, unmount } from 'svelte';
 	import { Button } from '@delightstack/components/actions';
 	import { page } from '$app/stores';
 	import { bgStyle } from '$lib/client/images';
+	import VideoPlayer from '$lib/components/about/primitives/VideoPlayer.svelte';
 
 	let { data } = $props();
+
+	// The post body is server-rendered HTML ({@html} below). renderDoc emits
+	// `<figure class="blog-video">` placeholders for embedded HLS videos; here
+	// we find them after mount and hydrate each into a video.js player.
+	let contentEl = $state<HTMLElement | undefined>();
+
+	onMount(() => {
+		const root = contentEl;
+		if (!root) return;
+		const players: Array<Record<string, unknown>> = [];
+		for (const fig of root.querySelectorAll<HTMLElement>('figure.blog-video')) {
+			const slug = fig.dataset.videoSlug;
+			const target = fig.querySelector<HTMLElement>('.blog-video-mount');
+			if (!slug || !target) continue;
+			target.replaceChildren();
+			players.push(
+				mount(VideoPlayer, {
+					target,
+					props: { slug, title: fig.dataset.videoTitle || '', ratio: '16 / 9' }
+				})
+			);
+		}
+		return () => {
+			for (const player of players) unmount(player);
+		};
+	});
 
 	function formatDate(date: number | null | undefined) {
 		if (!date) return '';
@@ -94,7 +122,7 @@
 			</figure>
 		{/if}
 
-		<div class="post-content prose">
+		<div class="post-content prose" bind:this={contentEl}>
 			{@html data.contentHtml}
 		</div>
 
@@ -360,5 +388,106 @@
 
 	.post-content :global(figure.blog-img[data-width-mode='full'] figcaption) {
 		border-radius: 0;
+	}
+
+	/* ── BlogVideo (HLS embed) ────────────────────────────────────────────
+	   Three width modes mirror BlogImage. `.blog-video-mount` is the poster
+	   placeholder shown until blog/[slug] hydrates a video.js player into it. */
+	.post-content :global(figure.blog-video) {
+		margin: var(--space-10) auto;
+		display: block;
+	}
+
+	.post-content :global(figure.blog-video[data-width-mode='normal']) {
+		max-width: var(--measure);
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.post-content :global(figure.blog-video[data-width-mode='wide']) {
+		width: var(--prose-wide);
+		max-width: calc(100vw - 2rem);
+		margin-left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.post-content :global(figure.blog-video[data-width-mode='full']) {
+		width: 100vw;
+		max-width: 100vw;
+		margin-left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.post-content :global(figure.blog-video .blog-video-mount) {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		background: #000;
+		border-radius: var(--radius-lg);
+		overflow: hidden;
+	}
+
+	.post-content :global(figure.blog-video[data-width-mode='full'] .blog-video-mount) {
+		border-radius: 0;
+	}
+
+	.post-content :global(figure.blog-video .blog-video-poster) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.post-content :global(figure.blog-video .blog-video-play) {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 72px;
+		height: 72px;
+		transform: translate(-50%, -50%);
+		border-radius: 50%;
+		background: rgba(0, 0, 0, 0.5);
+		border: 1.5px solid rgba(255, 255, 255, 0.9);
+	}
+
+	.post-content :global(figure.blog-video .blog-video-play::before) {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 54%;
+		transform: translate(-50%, -50%);
+		border-style: solid;
+		border-width: 12px 0 12px 20px;
+		border-color: transparent transparent transparent #fff;
+	}
+
+	.post-content :global(figure.blog-video figcaption),
+	.post-content :global(figure.blog-audio figcaption) {
+		margin-top: var(--space-3);
+		font-size: 0.9375rem;
+		line-height: 1.4;
+		color: var(--color-text-muted);
+		text-align: center;
+	}
+
+	/* ── BlogAudio (native <audio>) ─────────────────────────────────────── */
+	.post-content :global(figure.blog-audio) {
+		max-width: var(--measure);
+		margin: var(--space-10) auto;
+		padding: var(--space-4);
+		background: var(--color-bg-secondary);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+	}
+
+	.post-content :global(figure.blog-audio .blog-audio-title) {
+		display: block;
+		font-weight: 600;
+		font-size: 0.9375rem;
+		margin-bottom: var(--space-2);
+		color: var(--color-text-secondary);
+	}
+
+	.post-content :global(figure.blog-audio audio) {
+		width: 100%;
+		display: block;
 	}
 </style>

@@ -40,3 +40,8 @@ TODO.md
 
 # Media Directory (these files are stored in R2 bucket)
 /media/
+
+# Legacy blog migration — old-site content + one-off migration tooling.
+# Content is uploaded to R2/KV directly and intentionally not committed.
+/legacy-content/
+/scripts/legacy-migrate/

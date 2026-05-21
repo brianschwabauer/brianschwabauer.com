@@ -5,6 +5,8 @@
 	import Heading from '@tiptap/extension-heading';
 	import Link from '@tiptap/extension-link';
 	import { BlogImage } from './extensions/BlogImage';
+	import { BlogVideo } from './extensions/BlogVideo';
+	import { BlogAudio } from './extensions/BlogAudio';
 	import { imageDropHandler, recordToBlogImageAttrs } from './extensions/imageDropHandler';
 	import { SlashCommand } from './extensions/slashCommand';
 	import { TrailingParagraph } from './extensions/trailingParagraph';
@@ -107,6 +109,8 @@
 				ShiftedHeading,
 				Link.configure({ openOnClick: false }),
 				BlogImage,
+				BlogVideo,
+				BlogAudio,
 				TrailingParagraph,
 				imageDropHandler.configure({
 					onUploadError: (err, file) => {
@@ -686,6 +690,98 @@
 	}
 
 	.body-host :global(figure.blog-img.is-selected) {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 4px;
+		border-radius: 4px;
+	}
+
+	/* ── BlogVideo / BlogAudio (in-editor) ──────────────────────────────── */
+	.body-host :global(figure.blog-video),
+	.body-host :global(figure.blog-audio) {
+		margin: var(--space-8) auto;
+	}
+
+	.body-host :global(figure.blog-video[data-width-mode='normal']) {
+		max-width: var(--measure);
+	}
+	.body-host :global(figure.blog-video[data-width-mode='wide']) {
+		width: var(--prose-wide);
+		max-width: calc(100vw - 2rem);
+		margin-left: 50%;
+		transform: translateX(-50%);
+	}
+	.body-host :global(figure.blog-video[data-width-mode='full']) {
+		width: 100vw;
+		max-width: 100vw;
+		margin-left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.body-host :global(figure.blog-video .blog-video-mount) {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		background: #000;
+		border-radius: var(--radius-md);
+		overflow: hidden;
+	}
+	.body-host :global(figure.blog-video[data-width-mode='full'] .blog-video-mount) {
+		border-radius: 0;
+	}
+	.body-host :global(figure.blog-video .blog-video-poster) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		opacity: 0.9;
+	}
+	.body-host :global(figure.blog-video .blog-video-play) {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 64px;
+		height: 64px;
+		transform: translate(-50%, -50%);
+		border-radius: 50%;
+		background: rgba(0, 0, 0, 0.55);
+		border: 1.5px solid rgba(255, 255, 255, 0.9);
+	}
+	.body-host :global(figure.blog-video .blog-video-play::before) {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 54%;
+		transform: translate(-50%, -50%);
+		border-style: solid;
+		border-width: 11px 0 11px 18px;
+		border-color: transparent transparent transparent #fff;
+	}
+	.body-host :global(figure.blog-video figcaption),
+	.body-host :global(figure.blog-audio figcaption) {
+		margin-top: var(--space-2);
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
+		text-align: center;
+	}
+
+	.body-host :global(figure.blog-audio) {
+		max-width: var(--measure);
+		padding: var(--space-4);
+		background: var(--color-bg-secondary);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-md);
+	}
+	.body-host :global(figure.blog-audio .blog-audio-title) {
+		display: block;
+		font-weight: 600;
+		font-size: var(--text-sm);
+		margin-bottom: var(--space-2);
+	}
+	.body-host :global(figure.blog-audio audio) {
+		width: 100%;
+		display: block;
+	}
+
+	.body-host :global(figure.blog-video.ProseMirror-selectednode),
+	.body-host :global(figure.blog-audio.ProseMirror-selectednode) {
 		outline: 2px solid var(--color-accent);
 		outline-offset: 4px;
 		border-radius: 4px;
