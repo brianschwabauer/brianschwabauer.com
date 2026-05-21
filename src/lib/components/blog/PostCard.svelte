@@ -23,10 +23,7 @@
 <article class="post-card">
 	<a href="/blog/{post.slug}" class="post-link">
 		{#if post.featuredImage}
-			<div
-				class="post-image"
-				style={bgStyle(post.featuredImage)}
-				style:aspect-ratio={post.featuredImage.aspect_ratio || 16 / 9}>
+			<div class="post-image" style={bgStyle(post.featuredImage)}>
 				<img
 					src={thumbnailURL(post.featuredImage)}
 					alt={post.featuredImage.alt_text ?? ''}
@@ -89,6 +86,7 @@
 
 	.post-image {
 		width: 100%;
+		aspect-ratio: 2.35 / 1;
 		overflow: hidden;
 		border-bottom: 1px solid var(--color-border);
 	}
