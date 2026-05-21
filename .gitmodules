@@ -1,3 +1,4 @@
 [submodule "delightstack"]
 	path = delightstack
-	url = /home/brian/Work/delightstack
+	url = https://github.com/brianschwabauer/delightstack.git
+	branch = main

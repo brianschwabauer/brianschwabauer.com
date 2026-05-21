@@ -1,5 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { rateLimit } from '$lib/server/rateLimit';
 
 function escapeHeader(value: string): string {
 	return value.replace(/[\r\n]/g, ' ').trim();
@@ -28,7 +29,20 @@ function buildMime(opts: {
 	].join('\r\n');
 }
 
-export const POST: RequestHandler = async ({ request, platform }) => {
+export const POST: RequestHandler = async ({ request, platform, getClientAddress }) => {
+	const env = platform?.env;
+	if (!env?.SEND_EMAIL || !env.CONTACT_FROM_EMAIL || !env.CONTACT_TO_EMAIL) {
+		console.error('Email binding or addresses not configured');
+		throw error(500, 'Email service not configured');
+	}
+
+	// The contact form is unauthenticated — throttle by client IP so it can't
+	// be scripted to flood the destination inbox. 5 messages per 10 minutes.
+	if (env.KV) {
+		const { ok } = await rateLimit(env.KV, `contact:${getClientAddress()}`, 5, 600);
+		if (!ok) throw error(429, 'Too many messages sent. Please try again later.');
+	}
+
 	const { name, email, message } = await request.json();
 
 	if (!name || typeof name !== 'string' || name.length > 100) throw error(400, 'Invalid name');
@@ -37,12 +51,6 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 	}
 	if (!message || typeof message !== 'string' || message.length > 5000) {
 		throw error(400, 'Invalid message');
-	}
-
-	const env = platform?.env;
-	if (!env?.SEND_EMAIL || !env.CONTACT_FROM_EMAIL || !env.CONTACT_TO_EMAIL) {
-		console.error('Email binding or addresses not configured');
-		throw error(500, 'Email service not configured');
 	}
 
 	const cleanName = name.trim();

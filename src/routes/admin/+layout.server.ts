@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import { loadAdminData } from '$lib/server/adminData';
 
@@ -6,6 +6,12 @@ export const load: LayoutServerLoad = async ({ locals, url, platform }) => {
 	if (!locals.session) {
 		const target = `${url.pathname}${url.search}`;
 		throw redirect(303, `/signin?redirect=${encodeURIComponent(target)}`);
+	}
+	// A valid session is not enough — only configured admins (ADMIN_EMAILS)
+	// may reach the dashboard. The role is set by the auth JWT callback.
+	const role = (locals.session.user as { role?: string } | undefined)?.role;
+	if (role !== 'admin') {
+		throw error(403, 'You do not have access to this area.');
 	}
 	const adminData = platform?.env?.KV
 		? await loadAdminData(platform.env.KV)
