@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { BlogPostMeta } from "$lib/server/blog";
 	import { bgStyle, thumbnailURL } from "$lib/client/images";
+	import { formatPostDate, isoPostDate } from "$lib/utils/date";
 	import { ripple } from "@delightstack/utilities";
 
 	interface Props {
@@ -8,15 +9,6 @@
 	}
 
 	let { post }: Props = $props();
-
-	function formatDate(date: number | null | undefined) {
-		if (!date) return "";
-		return new Date(date).toLocaleDateString("en-US", {
-			month: "long",
-			day: "numeric",
-			year: "numeric",
-		});
-	}
 
 	const summary = $derived(post.summary ?? post.aiSummary ?? "");
 </script>
@@ -39,7 +31,9 @@
 		{/if}
 		<div class="post-body">
 			<div class="post-meta">
-				<time class="post-date">{formatDate(post.publishedAt)}</time>
+				<time class="post-date" datetime={isoPostDate(post.publishedAt)}
+					>{formatPostDate(post.publishedAt)}</time
+				>
 			</div>
 
 			<h2
