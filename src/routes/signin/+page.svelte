@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { signIn } from '@auth/sveltekit/client';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { Button } from '@delightstack/components/actions';
 
 	const callbackUrl = $derived.by(() => {
-		const raw = $page.url.searchParams.get('redirect');
+		const raw = page.url.searchParams.get('redirect');
 		// Only accept same-origin relative paths to prevent open-redirect.
 		if (raw && raw.startsWith('/') && !raw.startsWith('//')) return raw;
 		return '/admin';

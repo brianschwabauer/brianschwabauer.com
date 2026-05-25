@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import PostCard from '$lib/components/blog/PostCard.svelte';
 	import FeaturedPostCard from '$lib/components/blog/FeaturedPostCard.svelte';
@@ -16,7 +16,7 @@
 	 * deleted tag), we keep the raw URL value as the label so the active
 	 * chip is still visible — clicking "All Posts" clears it.
 	 */
-	const activeTagParam = $derived($page.url.searchParams.get('tag') || null);
+	const activeTagParam = $derived(page.url.searchParams.get('tag') || null);
 	const activeTag = $derived.by(() => {
 		if (!activeTagParam) return null;
 		const key = activeTagParam.toLowerCase();
@@ -29,7 +29,7 @@
 	});
 
 	function setActiveTag(tag: string | null) {
-		const url = new URL($page.url);
+		const url = new URL(page.url);
 		if (tag) url.searchParams.set('tag', tag);
 		else url.searchParams.delete('tag');
 		goto(url, { keepFocus: true, noScroll: true });

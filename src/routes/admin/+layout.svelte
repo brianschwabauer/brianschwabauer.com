@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { Button } from '@delightstack/components/actions';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	let { data, children } = $props();
 
 	const isAdmin = $derived((data.session?.user as { role?: string })?.role === 'admin');
 	// The post editor manages its own chrome and full-bleed layout, so the
 	// shared admin wrapper opts out of its padding/max-width on that route.
-	const isPostEditor = $derived($page.url.pathname.startsWith('/admin/blog/'));
+	const isPostEditor = $derived(page.url.pathname.startsWith('/admin/blog/'));
 </script>
 
 {#if !isAdmin}

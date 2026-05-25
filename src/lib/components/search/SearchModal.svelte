@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { create, load, search, type AnyOrama, type Results } from '@orama/orama';
 	import { entryLabel, indexSchema, type SearchEntry } from '$lib/search';
 	import { bgStyle, thumbnailURL } from '$lib/client/images';
@@ -164,7 +164,7 @@
 		if (hit.type === 'home') {
 			const hashIndex = hit.url.indexOf('#');
 			const id = hashIndex >= 0 ? hit.url.slice(hashIndex + 1) : '';
-			if ($page.url.pathname !== '/') {
+			if (page.url.pathname !== '/') {
 				await goto('/' + (id ? `#${id}` : ''));
 				await tick();
 				requestAnimationFrame(() => scrollToId(id));
