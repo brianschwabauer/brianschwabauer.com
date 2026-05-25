@@ -10,6 +10,7 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 	const entries: string[] = [
 		`\t<url>\n\t\t<loc>${siteUrl}/</loc>\n\t\t<priority>1.0</priority>\n\t</url>`,
 		`\t<url>\n\t\t<loc>${siteUrl}/blog</loc>\n\t\t<priority>0.8</priority>\n\t</url>`,
+		`\t<url>\n\t\t<loc>${siteUrl}/contact</loc>\n\t\t<priority>0.7</priority>\n\t</url>`,
 		...posts.map((post) => {
 			const lastmod = new Date(
 				post.updatedAt || post.publishedAt || post.createdAt
