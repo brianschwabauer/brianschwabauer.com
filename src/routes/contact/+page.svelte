@@ -284,7 +284,7 @@
 	}
 	@media (min-width: 768px) {
 		.contact-page {
-			padding: var(--space-16) var(--space-8) var(--space-24);
+			padding: var(--space-12) var(--space-8) var(--space-24);
 		}
 	}
 
