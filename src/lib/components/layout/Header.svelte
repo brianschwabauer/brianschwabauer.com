@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ThemeToggle } from "@delightstack/components/actions";
+	import { ripple } from "@delightstack/utilities";
 	import { page } from "$app/stores";
 	import { hideHeaderLogo, searchOpen } from "$lib/stores/navState";
 	import SearchModal from "$lib/components/search/SearchModal.svelte";
@@ -60,22 +61,23 @@
 			href="/"
 			class="logo"
 			class:hidden={logoHidden}
+			class:on-dark={invertLogo}
 			onclick={handleLogoClick}
-			aria-label="Brian Schwabauer — back to top"
+			aria-label={onRootPage
+				? "Brian Schwabauer — back to top"
+				: "Brian Schwabauer — go to homepage"}
+			aria-current={onRootPage ? "page" : undefined}
 			tabindex={logoHidden ? -1 : 0}
 		>
 			<img
 				src="/logo.svg"
-				alt="Brian Schwabauer"
+				alt=""
 				class="logo-img"
 				class:invert={invertLogo}
 			/>
 		</a>
 
 		<div class="header-actions">
-			{#if !onRootPage}
-				<a href="/" class="nav-link" class:on-dark={invertLogo}>Home</a>
-			{/if}
 			{#if showThemeToggle}
 				<ThemeToggle />
 			{/if}
@@ -85,6 +87,7 @@
 				class:on-dark={invertLogo}
 				class:active={onBlogPage}
 				aria-current={onBlogPage ? "page" : undefined}
+				{@attach ripple({ zIndex: 1 })}
 			>
 				Blog
 			</a>
@@ -95,6 +98,7 @@
 				onclick={() => ($searchOpen = true)}
 				aria-label="Search the site"
 				title="Search (⌘K)"
+				{@attach ripple({ zIndex: 1 })}
 			>
 				<svg
 					viewBox="0 0 24 24"
@@ -163,10 +167,31 @@
 		font-size: var(--text-xl);
 		color: var(--color-text);
 		text-decoration: none;
+		border-radius: 8px;
+		padding: 4px 6px;
+		margin: -4px -6px;
 		transition:
 			opacity 200ms ease,
 			transform 200ms ease,
+			background-color var(--transition-fast),
+			box-shadow var(--transition-fast),
 			visibility 0s linear 0s;
+	}
+	.logo:hover .logo-img {
+		transform: scale(1.04);
+	}
+	.logo:active .logo-img {
+		transform: scale(0.97);
+	}
+	.logo:focus {
+		outline: none;
+	}
+	.logo:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
+	.logo.on-dark:focus-visible {
+		outline-color: rgba(0, 242, 195, 0.8);
 	}
 	.logo.hidden {
 		opacity: 0;
@@ -182,10 +207,25 @@
 	.logo-img {
 		height: 32px;
 		width: auto;
+		transition: transform var(--transition-fast);
 	}
 
 	.logo-img.invert {
 		filter: brightness(0) invert(1);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.logo-img,
+		.nav-link,
+		.search-btn {
+			transition: none;
+		}
+		.logo:hover .logo-img,
+		.logo:active .logo-img,
+		.nav-link:active,
+		.search-btn:active {
+			transform: none;
+		}
 	}
 
 	.header-actions {
@@ -196,6 +236,7 @@
 	}
 
 	.nav-link {
+		position: relative; /* anchors the ripple overlay */
 		font-family: var(--font-mono, ui-monospace, monospace);
 		font-size: 0.78rem;
 		font-weight: 700;
@@ -205,10 +246,15 @@
 		padding: 0.55rem 1rem;
 		border-radius: 999px;
 		border: 1px solid var(--color-border);
+		-webkit-tap-highlight-color: transparent;
 		transition:
 			color var(--transition-fast),
 			background-color var(--transition-fast),
-			border-color var(--transition-fast);
+			border-color var(--transition-fast),
+			transform var(--transition-fast);
+	}
+	.nav-link:active {
+		transform: scale(0.97);
 	}
 	.nav-link:hover {
 		color: var(--color-text);
@@ -237,6 +283,7 @@
 	}
 
 	.search-btn {
+		position: relative; /* anchors the ripple overlay */
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -246,15 +293,20 @@
 		border: 1px solid var(--color-border);
 		color: var(--color-text-secondary);
 		background: transparent;
+		-webkit-tap-highlight-color: transparent;
 		transition:
 			color var(--transition-fast),
 			background-color var(--transition-fast),
-			border-color var(--transition-fast);
+			border-color var(--transition-fast),
+			transform var(--transition-fast);
 		&:hover {
 			color: var(--color-text);
 			background: var(--color-surface);
 			border-color: var(--color-accent);
 			transition: none;
+		}
+		&:active {
+			transform: scale(0.97);
 		}
 	}
 	.search-btn svg {
