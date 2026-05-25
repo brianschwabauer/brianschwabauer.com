@@ -101,7 +101,13 @@
 			{#if tags.length > 0}
 				<div class="post-tags">
 					{#each tags as tag}
-						<span class="tag">{tag}</span>
+						<a
+							class="tag"
+							href="/blog?tag={encodeURIComponent(tag)}"
+							title="Filter posts by {tag}"
+						>
+							{tag}
+						</a>
 					{/each}
 				</div>
 			{/if}
@@ -247,11 +253,44 @@
 	}
 
 	.tag {
+		display: inline-block;
 		font-size: var(--text-sm);
 		padding: var(--space-1) var(--space-3);
 		background: var(--color-bg-secondary);
+		border: 1px solid transparent;
 		border-radius: var(--radius-full);
 		color: var(--color-text-secondary);
+		text-decoration: none;
+		-webkit-tap-highlight-color: transparent;
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast),
+			border-color var(--transition-fast),
+			transform var(--transition-fast);
+	}
+	.tag:hover {
+		color: var(--color-text);
+		background: var(--color-surface);
+		border-color: var(--color-accent);
+	}
+	.tag:focus {
+		outline: none;
+	}
+	.tag:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
+	.tag:active {
+		transform: scale(0.97);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.tag {
+			transition: none;
+		}
+		.tag:active {
+			transform: none;
+		}
 	}
 
 	.post-featured {
