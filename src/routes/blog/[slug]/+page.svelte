@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { onMount, mount, unmount } from 'svelte';
-	import { Button } from '@delightstack/components/actions';
-	import { page } from '$app/state';
-	import { bgStyle } from '$lib/client/images';
-	import VideoPlayer from '$lib/components/about/primitives/VideoPlayer.svelte';
+	import { onMount, mount, unmount } from "svelte";
+	import { Button } from "@delightstack/components/actions";
+	import { page } from "$app/state";
+	import { bgStyle } from "$lib/client/images";
+	import VideoPlayer from "$lib/components/about/primitives/VideoPlayer.svelte";
 
 	let { data } = $props();
 
@@ -16,16 +16,16 @@
 		const root = contentEl;
 		if (!root) return;
 		const players: Array<Record<string, unknown>> = [];
-		for (const fig of root.querySelectorAll<HTMLElement>('figure.blog-video')) {
+		for (const fig of root.querySelectorAll<HTMLElement>("figure.blog-video")) {
 			const slug = fig.dataset.videoSlug;
-			const target = fig.querySelector<HTMLElement>('.blog-video-mount');
+			const target = fig.querySelector<HTMLElement>(".blog-video-mount");
 			if (!slug || !target) continue;
 			target.replaceChildren();
 			players.push(
 				mount(VideoPlayer, {
 					target,
-					props: { slug, title: fig.dataset.videoTitle || '', ratio: '16 / 9' }
-				})
+					props: { slug, title: fig.dataset.videoTitle || "", ratio: "16 / 9" },
+				}),
 			);
 		}
 		return () => {
@@ -34,27 +34,30 @@
 	});
 
 	function formatDate(date: number | null | undefined) {
-		if (!date) return '';
-		return new Date(date).toLocaleDateString('en-US', {
-			month: 'long',
-			day: 'numeric',
-			year: 'numeric'
+		if (!date) return "";
+		return new Date(date).toLocaleDateString("en-US", {
+			month: "long",
+			day: "numeric",
+			year: "numeric",
 		});
 	}
 
-	const summary = $derived(data.post?.summary ?? data.post?.aiSummary ?? '');
+	const summary = $derived(data.post?.summary ?? data.post?.aiSummary ?? "");
 	const tags = $derived(data.post?.tags ?? []);
 	const featured = $derived(data.post?.featuredImage ?? null);
 	const focalX = $derived(data.post?.coverFocalX ?? 50);
 	const focalY = $derived(data.post?.coverFocalY ?? 50);
-	const ogImage = $derived(featured ? `/cdn/image/${featured.path}/default` : null);
+	const ogImage = $derived(
+		featured ? `/cdn/image/${featured.path}/default` : null,
+	);
 	const isAdmin = $derived(
-		(page.data.session?.user as { role?: string } | undefined)?.role === 'admin'
+		(page.data.session?.user as { role?: string } | undefined)?.role ===
+			"admin",
 	);
 </script>
 
 <svelte:head>
-	<title>{data.post?.title ?? 'Post Not Found'} - Brian Schwabauer</title>
+	<title>{data.post?.title ?? "Post Not Found"} - Brian Schwabauer</title>
 	{#if summary}
 		<meta name="description" content={summary} />
 	{/if}
@@ -75,9 +78,22 @@
 <article class="post-page">
 	{#if data.post}
 		{#if isAdmin}
-			<a class="edit-post-fab" href={`/admin/blog/${data.post.slug}`} title="Edit this post">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-					<path d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+			<a
+				class="edit-post-fab"
+				href={`/admin/blog/${data.post.slug}`}
+				title="Edit this post"
+			>
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					width="16"
+					height="16"
+				>
+					<path
+						d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
+					/>
 				</svg>
 				<span>Edit Post</span>
 			</a>
@@ -92,7 +108,12 @@
 				<time class="post-date">{formatDate(data.post.publishedAt)}</time>
 			</div>
 
-			<h1 class="post-title" style:view-transition-name="post-title-{data.post.slug}">{data.post.title}</h1>
+			<h1
+				class="post-title"
+				style:view-transition-name="post-title-{data.post.slug}"
+			>
+				{data.post.title}
+			</h1>
 
 			{#if summary}
 				<p class="post-excerpt">{summary}</p>
@@ -118,15 +139,17 @@
 				class="post-featured"
 				style={bgStyle(featured)}
 				style:view-transition-name="post-image-{data.post.slug}"
-				style:view-transition-class="blog-cover">
+				style:view-transition-class="blog-cover"
+			>
 				<img
 					src={`/cdn/image/${featured.path}/default`}
-					alt={featured.alt_text ?? ''}
+					alt={featured.alt_text ?? ""}
 					width={featured.width || undefined}
 					height={featured.height || undefined}
 					loading="eager"
 					decoding="async"
-					style:object-position={`${focalX}% ${focalY}%`} />
+					style:object-position={`${focalX}% ${focalY}%`}
+				/>
 			</figure>
 		{/if}
 
@@ -136,7 +159,14 @@
 
 		<footer class="post-footer">
 			<Button href="/blog" outline>
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					width="16"
+					height="16"
+				>
 					<line x1="19" y1="12" x2="5" y2="12" />
 					<polyline points="12 19 5 12 12 5" />
 				</svg>
@@ -163,7 +193,7 @@
 		position: relative;
 		max-width: var(--prose-wide);
 		margin: 0 auto;
-		padding: var(--space-12) var(--space-4) var(--space-24);
+		padding: var(--space-8) var(--space-4) var(--space-24);
 	}
 
 	.edit-post-fab {
@@ -182,7 +212,9 @@
 		font-size: var(--text-sm);
 		font-weight: 500;
 		box-shadow: var(--shadow-md);
-		transition: color 120ms ease, border-color 120ms ease;
+		transition:
+			color 120ms ease,
+			border-color 120ms ease;
 	}
 
 	.edit-post-fab:hover {
@@ -204,7 +236,7 @@
 
 	@media (min-width: 768px) {
 		.post-page {
-			padding: var(--space-16) var(--space-8) var(--space-24);
+			padding: var(--space-8) var(--space-8) var(--space-24);
 		}
 	}
 
@@ -353,21 +385,21 @@
 		display: block;
 	}
 
-	.post-content :global(figure.blog-img[data-width-mode='normal']) {
+	.post-content :global(figure.blog-img[data-width-mode="normal"]) {
 		width: var(--blog-img-pct, 100%);
 		max-width: var(--measure);
 		margin-left: auto;
 		margin-right: auto;
 	}
 
-	.post-content :global(figure.blog-img[data-width-mode='wide']) {
+	.post-content :global(figure.blog-img[data-width-mode="wide"]) {
 		width: var(--prose-wide);
 		max-width: calc(100vw - 2rem);
 		margin-left: 50%;
 		transform: translateX(-50%);
 	}
 
-	.post-content :global(figure.blog-img[data-width-mode='full']) {
+	.post-content :global(figure.blog-img[data-width-mode="full"]) {
 		width: 100vw;
 		max-width: 100vw;
 		margin-left: 50%;
@@ -383,7 +415,7 @@
 		border-radius: var(--radius-md);
 	}
 
-	.post-content :global(figure.blog-img[data-width-mode='full'] img) {
+	.post-content :global(figure.blog-img[data-width-mode="full"] img) {
 		border-radius: 0;
 	}
 
@@ -395,7 +427,7 @@
 		overflow: hidden;
 		border-radius: var(--radius-md);
 	}
-	.post-content :global(figure.blog-img.is-cropped[data-width-mode='full']) {
+	.post-content :global(figure.blog-img.is-cropped[data-width-mode="full"]) {
 		border-radius: 0;
 	}
 	.post-content :global(figure.blog-img.is-cropped img) {
@@ -427,7 +459,7 @@
 		pointer-events: none;
 	}
 
-	.post-content :global(figure.blog-img[data-width-mode='full'] figcaption) {
+	.post-content :global(figure.blog-img[data-width-mode="full"] figcaption) {
 		border-radius: 0;
 	}
 
@@ -439,21 +471,21 @@
 		display: block;
 	}
 
-	.post-content :global(figure.blog-video[data-width-mode='normal']) {
+	.post-content :global(figure.blog-video[data-width-mode="normal"]) {
 		width: var(--blog-video-pct, 100%);
 		max-width: var(--measure);
 		margin-left: auto;
 		margin-right: auto;
 	}
 
-	.post-content :global(figure.blog-video[data-width-mode='wide']) {
+	.post-content :global(figure.blog-video[data-width-mode="wide"]) {
 		width: var(--prose-wide);
 		max-width: calc(100vw - 2rem);
 		margin-left: 50%;
 		transform: translateX(-50%);
 	}
 
-	.post-content :global(figure.blog-video[data-width-mode='full']) {
+	.post-content :global(figure.blog-video[data-width-mode="full"]) {
 		width: 100vw;
 		max-width: 100vw;
 		margin-left: 50%;
@@ -468,7 +500,8 @@
 		overflow: hidden;
 	}
 
-	.post-content :global(figure.blog-video[data-width-mode='full'] .blog-video-mount) {
+	.post-content
+		:global(figure.blog-video[data-width-mode="full"] .blog-video-mount) {
 		border-radius: 0;
 	}
 
@@ -491,7 +524,7 @@
 	}
 
 	.post-content :global(figure.blog-video .blog-video-play::before) {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 50%;
 		left: 54%;
