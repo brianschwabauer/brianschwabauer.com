@@ -55,14 +55,21 @@
 	 * then we keep the top 5 by count. Ties break alphabetically so the
 	 * order is stable as you write new posts. Tags themselves still live
 	 * on each post — this only trims the filter row.
+	 *
+	 * `FILTER_HIDDEN_TAGS` are tags that should never appear in the filter
+	 * row regardless of popularity (e.g. "Archive" — it's a bookkeeping
+	 * label, not a topic worth slicing the list by). The tag still renders
+	 * on individual post cards; it just isn't an option here.
 	 */
 	const POPULAR_TAG_LIMIT = 5;
 	const POPULAR_TAG_MIN_POSTS = 2;
+	const FILTER_HIDDEN_TAGS = new Set(['archive']);
 	const popularTags = $derived.by(() => {
 		const counts = new Map<string, { display: string; count: number }>();
 		for (const p of data.posts) {
 			for (const t of p.tags ?? []) {
 				const key = t.toLowerCase();
+				if (FILTER_HIDDEN_TAGS.has(key)) continue;
 				const entry = counts.get(key);
 				if (entry) entry.count += 1;
 				else counts.set(key, { display: t, count: 1 });
