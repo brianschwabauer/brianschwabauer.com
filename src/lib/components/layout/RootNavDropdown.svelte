@@ -234,6 +234,7 @@
 
 		<div class="mobile-actions">
 			<a href="/blog" class="action-link" {@attach navRipple()}>Blog</a>
+			<a href="/contact" class="action-link" {@attach navRipple()}>Contact</a>
 			<button
 				type="button"
 				class="action-icon"

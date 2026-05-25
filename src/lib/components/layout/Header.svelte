@@ -45,6 +45,7 @@
 	const onBlogPage = $derived(
 		page.url.pathname === "/blog" || page.url.pathname.startsWith("/blog/"),
 	);
+	const onContactPage = $derived(page.url.pathname === "/contact");
 	const logoHidden = $derived($hideHeaderLogo);
 
 	function handleLogoClick(e: MouseEvent) {
@@ -69,12 +70,7 @@
 			aria-current={onRootPage ? "page" : undefined}
 			tabindex={logoHidden ? -1 : 0}
 		>
-			<img
-				src="/logo.svg"
-				alt=""
-				class="logo-img"
-				class:invert={invertLogo}
-			/>
+			<img src="/logo.svg" alt="" class="logo-img" class:invert={invertLogo} />
 		</a>
 
 		<div class="header-actions">
@@ -90,6 +86,16 @@
 				{@attach ripple({ zIndex: 1 })}
 			>
 				Blog
+			</a>
+			<a
+				href="/contact"
+				class="nav-link"
+				class:on-dark={invertLogo}
+				class:active={onContactPage}
+				aria-current={onContactPage ? "page" : undefined}
+				{@attach ripple({ zIndex: 1 })}
+			>
+				Contact
 			</a>
 			<button
 				type="button"
@@ -233,6 +239,9 @@
 		align-items: center;
 		gap: var(--space-3);
 		margin-left: auto;
+		@media (max-width: 768px) {
+			gap: var(--space-1);
+		}
 	}
 
 	.nav-link {
@@ -252,6 +261,14 @@
 			background-color var(--transition-fast),
 			border-color var(--transition-fast),
 			transform var(--transition-fast);
+		@media (max-width: 768px) {
+			padding: 0.45rem 0.75rem;
+			letter-spacing: 0.05em;
+			font-weight: 500;
+			&.active {
+				font-weight: 700;
+			}
+		}
 	}
 	.nav-link:active {
 		transform: scale(0.97);
