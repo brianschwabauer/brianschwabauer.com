@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { BlogPostMeta } from '$lib/server/blog';
 	import { bgStyle, thumbnailURL } from '$lib/client/images';
+	import { ripple } from '@delightstack/utilities';
 
 	interface Props {
 		post: BlogPostMeta;
@@ -21,7 +22,7 @@
 </script>
 
 <article class="post-card">
-	<a href="/blog/{post.slug}" class="post-link">
+	<a href="/blog/{post.slug}" class="post-link" {@attach ripple({ zIndex: 1 })}>
 		{#if post.featuredImage}
 			<div
 				class="post-image"
@@ -80,7 +81,20 @@
 		box-shadow: var(--shadow-lg);
 	}
 
+	/* Same press-down recipe as the tag chips and delightstack <Button>:
+	   `perspective()` inside the transform so each card is its own
+	   vanishing point. :has(:active) lets us read the active state of
+	   the inner <a> from the article so the existing hover transform
+	   on .post-card cleanly cascades into the press. */
+	.post-card:has(:active) {
+		transform: perspective(100px) translate3d(0, 1px, clamp(-10px, calc(0.2em - 12px), -2px));
+	}
+
 	.post-link {
+		/* Anchors the ripple overlay inside the card. .post-card already
+		   has overflow:hidden + border-radius, so the ripple is clipped
+		   to the rounded card silhouette. */
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		text-decoration: none;

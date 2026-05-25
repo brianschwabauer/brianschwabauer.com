@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { BlogPostMeta } from '$lib/server/blog';
 	import { bgStyle, thumbnailURL } from '$lib/client/images';
+	import { ripple } from '@delightstack/utilities';
 
 	interface Props {
 		post: BlogPostMeta;
@@ -23,7 +24,7 @@
 </script>
 
 <article class="featured-card">
-	<a href="/blog/{post.slug}" class="featured-link">
+	<a href="/blog/{post.slug}" class="featured-link" {@attach ripple({ zIndex: 1 })}>
 		{#if post.featuredImage}
 			<div
 				class="featured-image"
@@ -90,7 +91,14 @@
 		box-shadow: var(--shadow-lg);
 	}
 
+	/* See PostCard.svelte — same press-down recipe. */
+	.featured-card:has(:active) {
+		transform: perspective(100px) translate3d(0, 1px, clamp(-10px, calc(0.2em - 12px), -2px));
+	}
+
 	.featured-link {
+		/* Anchors the ripple inside the card. */
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		text-decoration: none;
