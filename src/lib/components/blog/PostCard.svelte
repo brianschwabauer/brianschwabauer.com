@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { BlogPostMeta } from '$lib/server/blog';
-	import { bgStyle, thumbnailURL } from '$lib/client/images';
-	import { ripple } from '@delightstack/utilities';
+	import type { BlogPostMeta } from "$lib/server/blog";
+	import { bgStyle, thumbnailURL } from "$lib/client/images";
+	import { ripple } from "@delightstack/utilities";
 
 	interface Props {
 		post: BlogPostMeta;
@@ -10,15 +10,15 @@
 	let { post }: Props = $props();
 
 	function formatDate(date: number | null | undefined) {
-		if (!date) return '';
-		return new Date(date).toLocaleDateString('en-US', {
-			month: 'long',
-			day: 'numeric',
-			year: 'numeric'
+		if (!date) return "";
+		return new Date(date).toLocaleDateString("en-US", {
+			month: "long",
+			day: "numeric",
+			year: "numeric",
 		});
 	}
 
-	const summary = $derived(post.summary ?? post.aiSummary ?? '');
+	const summary = $derived(post.summary ?? post.aiSummary ?? "");
 </script>
 
 <article class="post-card">
@@ -28,11 +28,13 @@
 				class="post-image"
 				style={bgStyle(post.featuredImage)}
 				style:view-transition-name="post-image-{post.slug}"
-				style:view-transition-class="blog-cover">
+				style:view-transition-class="blog-cover"
+			>
 				<img
 					src={thumbnailURL(post.featuredImage)}
-					alt={post.featuredImage.alt_text ?? ''}
-					loading="lazy" />
+					alt={post.featuredImage.alt_text ?? ""}
+					loading="lazy"
+				/>
 			</div>
 		{/if}
 		<div class="post-body">
@@ -40,7 +42,12 @@
 				<time class="post-date">{formatDate(post.publishedAt)}</time>
 			</div>
 
-			<h2 class="post-title" style:view-transition-name="post-title-{post.slug}">{post.title}</h2>
+			<h2
+				class="post-title"
+				style:view-transition-name="post-title-{post.slug}"
+			>
+				{post.title}
+			</h2>
 
 			{#if summary}
 				<p class="post-excerpt">{summary}</p>
@@ -56,7 +63,12 @@
 
 			<span class="read-more">
 				Read article
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+				>
 					<line x1="5" y1="12" x2="19" y2="12" />
 					<polyline points="12 5 19 12 12 19" />
 				</svg>
@@ -71,7 +83,9 @@
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
 		overflow: hidden;
-		transition: border-color var(--transition-fast), transform var(--transition-fast),
+		transition:
+			border-color var(--transition-fast),
+			transform var(--transition-fast),
 			box-shadow var(--transition-fast);
 	}
 
@@ -87,7 +101,8 @@
 	   the inner <a> from the article so the existing hover transform
 	   on .post-card cleanly cascades into the press. */
 	.post-card:has(:active) {
-		transform: perspective(100px) translate3d(0, 1px, clamp(-10px, calc(0.2em - 12px), -2px));
+		transform: perspective(100px)
+			translate3d(0, 1px, clamp(-10px, calc(0.2em - 12px), -2px));
 	}
 
 	.post-link {

@@ -1,11 +1,120 @@
 <script lang="ts">
-	import { page } from "$app/state";
+	import { page, navigating } from "$app/state";
 	import { goto } from "$app/navigation";
+	import { fly, scale, slide } from "svelte/transition";
+	import { flip } from "svelte/animate";
+	import { backIn, quintOut } from "svelte/easing";
 	import PostCard from "$lib/components/blog/PostCard.svelte";
 	import FeaturedPostCard from "$lib/components/blog/FeaturedPostCard.svelte";
 	import PostFilters from "$lib/components/blog/PostFilters.svelte";
 
 	let { data } = $props();
+
+	/**
+	 * `mounted` gates the card entrance/exit transitions. It starts false so
+	 * the initial SSR-hydrated list paints with no motion (anything else
+	 * would jolt the already-rendered cards on hydration), then flips true
+	 * in the post-mount effect. Because this page stays mounted across tag
+	 * filter changes — only the keyed each block reconciles — `mounted`
+	 * remains true for the rest of the session, so every subsequent filter
+	 * switch animates the entering/leaving cards.
+	 */
+	let mounted = $state(false);
+	$effect(() => {
+		mounted = true;
+	});
+
+	/**
+	 * Transitions are scoped to filter changes only. /blog ↔ /blog/[slug]
+	 * navigation is already animated by the page-level view transition in
+	 * +layout.svelte; letting Svelte's in/out also fire there made the
+	 * outgoing card linger in the DOM at view-transition-snapshot time,
+	 * which polluted the destination snapshot and broke the morph.
+	 *
+	 * A filter change is `/blog → /blog?tag=…` (same pathname, just a
+	 * query change), so the pathname-vs-pathname check cleanly separates
+	 * the two cases.
+	 */
+	const isCrossPageNav = $derived(
+		!!(
+			navigating.from &&
+			navigating.to &&
+			navigating.from.url.pathname !== navigating.to.url.pathname
+		),
+	);
+
+	/**
+	 * Stagger + slide-up entrance for cards added to a filtered list.
+	 * No-ops on initial mount (`enabled` is false until `mounted` flips)
+	 * and during cross-page navigation (the view transition handles it).
+	 * Returning `{ duration: 0, css: () => '' }` means Svelte writes no
+	 * inline style at all on the disabled path — important so the
+	 * already-painted card doesn't jolt to a "from" state.
+	 */
+	function flyIn(
+		node: Element,
+		params: { enabled: boolean; crossPage: boolean; index: number },
+	) {
+		if (!params.enabled || params.crossPage)
+			return { duration: 0, css: () => "" };
+		return fly(node as HTMLElement, {
+			y: 20,
+			duration: 300,
+			delay: params.index * 35,
+			easing: quintOut,
+		});
+	}
+
+	/**
+	 * "Pops" out cards leaving the filtered list. Built on Svelte's `scale`
+	 * transition with `backIn` easing: backIn dips below 0 around t≈0.42,
+	 * which makes Svelte's `scale(1 - sd*u)` formula briefly exceed 1
+	 * (~1.09 peak) before settling to 0 — i.e. the card swells slightly,
+	 * then shrinks to nothing.
+	 *
+	 * `pin: true` lifts the card out of grid flow at its old geometry so
+	 * the grid reflows to the new list immediately — otherwise the page
+	 * briefly grows by several rows and snaps back as the animation
+	 * completes (a very visible footer jump going from "All Posts" to a
+	 * small filter). Used for the regular posts grid.
+	 *
+	 * `pin: false` leaves the card in flow. Used for the featured section
+	 * which is animated by `transition:slide` on the section itself —
+	 * pinning would empty the section's in-flow content and break slide's
+	 * height measurement, so we let the card scale away in place inside
+	 * the section's closing clip.
+	 *
+	 * Skipped entirely during cross-page navigation: the view transition
+	 * is already animating the visual, and lingering cards here would
+	 * pollute the destination page's view-transition snapshot.
+	 */
+	function popOut(
+		node: Element,
+		params: { enabled: boolean; crossPage: boolean; pin?: boolean },
+	) {
+		if (!params.enabled || params.crossPage)
+			return { duration: 0, css: () => "" };
+		const el = node as HTMLElement;
+		el.style.pointerEvents = "none";
+		if (params.pin) {
+			const parent = el.parentElement;
+			if (parent) {
+				const r = el.getBoundingClientRect();
+				const pr = parent.getBoundingClientRect();
+				el.style.position = "absolute";
+				el.style.top = `${r.top - pr.top}px`;
+				el.style.left = `${r.left - pr.left}px`;
+				el.style.width = `${r.width}px`;
+				el.style.height = `${r.height}px`;
+			}
+		}
+		return scale(el, {
+			duration: 150,
+			easing: backIn,
+			start: 0.7,
+			opacity: 0,
+		});
+	}
 
 	/**
 	 * The URL's `?tag=` is the source of truth for the active filter — that
@@ -124,10 +233,35 @@
 	{/if}
 
 	{#if pinnedPosts.length > 0}
-		<section class="featured-section" aria-label="Featured posts">
+		<!-- transition:slide collapses the section's height/padding/margin
+		     when pinnedPosts empties out (or expands it when posts come
+		     back), so the .posts-grid below glides up smoothly instead of
+		     snapping. Cards inside use pin:false so they stay in-flow for
+		     slide's height measurement and scale away inside the closing
+		     clip. Matching duration to popOut keeps the visuals in sync. -->
+		<section
+			class="featured-section"
+			aria-label="Featured posts"
+			transition:slide={{ duration: 200, easing: quintOut }}
+		>
 			<div class="featured-grid" class:single={pinnedPosts.length === 1}>
-				{#each pinnedPosts as post (post.slug)}
-					<FeaturedPostCard {post} />
+				{#each pinnedPosts as post, i (post.slug)}
+					<div
+						class="card-anim"
+						animate:flip={{ duration: 250, easing: quintOut }}
+						in:flyIn|global={{
+							enabled: mounted,
+							crossPage: isCrossPageNav,
+							index: i,
+						}}
+						out:popOut|global={{
+							enabled: mounted,
+							crossPage: isCrossPageNav,
+							pin: false,
+						}}
+					>
+						<FeaturedPostCard {post} />
+					</div>
 				{/each}
 			</div>
 		</section>
@@ -135,8 +269,23 @@
 
 	{#if regularPosts.length > 0}
 		<div class="posts-grid">
-			{#each regularPosts as post (post.slug)}
-				<PostCard {post} />
+			{#each regularPosts as post, i (post.slug)}
+				<div
+					class="card-anim"
+					animate:flip={{ duration: 250, easing: quintOut }}
+					in:flyIn|global={{
+						enabled: mounted,
+						crossPage: isCrossPageNav,
+						index: i,
+					}}
+					out:popOut|global={{
+						enabled: mounted,
+						crossPage: isCrossPageNav,
+						pin: true,
+					}}
+				>
+					<PostCard {post} />
+				</div>
 			{/each}
 		</div>
 	{:else if pinnedPosts.length === 0}
@@ -196,6 +345,10 @@
 	.featured-grid {
 		display: grid;
 		gap: var(--space-6);
+		/* Anchor outgoing cards (position:absolute during their fade-out) so
+		   they freeze at their previous grid spot — see FeaturedPostCard.svelte's
+		   fadeOut. */
+		position: relative;
 	}
 
 	@media (min-width: 1024px) {
@@ -212,6 +365,8 @@
 	.posts-grid {
 		display: grid;
 		gap: var(--space-6);
+		/* See .featured-grid — anchors absolutely-positioned exiting cards. */
+		position: relative;
 	}
 
 	@media (min-width: 768px) {
@@ -231,5 +386,18 @@
 		text-align: center;
 		padding: var(--space-16);
 		color: var(--color-text-muted);
+	}
+
+	/* Wraps each card so animate:flip + in:fly + out:fade can ride on a
+	   real element that's a direct child of the keyed each. Flex column
+	   with the card flex:1 makes the inner article fill the grid cell's
+	   stretched height (which the wrapper picks up by being the grid item). */
+	.card-anim {
+		display: flex;
+		flex-direction: column;
+	}
+	.card-anim > :global(.post-card),
+	.card-anim > :global(.featured-card) {
+		flex: 1;
 	}
 </style>

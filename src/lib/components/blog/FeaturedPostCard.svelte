@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { BlogPostMeta } from '$lib/server/blog';
-	import { bgStyle, thumbnailURL } from '$lib/client/images';
-	import { ripple } from '@delightstack/utilities';
+	import type { BlogPostMeta } from "$lib/server/blog";
+	import { bgStyle, thumbnailURL } from "$lib/client/images";
+	import { ripple } from "@delightstack/utilities";
 
 	interface Props {
 		post: BlogPostMeta;
@@ -10,47 +10,72 @@
 	let { post }: Props = $props();
 
 	function formatDate(date: number | null | undefined) {
-		if (!date) return '';
-		return new Date(date).toLocaleDateString('en-US', {
-			month: 'long',
-			day: 'numeric',
-			year: 'numeric'
+		if (!date) return "";
+		return new Date(date).toLocaleDateString("en-US", {
+			month: "long",
+			day: "numeric",
+			year: "numeric",
 		});
 	}
 
-	const summary = $derived(post.summary ?? post.aiSummary ?? '');
-	const focalX = $derived(typeof post.coverFocalX === 'number' ? post.coverFocalX : 50);
-	const focalY = $derived(typeof post.coverFocalY === 'number' ? post.coverFocalY : 50);
+	const summary = $derived(post.summary ?? post.aiSummary ?? "");
+	const focalX = $derived(
+		typeof post.coverFocalX === "number" ? post.coverFocalX : 50,
+	);
+	const focalY = $derived(
+		typeof post.coverFocalY === "number" ? post.coverFocalY : 50,
+	);
 </script>
 
 <article class="featured-card">
-	<a href="/blog/{post.slug}" class="featured-link" {@attach ripple({ zIndex: 1 })}>
+	<a
+		href="/blog/{post.slug}"
+		class="featured-link"
+		{@attach ripple({ zIndex: 1 })}
+	>
 		{#if post.featuredImage}
 			<div
 				class="featured-image"
 				style={bgStyle(post.featuredImage)}
 				style:view-transition-name="post-image-{post.slug}"
-				style:view-transition-class="blog-cover">
+				style:view-transition-class="blog-cover"
+			>
 				<img
 					src={thumbnailURL(post.featuredImage)}
-					alt={post.featuredImage.alt_text ?? ''}
+					alt={post.featuredImage.alt_text ?? ""}
 					style:object-position="{focalX}% {focalY}%"
-					loading="eager" />
+					loading="eager"
+				/>
 			</div>
 		{/if}
 		<div class="featured-body">
 			<div class="featured-meta">
 				<span class="featured-pin" aria-label="Pinned">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						aria-hidden="true"
+					>
 						<line x1="12" x2="12" y1="17" y2="22" />
-						<path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
+						<path
+							d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"
+						/>
 					</svg>
 					Featured
 				</span>
 				<time class="featured-date">{formatDate(post.publishedAt)}</time>
 			</div>
 
-			<h2 class="featured-title" style:view-transition-name="post-title-{post.slug}">{post.title}</h2>
+			<h2
+				class="featured-title"
+				style:view-transition-name="post-title-{post.slug}"
+			>
+				{post.title}
+			</h2>
 
 			{#if summary}
 				<p class="featured-excerpt">{summary}</p>
@@ -66,7 +91,12 @@
 
 			<span class="read-more">
 				Read article
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+				>
 					<line x1="5" y1="12" x2="19" y2="12" />
 					<polyline points="12 5 19 12 12 19" />
 				</svg>
@@ -81,7 +111,9 @@
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
 		overflow: hidden;
-		transition: border-color var(--transition-fast), transform var(--transition-fast),
+		transition:
+			border-color var(--transition-fast),
+			transform var(--transition-fast),
 			box-shadow var(--transition-fast);
 	}
 
@@ -93,7 +125,8 @@
 
 	/* See PostCard.svelte — same press-down recipe. */
 	.featured-card:has(:active) {
-		transform: perspective(100px) translate3d(0, 1px, clamp(-10px, calc(0.2em - 12px), -2px));
+		transform: perspective(100px)
+			translate3d(0, 1px, clamp(-10px, calc(0.2em - 12px), -2px));
 	}
 
 	.featured-link {
