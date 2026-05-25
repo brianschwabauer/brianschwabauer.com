@@ -238,19 +238,17 @@
 			{/if}
 
 			<div class="actions">
-				<Button accent pill onclick={submit}>
+				<Button
+					accent
+					fullWidth
+					size="2"
+					disabled={!name.trim() || !message.trim() || !email.trim()}
+					onclick={submit}
+				>
 					{#snippet children({ isLoading, isLoadingSuccess })}
-						{isLoading
-							? "Sending…"
-							: isLoadingSuccess
-								? "Sent"
-								: "Send it"}
+						{isLoading ? "Sending…" : isLoadingSuccess ? "Sent" : "Send it"}
 						{#if !isLoading && !isLoadingSuccess}
-							<svg
-								class="send-arrow"
-								viewBox="0 0 24 24"
-								aria-hidden="true"
-							>
+							<svg class="send-arrow" viewBox="0 0 24 24" aria-hidden="true">
 								<path
 									d="M5 12h14M13 6l6 6-6 6"
 									fill="none"
