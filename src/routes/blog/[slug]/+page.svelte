@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, mount, unmount } from 'svelte';
 	import { Button } from '@delightstack/components/actions';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { bgStyle } from '$lib/client/images';
 	import VideoPlayer from '$lib/components/about/primitives/VideoPlayer.svelte';
 
@@ -49,7 +49,7 @@
 	const focalY = $derived(data.post?.coverFocalY ?? 50);
 	const ogImage = $derived(featured ? `/cdn/image/${featured.path}/default` : null);
 	const isAdmin = $derived(
-		($page.data.session?.user as { role?: string } | undefined)?.role === 'admin'
+		(page.data.session?.user as { role?: string } | undefined)?.role === 'admin'
 	);
 </script>
 

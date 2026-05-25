@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ThemeToggle } from "@delightstack/components/actions";
 	import { ripple } from "@delightstack/utilities";
-	import { page } from "$app/stores";
+	import { page } from "$app/state";
 	import { hideHeaderLogo, searchOpen } from "$lib/stores/navState";
 	import SearchModal from "$lib/components/search/SearchModal.svelte";
 
@@ -41,9 +41,9 @@
 		return () => window.removeEventListener("keydown", handleShortcut);
 	});
 
-	const onRootPage = $derived($page.url.pathname === "/");
+	const onRootPage = $derived(page.url.pathname === "/");
 	const onBlogPage = $derived(
-		$page.url.pathname === "/blog" || $page.url.pathname.startsWith("/blog/"),
+		page.url.pathname === "/blog" || page.url.pathname.startsWith("/blog/"),
 	);
 	const logoHidden = $derived($hideHeaderLogo);
 

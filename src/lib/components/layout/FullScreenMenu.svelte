@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	interface Props {
 		open: boolean;
@@ -36,7 +36,7 @@
 					<a
 						href={link.href}
 						class="menu-link"
-						class:active={$page.url.pathname === link.href}
+						class:active={page.url.pathname === link.href}
 						onclick={() => (open = false)}
 					>
 						{link.label}
