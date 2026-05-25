@@ -219,7 +219,9 @@
 
 <div class="blog-page">
 	<div class="blog-header">
-		<h1 class="blog-title">Blog</h1>
+		<h1 class="blog-title">
+			<span class="blog-title-line">Blog.</span>
+		</h1>
 		<p class="blog-subtitle">
 			Thoughts on software development, creativity, and the journey of building
 			things.
@@ -310,26 +312,66 @@
 
 	.blog-header {
 		text-align: center;
-		margin-bottom: var(--space-12);
+		margin-bottom: var(--space-10);
 	}
 
+	/* Sizing/weight/letter-spacing mirror /contact's .title so the two pages
+	   line up visually when you flip between them. line-height 1.15 +
+	   padding-bottom on the inner span keep the descender-less "Blog." from
+	   collapsing its line box too tightly and let the gradient paint all the
+	   way through any future glyph. */
 	.blog-title {
-		font-size: var(--text-4xl);
-		font-weight: 700;
-		margin-bottom: var(--space-4);
+		font-size: clamp(2.4rem, 7vw, 4rem);
+		font-weight: 900;
+		line-height: 1.15;
+		letter-spacing: -0.03em;
+		margin: 0 0 var(--space-4);
 	}
 
-	@media (min-width: 768px) {
-		.blog-title {
-			font-size: var(--text-5xl);
+	/* Gradient is identical to /contact's .title-line — the gradient lives on
+	   an inline-block span (not the <h1>) because background-clip:text only
+	   paints inside the element's content box; the span hugs the text so the
+	   stops land at the same offsets they do on the contact page. */
+	.blog-title-line {
+		display: inline-block;
+		padding-bottom: 0.1em;
+		background: linear-gradient(
+			95deg,
+			var(--color-text) 0%,
+			var(--color-accent) 90%
+		);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		/* Same entrance as /contact's .title-line: rise + un-tilt + un-blur in
+		   one motion. There's no cycling here, so it only plays once on load. */
+		animation: blog-title-in 520ms cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	@keyframes blog-title-in {
+		from {
+			opacity: 0;
+			transform: translateY(0.4em) rotate(-1.2deg);
+			filter: blur(6px);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+			filter: none;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.blog-title-line {
+			animation: none;
 		}
 	}
 
 	.blog-subtitle {
 		font-size: var(--text-lg);
 		color: var(--color-text-secondary);
-		max-width: 500px;
+		max-width: 32rem;
 		margin: 0 auto;
+		line-height: var(--leading-relaxed);
+		text-wrap: pretty;
 	}
 
 	.blog-filters {
