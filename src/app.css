@@ -22,9 +22,11 @@
 	--color-error: #ef4444;
 
 	/* Typography — overrides delightstack defaults (loaded earlier in +layout.svelte). */
-	--font-sans: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-	--font-serif: 'Merriweather', ui-serif, Georgia, serif;
-	--font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+	--font-sans:
+		"Nunito Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		sans-serif;
+	--font-serif: "Merriweather", ui-serif, Georgia, serif;
+	--font-mono: "JetBrains Mono", "Fira Code", monospace;
 
 	--text-xs: 0.75rem;
 	--text-sm: 0.875rem;
@@ -84,9 +86,12 @@
 
 	/* Shadows */
 	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-	--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+	--shadow-md:
+		0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+	--shadow-lg:
+		0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+	--shadow-xl:
+		0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 
 	/* Transitions */
 	--transition-fast: 150ms ease;
@@ -103,7 +108,7 @@
 }
 
 /* Dark Theme */
-[data-theme='dark'] {
+[data-theme="dark"] {
 	--color-bg: #0a0a0a;
 	--color-bg-secondary: #141414;
 	--color-surface: #1a1a1a;
@@ -113,9 +118,12 @@
 	--color-border: #2a2a2a;
 
 	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-	--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+	--shadow-md:
+		0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+	--shadow-lg:
+		0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+	--shadow-xl:
+		0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 }
 
 /* Reset & Base Styles */
@@ -231,7 +239,9 @@ select {
 	border: 1px solid var(--color-border);
 	border-radius: var(--radius-md);
 	padding: var(--space-2) var(--space-3);
-	transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+	transition:
+		border-color var(--transition-fast),
+		box-shadow var(--transition-fast);
 }
 
 input:focus,
@@ -421,12 +431,36 @@ select:focus {
 	margin-top: 0;
 }
 
-.prose h1 { font-size: 2.25rem; }
-.prose h2 { font-size: 1.75rem; font-weight: 700; }
-.prose h3 { font-size: 1.375rem; font-weight: 600; letter-spacing: -0.012em; }
-.prose h4 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.008em; }
-.prose h5 { font-size: 1rem; font-weight: 600; letter-spacing: 0; text-transform: uppercase; }
-.prose h6 { font-size: 0.875rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-text-secondary); }
+.prose h1 {
+	font-size: 2.25rem;
+}
+.prose h2 {
+	font-size: 1.75rem;
+	font-weight: 700;
+}
+.prose h3 {
+	font-size: 1.375rem;
+	font-weight: 600;
+	letter-spacing: -0.012em;
+}
+.prose h4 {
+	font-size: 1.125rem;
+	font-weight: 600;
+	letter-spacing: -0.008em;
+}
+.prose h5 {
+	font-size: 1rem;
+	font-weight: 600;
+	letter-spacing: 0;
+	text-transform: uppercase;
+}
+.prose h6 {
+	font-size: 0.875rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--color-text-secondary);
+}
 
 /* Tighten the space between a heading and the paragraph that follows it. */
 .prose h1 + *,
@@ -445,7 +479,9 @@ select:focus {
 	text-decoration-thickness: 1px;
 	text-underline-offset: 0.22em;
 	text-decoration-color: var(--color-text-muted);
-	transition: color var(--transition-fast), text-decoration-color var(--transition-fast);
+	transition:
+		color var(--transition-fast),
+		text-decoration-color var(--transition-fast);
 }
 
 .prose a:hover {
@@ -453,9 +489,15 @@ select:focus {
 	text-decoration-color: var(--color-accent);
 }
 
-.prose strong { font-weight: 700; }
-.prose em { font-style: italic; }
-.prose s { color: var(--color-text-muted); }
+.prose strong {
+	font-weight: 700;
+}
+.prose em {
+	font-style: italic;
+}
+.prose s {
+	color: var(--color-text-muted);
+}
 
 .prose code {
 	font-family: var(--font-mono);
@@ -511,8 +553,12 @@ select:focus {
 	padding-left: 1.5em;
 }
 
-.prose ul { list-style: disc; }
-.prose ol { list-style: decimal; }
+.prose ul {
+	list-style: disc;
+}
+.prose ol {
+	list-style: decimal;
+}
 
 .prose li {
 	margin-top: var(--space-2);
@@ -523,8 +569,12 @@ select:focus {
 	color: var(--color-text-muted);
 }
 
-.prose li > p { margin: 0; }
-.prose li > p + p { margin-top: var(--space-2); }
+.prose li > p {
+	margin: 0;
+}
+.prose li > p + p {
+	margin-top: var(--space-2);
+}
 
 .prose ul ul,
 .prose ol ol,
@@ -564,8 +614,77 @@ select:focus {
 }
 
 @media (min-width: 768px) {
-	.prose { font-size: 1.1875rem; }
-	.prose h1 { font-size: 2.625rem; }
-	.prose h2 { font-size: 1.875rem; }
-	.prose h3 { font-size: 1.5rem; }
+	.prose {
+		font-size: 1.1875rem;
+	}
+	.prose h1 {
+		font-size: 2.625rem;
+	}
+	.prose h2 {
+		font-size: 1.875rem;
+	}
+	.prose h3 {
+		font-size: 1.5rem;
+	}
+}
+
+/* ── /blog ↔ /blog/[slug] view transitions ────────────────────────────────
+   Driven by onNavigate in +layout.svelte. Each blog card and the post page
+   stamp slug-scoped view-transition-names on the cover image + title, so
+   the browser morphs the clicked pair. These rules tune the timing:
+
+     • Morph (named groups): quick, with an easeOutQuint so motion is
+       front-loaded — the title/image land sharply and the tail just settles.
+     • Root cross-fade: the OLD page (rest of /blog or the post body)
+       starts fading out immediately. The NEW page's root waits until the
+       morph is mostly resolved before fading in — otherwise post-body
+       content pops up while the title/image are still flying, which is
+       jarring. The new-root delay = old-root duration, so the page
+       backdrop never goes blank: morph runs over the old page, then the
+       new page fades in as the morph settles.
+
+   The header and footer get their own view-transition-name so they're
+   lifted out of the root snapshot. They render identically on both pages,
+   so the per-element morph is a no-op and they appear to stay put across
+   the navigation instead of cross-fading with the rest of the page.
+
+   End-to-end ~360ms. Reduced-motion is already handled by the JS bailout
+   (startViewTransition isn't called at all), so no CSS guard needed. */
+.header {
+	view-transition-name: site-header;
+}
+
+.footer {
+	view-transition-name: site-footer;
+}
+
+::view-transition-group(*) {
+	animation-duration: 280ms;
+	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); /* easeOutQuint */
+}
+
+/* The blog cover-image groups (cards on /blog and the figure on the post
+   page) all share `view-transition-class: blog-cover`. The card-side
+   snapshot is a flat rectangle — its visible top-corner rounding comes
+   from the parent .post-card's overflow clip, which isn't part of the
+   element's own paint. Clipping the morphing group to a rounded rect
+   keeps both snapshots looking rounded throughout the morph without
+   forcing the card design to actually round its image element. Browsers
+   that don't support view-transition-class will fall back to the
+   default "square mid-morph" — acceptable graceful degradation since
+   the whole feature is already progressive. */
+::view-transition-group(.blog-cover) {
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+}
+
+::view-transition-old(root) {
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-new(root) {
+	animation-duration: 300ms;
+	animation-delay: 300ms;
+	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
