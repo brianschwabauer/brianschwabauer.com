@@ -404,6 +404,15 @@
 		}
 	}
 
+	/* When only one post is featured, the card stretches to the full grid
+	   width and the default 2.35:1 cover ratio turns into a wall of image
+	   that dwarfs the title/excerpt. Squash it to ~3:1 so the cover stays
+	   a banner instead of a hero. Scoped via :global so the FeaturedPostCard
+	   component keeps its taller default in the two-up layout. */
+	.featured-grid.single :global(.featured-image) {
+		aspect-ratio: 3 / 1;
+	}
+
 	.posts-grid {
 		display: grid;
 		gap: var(--space-6);
