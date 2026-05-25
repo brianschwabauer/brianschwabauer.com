@@ -1,11 +1,39 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import PostCard from '$lib/components/blog/PostCard.svelte';
 	import FeaturedPostCard from '$lib/components/blog/FeaturedPostCard.svelte';
 	import PostFilters from '$lib/components/blog/PostFilters.svelte';
 
 	let { data } = $props();
 
-	let activeTag = $state<string | null>(null);
+	/**
+	 * The URL's `?tag=` is the source of truth for the active filter — that
+	 * way refresh, bookmark, and back/forward all just work. We canonicalize
+	 * the URL value's casing against whatever a post actually uses so the
+	 * chip label matches post-side spelling (e.g. `?tag=vfx` → "Vfx" chip).
+	 * If no post uses the tag at all (e.g. bookmarked URL pointing to a
+	 * deleted tag), we keep the raw URL value as the label so the active
+	 * chip is still visible — clicking "All Posts" clears it.
+	 */
+	const activeTagParam = $derived($page.url.searchParams.get('tag') || null);
+	const activeTag = $derived.by(() => {
+		if (!activeTagParam) return null;
+		const key = activeTagParam.toLowerCase();
+		for (const p of data.posts) {
+			for (const t of p.tags ?? []) {
+				if (t.toLowerCase() === key) return t;
+			}
+		}
+		return activeTagParam;
+	});
+
+	function setActiveTag(tag: string | null) {
+		const url = new URL($page.url);
+		if (tag) url.searchParams.set('tag', tag);
+		else url.searchParams.delete('tag');
+		goto(url, { keepFocus: true, noScroll: true });
+	}
 
 	const filteredPosts = $derived(
 		activeTag
@@ -46,6 +74,18 @@
 			.slice(0, POPULAR_TAG_LIMIT)
 			.map((t) => t.display);
 	});
+
+	/**
+	 * The chip row is the popular tags plus, if needed, the currently-active
+	 * tag so a deep-linked filter is always visible as a selected chip.
+	 * Appended at the end so the popularity ordering of the top 5 stays put.
+	 */
+	const displayTags = $derived.by(() => {
+		if (!activeTag) return popularTags;
+		const key = activeTag.toLowerCase();
+		if (popularTags.some((t) => t.toLowerCase() === key)) return popularTags;
+		return [...popularTags, activeTag];
+	});
 </script>
 
 <svelte:head>
@@ -62,9 +102,9 @@
 		<p class="blog-subtitle">Thoughts on development, creativity, and the journey of building things.</p>
 	</div>
 
-	{#if popularTags.length > 0}
+	{#if displayTags.length > 0}
 		<div class="blog-filters">
-			<PostFilters tags={popularTags} {activeTag} onChange={(t) => (activeTag = t)} />
+			<PostFilters tags={displayTags} {activeTag} onChange={setActiveTag} />
 		</div>
 	{/if}
 
