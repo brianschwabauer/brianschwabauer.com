@@ -3,6 +3,7 @@
 	import { Button } from "@delightstack/components/actions";
 	import { page } from "$app/state";
 	import { bgStyle } from "$lib/client/images";
+	import { formatPostDate, isoPostDate } from "$lib/utils/date";
 	import VideoPlayer from "$lib/components/about/primitives/VideoPlayer.svelte";
 
 	let { data } = $props();
@@ -32,15 +33,6 @@
 			for (const player of players) unmount(player);
 		};
 	});
-
-	function formatDate(date: number | null | undefined) {
-		if (!date) return "";
-		return new Date(date).toLocaleDateString("en-US", {
-			month: "long",
-			day: "numeric",
-			year: "numeric",
-		});
-	}
 
 	const summary = $derived(data.post?.summary ?? data.post?.aiSummary ?? "");
 	const tags = $derived(data.post?.tags ?? []);
@@ -105,7 +97,9 @@
 		{/if}
 		<header class="post-header">
 			<div class="post-meta">
-				<time class="post-date">{formatDate(data.post.publishedAt)}</time>
+				<time class="post-date" datetime={isoPostDate(data.post.publishedAt)}
+					>{formatPostDate(data.post.publishedAt)}</time
+				>
 			</div>
 
 			<h1

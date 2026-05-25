@@ -5,6 +5,7 @@
 	import { create, load, search, type AnyOrama, type Results } from '@orama/orama';
 	import { entryLabel, indexSchema, type SearchEntry } from '$lib/search';
 	import { bgStyle, thumbnailURL } from '$lib/client/images';
+	import { formatPostDate, isoPostDate } from '$lib/utils/date';
 
 	interface Props {
 		open: boolean;
@@ -219,14 +220,6 @@
 		el?.scrollIntoView({ block: 'nearest' });
 	}
 
-	function formatDate(date: number) {
-		return new Date(date).toLocaleDateString('en-US', {
-			month: 'short',
-			day: 'numeric',
-			year: 'numeric'
-		});
-	}
-
 	$effect(() => {
 		if (open) {
 			loadIndex();
@@ -330,7 +323,9 @@
 								<div class="result-head">
 									<span class="result-category">{entryLabel(hit)}</span>
 									{#if hit.date && hit.type === 'blog'}
-										<time class="result-date">{formatDate(hit.date)}</time>
+										<time class="result-date" datetime={isoPostDate(hit.date)}
+											>{formatPostDate(hit.date)}</time
+										>
 									{/if}
 								</div>
 								<div class="result-title">{hit.title}</div>
