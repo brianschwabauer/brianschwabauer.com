@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import { goto } from '$app/navigation';
-	import PostCard from '$lib/components/blog/PostCard.svelte';
-	import FeaturedPostCard from '$lib/components/blog/FeaturedPostCard.svelte';
-	import PostFilters from '$lib/components/blog/PostFilters.svelte';
+	import { page } from "$app/state";
+	import { goto } from "$app/navigation";
+	import PostCard from "$lib/components/blog/PostCard.svelte";
+	import FeaturedPostCard from "$lib/components/blog/FeaturedPostCard.svelte";
+	import PostFilters from "$lib/components/blog/PostFilters.svelte";
 
 	let { data } = $props();
 
@@ -16,7 +16,7 @@
 	 * deleted tag), we keep the raw URL value as the label so the active
 	 * chip is still visible — clicking "All Posts" clears it.
 	 */
-	const activeTagParam = $derived(page.url.searchParams.get('tag') || null);
+	const activeTagParam = $derived(page.url.searchParams.get("tag") || null);
 	const activeTag = $derived.by(() => {
 		if (!activeTagParam) return null;
 		const key = activeTagParam.toLowerCase();
@@ -30,21 +30,26 @@
 
 	function setActiveTag(tag: string | null) {
 		const url = new URL(page.url);
-		if (tag) url.searchParams.set('tag', tag);
-		else url.searchParams.delete('tag');
+		if (tag) url.searchParams.set("tag", tag);
+		else url.searchParams.delete("tag");
 		goto(url, { keepFocus: true, noScroll: true });
 	}
 
 	const filteredPosts = $derived(
 		activeTag
-			? data.posts.filter((p) => p.tags?.some((t) => t.toLowerCase() === activeTag!.toLowerCase()))
-			: data.posts
+			? data.posts.filter((p) =>
+					p.tags?.some((t) => t.toLowerCase() === activeTag!.toLowerCase()),
+				)
+			: data.posts,
 	);
 
 	const pinnedPosts = $derived(
 		[...filteredPosts]
 			.filter((p) => p.pinned)
-			.sort((a, b) => (b.publishedAt ?? b.createdAt) - (a.publishedAt ?? a.createdAt))
+			.sort(
+				(a, b) =>
+					(b.publishedAt ?? b.createdAt) - (a.publishedAt ?? a.createdAt),
+			),
 	);
 
 	const regularPosts = $derived(filteredPosts.filter((p) => !p.pinned));
@@ -63,7 +68,7 @@
 	 */
 	const POPULAR_TAG_LIMIT = 5;
 	const POPULAR_TAG_MIN_POSTS = 2;
-	const FILTER_HIDDEN_TAGS = new Set(['archive']);
+	const FILTER_HIDDEN_TAGS = new Set(["archive"]);
 	const popularTags = $derived.by(() => {
 		const counts = new Map<string, { display: string; count: number }>();
 		for (const p of data.posts) {
@@ -99,14 +104,17 @@
 	<title>Blog - Brian Schwabauer</title>
 	<meta
 		name="description"
-		content="Thoughts on development, creativity, and the journey of building things."
+		content="Thoughts on software development, creativity, and the journey of building things."
 	/>
 </svelte:head>
 
 <div class="blog-page">
 	<div class="blog-header">
 		<h1 class="blog-title">Blog</h1>
-		<p class="blog-subtitle">Thoughts on development, creativity, and the journey of building things.</p>
+		<p class="blog-subtitle">
+			Thoughts on software development, creativity, and the journey of building
+			things.
+		</p>
 	</div>
 
 	{#if displayTags.length > 0}
