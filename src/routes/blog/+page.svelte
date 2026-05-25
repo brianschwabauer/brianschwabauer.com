@@ -21,15 +21,30 @@
 
 	const regularPosts = $derived(filteredPosts.filter((p) => !p.pinned));
 
-	const allTags = $derived.by(() => {
-		const seen = new Map<string, string>();
+	/**
+	 * Surface the top filter chips by usage: tags must be used on at least
+	 * 2 posts to clear the noise floor (kills WordPress-import long-tail),
+	 * then we keep the top 5 by count. Ties break alphabetically so the
+	 * order is stable as you write new posts. Tags themselves still live
+	 * on each post — this only trims the filter row.
+	 */
+	const POPULAR_TAG_LIMIT = 5;
+	const POPULAR_TAG_MIN_POSTS = 2;
+	const popularTags = $derived.by(() => {
+		const counts = new Map<string, { display: string; count: number }>();
 		for (const p of data.posts) {
 			for (const t of p.tags ?? []) {
 				const key = t.toLowerCase();
-				if (!seen.has(key)) seen.set(key, t);
+				const entry = counts.get(key);
+				if (entry) entry.count += 1;
+				else counts.set(key, { display: t, count: 1 });
 			}
 		}
-		return [...seen.values()].sort((a, b) => a.localeCompare(b));
+		return [...counts.values()]
+			.filter((t) => t.count >= POPULAR_TAG_MIN_POSTS)
+			.sort((a, b) => b.count - a.count || a.display.localeCompare(b.display))
+			.slice(0, POPULAR_TAG_LIMIT)
+			.map((t) => t.display);
 	});
 </script>
 
@@ -47,9 +62,9 @@
 		<p class="blog-subtitle">Thoughts on development, creativity, and the journey of building things.</p>
 	</div>
 
-	{#if allTags.length > 0}
+	{#if popularTags.length > 0}
 		<div class="blog-filters">
-			<PostFilters tags={allTags} {activeTag} onChange={(t) => (activeTag = t)} />
+			<PostFilters tags={popularTags} {activeTag} onChange={(t) => (activeTag = t)} />
 		</div>
 	{/if}
 
