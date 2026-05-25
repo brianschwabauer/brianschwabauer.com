@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from "svelte";
+	import { Button } from "@delightstack/components/actions";
 
 	// ---- rotating headline -------------------------------------------------
 	// The headline cycles every few seconds — gives the page a little life
@@ -21,10 +22,14 @@
 	});
 
 	// ---- form state --------------------------------------------------------
+	// `submitting` mirrors the in-flight network request — the delightstack
+	// <Button> tracks its own loading via the onclick promise, but we still
+	// need this to disable the inputs while the request is in the air.
 	let name = $state("");
 	let email = $state("");
 	let message = $state("");
-	let formState = $state<"idle" | "sending" | "sent" | "error">("idle");
+	let formState = $state<"idle" | "sent">("idle");
+	let submitting = $state(false);
 	let formError = $state("");
 
 	// Sassy meter that reacts to message length — gives writing a little
@@ -55,15 +60,19 @@
 		};
 	});
 
-	async function submit(e: SubmitEvent) {
-		e.preventDefault();
-		if (formState === "sending") return;
+	/**
+	 * Submit handler used by both the form's onsubmit (Enter-to-send from a
+	 * field) and the <Button>'s onclick. Throwing on failure lets <Button>'s
+	 * onclick-promise tracker reset its spinner without flashing the success
+	 * checkmark.
+	 */
+	async function submit() {
+		if (submitting) return;
 		if (!name.trim() || !email.trim() || !message.trim()) {
 			formError = "Name, email, and message — none of them optional.";
-			formState = "error";
-			return;
+			throw new Error(formError);
 		}
-		formState = "sending";
+		submitting = true;
 		formError = "";
 		try {
 			const res = await fetch("/api/contact", {
@@ -77,8 +86,10 @@
 			}
 			formState = "sent";
 		} catch (err) {
-			formState = "error";
 			formError = err instanceof Error ? err.message : "Send failed";
+			throw err;
+		} finally {
+			submitting = false;
 		}
 	}
 
@@ -163,7 +174,18 @@
 			>
 		</div>
 	{:else}
-		<form class="card form" onsubmit={submit} novalidate>
+		<form
+			class="card form"
+			onsubmit={(e) => {
+				e.preventDefault();
+				// Form-level submit is just the Enter-key path; <Button> handles
+				// its own loading state via the onclick promise. Swallow throws
+				// here so unhandled-rejection warnings don't fire — the error is
+				// already surfaced in formError.
+				submit().catch(() => {});
+			}}
+			novalidate
+		>
 			<div class="field-row">
 				<label class="field">
 					<span class="field-label">Your name</span>
@@ -175,7 +197,7 @@
 						maxlength="100"
 						autocomplete="name"
 						placeholder="Johnny Appleseed"
-						disabled={formState === "sending"}
+						disabled={submitting}
 					/>
 				</label>
 				<label class="field">
@@ -188,7 +210,7 @@
 						maxlength="200"
 						autocomplete="email"
 						placeholder="johnny@example.com"
-						disabled={formState === "sending"}
+						disabled={submitting}
 					/>
 				</label>
 			</div>
@@ -204,7 +226,7 @@
 					maxlength="5000"
 					rows="7"
 					placeholder="Tell me about your idea, the dream, or just say hi."
-					disabled={formState === "sending"}
+					disabled={submitting}
 				></textarea>
 				<span class="char-count" class:near={message.length > 4500}>
 					{message.length} / 5000
@@ -216,28 +238,31 @@
 			{/if}
 
 			<div class="actions">
-				<button
-					class="send-btn"
-					type="submit"
-					disabled={formState === "sending"}
-				>
-					{#if formState === "sending"}
-						<span class="spinner" aria-hidden="true"></span>
-						Sending…
-					{:else}
-						Send it
-						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<path
-								d="M5 12h14M13 6l6 6-6 6"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
-						</svg>
-					{/if}
-				</button>
+				<Button accent pill onclick={submit}>
+					{#snippet children({ isLoading, isLoadingSuccess })}
+						{isLoading
+							? "Sending…"
+							: isLoadingSuccess
+								? "Sent"
+								: "Send it"}
+						{#if !isLoading && !isLoadingSuccess}
+							<svg
+								class="send-arrow"
+								viewBox="0 0 24 24"
+								aria-hidden="true"
+							>
+								<path
+									d="M5 12h14M13 6l6 6-6 6"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						{/if}
+					{/snippet}
+				</Button>
 				<p class="fine-print">
 					No tracking, no list, no spam. Promise written in actual code:
 					<a
@@ -274,14 +299,21 @@
 	.title {
 		font-size: clamp(2.4rem, 7vw, 4rem);
 		font-weight: 900;
-		line-height: 1;
+		/* line-height 1 + descender-bearing letters (p, j, g, y) clipped the
+		   bottoms of "Pitch" and "Just" — the gradient's background-clip:text
+		   only paints inside the element's content box, so any glyph reaching
+		   below the line box rendered transparent. Open up the line a bit and
+		   add a hair of padding-bottom on the inline-block span so descenders
+		   stay inside the painted area. */
+		line-height: 1.15;
 		letter-spacing: -0.03em;
 		margin: 0 0 var(--space-4);
-		min-height: 1.1em;
+		min-height: 1.25em;
 		position: relative;
 	}
 	.title-line {
 		display: inline-block;
+		padding-bottom: 0.1em;
 		background: linear-gradient(
 			95deg,
 			var(--color-text) 0%,
@@ -443,61 +475,9 @@
 		gap: var(--space-3);
 		margin-top: var(--space-2);
 	}
-	.send-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.55rem;
-		padding: 0.95rem 1.8rem;
-		background: linear-gradient(
-			135deg,
-			var(--color-accent) 0%,
-			color-mix(in srgb, var(--color-accent) 65%, #00d6ff) 100%
-		);
-		color: #fff;
-		border: none;
-		border-radius: var(--radius-full);
-		font-family: var(--font-sans);
-		font-weight: 800;
-		font-size: 1.05rem;
-		letter-spacing: 0.01em;
-		cursor: pointer;
-		box-shadow: 0 10px 30px
-			color-mix(in srgb, var(--color-accent) 35%, transparent);
-		transition:
-			transform 200ms ease,
-			box-shadow 200ms ease,
-			opacity 200ms ease;
-	}
-	.send-btn:hover:not(:disabled) {
-		transform: translateY(-2px);
-		box-shadow: 0 14px 36px
-			color-mix(in srgb, var(--color-accent) 45%, transparent);
-	}
-	.send-btn:active:not(:disabled) {
-		transform: translateY(0) scale(0.98);
-	}
-	.send-btn:disabled {
-		opacity: 0.7;
-		cursor: progress;
-	}
-	.send-btn svg {
-		width: 18px;
-		height: 18px;
-	}
-	.spinner {
-		display: inline-block;
-		width: 14px;
-		height: 14px;
-		border: 2px solid rgba(255, 255, 255, 0.45);
-		border-top-color: #fff;
-		border-radius: 50%;
-		animation: spin 700ms linear infinite;
-	}
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
+	.send-arrow {
+		width: 16px;
+		height: 16px;
 	}
 
 	.fine-print {
@@ -663,9 +643,6 @@
 		.plane,
 		.trail span {
 			animation: none;
-		}
-		.send-btn:hover:not(:disabled) {
-			transform: none;
 		}
 	}
 </style>
