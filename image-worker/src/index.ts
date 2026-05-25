@@ -24,8 +24,8 @@ import {
 // startAndWaitForPorts() itself, so we don't need a local wrapper anymore.
 //
 // Note the `/worker` subpath import: the package keeps this DO class out of
-// its main barrel because the class imports `cloudflare:workers`, which
-// otherwise breaks any non-worker bundler that tries to load the package.
+// its main barrel because the class transitively depends on cloudflare:workers,
+// which otherwise breaks any non-worker bundler that tries to load the package.
 export { ImageProcessorContainer } from '@delightstack/images/worker';
 
 export default {
