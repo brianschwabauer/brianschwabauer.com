@@ -92,7 +92,7 @@
 				<time class="post-date">{formatDate(data.post.publishedAt)}</time>
 			</div>
 
-			<h1 class="post-title">{data.post.title}</h1>
+			<h1 class="post-title" style:view-transition-name="post-title-{data.post.slug}">{data.post.title}</h1>
 
 			{#if summary}
 				<p class="post-excerpt">{summary}</p>
@@ -116,7 +116,9 @@
 		{#if featured}
 			<figure
 				class="post-featured"
-				style={bgStyle(featured)}>
+				style={bgStyle(featured)}
+				style:view-transition-name="post-image-{data.post.slug}"
+				style:view-transition-class="blog-cover">
 				<img
 					src={`/cdn/image/${featured.path}/default`}
 					alt={featured.alt_text ?? ''}

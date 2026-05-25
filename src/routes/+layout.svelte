@@ -5,7 +5,7 @@
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import { theme } from '$lib/stores/theme';
 	import { page } from '$app/state';
-	import { beforeNavigate } from '$app/navigation';
+	import { beforeNavigate, onNavigate } from '$app/navigation';
 
 	let { children } = $props();
 
@@ -24,6 +24,35 @@
 		} else {
 			theme.forceTheme('light');
 		}
+	});
+
+	// Progressive-enhancement view transition for /blog ↔ /blog/[slug]
+	// navigations. The blog cards and the individual post page both stamp a
+	// slug-scoped `view-transition-name` on the cover image + title, so the
+	// browser morphs the clicked card's hero/title into the post-page hero/
+	// title. Other cards on the listing just cross-fade out with the rest of
+	// the page — which is the correct visual outcome since they don't have a
+	// matching named element on the destination. Bails out cleanly on
+	// browsers without the API and when the user prefers reduced motion.
+	onNavigate((navigation) => {
+		if (typeof document === 'undefined') return;
+		if (!('startViewTransition' in document)) return;
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+		const from = navigation.from?.url.pathname ?? '';
+		const to = navigation.to?.url.pathname ?? '';
+		const isBlogListToPost = from === '/blog' && to.startsWith('/blog/') && to !== '/blog/rss.xml';
+		const isPostToBlogList = from.startsWith('/blog/') && to === '/blog';
+		if (!isBlogListToPost && !isPostToBlogList) return;
+
+		return new Promise((resolve) => {
+			(document as Document & {
+				startViewTransition: (cb: () => Promise<void>) => unknown;
+			}).startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
 	});
 </script>
 

@@ -25,7 +25,11 @@
 <article class="featured-card">
 	<a href="/blog/{post.slug}" class="featured-link">
 		{#if post.featuredImage}
-			<div class="featured-image" style={bgStyle(post.featuredImage)}>
+			<div
+				class="featured-image"
+				style={bgStyle(post.featuredImage)}
+				style:view-transition-name="post-image-{post.slug}"
+				style:view-transition-class="blog-cover">
 				<img
 					src={thumbnailURL(post.featuredImage)}
 					alt={post.featuredImage.alt_text ?? ''}
@@ -45,7 +49,7 @@
 				<time class="featured-date">{formatDate(post.publishedAt)}</time>
 			</div>
 
-			<h2 class="featured-title">{post.title}</h2>
+			<h2 class="featured-title" style:view-transition-name="post-title-{post.slug}">{post.title}</h2>
 
 			{#if summary}
 				<p class="featured-excerpt">{summary}</p>
