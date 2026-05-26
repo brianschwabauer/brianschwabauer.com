@@ -19,7 +19,8 @@
 		const onScroll = () => {
 			const rect = el!.getBoundingClientRect();
 			const vh = window.innerHeight || 1;
-			const total = rect.height + vh;
+			const navbarHeight = 350;
+			const total = rect.height + vh - navbarHeight;
 			const traversed = vh - rect.top;
 			progress = Math.max(0, Math.min(1, traversed / total));
 		};
