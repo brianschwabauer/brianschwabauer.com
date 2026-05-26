@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { create, load, search, type AnyOrama, type Results } from '@orama/orama';
+	import { Button } from '@delightstack/components/actions';
 	import { entryLabel, indexSchema, type SearchEntry } from '$lib/search';
 	import { bgStyle, thumbnailURL } from '$lib/client/images';
 	import { formatPostDate, isoPostDate } from '$lib/utils/date';
@@ -286,12 +287,12 @@
 					autocomplete="off"
 					spellcheck="false"
 					aria-label="Search" />
-				<button class="close-btn" type="button" onclick={close} aria-label="Close search">
+				<Button icon transparent size="0" onclick={close} aria-label="Close search">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 						<line x1="18" y1="6" x2="6" y2="18" />
 						<line x1="6" y1="6" x2="18" y2="18" />
 					</svg>
-				</button>
+				</Button>
 			</div>
 
 			<div class="results" bind:this={listEl}>
@@ -460,30 +461,6 @@
 
 	.search-bar input::-webkit-search-cancel-button {
 		appearance: none;
-	}
-
-	.close-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 32px;
-		height: 32px;
-		border-radius: var(--radius-md);
-		color: var(--color-text-muted);
-		transition:
-			color var(--transition-fast),
-			background-color var(--transition-fast);
-	}
-
-	.close-btn:hover {
-		transition-duration: 0s;
-		color: var(--color-text);
-		background: var(--color-bg-secondary);
-	}
-
-	.close-btn svg {
-		width: 18px;
-		height: 18px;
 	}
 
 	.results {
