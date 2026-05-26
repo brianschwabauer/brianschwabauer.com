@@ -9,6 +9,44 @@
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
+	let pacTunnel = $state<HTMLElement | null>(null);
+	let pacProgress = $state(0);
+	let pelletTargets = $state([0.2, 0.31, 0.42, 0.54, 0.66, 0.77]);
+
+	$effect(() => {
+		if (!pacTunnel) return;
+		const recomputePelletTargets = () => {
+			const vw = window.innerWidth || 1;
+			const pacSize = Math.max(220, Math.min(400, vw * 0.3));
+			const startCenter = -pacSize / 2 - 20;
+			const travel = vw + pacSize + 80;
+			const padding = vw * 0.08;
+			const spacing = (vw - 2 * padding) / 5;
+			pelletTargets = [0, 1, 2, 3, 4, 5].map(
+				(i) => (padding + i * spacing - startCenter) / travel,
+			);
+		};
+		const updateProgress = () => {
+			const rect = pacTunnel!.getBoundingClientRect();
+			const vh = window.innerHeight || 1;
+			const range = vh + pacTunnel!.offsetHeight;
+			const p = range > 0 ? (vh - rect.top) / range : 0;
+			pacProgress = Math.max(0, Math.min(1, p));
+		};
+		const onResize = () => {
+			recomputePelletTargets();
+			updateProgress();
+		};
+		recomputePelletTargets();
+		updateProgress();
+		window.addEventListener('scroll', updateProgress, { passive: true });
+		window.addEventListener('resize', onResize);
+		return () => {
+			window.removeEventListener('scroll', updateProgress);
+			window.removeEventListener('resize', onResize);
+		};
+	});
+
 	const xyzShots = [
 		{
 			src: '2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen.avif',
@@ -80,9 +118,9 @@
 		<div class="grid-2">
 			<Reveal>
 				<h2 class="green-title">
-					Kevin's dad painted
+					Bedroom wall
 					<br />
-					<span class="key">a wall neon green.</span>
+					<span class="key">painted neon green.</span>
 				</h2>
 				<p class="lede">
 					Suddenly the possibilities felt infinite. We didn't know how to use a chroma
@@ -125,6 +163,35 @@
 			</Reveal>
 		</div>
 
+		<div
+			bind:this={pacTunnel}
+			class="pac-tunnel"
+			style:--p={pacProgress}
+			aria-hidden="true">
+			<div class="pac-stage">
+				<div class="pac-pellets">
+					{#each pelletTargets as t, i (i)}
+						<span class:eaten={pacProgress > t}></span>
+					{/each}
+				</div>
+				<div class="pac-runner">
+					<svg viewBox="0 0 100 100">
+						<defs>
+							<mask id="pac-mouth-mask">
+								<rect x="0" y="0" width="100" height="100" fill="white" />
+								<polygon
+									points="50,50 100,18 100,82"
+									fill="black"
+									class="pac-runner-mouth" />
+							</mask>
+						</defs>
+						<circle cx="50" cy="50" r="46" fill="#ffd934" mask="url(#pac-mouth-mask)" />
+						<circle cx="62" cy="28" r="4" fill="#1a0c00" />
+					</svg>
+				</div>
+			</div>
+		</div>
+
 		<div class="pac-block">
 			<div class="pac-grid">
 				<Reveal>
@@ -155,29 +222,11 @@
 								src="2008-01-06_pac-attack-pacman_eats_kevin_visual_effect.avif"
 								alt="Pacman eats Kevin"
 								ratio="4 / 3" />
-							<div class="pac-bites">
-								<span class="pellet" style:--i="0"></span>
-								<span class="pellet" style:--i="1"></span>
-								<span class="pellet" style:--i="2"></span>
-								<span class="pellet" style:--i="3"></span>
-								<span class="pellet" style:--i="4"></span>
-								<span class="pac" aria-hidden="true">
-									<svg viewBox="0 0 100 100">
-										<defs>
-											<clipPath id="mouth">
-												<polygon points="50,50 100,20 100,80"></polygon>
-											</clipPath>
-										</defs>
-										<circle cx="50" cy="50" r="46" fill="#ffd934" />
-										<polygon points="50,50 100,20 100,80" fill="#000" class="mouth-tri" />
-									</svg>
-								</span>
-							</div>
 						</div>
 						<div class="arcade-base">
 							<span class="coin">INSERT COIN</span>
 							<span class="hi">
-								HI · 1
+								PLAYER 1
 								<span class="blink">_</span>
 							</span>
 						</div>
@@ -211,7 +260,7 @@
 							src="2008-01-06_pac-attack-flash_game_screen_recording-pacman_eats_brians_floating_faces.avif"
 							alt="The companion Flash game"
 							ratio="4 / 3" />
-						<p>Bonus: a Flash game launched alongside the film. Brian-faces. Pellets.</p>
+						<p>Bonus: a Flash game launched alongside the film. Eat the Brian-faces.</p>
 					</div>
 				</div>
 			</Reveal>
@@ -432,11 +481,13 @@
 		letter-spacing: 0.04em;
 	}
 	.xyz-block,
-	.pac-block,
 	.ae-block,
 	.nuisance-block,
 	.sideline-block {
 		margin: 4rem 0;
+	}
+	.pac-block {
+		margin: 0;
 	}
 	.inline-video {
 		max-width: 880px;
@@ -449,6 +500,8 @@
 		gap: clamp(1.5rem, 4vw, 3rem);
 		align-items: center;
 		margin-bottom: 3rem;
+		font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+		line-height: 1.6;
 	}
 	@media (max-width: 768px) {
 		.pac-grid {
@@ -469,68 +522,6 @@
 		background: #000;
 		border-radius: 4px;
 		overflow: hidden;
-	}
-	.pac-bites {
-		position: absolute;
-		left: 0;
-		top: 50%;
-		transform: translateY(-50%);
-		width: 100%;
-		height: 24px;
-		display: flex;
-		align-items: center;
-		justify-content: space-around;
-		pointer-events: none;
-	}
-	.pellet {
-		display: block;
-		width: 8px;
-		height: 8px;
-		background: #ffd934;
-		border-radius: 50%;
-		opacity: 0;
-		animation: eat 4s linear infinite;
-		animation-delay: calc(var(--i) * 0.5s);
-	}
-	@keyframes eat {
-		0%,
-		95%,
-		100% {
-			opacity: 1;
-		}
-		96% {
-			opacity: 0;
-			transform: scale(2);
-		}
-	}
-	.pac {
-		position: absolute;
-		left: -10%;
-		top: 50%;
-		width: 38px;
-		height: 38px;
-		transform: translateY(-50%);
-		animation: chomp 4s linear infinite;
-	}
-	@keyframes chomp {
-		from {
-			left: -10%;
-		}
-		to {
-			left: 110%;
-		}
-	}
-	.mouth-tri {
-		transform-origin: 50% 50%;
-		animation: mouth 0.25s ease-in-out infinite alternate;
-	}
-	@keyframes mouth {
-		from {
-			transform: scaleY(1);
-		}
-		to {
-			transform: scaleY(0.15);
-		}
 	}
 	.arcade-base {
 		display: flex;
@@ -613,5 +604,83 @@
 	.prose em {
 		color: #22ff90;
 		font-style: italic;
+	}
+
+	.pac-tunnel {
+		--pac-size: clamp(220px, 30vw, 400px);
+		--stage-height: calc(var(--pac-size) + clamp(20px, 3vw, 48px));
+		--extra-scroll: 50vh;
+		position: relative;
+		width: 100vw;
+		max-width: 100vw;
+		margin-left: calc(50% - 50vw);
+		margin-right: calc(50% - 50vw);
+		margin-top: 2rem;
+		margin-bottom: 0;
+		height: calc(var(--stage-height) + var(--extra-scroll));
+		pointer-events: none;
+	}
+	.pac-stage {
+		position: sticky;
+		top: calc(50vh - var(--stage-height) / 2);
+		height: var(--stage-height);
+		overflow-x: clip;
+		overflow-y: visible;
+	}
+	.pac-pellets {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 8vw;
+	}
+	.pac-pellets span {
+		display: block;
+		width: clamp(14px, 1.6vw, 22px);
+		height: clamp(14px, 1.6vw, 22px);
+		background: #ffd934;
+		border-radius: 50%;
+		box-shadow: 0 0 18px rgba(255, 217, 52, 0.6);
+		transition:
+			transform 140ms ease-out,
+			opacity 140ms ease-out;
+	}
+	.pac-pellets span.eaten {
+		opacity: 0;
+		transform: scale(0);
+	}
+	.pac-runner {
+		position: absolute;
+		top: 50%;
+		width: var(--pac-size);
+		height: var(--pac-size);
+		margin-top: calc(var(--pac-size) / -2);
+		left: calc(var(--p, 0) * (100vw + var(--pac-size) + 80px) - var(--pac-size) - 20px);
+		filter: drop-shadow(0 0 32px rgba(255, 217, 52, 0.55));
+		will-change: left;
+	}
+	.pac-runner svg {
+		width: 100%;
+		height: 100%;
+		display: block;
+		overflow: visible;
+	}
+	.pac-runner-mouth {
+		transform-origin: 50% 50%;
+		animation: pac-chomp 0.28s ease-in-out infinite alternate;
+	}
+	@keyframes pac-chomp {
+		from {
+			transform: scaleY(1);
+		}
+		to {
+			transform: scaleY(0);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.pac-tunnel {
+			display: none;
+		}
 	}
 </style>
