@@ -1008,6 +1008,9 @@
 		text-transform: uppercase;
 		color: rgba(255, 255, 255, 0.85);
 		backdrop-filter: blur(8px);
+		span:not(.avatar) {
+			text-box: trim-both cap alphabetic;
+		}
 	}
 	.avatar {
 		position: relative;
@@ -1016,9 +1019,9 @@
 		overflow: hidden;
 		flex-shrink: 0;
 		isolation: isolate;
-		width: 52px;
-		height: 52px;
-		margin: -20px 0 -10px -4px;
+		width: 60px;
+		height: 60px;
+		margin: -30px 0 -10px -4px;
 	}
 	.avatar img {
 		width: 100%;
