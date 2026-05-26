@@ -427,6 +427,7 @@
 		transition: transform 200ms ease;
 	}
 	.ranger-card:hover {
+		transition-duration: 0s;
 		transform: translateY(-4px);
 	}
 	.ranger-card::before {

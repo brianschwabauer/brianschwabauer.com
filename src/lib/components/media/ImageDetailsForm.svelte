@@ -137,6 +137,7 @@
 		cursor: pointer;
 	}
 	.back-btn:hover {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 		color: var(--color-text);
 	}

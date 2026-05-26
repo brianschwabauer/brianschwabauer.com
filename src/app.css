@@ -179,6 +179,7 @@ a {
 }
 
 a:hover {
+	transition-duration: 0s;
 	color: var(--color-accent-hover);
 }
 
@@ -478,6 +479,7 @@ select:focus {
 }
 
 .prose a:hover {
+	transition-duration: 0s;
 	color: var(--color-accent);
 	text-decoration-color: var(--color-accent);
 }

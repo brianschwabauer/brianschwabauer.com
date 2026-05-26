@@ -588,6 +588,7 @@
 			background 220ms ease;
 	}
 	.film:hover {
+		transition-duration: 0s;
 		transform: translateY(-3px);
 		border-color: rgba(255, 156, 74, 0.45);
 		background: rgba(255, 156, 74, 0.06);

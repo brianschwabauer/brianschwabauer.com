@@ -129,6 +129,7 @@
 	}
 
 	.footer-nav a:hover {
+		transition-duration: 0s;
 		color: var(--color-accent);
 	}
 
@@ -153,6 +154,7 @@
 	}
 
 	.social-link:hover {
+		transition-duration: 0s;
 		color: var(--color-accent);
 		background: var(--color-accent-light);
 		transform: translateY(-2px);

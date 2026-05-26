@@ -376,6 +376,7 @@
 	}
 
 	.toolbar-btn:hover {
+		transition-duration: 0s;
 		background: var(--color-surface);
 		color: var(--color-text);
 	}
@@ -601,6 +602,7 @@
 
 	.editor-content :global(figure.blog-img:hover .blog-img-handle),
 	.editor-content :global(figure.blog-img.is-selected .blog-img-handle) {
+		transition-duration: 0s;
 		opacity: 1;
 	}
 
@@ -654,6 +656,7 @@
 	}
 
 	.editor-content :global(figure.blog-img .blog-img-toolbar button:hover) {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 		color: var(--color-text);
 	}
@@ -757,12 +760,14 @@
 		height: 14px;
 	}
 	.editor-content :global(figure.blog-img .blog-img-repos-toolbar button:hover) {
+		transition-duration: 0s;
 		background: rgba(255, 255, 255, 0.18);
 	}
 	.editor-content :global(figure.blog-img .blog-img-repos-toolbar button.primary) {
 		background: var(--color-accent);
 	}
 	.editor-content :global(figure.blog-img .blog-img-repos-toolbar button.primary:hover) {
+		transition-duration: 0s;
 		background: var(--color-accent);
 		filter: brightness(1.1);
 	}

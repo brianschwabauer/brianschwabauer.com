@@ -272,6 +272,7 @@
 			border-color 200ms ease;
 	}
 	.cta:hover {
+		transition-duration: 0s;
 		background: rgba(255, 255, 255, 0.12);
 		border-color: rgba(255, 156, 74, 0.55);
 		transform: translateY(-2px);

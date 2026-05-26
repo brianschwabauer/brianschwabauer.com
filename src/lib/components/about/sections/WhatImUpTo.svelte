@@ -226,6 +226,7 @@
 		text-underline-offset: 4px;
 	}
 	.lede a:hover {
+		transition-duration: 0s;
 		color: #fff;
 	}
 
@@ -251,6 +252,7 @@
 		box-shadow: 0 10px 30px rgba(0, 242, 195, 0.3);
 	}
 	.cta-primary:hover {
+		transition-duration: 0s;
 		transform: translateY(-2px);
 		box-shadow: 0 14px 40px rgba(0, 242, 195, 0.45);
 	}
@@ -276,6 +278,7 @@
 			transform 200ms ease;
 	}
 	.cta-ghost:hover {
+		transition-duration: 0s;
 		background: rgba(255, 255, 255, 0.1);
 		border-color: rgba(0, 242, 195, 0.45);
 		transform: translateY(-2px);

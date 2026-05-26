@@ -74,6 +74,7 @@
 	}
 
 	.post-card:hover {
+		transition-duration: 0s;
 		border-color: var(--color-accent);
 		transform: translateY(-4px);
 		box-shadow: var(--shadow-lg);
@@ -181,6 +182,7 @@
 	}
 
 	.post-card:hover .read-more svg {
+		transition-duration: 0s;
 		transform: translateX(4px);
 	}
 </style>

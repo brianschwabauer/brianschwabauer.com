@@ -101,6 +101,7 @@
 	}
 
 	.btn.primary:hover:not(:disabled) {
+		transition-duration: 0s;
 		box-shadow: 0 4px 16px rgba(0, 180, 160, 0.4);
 		transform: translateY(-1px);
 	}
@@ -112,6 +113,7 @@
 	}
 
 	.btn.secondary:hover:not(:disabled) {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 		border-color: var(--color-accent);
 	}
@@ -122,6 +124,7 @@
 	}
 
 	.btn.ghost:hover:not(:disabled) {
+		transition-duration: 0s;
 		background: var(--color-accent-light);
 		color: var(--color-accent);
 	}
@@ -132,6 +135,7 @@
 	}
 
 	.btn.danger:hover:not(:disabled) {
+		transition-duration: 0s;
 		background: #dc2626;
 	}
 

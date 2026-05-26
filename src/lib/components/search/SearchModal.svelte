@@ -476,6 +476,7 @@
 	}
 
 	.close-btn:hover {
+		transition-duration: 0s;
 		color: var(--color-text);
 		background: var(--color-bg-secondary);
 	}
@@ -529,11 +530,12 @@
 		border-radius: var(--radius-md);
 		color: inherit;
 		background: transparent;
-		transition: background-color var(--transition-fast);
+		transition: background-color 250ms;
 	}
 
 	.result:hover,
 	.result.active {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 	}
 
@@ -640,6 +642,7 @@
 	}
 
 	.full-btn:hover {
+		transition-duration: 0s;
 		background: var(--color-accent-light);
 		border-color: var(--color-accent);
 		color: var(--color-accent);

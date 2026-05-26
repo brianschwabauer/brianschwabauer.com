@@ -470,6 +470,7 @@
 		border-bottom: 1px dotted color-mix(in srgb, var(--color-accent) 50%, transparent);
 	}
 	.fine-print a:hover {
+		transition-duration: 0s;
 		border-bottom-color: var(--color-accent);
 	}
 
@@ -607,6 +608,7 @@
 			color var(--transition-fast);
 	}
 	.ghost-btn:hover {
+		transition-duration: 0s;
 		background: var(--color-accent-light);
 		border-color: var(--color-accent);
 		color: var(--color-accent);

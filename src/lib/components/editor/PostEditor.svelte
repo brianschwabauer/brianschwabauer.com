@@ -409,6 +409,7 @@
 		flex-shrink: 0;
 	}
 	.back-link:hover {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 		color: var(--color-accent);
 	}
@@ -460,6 +461,7 @@
 		border-radius: var(--radius-sm);
 	}
 	.preview-link:hover {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 		color: var(--color-accent);
 	}

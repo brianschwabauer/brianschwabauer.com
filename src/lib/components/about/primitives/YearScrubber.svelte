@@ -126,6 +126,7 @@
 		transition: color 200ms ease;
 	}
 	button:hover {
+		transition-duration: 0s;
 		color: #fff;
 	}
 	.year {
@@ -147,6 +148,7 @@
 	}
 	button:hover .label,
 	button.active .label {
+		transition-duration: 0s;
 		max-width: 12rem;
 		opacity: 1;
 	}

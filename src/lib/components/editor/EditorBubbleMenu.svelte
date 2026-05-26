@@ -370,6 +370,7 @@
 		transition: background-color 120ms ease;
 	}
 	.bm-btn:hover {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 	}
 	.bm-btn.active {
@@ -387,6 +388,7 @@
 		color: var(--color-accent);
 	}
 	.bm-btn.ai:hover {
+		transition-duration: 0s;
 		background: var(--color-accent-light);
 	}
 

@@ -516,6 +516,7 @@
 
 	.body-host :global(figure.blog-img:hover .blog-img-handle),
 	.body-host :global(figure.blog-img.is-selected .blog-img-handle) {
+		transition-duration: 0s;
 		opacity: 1;
 	}
 
@@ -577,6 +578,7 @@
 	}
 
 	.body-host :global(figure.blog-img .blog-img-toolbar button:hover) {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 	}
 
@@ -687,12 +689,14 @@
 		height: 14px;
 	}
 	.body-host :global(figure.blog-img .blog-img-repos-toolbar button:hover) {
+		transition-duration: 0s;
 		background: rgba(255, 255, 255, 0.18);
 	}
 	.body-host :global(figure.blog-img .blog-img-repos-toolbar button.primary) {
 		background: var(--color-accent);
 	}
 	.body-host :global(figure.blog-img .blog-img-repos-toolbar button.primary:hover) {
+		transition-duration: 0s;
 		background: var(--color-accent);
 		filter: brightness(1.1);
 	}
@@ -816,6 +820,7 @@
 	}
 	.body-host :global(figure.blog-video:hover .blog-video-handle),
 	.body-host :global(figure.blog-video.is-selected .blog-video-handle) {
+		transition-duration: 0s;
 		opacity: 1;
 	}
 
@@ -860,6 +865,7 @@
 		height: 18px;
 	}
 	.body-host :global(figure.blog-video .blog-video-toolbar button:hover) {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 	}
 	.body-host :global(figure.blog-video .blog-video-toolbar button.is-active) {

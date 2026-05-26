@@ -518,6 +518,7 @@
 			transform 200ms ease;
 	}
 	.cr-card:hover {
+		transition-duration: 0s;
 		border-color: rgba(255, 58, 58, 0.4);
 		transform: translateY(-3px);
 	}

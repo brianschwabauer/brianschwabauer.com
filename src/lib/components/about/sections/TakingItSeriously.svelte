@@ -241,12 +241,15 @@
 		z-index: 3;
 	}
 	.browser-stack:hover .b1 {
+		transition-duration: 0s;
 		transform: rotate(-12deg) translate(-14%, 10%);
 	}
 	.browser-stack:hover .b2 {
+		transition-duration: 0s;
 		transform: rotate(4deg) translate(6%, -7%);
 	}
 	.browser-stack:hover .b3 {
+		transition-duration: 0s;
 		transform: rotate(0deg) translate(2%, -2%);
 	}
 
