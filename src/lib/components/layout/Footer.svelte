@@ -1,4 +1,6 @@
 <script lang="ts">
+	let { invertLogo = false } = $props();
+
 	const currentYear = new Date().getFullYear();
 
 	const socialLinks = [
@@ -25,7 +27,11 @@
 		<div class="footer-content">
 			<div class="footer-brand">
 				<a href="/" class="footer-logo">
-					<img src="/logo.svg" alt="Brian Schwabauer" class="footer-logo-img" />
+					<img
+						src="/logo.svg"
+						alt="Brian Schwabauer"
+						class="footer-logo-img"
+						class:invert={invertLogo} />
 				</a>
 				<p class="footer-tagline">
 					Delivering delight as a software engineer, creator, entrepreneur.
@@ -99,6 +105,10 @@
 	.footer-logo-img {
 		height: 36px;
 		width: auto;
+	}
+
+	.footer-logo-img.invert {
+		filter: brightness(0) invert(1);
 	}
 
 	.footer-tagline {
