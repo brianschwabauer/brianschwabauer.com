@@ -9,6 +9,7 @@ import {
 	SlugConflictError,
 } from '$lib/server/blog';
 import { rebuildIndex, rebuildVectorIndex } from '$lib/server/searchIndex';
+import { invalidateFuzzyCache } from '$lib/server/fuzzyRedirect';
 import { refreshAdminTags } from '$lib/server/adminData';
 import { augmentWithAi } from '$lib/server/blogAi';
 import type { TipTapDoc } from '$lib/server/renderDoc';
@@ -117,6 +118,7 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 		rebuildVectorIndex(env.KV),
 		refreshAdminTags(env.KV),
 	]);
+	invalidateFuzzyCache();
 
 	return json({ post: updated });
 };
@@ -131,5 +133,6 @@ export const DELETE: RequestHandler = async ({ params, platform, locals }) => {
 		rebuildVectorIndex(platform.env.KV),
 		refreshAdminTags(platform.env.KV),
 	]);
+	invalidateFuzzyCache();
 	return json({ success: true });
 };

@@ -107,10 +107,25 @@ The image worker is deployed separately:
 wrangler deploy --config wrangler.images.toml
 ```
 
-### Legacy URL redirects
+### Redirects & 404 handling
 
-`static/_redirects` 301s the pre-2026 `/blog/YYYY/MM/slug` URLs to the current
-`/blog/slug` scheme to preserve inbound links and SEO.
+Three layers, in priority order:
+
+1. **`static/_redirects`** — Cloudflare static asset rule: pre-2026
+   `/blog/YYYY/MM/slug` → `/blog/slug`. Matched at the edge before the worker
+   runs. The `redirectHandle` hook re-applies the same pattern as a safety net
+   so trailing-slash variants and other edge cases still 301.
+2. **KV `/redirects.json`** — exact-match map for arbitrary legacy URLs
+   (WordPress pages, custom slugs, etc.). Managed at `/admin/redirects`. Looked
+   up only on 404s, so the happy path never reads it. KV's edge cache absorbs
+   repeat reads. Keeping the list in KV (vs. a committed file) keeps the legacy
+   URL list out of the public repo and lets edits ship without redeploying.
+3. **Fuzzy fallback** — when a 404 wasn't matched above, the smart-redirect
+   hook treats the unmatched slug as an Orama search query. If the top hit is
+   clearly the right answer (significant score gap over the runner-up) it issues
+   a **302** (temporary — the slug might one day become a real route).
+   Otherwise the request falls through to `src/routes/+error.svelte`, which
+   shows the same suggestions plus a search input.
 
 ## Media hosting on Cloudflare R2
 
