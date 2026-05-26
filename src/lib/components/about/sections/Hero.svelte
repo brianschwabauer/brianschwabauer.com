@@ -199,7 +199,7 @@
 
 		// per-tile warp position, and whether it has been swept out and parked
 		const u = seededU.slice();
-		const parked: boolean[] = new Array(STAR_COUNT).fill(false);
+		const parked: boolean[] = Array.from({ length: STAR_COUNT }, () => false);
 
 		let heroVisible = true;
 		let raf = 0;

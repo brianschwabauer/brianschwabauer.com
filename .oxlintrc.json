@@ -1,0 +1,41 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["typescript", "unicorn", "oxc", "import", "promise"],
+	"categories": {
+		"correctness": "error"
+	},
+	"rules": {},
+	"overrides": [
+		{
+			"files": ["**/*.svelte"],
+			"rules": {
+				"eslint/no-unassigned-vars": "off"
+			}
+		},
+		{
+			"files": ["src/lib/components/editor/extensions/*.ts"],
+			"rules": {
+				"typescript/no-this-alias": "off"
+			}
+		}
+	],
+	"env": {
+		"builtin": true,
+		"browser": true,
+		"node": true,
+		"es2024": true
+	},
+	"ignorePatterns": [
+		"delightstack/",
+		".svelte-kit/",
+		"build/",
+		".wrangler/",
+		".vercel/",
+		"node_modules/",
+		"static/",
+		"media/",
+		"legacy-content/",
+		".claude/",
+		"scripts/"
+	]
+}

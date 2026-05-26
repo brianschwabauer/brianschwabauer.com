@@ -13,7 +13,9 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "oxfmt",
-		"format:check": "oxfmt --check"
+		"format:check": "oxfmt --check",
+		"lint": "oxlint",
+		"lint:fix": "oxlint --fix"
 	},
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.32.0",
@@ -41,6 +43,7 @@
 		"@types/video.js": "^7.3.58",
 		"concurrently": "^9.0.0",
 		"oxfmt": "^0.52.0",
+		"oxlint": "^1.67.0",
 		"svelte": "^5.54.0",
 		"svelte-check": "^4.4.5",
 		"typescript": "^5.0.0",
