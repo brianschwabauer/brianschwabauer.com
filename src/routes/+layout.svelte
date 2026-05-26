@@ -73,7 +73,7 @@
 		{@render children()}
 	</main>
 	{#if !isAdminPage}
-		<Footer />
+		<Footer invertLogo={isRootPage} />
 	{/if}
 </div>
 
