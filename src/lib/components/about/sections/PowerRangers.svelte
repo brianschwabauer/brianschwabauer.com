@@ -41,7 +41,7 @@
 	];
 </script>
 
-<SectionShell id="power-rangers" year="2007-2008" label="Power Rangers 360" theme="ranger">
+<SectionShell id="power-rangers" year="2008" label="Power Rangers 360" theme="ranger">
 	<div class="prismatic" aria-hidden="true">
 		<span class="band red"></span>
 		<span class="band blue"></span>
@@ -52,7 +52,7 @@
 
 	<div class="container">
 		<Reveal>
-			<YearMark year="2007 – 2008" subtitle="Feature Length" color="#ffcc33" />
+			<YearMark year="2008" subtitle="Feature Length" color="#ffcc33" />
 		</Reveal>
 
 		<div class="lockup">

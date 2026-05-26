@@ -33,7 +33,7 @@
 	].map((src) => ({ src }));
 </script>
 
-<SectionShell id="music-videos" year="2008-2010" label="Music Videos" theme="audio">
+<SectionShell id="music-videos" year="2009" label="Music Videos" theme="audio">
 	<div class="eq" aria-hidden="true">
 		{#each Array(40) as _, i}
 			<span style:--i={i}></span>
@@ -42,7 +42,7 @@
 
 	<div class="container">
 		<Reveal>
-			<YearMark year="2008 – 2010" subtitle="Music Videos" color="#ff7ad0" />
+			<YearMark year="2009" subtitle="Music Videos" color="#ff7ad0" />
 		</Reveal>
 
 		<div class="hero-grid">

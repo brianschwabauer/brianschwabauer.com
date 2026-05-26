@@ -31,7 +31,7 @@
 <SectionShell id="spunksters" year="2013" label="The Spunksters" theme="spunksters">
 	<div class="container">
 		<Reveal>
-			<YearMark year="2011 – 2013" subtitle="End of an era" color="#ffd934" />
+			<YearMark year="2013" subtitle="End of an era" color="#ffd934" />
 		</Reveal>
 
 		<div class="lockup">

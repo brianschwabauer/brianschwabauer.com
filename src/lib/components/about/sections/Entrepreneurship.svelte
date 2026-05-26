@@ -46,10 +46,10 @@
 	const scrambledLetters = ['S', 'C', 'R', 'M', 'B', 'L', 'D'];
 </script>
 
-<SectionShell id="entrepreneurship" year="2015-2024" label="Entrepreneurship" theme="entr">
+<SectionShell id="entrepreneurship" year="2017" label="Entrepreneurship" theme="entr">
 	<div class="container">
 		<Reveal>
-			<YearMark year="2015 – 2024" subtitle="Entrepreneurship" color="#00d6ff" />
+			<YearMark year="2017" subtitle="Entrepreneurship" color="#00d6ff" />
 		</Reveal>
 
 		<div class="lockup">

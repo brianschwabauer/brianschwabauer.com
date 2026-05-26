@@ -33,10 +33,10 @@
 	].map((src) => ({ src }));
 </script>
 
-<SectionShell id="animation" year="2009-2011" label="Animation & VFX" theme="vfx">
+<SectionShell id="animation" year="2010" label="Animation & VFX" theme="vfx">
 	<div class="container">
 		<Reveal>
-			<YearMark year="2009 – 2011" subtitle="Animation & Special Effects" color="#6c63ff" />
+			<YearMark year="2010" subtitle="Animation & Special Effects" color="#6c63ff" />
 		</Reveal>
 
 		<div class="lockup">
