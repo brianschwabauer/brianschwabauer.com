@@ -123,8 +123,8 @@
 			<Reveal variant="right" delay={200}>
 				<figure class="annotated">
 					<LazyMedia
-						src="2007-06-16_power_rangers_360-premiere-power_rangers_group_photo_1.jpg"
-						alt="Brian and Kevin with the early crew"
+						src="1998-05-01_brian_and_kevin_at_preschool_graduation.jpg"
+						alt="Brian and Kevin at preschool graduation"
 						ratio="4 / 3" />
 					<svg class="arrows" viewBox="0 0 400 300" aria-hidden="true">
 						<defs>
@@ -132,39 +132,39 @@
 								id="arrowhead"
 								markerWidth="10"
 								markerHeight="10"
-								refX="6"
+								refX="3"
 								refY="3"
 								orient="auto">
-								<polygon points="0 0, 6 3, 0 6" fill="#ff9c4a" />
+								<polygon points="0 0, 6 3, 0 6" fill="#00e0ff" />
 							</marker>
 						</defs>
 						<path
-							d="M 60,40 Q 130,80 180,160"
+							d="M 25,40 Q 30,80 120,120"
 							fill="none"
-							stroke="#ff9c4a"
-							stroke-width="2.5"
+							stroke="#00e0ff"
+							stroke-width="3.5"
 							marker-end="url(#arrowhead)" />
 						<text
 							x="20"
 							y="34"
-							fill="#ff9c4a"
+							fill="#00e0ff"
 							font-family="ui-monospace, monospace"
-							font-size="14"
+							font-size="20"
 							font-weight="700">
 							ME
 						</text>
 						<path
-							d="M 360,50 Q 300,100 260,170"
+							d="M 380,50 Q 350,140 260,120"
 							fill="none"
 							stroke="#00e0ff"
-							stroke-width="2.5"
+							stroke-width="3.5"
 							marker-end="url(#arrowhead)" />
 						<text
 							x="328"
 							y="44"
 							fill="#00e0ff"
 							font-family="ui-monospace, monospace"
-							font-size="14"
+							font-size="20"
 							font-weight="700">
 							KEVIN
 						</text>
@@ -446,6 +446,9 @@
 	.annotated {
 		position: relative;
 		margin: 0;
+		:global(img) {
+			object-position: 50% 36%;
+		}
 	}
 	.arrows {
 		position: absolute;
