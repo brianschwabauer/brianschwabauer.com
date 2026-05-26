@@ -78,7 +78,7 @@ function toMeta(post: BlogPost): BlogPostMeta {
 		pinned: post.pinned ?? false,
 		publishedAt: post.publishedAt,
 		createdAt: post.createdAt,
-		updatedAt: post.updatedAt
+		updatedAt: post.updatedAt,
 	};
 }
 
@@ -127,11 +127,11 @@ async function writeIndexes(kv: KVNamespace, allPosts: BlogPostMeta[]): Promise<
 	const allIndex: BlogIndex = { updatedAt, posts: sorted };
 	const latestIndex: BlogIndex = {
 		updatedAt,
-		posts: sorted.filter((p) => p.status === 'published').slice(0, LATEST_LIMIT)
+		posts: sorted.filter((p) => p.status === 'published').slice(0, LATEST_LIMIT),
 	};
 	await Promise.all([
 		kv.put(ALL_INDEX_KEY, JSON.stringify(allIndex)),
-		kv.put(LATEST_INDEX_KEY, JSON.stringify(latestIndex))
+		kv.put(LATEST_INDEX_KEY, JSON.stringify(latestIndex)),
 	]);
 }
 
@@ -175,7 +175,9 @@ export async function savePost(kv: KVNamespace, input: SavePostInput): Promise<B
 		tags: normalizeTagList(input.tags ?? existing?.tags ?? []),
 		status,
 		featuredImage:
-			input.featuredImage === undefined ? existing?.featuredImage ?? null : input.featuredImage,
+			input.featuredImage === undefined
+				? (existing?.featuredImage ?? null)
+				: input.featuredImage,
 		coverFocalX: clampFocal(input.coverFocalX, existing?.coverFocalX ?? 50),
 		coverFocalY: clampFocal(input.coverFocalY, existing?.coverFocalY ?? 50),
 		pinned: input.pinned ?? existing?.pinned ?? false,
@@ -188,7 +190,7 @@ export async function savePost(kv: KVNamespace, input: SavePostInput): Promise<B
 		createdAt: existing?.createdAt ?? now,
 		updatedAt: now,
 		contentHash: input.contentHash ?? existing?.contentHash ?? null,
-		embedding: input.embedding ?? existing?.embedding ?? null
+		embedding: input.embedding ?? existing?.embedding ?? null,
 	};
 
 	await kv.put(postKey(finalSlug), JSON.stringify(post));
@@ -217,7 +219,7 @@ export class SlugConflictError extends Error {
 export async function renamePost(
 	kv: KVNamespace,
 	oldSlug: string,
-	newSlug: string
+	newSlug: string,
 ): Promise<BlogPost | null> {
 	if (oldSlug === newSlug) return getPost(kv, oldSlug);
 

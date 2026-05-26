@@ -7,7 +7,10 @@
 	import { BlogImage } from './extensions/BlogImage';
 	import { BlogVideo } from './extensions/BlogVideo';
 	import { BlogAudio } from './extensions/BlogAudio';
-	import { imageDropHandler, recordToBlogImageAttrs } from './extensions/imageDropHandler';
+	import {
+		imageDropHandler,
+		recordToBlogImageAttrs,
+	} from './extensions/imageDropHandler';
 	import { SlashCommand } from './extensions/slashCommand';
 	import { TrailingParagraph } from './extensions/trailingParagraph';
 	import MediaLibrary from '$lib/components/media/MediaLibrary.svelte';
@@ -222,8 +225,7 @@
 		class:is-empty={isDocEmpty}
 		data-placeholder={placeholder}
 		onmousedown={handleHostPointerDown}
-		role="presentation"
-	>
+		role="presentation">
 		<div bind:this={editorElement}>
 			{#if !mounted && initialHtml}
 				<div class="body-pm prose body-ssr" aria-hidden="true">{@html initialHtml}</div>
@@ -460,7 +462,9 @@
 	}
 
 	@keyframes blog-img-spin {
-		to { transform: rotate(360deg); }
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	.body-host :global(figure.blog-img .blog-img-handle) {
@@ -488,8 +492,12 @@
 		border-radius: 1px;
 	}
 
-	.body-host :global(figure.blog-img .blog-img-handle-left) { left: 6px; }
-	.body-host :global(figure.blog-img .blog-img-handle-right) { right: 6px; }
+	.body-host :global(figure.blog-img .blog-img-handle-left) {
+		left: 6px;
+	}
+	.body-host :global(figure.blog-img .blog-img-handle-right) {
+		right: 6px;
+	}
 
 	/* Bottom handle: horizontal bar at the bottom-center for resizing height. */
 	.body-host :global(figure.blog-img .blog-img-handle-bottom) {

@@ -189,7 +189,8 @@ function renderBlogImage(node: TipTapNode): string {
 	const bgColor = attrs.bgColor ? String(attrs.bgColor) : '';
 	const caption = typeof attrs.caption === 'string' ? attrs.caption.trim() : '';
 	const cropAspectRaw = Number(attrs.cropAspect);
-	const cropAspect = Number.isFinite(cropAspectRaw) && cropAspectRaw > 0 ? cropAspectRaw : 0;
+	const cropAspect =
+		Number.isFinite(cropAspectRaw) && cropAspectRaw > 0 ? cropAspectRaw : 0;
 	const focalX = Number(attrs.focalX);
 	const focalY = Number(attrs.focalY);
 
@@ -207,12 +208,14 @@ function renderBlogImage(node: TipTapNode): string {
 		.slice()
 		.sort((a, b) => a.width - b.width)
 		.map((v) => `${cdnBase}/${v.name} ${v.width}w`);
-	const srcsetAttr = srcsetEntries.length > 0 ? ` srcset="${escapeAttr(srcsetEntries.join(', '))}"` : '';
+	const srcsetAttr =
+		srcsetEntries.length > 0 ? ` srcset="${escapeAttr(srcsetEntries.join(', '))}"` : '';
 
 	// `sizes` is keyed to the chosen width mode so the browser picks an
 	// appropriately-sized variant from the srcset.
 	let sizes = '100vw';
-	if (widthMode === 'normal') sizes = `(max-width: 768px) 100vw, ${Math.round((widthPct / 100) * 720)}px`;
+	if (widthMode === 'normal')
+		sizes = `(max-width: 768px) 100vw, ${Math.round((widthPct / 100) * 720)}px`;
 	else if (widthMode === 'wide') sizes = '(max-width: 1100px) 100vw, 1100px';
 
 	const styleParts: string[] = [];
@@ -225,7 +228,8 @@ function renderBlogImage(node: TipTapNode): string {
 		styleParts.push(`--blog-img-focal-x: ${fx}%`);
 		styleParts.push(`--blog-img-focal-y: ${fy}%`);
 	}
-	const styleAttr = styleParts.length > 0 ? ` style="${escapeAttr(styleParts.join('; '))}"` : '';
+	const styleAttr =
+		styleParts.length > 0 ? ` style="${escapeAttr(styleParts.join('; '))}"` : '';
 
 	const classes = ['blog-img'];
 	if (caption) classes.push('has-caption');
@@ -281,7 +285,8 @@ function renderBlogVideo(node: TipTapNode): string {
 	const classes = ['blog-video'];
 	if (caption) classes.push('has-caption');
 	const captionHTML = caption ? `<figcaption>${escapeHTML(caption)}</figcaption>` : '';
-	const styleAttr = widthMode === 'normal' ? ` style="--blog-video-pct: ${widthPct}%"` : '';
+	const styleAttr =
+		widthMode === 'normal' ? ` style="--blog-video-pct: ${widthPct}%"` : '';
 	return (
 		`<figure class="${classes.join(' ')}" data-width-mode="${escapeAttr(widthMode)}"` +
 		` data-width-pct="${widthPct}" data-video-slug="${escapeAttr(slug)}"` +
@@ -300,7 +305,9 @@ function renderBlogAudio(node: TipTapNode): string {
 	if (!src) return '';
 	const title = typeof attrs.title === 'string' ? attrs.title.trim() : '';
 	const caption = typeof attrs.caption === 'string' ? attrs.caption.trim() : '';
-	const titleHTML = title ? `<span class="blog-audio-title">${escapeHTML(title)}</span>` : '';
+	const titleHTML = title
+		? `<span class="blog-audio-title">${escapeHTML(title)}</span>`
+		: '';
 	const captionHTML = caption ? `<figcaption>${escapeHTML(caption)}</figcaption>` : '';
 	return (
 		`<figure class="blog-audio">${titleHTML}` +

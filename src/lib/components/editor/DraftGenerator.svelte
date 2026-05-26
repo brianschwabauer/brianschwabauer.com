@@ -24,7 +24,7 @@
 			const res = await fetch('/api/ai/generate', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ outline, type })
+				body: JSON.stringify({ outline, type }),
 			});
 
 			if (!res.ok) {
@@ -60,8 +60,7 @@
 			bind:value={outline}
 			placeholder={type === 'blog'
 				? 'e.g., - Introduction to SvelteKit\n- Why I chose it for my portfolio\n- Key features I love\n- Challenges I faced\n- Conclusion'
-				: 'e.g., Started learning Svelte, built first project, deployed to Cloudflare'}
-		/>
+				: 'e.g., Started learning Svelte, built first project, deployed to Cloudflare'} />
 
 		<div class="actions">
 			<Button outline onclick={() => (open = false)}>Cancel</Button>

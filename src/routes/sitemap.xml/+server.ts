@@ -13,10 +13,10 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 		`\t<url>\n\t\t<loc>${siteUrl}/contact</loc>\n\t\t<priority>0.7</priority>\n\t</url>`,
 		...posts.map((post) => {
 			const lastmod = new Date(
-				post.updatedAt || post.publishedAt || post.createdAt
+				post.updatedAt || post.publishedAt || post.createdAt,
 			).toISOString();
 			return `\t<url>\n\t\t<loc>${siteUrl}/blog/${post.slug}</loc>\n\t\t<lastmod>${lastmod}</lastmod>\n\t\t<priority>0.6</priority>\n\t</url>`;
-		})
+		}),
 	];
 
 	const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -27,7 +27,7 @@ ${entries.join('\n')}
 	return new Response(xml, {
 		headers: {
 			'Content-Type': 'application/xml',
-			'Cache-Control': 'max-age=0, s-maxage=3600'
-		}
+			'Cache-Control': 'max-age=0, s-maxage=3600',
+		},
 	});
 };

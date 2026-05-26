@@ -36,7 +36,8 @@ export default {
 		try {
 			// ── CDN serving ──────────────────────────────────────────────
 			if (pathname.startsWith('/cdn/image/')) {
-				if (request.method !== 'GET') return new Response('Method Not Allowed', { status: 405 });
+				if (request.method !== 'GET')
+					return new Response('Method Not Allowed', { status: 405 });
 				const path = pathname.slice('/cdn/image/'.length);
 				return serveImage(env, request, path);
 			}
@@ -76,7 +77,10 @@ export default {
 						alt?: string | null;
 						caption?: string | null;
 					};
-					const updated = await updateImage(env, path, { alt: body.alt, caption: body.caption });
+					const updated = await updateImage(env, path, {
+						alt: body.alt,
+						caption: body.caption,
+					});
 					if (!updated) return jsonResponse({ message: 'Not found' }, 404);
 					return jsonResponse({ image: updated });
 				}

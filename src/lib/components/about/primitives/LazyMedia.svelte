@@ -11,7 +11,7 @@
 		shadow = true,
 		eager = false,
 		class: klass = '',
-		style = ''
+		style = '',
 	}: {
 		src: string;
 		alt?: string;
@@ -29,7 +29,12 @@
 	let loaded = $state(false);
 </script>
 
-<figure class="lazy-media {klass}" class:rounded class:shadow style:aspect-ratio={ratio || undefined} {style}>
+<figure
+	class="lazy-media {klass}"
+	class:rounded
+	class:shadow
+	style:aspect-ratio={ratio || undefined}
+	{style}>
 	<img
 		src={resolved}
 		{alt}
@@ -37,8 +42,7 @@
 		decoding="async"
 		class:loaded
 		style:object-fit={fit}
-		onload={() => (loaded = true)}
-	/>
+		onload={() => (loaded = true)} />
 	{#if caption}
 		<figcaption>{caption}</figcaption>
 	{/if}

@@ -7,7 +7,7 @@
 		label,
 		theme = 'default',
 		children,
-		class: klass = ''
+		class: klass = '',
 	}: {
 		id: string;
 		year?: string;
@@ -24,8 +24,7 @@
 	data-section-label={label}
 	data-section-year={year ?? ''}
 	data-theme={theme}
-	class="section-shell {klass}"
->
+	class="section-shell {klass}">
 	{@render children()}
 </section>
 

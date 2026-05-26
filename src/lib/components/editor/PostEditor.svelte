@@ -1,21 +1,21 @@
 <script lang="ts">
-	import { untrack } from "svelte";
-	import { goto } from "$app/navigation";
-	import { Button, alert } from "@delightstack/components/actions";
-	import TitleEditor from "./TitleEditor.svelte";
-	import BodyEditor from "./BodyEditor.svelte";
-	import FeaturedImagePicker from "./FeaturedImagePicker.svelte";
-	import PillsBar from "./PillsBar.svelte";
-	import PostSettingsModal from "./PostSettingsModal.svelte";
-	import DraftGenerator from "./DraftGenerator.svelte";
-	import type { JSONContent } from "@tiptap/core";
-	import type { ImageRecord } from "$lib/client/images";
-	import type { BlogPost } from "$lib/server/blog";
+	import { untrack } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { Button, alert } from '@delightstack/components/actions';
+	import TitleEditor from './TitleEditor.svelte';
+	import BodyEditor from './BodyEditor.svelte';
+	import FeaturedImagePicker from './FeaturedImagePicker.svelte';
+	import PillsBar from './PillsBar.svelte';
+	import PostSettingsModal from './PostSettingsModal.svelte';
+	import DraftGenerator from './DraftGenerator.svelte';
+	import type { JSONContent } from '@tiptap/core';
+	import type { ImageRecord } from '$lib/client/images';
+	import type { BlogPost } from '$lib/server/blog';
 
 	interface Props {
 		/** `new` defers the API write until the first Save click; `edit` PATCHes
 		    on save and uses `initialPost.slug` for delete/preview links. */
-		mode: "new" | "edit";
+		mode: 'new' | 'edit';
 		initialPost?: BlogPost | null;
 		/** Server-rendered HTML of `initialPost.content`. Painted into the body
 		    editor mount point so SSR shows real content immediately — TipTap
@@ -28,7 +28,7 @@
 	let {
 		mode,
 		initialPost = null,
-		initialContentHtml = "",
+		initialContentHtml = '',
 		tagSuggestions = [],
 	}: Props = $props();
 
@@ -36,30 +36,28 @@
 	// reference point (the prop itself stays reactive).
 	const initial = untrack(() => initialPost);
 	const emptyDoc: JSONContent = {
-		type: "doc",
-		content: [{ type: "paragraph" }],
+		type: 'doc',
+		content: [{ type: 'paragraph' }],
 	};
 	const initialContent: JSONContent =
 		(initial?.content as JSONContent | undefined) ?? emptyDoc;
 
-	let title = $state(initial?.title ?? "");
-	let summary = $state(initial?.summary ?? initial?.aiSummary ?? "");
+	let title = $state(initial?.title ?? '');
+	let summary = $state(initial?.summary ?? initial?.aiSummary ?? '');
 	let tags = $state<string[]>(initial?.tags ?? []);
-	let status = $state<"draft" | "published">(
-		initial?.status === "published" ? "published" : "draft",
+	let status = $state<'draft' | 'published'>(
+		initial?.status === 'published' ? 'published' : 'draft',
 	);
 	let content = $state<JSONContent>(initialContent);
-	let contentText = $state(initial?.contentText ?? "");
-	let featuredImage = $state<ImageRecord | null>(
-		initial?.featuredImage ?? null,
-	);
+	let contentText = $state(initial?.contentText ?? '');
+	let featuredImage = $state<ImageRecord | null>(initial?.featuredImage ?? null);
 	let coverFocalX = $state<number>(initial?.coverFocalX ?? 50);
 	let coverFocalY = $state<number>(initial?.coverFocalY ?? 50);
-	let slug = $state(initial?.slug ?? "");
+	let slug = $state(initial?.slug ?? '');
 	let publishedAt = $state<number | null>(initial?.publishedAt ?? null);
 
 	let deleting = $state(false);
-	let error = $state("");
+	let error = $state('');
 	let generatorOpen = $state(false);
 	let settingsOpen = $state(false);
 
@@ -72,16 +70,16 @@
 
 	let savedSnapshot = $state(
 		snapshotOf({
-			title: initial?.title ?? "",
-			summary: initial?.summary ?? initial?.aiSummary ?? "",
+			title: initial?.title ?? '',
+			summary: initial?.summary ?? initial?.aiSummary ?? '',
 			tags: initial?.tags ?? [],
-			status: initial?.status === "published" ? "published" : "draft",
+			status: initial?.status === 'published' ? 'published' : 'draft',
 			content: initialContent,
 			featuredImagePath: initial?.featuredImage?.path ?? null,
 			featuredImageAlt: initial?.featuredImage?.alt_text ?? null,
 			coverFocalX: initial?.coverFocalX ?? 50,
 			coverFocalY: initial?.coverFocalY ?? 50,
-			slug: initial?.slug ?? "",
+			slug: initial?.slug ?? '',
 			publishedAt: initial?.publishedAt ?? null,
 		}),
 	);
@@ -104,23 +102,19 @@
 
 	// In `new` mode there's nothing persisted yet, so the first Save is always
 	// available — `hasChanges` would otherwise be false for an empty draft.
-	const hasChanges = $derived(
-		mode === "new" ? true : savedSnapshot !== currentSnapshot,
-	);
+	const hasChanges = $derived(mode === 'new' ? true : savedSnapshot !== currentSnapshot);
 
 	const saveLabel = $derived.by(() => {
-		const willPublish = status === "published";
-		if (mode === "new") return willPublish ? "Publish Post" : "Create Draft";
-		if (hasChanges) return willPublish ? "Publish Changes" : "Save Changes";
-		return willPublish ? "Published" : "Saved";
+		const willPublish = status === 'published';
+		if (mode === 'new') return willPublish ? 'Publish Post' : 'Create Draft';
+		if (hasChanges) return willPublish ? 'Publish Changes' : 'Save Changes';
+		return willPublish ? 'Published' : 'Saved';
 	});
 
 	// Shown inside <Button>'s loading state so the label tracks the spinner
 	// (instead of flipping to "Published" the moment the PATCH resolves while
 	// the spinner is still winding down).
-	const savingLabel = $derived(
-		status === "published" ? "Publishing…" : "Saving…",
-	);
+	const savingLabel = $derived(status === 'published' ? 'Publishing…' : 'Saving…');
 
 	function handleBodyUpdate(json: JSONContent, text: string) {
 		content = json;
@@ -130,7 +124,7 @@
 	function handleGenerated(generatedHtml: string) {
 		bodyEditor?.setContent(generatedHtml);
 		content = bodyEditor?.getJSON() ?? emptyDoc;
-		contentText = bodyEditor?.getText() ?? "";
+		contentText = bodyEditor?.getText() ?? '';
 	}
 
 	function handleAiAction(_selected: string) {
@@ -143,25 +137,25 @@
 		// Validation failures throw so <Button>'s onclick-promise tracker
 		// resets the spinner without flashing the success checkmark.
 		if (!title.trim()) {
-			error = "A title is required before saving.";
+			error = 'A title is required before saving.';
 			titleEditor?.focus();
 			throw new Error(error);
 		}
 		// Slug is only required at save time in edit mode; in new mode the API
 		// derives one from the title.
-		if (mode === "edit" && !slug.trim()) {
-			error = "A slug is required (open Settings to set one).";
+		if (mode === 'edit' && !slug.trim()) {
+			error = 'A slug is required (open Settings to set one).';
 			settingsOpen = true;
 			throw new Error(error);
 		}
 
-		error = "";
+		error = '';
 
 		try {
-			if (mode === "new") {
-				const res = await fetch("/api/blog", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
+			if (mode === 'new') {
+				const res = await fetch('/api/blog', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
 						title: title.trim(),
 						summary: summary.trim() || null,
@@ -182,7 +176,7 @@
 					const body = (await res.json().catch(() => ({}))) as {
 						message?: string;
 					};
-					throw new Error(body.message || "Failed to create post");
+					throw new Error(body.message || 'Failed to create post');
 				}
 				const { post } = (await res.json()) as { post: { slug: string } };
 				// Replace the URL so Back doesn't return to /new with no content.
@@ -195,8 +189,8 @@
 
 			// edit mode — PATCH the existing slug.
 			const res = await fetch(`/api/blog/${initial?.slug}`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					title: title.trim(),
 					summary: summary.trim() || null,
@@ -215,7 +209,7 @@
 				const body = (await res.json().catch(() => ({}))) as {
 					message?: string;
 				};
-				throw new Error(body.message || "Failed to save");
+				throw new Error(body.message || 'Failed to save');
 			}
 			const { post } = await res.json();
 			savedSnapshot = currentSnapshot;
@@ -223,33 +217,33 @@
 				goto(`/admin/blog/${post.slug}`, { invalidateAll: true });
 			}
 		} catch (err) {
-			error = err instanceof Error ? err.message : "Something went wrong";
+			error = err instanceof Error ? err.message : 'Something went wrong';
 			throw err;
 		}
 	}
 
 	async function handleDelete() {
-		if (mode === "new") {
+		if (mode === 'new') {
 			// No server-side row yet — just leave the page.
-			goto("/admin");
+			goto('/admin');
 			return;
 		}
 		const ok = await alert({
-			title: "Delete this post?",
-			message: "This can’t be undone — the post will be removed permanently.",
-			continueText: "Delete",
+			title: 'Delete this post?',
+			message: 'This can’t be undone — the post will be removed permanently.',
+			continueText: 'Delete',
 			destructive: true,
 		});
 		if (!ok) return;
 		deleting = true;
 		try {
 			const res = await fetch(`/api/blog/${initial?.slug}`, {
-				method: "DELETE",
+				method: 'DELETE',
 			});
-			if (!res.ok) throw new Error("Failed to delete");
-			goto("/admin");
+			if (!res.ok) throw new Error('Failed to delete');
+			goto('/admin');
 		} catch (err) {
-			error = err instanceof Error ? err.message : "Failed to delete";
+			error = err instanceof Error ? err.message : 'Failed to delete';
 			deleting = false;
 		}
 	}
@@ -259,12 +253,8 @@
 	}
 
 	// The preview link only makes sense once a real slug exists.
-	const previewHref = $derived(
-		initial?.slug ? `/blog/${slug || initial.slug}` : null,
-	);
-	const docTitle = $derived(
-		mode === "new" ? title || "New Post" : title || "Edit Post",
-	);
+	const previewHref = $derived(initial?.slug ? `/blog/${slug || initial.slug}` : null);
+	const docTitle = $derived(mode === 'new' ? title || 'New Post' : title || 'Edit Post');
 </script>
 
 <svelte:head>
@@ -280,19 +270,18 @@
 				stroke="currentColor"
 				stroke-width="2"
 				width="18"
-				height="18"
-			>
+				height="18">
 				<line x1="19" y1="12" x2="5" y2="12" />
 				<polyline points="12 19 5 12 12 5" />
 			</svg>
 		</Button>
 		<div class="topbar-title">
 			<span class="topbar-title-text">
-				{title || (mode === "new" ? "New post" : "Untitled post")}
+				{title || (mode === 'new' ? 'New post' : 'Untitled post')}
 			</span>
-			{#if hasChanges && mode === "edit"}
+			{#if hasChanges && mode === 'edit'}
 				<span class="unsaved" title="Unsaved changes">●</span>
-			{:else if mode === "new"}
+			{:else if mode === 'new'}
 				<span class="unsaved new-badge">draft</span>
 			{/if}
 		</div>
@@ -303,16 +292,14 @@
 				href={previewHref}
 				target="_blank"
 				tooltip="Open the post in a new tab"
-				transparent
-			>
+				transparent>
 				<svg
 					viewBox="0 0 24 24"
 					fill="none"
 					stroke="currentColor"
 					stroke-width="2"
 					width="16"
-					height="16"
-				>
+					height="16">
 					<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
 					<polyline points="15 3 21 3 21 9" />
 					<line x1="10" y1="14" x2="21" y2="3" />
@@ -325,21 +312,14 @@
 			transparent
 			size="0"
 			onclick={() => (settingsOpen = true)}
-			tooltip="Post settings"
-		>
-			<svg
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-			>
+			tooltip="Post settings">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 				<circle cx="12" cy="12" r="3" />
 				<path
-					d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.18.41.5.74.91.91l.09.03a2 2 0 0 1 0 4l-.09.03a1.65 1.65 0 0 0-1 1.03z"
-				/>
+					d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.18.41.5.74.91.91l.09.03a2 2 0 0 1 0 4l-.09.03a1.65 1.65 0 0 0-1 1.03z" />
 			</svg>
 		</Button>
-		<Button onclick={handleSave} disabled={mode === "edit" && !hasChanges}>
+		<Button onclick={handleSave} disabled={mode === 'edit' && !hasChanges}>
 			{#snippet children({ isLoading })}
 				{isLoading ? savingLabel : saveLabel}
 			{/snippet}
@@ -356,8 +336,7 @@
 		bind:this={titleEditor}
 		bind:value={title}
 		placeholder="Enter post title…"
-		onEnter={focusBody}
-	/>
+		onEnter={focusBody} />
 
 	<PillsBar bind:status bind:publishedAt bind:tags {tagSuggestions} />
 
@@ -374,32 +353,25 @@
 		onFocalChange={(x, y) => {
 			coverFocalX = x;
 			coverFocalY = y;
-		}}
-	/>
+		}} />
 
 	<BodyEditor
 		bind:this={bodyEditor}
 		content={initialContent}
 		{initialContentHtml}
 		onUpdate={handleBodyUpdate}
-		onAiAction={handleAiAction}
-	/>
+		onAiAction={handleAiAction} />
 </article>
 
 <PostSettingsModal
 	bind:open={settingsOpen}
 	bind:slug
 	bind:summary
-	canDelete={mode === "edit"}
+	canDelete={mode === 'edit'}
 	{deleting}
-	onDelete={handleDelete}
-/>
+	onDelete={handleDelete} />
 
-<DraftGenerator
-	bind:open={generatorOpen}
-	type="blog"
-	onGenerate={handleGenerated}
-/>
+<DraftGenerator bind:open={generatorOpen} type="blog" onGenerate={handleGenerated} />
 
 <style>
 	.edit-topbar {

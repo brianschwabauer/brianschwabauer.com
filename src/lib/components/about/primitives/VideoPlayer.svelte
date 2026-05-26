@@ -9,7 +9,7 @@
 		muted = false,
 		loop = false,
 		preload = 'metadata',
-		class: klass = ''
+		class: klass = '',
 	}: {
 		slug: string;
 		title?: string;
@@ -37,7 +37,7 @@
 			// @ts-ignore
 			import('video.js/dist/video-js.css'),
 			// @ts-ignore
-			import('videojs-vtt-thumbnails/dist/videojs-vtt-thumbnails.css')
+			import('videojs-vtt-thumbnails/dist/videojs-vtt-thumbnails.css'),
 		]);
 
 		// Re-register the plugin on OUR videojs instance — Vite can end up with
@@ -62,13 +62,13 @@
 			html5: {
 				vhs: { overrideNative: true, withCredentials: false },
 				nativeAudioTracks: false,
-				nativeVideoTracks: false
+				nativeVideoTracks: false,
 			},
 			controlBar: {
 				pictureInPictureToggle: true,
-				volumePanel: { inline: false }
+				volumePanel: { inline: false },
 			},
-			sources: [{ src, type: 'application/x-mpegURL' }]
+			sources: [{ src, type: 'application/x-mpegURL' }],
 		});
 
 		player.ready(() => {
@@ -107,7 +107,11 @@
 
 <div class="video-shell {klass}" style:aspect-ratio={ratio}>
 	{#if !started}
-		<button class="poster-btn" type="button" onclick={start} aria-label={title ? `Play ${title}` : 'Play video'}>
+		<button
+			class="poster-btn"
+			type="button"
+			onclick={start}
+			aria-label={title ? `Play ${title}` : 'Play video'}>
 			<img src={poster} alt={title} loading="lazy" decoding="async" />
 			<span class="play">
 				<svg viewBox="0 0 80 80" aria-hidden="true">
@@ -117,7 +121,13 @@
 							<stop offset="100%" stop-color="rgba(0,0,0,0.55)" />
 						</radialGradient>
 					</defs>
-					<circle cx="40" cy="40" r="38" fill="url(#pl-grad)" stroke="rgba(255,255,255,0.95)" stroke-width="1.5" />
+					<circle
+						cx="40"
+						cy="40"
+						r="38"
+						fill="url(#pl-grad)"
+						stroke="rgba(255,255,255,0.95)"
+						stroke-width="1.5" />
 					<polygon points="33,26 33,54 58,40" fill="#fff" />
 				</svg>
 			</span>
@@ -132,8 +142,8 @@
 				bind:this={videoEl}
 				class="video-js vjs-bs vjs-big-play-centered vjs-show-big-play-button-on-pause"
 				playsinline
-				crossorigin="anonymous"
-			></video>
+				crossorigin="anonymous">
+			</video>
 		</div>
 	{/if}
 </div>
@@ -164,7 +174,9 @@
 		height: 100%;
 		object-fit: cover;
 		opacity: 0.92;
-		transition: transform 600ms ease, opacity 200ms ease;
+		transition:
+			transform 600ms ease,
+			opacity 200ms ease;
 	}
 	.poster-btn:hover img {
 		transform: scale(1.03);
@@ -177,7 +189,9 @@
 		width: clamp(56px, 8vw, 88px);
 		height: clamp(56px, 8vw, 88px);
 		transform: translate(-50%, -50%);
-		transition: transform 200ms ease, filter 200ms ease;
+		transition:
+			transform 200ms ease,
+			filter 200ms ease;
 		filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.6));
 	}
 	.poster-btn:hover .play {
@@ -221,7 +235,12 @@
 	.video-mount :global(.video-js.vjs-bs .vjs-control-bar) {
 		height: 56px;
 		padding: 14px 12px 4px;
-		background: linear-gradient(0deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.55) 55%, transparent 100%);
+		background: linear-gradient(
+			0deg,
+			rgba(0, 0, 0, 0.82) 0%,
+			rgba(0, 0, 0, 0.55) 55%,
+			transparent 100%
+		);
 		display: flex;
 		align-items: center;
 		gap: 4px;
@@ -233,7 +252,9 @@
 		height: 38px;
 		min-width: 38px;
 		cursor: pointer;
-		transition: transform 150ms ease, background 150ms ease;
+		transition:
+			transform 150ms ease,
+			background 150ms ease;
 		border-radius: 8px;
 	}
 	.video-mount :global(.video-js.vjs-bs .vjs-button:hover) {
@@ -265,7 +286,8 @@
 		border-radius: 3px;
 		transition: height 120ms ease;
 	}
-	.video-mount :global(.video-js.vjs-bs .vjs-progress-control:hover .vjs-progress-holder) {
+	.video-mount
+		:global(.video-js.vjs-bs .vjs-progress-control:hover .vjs-progress-holder) {
 		height: 8px;
 	}
 	.video-mount :global(.video-js.vjs-bs .vjs-play-progress) {
@@ -332,9 +354,13 @@
 		backdrop-filter: blur(8px);
 		margin-left: -44px;
 		margin-top: -44px;
-		transition: transform 200ms ease, background 200ms ease, border-color 200ms ease;
+		transition:
+			transform 200ms ease,
+			background 200ms ease,
+			border-color 200ms ease;
 	}
-	.video-mount :global(.video-js.vjs-bs .vjs-big-play-button .vjs-icon-placeholder::before) {
+	.video-mount
+		:global(.video-js.vjs-bs .vjs-big-play-button .vjs-icon-placeholder::before) {
 		font-size: 36px;
 		line-height: 88px;
 	}

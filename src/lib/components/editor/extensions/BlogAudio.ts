@@ -63,7 +63,10 @@ export const BlogAudio = Node.create({
 		const attrs = node.attrs as BlogAudioAttrs;
 		const children: unknown[] = [];
 		if (attrs.title) children.push(['span', { class: 'blog-audio-title' }, attrs.title]);
-		children.push(['audio', { controls: 'controls', preload: 'metadata', src: attrs.src }]);
+		children.push([
+			'audio',
+			{ controls: 'controls', preload: 'metadata', src: attrs.src },
+		]);
 		if (attrs.caption) children.push(['figcaption', {}, attrs.caption]);
 		return [
 			'figure',

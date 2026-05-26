@@ -1,7 +1,7 @@
 <script lang="ts">
-	import SectionShell from "../primitives/SectionShell.svelte";
-	import Reveal from "../primitives/Reveal.svelte";
-	import LazyMedia from "../primitives/LazyMedia.svelte";
+	import SectionShell from '../primitives/SectionShell.svelte';
+	import Reveal from '../primitives/Reveal.svelte';
+	import LazyMedia from '../primitives/LazyMedia.svelte';
 
 	const currentYear = new Date().getFullYear();
 </script>
@@ -10,8 +10,7 @@
 	id="what-im-up-to"
 	year={String(currentYear)}
 	label="What I'm up to"
-	theme="snt"
->
+	theme="snt">
 	<div class="bg" aria-hidden="true"></div>
 	<div class="container">
 		<div class="grid">
@@ -27,14 +26,11 @@
 						<div class="snt-mark" aria-hidden="true">
 							<img
 								src="https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-logo-icon_flash.svg"
-								alt="Show&Tour Logo"
-							/>
+								alt="Show&Tour Logo" />
 						</div>
 						<div>
 							<div class="brand">Show&amp;Tour</div>
-							<div class="tagline">
-								The best way to deliver real estate media.
-							</div>
+							<div class="tagline">The best way to deliver real estate media.</div>
 						</div>
 					</div>
 				</Reveal>
@@ -44,11 +40,12 @@
 						I'm full-time building <a
 							href="https://showandtour.com"
 							target="_blank"
-							rel="noopener">Show&amp;Tour</a
-						>: a project-delivery platform for real estate photographers.
-						Beautiful property websites, branded delivery pages, smart invoicing
-						— the whole workflow built around how photographers actually work.
-						Thousands of users and counting.
+							rel="noopener">
+							Show&amp;Tour
+						</a>
+						: a project-delivery platform for real estate photographers. Beautiful property
+						websites, branded delivery pages, smart invoicing — the whole workflow built around
+						how photographers actually work. Thousands of users and counting.
 					</p>
 				</Reveal>
 
@@ -58,8 +55,7 @@
 							class="cta-primary"
 							href="https://showandtour.com"
 							target="_blank"
-							rel="noopener"
-						>
+							rel="noopener">
 							Visit showandtour.com
 							<svg viewBox="0 0 24 24" aria-hidden="true">
 								<path
@@ -68,8 +64,7 @@
 									stroke="currentColor"
 									stroke-width="2"
 									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
+									stroke-linejoin="round" />
 							</svg>
 						</a>
 						<a class="cta-ghost" href="#showandtour">
@@ -81,8 +76,7 @@
 									stroke="currentColor"
 									stroke-width="2"
 									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
+									stroke-linejoin="round" />
 							</svg>
 						</a>
 					</div>
@@ -95,8 +89,7 @@
 						src="2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif"
 						alt="Show&Tour project detail page"
 						ratio="16 / 10"
-						rounded={false}
-					/>
+						rounded={false} />
 					<div class="shot-glow" aria-hidden="true"></div>
 				</div>
 			</Reveal>
@@ -105,18 +98,10 @@
 </SectionShell>
 
 <style>
-	:global([data-theme="snt"]) {
+	:global([data-theme='snt']) {
 		background:
-			radial-gradient(
-				circle at 12% 18%,
-				rgba(0, 242, 195, 0.12),
-				transparent 50%
-			),
-			radial-gradient(
-				circle at 88% 78%,
-				rgba(108, 99, 255, 0.1),
-				transparent 50%
-			),
+			radial-gradient(circle at 12% 18%, rgba(0, 242, 195, 0.12), transparent 50%),
+			radial-gradient(circle at 88% 78%, rgba(108, 99, 255, 0.1), transparent 50%),
 			linear-gradient(180deg, #050a0c, #08161a 60%, #050a10);
 		color: #e8faf6;
 	}

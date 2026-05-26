@@ -1,7 +1,7 @@
 <script lang="ts">
 	let {
 		trigger = 0,
-		origin = { x: 0.5, y: 0.45 }
+		origin = { x: 0.5, y: 0.45 },
 	}: {
 		trigger?: number;
 		origin?: { x: number; y: number };
@@ -53,7 +53,14 @@
 		const c = makeCanvas(size, size);
 		const ctx = c.getContext('2d')!;
 		// bright core
-		const core = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 4);
+		const core = ctx.createRadialGradient(
+			size / 2,
+			size / 2,
+			0,
+			size / 2,
+			size / 2,
+			size / 4,
+		);
 		core.addColorStop(0, '#ffffff');
 		core.addColorStop(1, color);
 		ctx.fillStyle = core;
@@ -62,7 +69,14 @@
 		ctx.fill();
 		// halo (additive so overlapping particles brighten)
 		ctx.globalCompositeOperation = 'lighter';
-		const halo = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+		const halo = ctx.createRadialGradient(
+			size / 2,
+			size / 2,
+			0,
+			size / 2,
+			size / 2,
+			size / 2,
+		);
 		halo.addColorStop(0, color);
 		halo.addColorStop(0.4, color);
 		halo.addColorStop(1, 'rgba(0,0,0,0)');
@@ -92,7 +106,14 @@
 		const c = makeCanvas(size, size);
 		const ctx = c.getContext('2d')!;
 		// soft radial gradient (replaces filter:blur per frame)
-		const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+		const g = ctx.createRadialGradient(
+			size / 2,
+			size / 2,
+			0,
+			size / 2,
+			size / 2,
+			size / 2,
+		);
 		g.addColorStop(0, 'rgba(140,140,150,0.55)');
 		g.addColorStop(0.45, 'rgba(110,110,120,0.32)');
 		g.addColorStop(0.85, 'rgba(80,80,90,0.08)');
@@ -104,11 +125,26 @@
 
 	function ensureSprites() {
 		if (sparkSprites.length === 0) {
-			const sparkColors = ['#fff8c0', '#ffd934', '#ff9d40', '#00f2c3', '#a8a0ff', '#ffffff'];
+			const sparkColors = [
+				'#fff8c0',
+				'#ffd934',
+				'#ff9d40',
+				'#00f2c3',
+				'#a8a0ff',
+				'#ffffff',
+			];
 			sparkSprites = sparkColors.map((col) => buildSparkSprite(col));
 		}
 		if (chunkSprites.length === 0) {
-			const chunkColors = ['#222632', '#3a4357', '#0c1018', '#1a2230', '#00f2c3', '#6c63ff', '#ffd934'];
+			const chunkColors = [
+				'#222632',
+				'#3a4357',
+				'#0c1018',
+				'#1a2230',
+				'#00f2c3',
+				'#6c63ff',
+				'#ffd934',
+			];
 			chunkSprites = chunkColors.map((col) => buildChunkSprite(col));
 		}
 		if (!smokeSprite) {
@@ -160,7 +196,7 @@
 				life: 0,
 				maxLife: rand(0.7, 1.3),
 				gravity: rand(380, 620),
-				drag: 0.93
+				drag: 0.93,
 			});
 		}
 
@@ -181,7 +217,7 @@
 				life: 0,
 				maxLife: rand(1.3, 2.2),
 				gravity: rand(520, 760),
-				drag: 0.985
+				drag: 0.985,
 			});
 		}
 
@@ -202,7 +238,7 @@
 				life: 0,
 				maxLife: rand(1.8, 2.8),
 				gravity: -20,
-				drag: 0.985
+				drag: 0.985,
 			});
 		}
 

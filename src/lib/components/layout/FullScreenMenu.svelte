@@ -37,8 +37,7 @@
 						href={link.href}
 						class="menu-link"
 						class:active={page.url.pathname === link.href}
-						onclick={() => (open = false)}
-					>
+						onclick={() => (open = false)}>
 						{link.label}
 					</a>
 				</li>
@@ -87,7 +86,9 @@
 		font-weight: 600;
 		color: var(--color-text);
 		padding: var(--space-3) 0;
-		transition: color var(--transition-fast), transform var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			transform var(--transition-fast);
 	}
 
 	.menu-link:hover,

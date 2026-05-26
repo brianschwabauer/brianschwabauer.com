@@ -9,14 +9,14 @@ const config = {
 		adapter: adapter({
 			routes: {
 				include: ['/*'],
-				exclude: ['<all>']
+				exclude: ['<all>'],
 			},
 			platformProxy: {
 				configPath: 'wrangler.toml',
-				persist: true
-			}
-		})
-	}
+				persist: true,
+			},
+		}),
+	},
 };
 
 export default config;

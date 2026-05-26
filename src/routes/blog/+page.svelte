@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { page, navigating } from "$app/state";
-	import { goto } from "$app/navigation";
-	import { fly, scale, slide } from "svelte/transition";
-	import { flip } from "svelte/animate";
-	import { backIn, quintOut } from "svelte/easing";
-	import PostCard from "$lib/components/blog/PostCard.svelte";
-	import FeaturedPostCard from "$lib/components/blog/FeaturedPostCard.svelte";
-	import PostFilters from "$lib/components/blog/PostFilters.svelte";
+	import { page, navigating } from '$app/state';
+	import { goto } from '$app/navigation';
+	import { fly, scale, slide } from 'svelte/transition';
+	import { flip } from 'svelte/animate';
+	import { backIn, quintOut } from 'svelte/easing';
+	import PostCard from '$lib/components/blog/PostCard.svelte';
+	import FeaturedPostCard from '$lib/components/blog/FeaturedPostCard.svelte';
+	import PostFilters from '$lib/components/blog/PostFilters.svelte';
 
 	let { data } = $props();
 
@@ -55,8 +55,7 @@
 		node: Element,
 		params: { enabled: boolean; crossPage: boolean; index: number },
 	) {
-		if (!params.enabled || params.crossPage)
-			return { duration: 0, css: () => "" };
+		if (!params.enabled || params.crossPage) return { duration: 0, css: () => '' };
 		return fly(node as HTMLElement, {
 			y: 20,
 			duration: 300,
@@ -92,16 +91,15 @@
 		node: Element,
 		params: { enabled: boolean; crossPage: boolean; pin?: boolean },
 	) {
-		if (!params.enabled || params.crossPage)
-			return { duration: 0, css: () => "" };
+		if (!params.enabled || params.crossPage) return { duration: 0, css: () => '' };
 		const el = node as HTMLElement;
-		el.style.pointerEvents = "none";
+		el.style.pointerEvents = 'none';
 		if (params.pin) {
 			const parent = el.parentElement;
 			if (parent) {
 				const r = el.getBoundingClientRect();
 				const pr = parent.getBoundingClientRect();
-				el.style.position = "absolute";
+				el.style.position = 'absolute';
 				el.style.top = `${r.top - pr.top}px`;
 				el.style.left = `${r.left - pr.left}px`;
 				el.style.width = `${r.width}px`;
@@ -125,7 +123,7 @@
 	 * deleted tag), we keep the raw URL value as the label so the active
 	 * chip is still visible — clicking "All Posts" clears it.
 	 */
-	const activeTagParam = $derived(page.url.searchParams.get("tag") || null);
+	const activeTagParam = $derived(page.url.searchParams.get('tag') || null);
 	const activeTag = $derived.by(() => {
 		if (!activeTagParam) return null;
 		const key = activeTagParam.toLowerCase();
@@ -139,8 +137,8 @@
 
 	function setActiveTag(tag: string | null) {
 		const url = new URL(page.url);
-		if (tag) url.searchParams.set("tag", tag);
-		else url.searchParams.delete("tag");
+		if (tag) url.searchParams.set('tag', tag);
+		else url.searchParams.delete('tag');
 		goto(url, { keepFocus: true, noScroll: true });
 	}
 
@@ -155,10 +153,7 @@
 	const pinnedPosts = $derived(
 		[...filteredPosts]
 			.filter((p) => p.pinned)
-			.sort(
-				(a, b) =>
-					(b.publishedAt ?? b.createdAt) - (a.publishedAt ?? a.createdAt),
-			),
+			.sort((a, b) => (b.publishedAt ?? b.createdAt) - (a.publishedAt ?? a.createdAt)),
 	);
 
 	const regularPosts = $derived(filteredPosts.filter((p) => !p.pinned));
@@ -177,7 +172,7 @@
 	 */
 	const POPULAR_TAG_LIMIT = 5;
 	const POPULAR_TAG_MIN_POSTS = 2;
-	const FILTER_HIDDEN_TAGS = new Set(["archive"]);
+	const FILTER_HIDDEN_TAGS = new Set(['archive']);
 	const popularTags = $derived.by(() => {
 		const counts = new Map<string, { display: string; count: number }>();
 		for (const p of data.posts) {
@@ -213,8 +208,7 @@
 	<title>Blog - Brian Schwabauer</title>
 	<meta
 		name="description"
-		content="Thoughts on software development, creativity, and the journey of building things."
-	/>
+		content="Thoughts on software development, creativity, and the journey of building things." />
 </svelte:head>
 
 <div class="blog-page">
@@ -223,8 +217,7 @@
 			<span class="blog-title-line">Blog.</span>
 		</h1>
 		<p class="blog-subtitle">
-			Thoughts on software development, creativity, and the journey of building
-			things.
+			Thoughts on software development, creativity, and the journey of building things.
 		</p>
 	</div>
 
@@ -244,8 +237,7 @@
 		<section
 			class="featured-section"
 			aria-label="Featured posts"
-			transition:slide={{ duration: 200, easing: quintOut }}
-		>
+			transition:slide={{ duration: 200, easing: quintOut }}>
 			<div class="featured-grid" class:single={pinnedPosts.length === 1}>
 				{#each pinnedPosts as post, i (post.slug)}
 					<div
@@ -260,8 +252,7 @@
 							enabled: mounted,
 							crossPage: isCrossPageNav,
 							pin: false,
-						}}
-					>
+						}}>
 						<FeaturedPostCard {post} />
 					</div>
 				{/each}
@@ -284,8 +275,7 @@
 						enabled: mounted,
 						crossPage: isCrossPageNav,
 						pin: true,
-					}}
-				>
+					}}>
 					<PostCard {post} />
 				</div>
 			{/each}
@@ -335,11 +325,7 @@
 	.blog-title-line {
 		display: inline-block;
 		padding-bottom: 0.1em;
-		background: linear-gradient(
-			95deg,
-			var(--color-text) 0%,
-			var(--color-accent) 90%
-		);
+		background: linear-gradient(95deg, var(--color-text) 0%, var(--color-accent) 90%);
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;

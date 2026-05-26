@@ -6,7 +6,7 @@
 		label = 'Learn more',
 		closeLabel = 'Show less',
 		variant = 'subtle',
-		class: klass = ''
+		class: klass = '',
 	}: {
 		children: Snippet;
 		label?: string;
@@ -19,10 +19,20 @@
 </script>
 
 <div class="expandable {klass}" class:open>
-	<button class="toggle {variant}" type="button" aria-expanded={open} onclick={() => (open = !open)}>
+	<button
+		class="toggle {variant}"
+		type="button"
+		aria-expanded={open}
+		onclick={() => (open = !open)}>
 		<span>{open ? closeLabel : label}</span>
 		<svg viewBox="0 0 24 24" aria-hidden="true" class="chev" class:rotated={open}>
-			<path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+			<path
+				d="M6 9l6 6 6-6"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2.5"
+				stroke-linecap="round"
+				stroke-linejoin="round" />
 		</svg>
 	</button>
 	<div class="content" hidden={!open}>
@@ -44,7 +54,10 @@
 		letter-spacing: 0.02em;
 		border-radius: 999px;
 		cursor: pointer;
-		transition: background 200ms ease, transform 200ms ease, color 200ms ease;
+		transition:
+			background 200ms ease,
+			transform 200ms ease,
+			color 200ms ease;
 	}
 	.toggle.subtle {
 		background: rgba(255, 255, 255, 0.08);

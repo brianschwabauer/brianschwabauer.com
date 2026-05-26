@@ -6,7 +6,7 @@ import {
 	renamePost,
 	savePost,
 	slugify,
-	SlugConflictError
+	SlugConflictError,
 } from '$lib/server/blog';
 import { rebuildIndex, rebuildVectorIndex } from '$lib/server/searchIndex';
 import { refreshAdminTags } from '$lib/server/adminData';
@@ -82,7 +82,7 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 		title: nextTitle,
 		content: nextContentText,
 		userSummary,
-		existing: { ...existing, contentText: nextContentText, content: nextContent }
+		existing: { ...existing, contentText: nextContentText, content: nextContent },
 	});
 
 	const updated = await savePost(env.KV, {
@@ -98,10 +98,8 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 		status: data.status ?? existing.status,
 		featuredImage:
 			data.featuredImage === undefined ? existing.featuredImage : data.featuredImage,
-		coverFocalX:
-			data.coverFocalX === undefined ? existing.coverFocalX : data.coverFocalX,
-		coverFocalY:
-			data.coverFocalY === undefined ? existing.coverFocalY : data.coverFocalY,
+		coverFocalX: data.coverFocalX === undefined ? existing.coverFocalX : data.coverFocalX,
+		coverFocalY: data.coverFocalY === undefined ? existing.coverFocalY : data.coverFocalY,
 		pinned: data.pinned === undefined ? existing.pinned : data.pinned,
 		publishedAt:
 			data.publishedAt === undefined
@@ -112,12 +110,12 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 						? null
 						: undefined,
 		contentHash,
-		embedding
+		embedding,
 	});
 	await Promise.all([
 		rebuildIndex(env.KV),
 		rebuildVectorIndex(env.KV),
-		refreshAdminTags(env.KV)
+		refreshAdminTags(env.KV),
 	]);
 
 	return json({ post: updated });
@@ -131,7 +129,7 @@ export const DELETE: RequestHandler = async ({ params, platform, locals }) => {
 	await Promise.all([
 		rebuildIndex(platform.env.KV),
 		rebuildVectorIndex(platform.env.KV),
-		refreshAdminTags(platform.env.KV)
+		refreshAdminTags(platform.env.KV),
 	]);
 	return json({ success: true });
 };

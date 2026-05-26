@@ -25,7 +25,7 @@ export interface AiAugmentResult {
 
 export async function augmentWithAi(
 	env: { AI: Ai; ANTHROPIC_API_KEY: string },
-	input: AiAugmentInput
+	input: AiAugmentInput,
 ): Promise<AiAugmentResult> {
 	const newHash = await hashContent(input.content);
 	const existing = input.existing;
@@ -33,12 +33,17 @@ export async function augmentWithAi(
 	const summaryReason =
 		!existing?.aiSummary ||
 		existing.contentHash !== newHash ||
-		(existing.contentText && lengthDrift(existing.contentText, input.content) >= DRIFT_THRESHOLD);
+		(existing.contentText &&
+			lengthDrift(existing.contentText, input.content) >= DRIFT_THRESHOLD);
 
 	let aiSummary = existing?.aiSummary ?? null;
 	if (summaryReason && env.ANTHROPIC_API_KEY) {
 		try {
-			aiSummary = await generateAiSummary(env.ANTHROPIC_API_KEY, input.title, input.content);
+			aiSummary = await generateAiSummary(
+				env.ANTHROPIC_API_KEY,
+				input.title,
+				input.content,
+			);
 		} catch (err) {
 			console.error('aiSummary generation failed:', err);
 		}

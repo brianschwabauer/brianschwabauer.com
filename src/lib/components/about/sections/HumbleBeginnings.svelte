@@ -1,95 +1,89 @@
 <script lang="ts">
-	import SectionShell from "../primitives/SectionShell.svelte";
-	import YearMark from "../primitives/YearMark.svelte";
-	import Reveal from "../primitives/Reveal.svelte";
-	import LazyMedia from "../primitives/LazyMedia.svelte";
-	import Expandable from "../primitives/Expandable.svelte";
-	import VideoPlayer from "../primitives/VideoPlayer.svelte";
-	import FilmReel from "../primitives/FilmReel.svelte";
-	import { media } from "../media";
+	import SectionShell from '../primitives/SectionShell.svelte';
+	import YearMark from '../primitives/YearMark.svelte';
+	import Reveal from '../primitives/Reveal.svelte';
+	import LazyMedia from '../primitives/LazyMedia.svelte';
+	import Expandable from '../primitives/Expandable.svelte';
+	import VideoPlayer from '../primitives/VideoPlayer.svelte';
+	import FilmReel from '../primitives/FilmReel.svelte';
+	import { media } from '../media';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
 	const earlyFilms = [
 		{
-			slug: "2006-08-10_quanesha",
-			title: "Quanesha",
-			date: "2006-08-10",
+			slug: '2006-08-10_quanesha',
+			title: 'Quanesha',
+			date: '2006-08-10',
 			private: true,
-			blurb:
-				"No script. No actors. Just two kids and a pile of stuffed animals.",
+			blurb: 'No script. No actors. Just two kids and a pile of stuffed animals.',
 		},
 		{
-			slug: "2006-08-30_bobby_mcqueen",
-			title: "Bobby McQueen",
-			date: "2006-08-30",
+			slug: '2006-08-30_bobby_mcqueen',
+			title: 'Bobby McQueen',
+			date: '2006-08-30',
 			private: true,
 			blurb:
-				"A third friend joins. The plot? Mostly Turbana, a guy in a comically large turban.",
+				'A third friend joins. The plot? Mostly Turbana, a guy in a comically large turban.',
 		},
 		{
-			slug: "2006-10-21_the_fight_scene",
-			title: "The Fight Scene",
-			date: "2006-10-21",
+			slug: '2006-10-21_the_fight_scene',
+			title: 'The Fight Scene',
+			date: '2006-10-21',
 			private: true,
 			blurb:
 				'We tried to act in slow motion so we could "speed it up" later. It does not work.',
 		},
 		{
-			slug: "2006-12-22_super_swatter_3001",
-			title: "Super Swatter 3001",
-			date: "2006-12-22",
+			slug: '2006-12-22_super_swatter_3001',
+			title: 'Super Swatter 3001',
+			date: '2006-12-22',
 			private: true,
 			blurb:
 				'A class assignment "invention" — a 3-headed fly swatter — sold via fake infomercial.',
 		},
 		{
-			slug: "2007-01-05_noggin_saver",
-			title: "Noggin Saver",
-			date: "2007-01-05",
+			slug: '2007-01-05_noggin_saver',
+			title: 'Noggin Saver',
+			date: '2007-01-05',
 			private: true,
 			blurb: "Kevin's invention: a device that stops chairs from tipping over.",
 		},
 		{
-			slug: "2007-09-09_ninja_men",
-			title: "Ninja Men",
-			date: "2007-09-09",
+			slug: '2007-09-09_ninja_men',
+			title: 'Ninja Men',
+			date: '2007-09-09',
 			private: true,
 			blurb:
-				"A year later. Pre-cut apple + toothpick = a karate-chop split that holds up.",
+				'A year later. Pre-cut apple + toothpick = a karate-chop split that holds up.',
 		},
 		{
-			slug: "2007-09-06_spatula_story",
-			title: "Spatula Story",
-			date: "2007-09-06",
+			slug: '2007-09-06_spatula_story',
+			title: 'Spatula Story',
+			date: '2007-09-06',
 			private: true,
 			blurb: "A quest. For a spatula. Don't ask.",
 		},
 		{
-			slug: "2008-02-23_rush_for_an_idea",
-			title: "Rush for an Idea",
-			date: "2008-02-23",
+			slug: '2008-02-23_rush_for_an_idea',
+			title: 'Rush for an Idea',
+			date: '2008-02-23',
 			private: true,
 			blurb:
-				"Our first film with a real script. Greenscreen, a soundtrack, multiple takes.",
+				'Our first film with a real script. Greenscreen, a soundtrack, multiple takes.',
 		},
 		{
-			slug: "2008-02-29_02.29.08",
-			title: "02.29.08",
-			date: "2008-02-29",
+			slug: '2008-02-29_02.29.08',
+			title: '02.29.08',
+			date: '2008-02-29',
 			private: true,
 			blurb:
-				"Newspaper contest: a 29-second short for leap day. Got 2nd place — and taught us quick cuts.",
+				'Newspaper contest: a 29-second short for leap day. Got 2nd place — and taught us quick cuts.',
 		},
 	];
 </script>
 
-<SectionShell
-	id="humble-beginnings"
-	year="2006"
-	label="Humble Beginnings"
-	theme="tape"
->
+<SectionShell id="humble-beginnings" year="2006" label="Humble Beginnings" theme="tape">
 	<div class="grain"></div>
 	<div class="scanlines" aria-hidden="true"></div>
 
@@ -101,9 +95,12 @@
 		<Reveal variant="up">
 			<h2 class="title">
 				<span class="rec" aria-hidden="true">
-					<span class="rec-dot"></span>REC <span class="tc">00:00:01:14</span>
+					<span class="rec-dot"></span>
+					REC
+					<span class="tc">00:00:01:14</span>
 				</span>
-				A bedroom, two kids,<br />
+				A bedroom, two kids,
+				<br />
 				and a tape that had to rewind.
 			</h2>
 		</Reveal>
@@ -111,15 +108,15 @@
 		<div class="lede-grid">
 			<Reveal variant="up" delay={100}>
 				<p class="lede">
-					My best friend Kevin and I were equipped with our family's miniDV
-					cameras — the kind where you literally had to play the tape back into
-					the computer in real time to digitize it. We had no filmmaking skills.
-					We had no lights, no mics, no idea what a "script" was. But we had
-					time, and that was the only thing the work required.
+					My best friend Kevin and I were equipped with our family's miniDV cameras — the
+					kind where you literally had to play the tape back into the computer in real
+					time to digitize it. We had no filmmaking skills. We had no lights, no mics, no
+					idea what a "script" was. But we had time, and that was the only thing the work
+					required.
 				</p>
 				<p class="lede">
-					We called ourselves <strong>Hunky Spunky Productions</strong>. We were
-					eleven.
+					We called ourselves <strong>Hunky Spunky Productions</strong>
+					. We were eleven.
 				</p>
 			</Reveal>
 
@@ -128,8 +125,7 @@
 					<LazyMedia
 						src="2007-06-16_power_rangers_360-premiere-power_rangers_group_photo_1.jpg"
 						alt="Brian and Kevin with the early crew"
-						ratio="4 / 3"
-					/>
+						ratio="4 / 3" />
 					<svg class="arrows" viewBox="0 0 400 300" aria-hidden="true">
 						<defs>
 							<marker
@@ -138,8 +134,7 @@
 								markerHeight="10"
 								refX="6"
 								refY="3"
-								orient="auto"
-							>
+								orient="auto">
 								<polygon points="0 0, 6 3, 0 6" fill="#ff9c4a" />
 							</marker>
 						</defs>
@@ -148,31 +143,31 @@
 							fill="none"
 							stroke="#ff9c4a"
 							stroke-width="2.5"
-							marker-end="url(#arrowhead)"
-						/>
+							marker-end="url(#arrowhead)" />
 						<text
 							x="20"
 							y="34"
 							fill="#ff9c4a"
 							font-family="ui-monospace, monospace"
 							font-size="14"
-							font-weight="700">ME</text
-						>
+							font-weight="700">
+							ME
+						</text>
 						<path
 							d="M 360,50 Q 300,100 260,170"
 							fill="none"
 							stroke="#00e0ff"
 							stroke-width="2.5"
-							marker-end="url(#arrowhead)"
-						/>
+							marker-end="url(#arrowhead)" />
 						<text
 							x="328"
 							y="44"
 							fill="#00e0ff"
 							font-family="ui-monospace, monospace"
 							font-size="14"
-							font-weight="700">KEVIN</text
-						>
+							font-weight="700">
+							KEVIN
+						</text>
 					</svg>
 				</figure>
 			</Reveal>
@@ -182,9 +177,9 @@
 			<div class="problem">
 				<div class="problem-eyebrow">PROBLEM</div>
 				<p>
-					Setting up a tripod was hard. We <em>thought</em> we could film handheld
-					— we couldn't. That meant one of us was always behind the camera. With only
-					two of us, how do you make a film with only one character?
+					Setting up a tripod was hard. We <em>thought</em>
+					we could film handheld — we couldn't. That meant one of us was always behind the camera.
+					With only two of us, how do you make a film with only one character?
 				</p>
 				<div class="problem-eyebrow">ANSWER</div>
 				<p>Film your stuffed animals.</p>
@@ -194,13 +189,13 @@
 		<div class="fight-block">
 			<Reveal variant="up">
 				<h3 class="subtle">
-					<span class="caret">▌</span> The "slowmo" fight scene
+					<span class="caret">▌</span>
+					The "slowmo" fight scene
 				</h3>
 				<p>
-					Our first big special-effects idea: act a fight in slow motion, then
-					speed it up in editing so we wouldn't actually hurt each other. It
-					turns out humans cannot act believably in slow motion. The footage is
-					ridiculous. We kept it anyway.
+					Our first big special-effects idea: act a fight in slow motion, then speed it up
+					in editing so we wouldn't actually hurt each other. It turns out humans cannot
+					act believably in slow motion. The footage is ridiculous. We kept it anyway.
 				</p>
 			</Reveal>
 			<div class="fight-pair">
@@ -208,15 +203,13 @@
 					<LazyMedia
 						src="2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo.avif"
 						alt="Brian and Kevin fight in slow motion"
-						ratio="16 / 9"
-					/>
+						ratio="16 / 9" />
 				</Reveal>
 				<Reveal variant="right" delay={200}>
 					<LazyMedia
 						src="2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo_2.avif"
 						alt="Round two, still in slowmo"
-						ratio="16 / 9"
-					/>
+						ratio="16 / 9" />
 				</Reveal>
 			</div>
 		</div>
@@ -225,21 +218,21 @@
 			<div class="karate">
 				<div class="karate-text">
 					<h3 class="subtle">
-						<span class="caret">▌</span> Pre-school special effects
+						<span class="caret">▌</span>
+						Pre-school special effects
 					</h3>
 					<p>
-						A year after The Fight Scene we made <strong>Ninja Men</strong>. We
-						pre-cut an apple, jammed a toothpick into it to hold it together,
-						and let a karate chop "split" it cleanly. Seventh-grade ingenuity
-						I'm still a little proud of.
+						A year after The Fight Scene we made <strong>Ninja Men</strong>
+						. We pre-cut an apple, jammed a toothpick into it to hold it together, and let a
+						karate chop "split" it cleanly. Seventh-grade ingenuity I'm still a little proud
+						of.
 					</p>
 				</div>
 				<LazyMedia
 					src="2007-09-09_ninja_men-grant_splits_apple_with_karate_chop_special_effect.avif"
 					alt="The karate-chop apple split"
 					ratio="16 / 9"
-					class="karate-media"
-				/>
+					class="karate-media" />
 			</div>
 		</Reveal>
 
@@ -250,26 +243,26 @@
 					<div class="qc-sub">Leap-day shorts contest · 29 seconds</div>
 					<p>
 						The local paper ran a 29-second short film contest for leap day. The
-						constraint forced us to learn quick cuts for the first time. We
-						placed 2nd. The technique stuck with us forever.
+						constraint forced us to learn quick cuts for the first time. We placed 2nd.
+						The technique stuck with us forever.
 					</p>
 				</div>
 				<LazyMedia
 					src="2008-02-25_02.29.08-editing_with_quick_shots.avif"
 					alt="Editing with quick cuts on 02.29.08"
-					ratio="16 / 9"
-				/>
+					ratio="16 / 9" />
 			</div>
 		</Reveal>
 
 		<Reveal variant="up">
 			<h3 class="vault-heading">
-				<span class="vault-line"></span>The vault — every short, in order
+				<span class="vault-line"></span>
+				The vault — every short, in order
 			</h3>
 			<p class="vault-sub">
-				These are bad. Some of them are wonderful-bad. They are <em
-					>where every other section of this page came from.</em
-				>
+				These are bad. Some of them are wonderful-bad. They are <em>
+					where every other section of this page came from.
+				</em>
 			</p>
 		</Reveal>
 
@@ -278,7 +271,7 @@
 				<Reveal variant="up" delay={50 + (i % 3) * 80}>
 					<li class="film">
 						<div class="film-head">
-							<span class="film-index">№ {String(i + 1).padStart(2, "0")}</span>
+							<span class="film-index">№ {String(i + 1).padStart(2, '0')}</span>
 							<span class="film-date">{film.date}</span>
 							{#if film.private}<span class="film-tag">private</span>{/if}
 						</div>
@@ -298,30 +291,29 @@
 			<Expandable label="The longer story — how the process worked">
 				<div class="prose">
 					<p>
-						Every weekend looked the same. I'd ride over to Kevin's house. We'd
-						come up with whatever crazy thing we could that day. We'd film it.
-						We'd edit it. All within a day, sometimes two. Then we'd repeat that
-						loop, over and over.
+						Every weekend looked the same. I'd ride over to Kevin's house. We'd come up
+						with whatever crazy thing we could that day. We'd film it. We'd edit it. All
+						within a day, sometimes two. Then we'd repeat that loop, over and over.
 					</p>
 					<p>
-						We upgraded our camera to one that recorded to a hard drive. We got
-						a computer with actual editing software (we'd been editing <em
-							>directly on the camera</em
-						> before). We still didn't have lights or mics. But we started learning
-						how to piece together multiple shots in a row to build a real narrative.
+						We upgraded our camera to one that recorded to a hard drive. We got a computer
+						with actual editing software (we'd been editing <em>
+							directly on the camera
+						</em>
+						before). We still didn't have lights or mics. But we started learning how to piece
+						together multiple shots in a row to build a real narrative.
 					</p>
 					<p>
-						With our new software, we could finally start doing "special
-						effects". The first one was speed manipulation. The second was
-						greenscreen, which is its own section below. Each project added a
-						new tool to the toolbag. Each tool combined with the others to
-						unlock the next one. That stacking is the entire story of this page,
-						really.
+						With our new software, we could finally start doing "special effects". The
+						first one was speed manipulation. The second was greenscreen, which is its own
+						section below. Each project added a new tool to the toolbag. Each tool
+						combined with the others to unlock the next one. That stacking is the entire
+						story of this page, really.
 					</p>
 					<p>
-						Around this time I noticed I had a real knack for the technical
-						side. Kevin was the better actor, so he started to act more. I
-						started to film more. That split has basically held to this day.
+						Around this time I noticed I had a real knack for the technical side. Kevin
+						was the better actor, so he started to act more. I started to film more. That
+						split has basically held to this day.
 					</p>
 				</div>
 			</Expandable>
@@ -330,7 +322,7 @@
 </SectionShell>
 
 <style>
-	:global([data-theme="tape"]) {
+	:global([data-theme='tape']) {
 		--tape-bg: #1a120a;
 		--tape-ink: #f5e6cf;
 		--tape-accent: #ff9c4a;
@@ -343,14 +335,8 @@
 		position: relative;
 		color: var(--tape-ink, #f5e6cf);
 	}
-	:global([data-theme="tape"]) {
-		background: linear-gradient(
-			180deg,
-			#06060a,
-			#160e07 30%,
-			#1a120a 70%,
-			#0a0709
-		);
+	:global([data-theme='tape']) {
+		background: linear-gradient(180deg, #06060a, #160e07 30%, #1a120a 70%, #0a0709);
 		color: var(--tape-ink);
 	}
 	.grain {

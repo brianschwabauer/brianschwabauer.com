@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { ThemeToggle } from "@delightstack/components/actions";
-	import { ripple } from "@delightstack/utilities";
-	import { page } from "$app/state";
-	import { hideHeaderLogo, searchOpen } from "$lib/stores/navState";
-	import SearchModal from "$lib/components/search/SearchModal.svelte";
+	import { ThemeToggle } from '@delightstack/components/actions';
+	import { ripple } from '@delightstack/utilities';
+	import { page } from '$app/state';
+	import { hideHeaderLogo, searchOpen } from '$lib/stores/navState';
+	import SearchModal from '$lib/components/search/SearchModal.svelte';
 
 	let { showThemeToggle = false, invertLogo = false } = $props();
 
 	let scrolled = $state(false);
 
-	if (typeof window !== "undefined") {
+	if (typeof window !== 'undefined') {
 		$effect(() => {
 			const handleScroll = () => {
 				scrolled = window.scrollY > 50;
@@ -18,34 +18,33 @@
 			// mid-page (via browser scroll restoration) renders the scrolled
 			// chrome immediately instead of waiting for the first scroll event.
 			handleScroll();
-			window.addEventListener("scroll", handleScroll);
-			return () => window.removeEventListener("scroll", handleScroll);
+			window.addEventListener('scroll', handleScroll);
+			return () => window.removeEventListener('scroll', handleScroll);
 		});
 	}
 
 	$effect(() => {
 		function handleShortcut(e: KeyboardEvent) {
-			if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+			if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
 				e.preventDefault();
 				$searchOpen = true;
-			} else if (e.key === "/" && !$searchOpen) {
+			} else if (e.key === '/' && !$searchOpen) {
 				const t = e.target as HTMLElement | null;
 				const tag = t?.tagName;
-				if (tag === "INPUT" || tag === "TEXTAREA" || t?.isContentEditable)
-					return;
+				if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return;
 				e.preventDefault();
 				$searchOpen = true;
 			}
 		}
-		window.addEventListener("keydown", handleShortcut);
-		return () => window.removeEventListener("keydown", handleShortcut);
+		window.addEventListener('keydown', handleShortcut);
+		return () => window.removeEventListener('keydown', handleShortcut);
 	});
 
-	const onRootPage = $derived(page.url.pathname === "/");
+	const onRootPage = $derived(page.url.pathname === '/');
 	const onBlogPage = $derived(
-		page.url.pathname === "/blog" || page.url.pathname.startsWith("/blog/"),
+		page.url.pathname === '/blog' || page.url.pathname.startsWith('/blog/'),
 	);
-	const onContactPage = $derived(page.url.pathname === "/contact");
+	const onContactPage = $derived(page.url.pathname === '/contact');
 	const logoHidden = $derived($hideHeaderLogo);
 
 	function handleLogoClick(e: MouseEvent) {
@@ -65,11 +64,10 @@
 			class:on-dark={invertLogo}
 			onclick={handleLogoClick}
 			aria-label={onRootPage
-				? "Brian Schwabauer — back to top"
-				: "Brian Schwabauer — go to homepage"}
-			aria-current={onRootPage ? "page" : undefined}
-			tabindex={logoHidden ? -1 : 0}
-		>
+				? 'Brian Schwabauer — back to top'
+				: 'Brian Schwabauer — go to homepage'}
+			aria-current={onRootPage ? 'page' : undefined}
+			tabindex={logoHidden ? -1 : 0}>
 			<img src="/logo.svg" alt="" class="logo-img" class:invert={invertLogo} />
 		</a>
 
@@ -82,9 +80,8 @@
 				class="nav-link"
 				class:on-dark={invertLogo}
 				class:active={onBlogPage}
-				aria-current={onBlogPage ? "page" : undefined}
-				{@attach ripple({ zIndex: 1 })}
-			>
+				aria-current={onBlogPage ? 'page' : undefined}
+				{@attach ripple({ zIndex: 1 })}>
 				Blog
 			</a>
 			<a
@@ -92,9 +89,8 @@
 				class="nav-link"
 				class:on-dark={invertLogo}
 				class:active={onContactPage}
-				aria-current={onContactPage ? "page" : undefined}
-				{@attach ripple({ zIndex: 1 })}
-			>
+				aria-current={onContactPage ? 'page' : undefined}
+				{@attach ripple({ zIndex: 1 })}>
 				Contact
 			</a>
 			<button
@@ -104,15 +100,13 @@
 				onclick={() => ($searchOpen = true)}
 				aria-label="Search the site"
 				title="Search (⌘K)"
-				{@attach ripple({ zIndex: 1 })}
-			>
+				{@attach ripple({ zIndex: 1 })}>
 				<svg
 					viewBox="0 0 24 24"
 					fill="none"
 					stroke="currentColor"
 					stroke-width="2"
-					aria-hidden="true"
-				>
+					aria-hidden="true">
 					<circle cx="11" cy="11" r="7" />
 					<path d="m20 20-3.5-3.5" />
 				</svg>

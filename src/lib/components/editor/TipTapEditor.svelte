@@ -5,7 +5,10 @@
 	import Heading from '@tiptap/extension-heading';
 	import Link from '@tiptap/extension-link';
 	import { BlogImage } from './extensions/BlogImage';
-	import { imageDropHandler, recordToBlogImageAttrs } from './extensions/imageDropHandler';
+	import {
+		imageDropHandler,
+		recordToBlogImageAttrs,
+	} from './extensions/imageDropHandler';
 	import MediaLibrary from '$lib/components/media/MediaLibrary.svelte';
 	import type { ImageRecord } from '$lib/client/images';
 
@@ -95,19 +98,39 @@
 
 	onDestroy(() => editor?.destroy());
 
-	function toggleBold() { editor?.chain().focus().toggleBold().run(); }
-	function toggleItalic() { editor?.chain().focus().toggleItalic().run(); }
-	function toggleStrike() { editor?.chain().focus().toggleStrike().run(); }
-	function toggleCode() { editor?.chain().focus().toggleCode().run(); }
+	function toggleBold() {
+		editor?.chain().focus().toggleBold().run();
+	}
+	function toggleItalic() {
+		editor?.chain().focus().toggleItalic().run();
+	}
+	function toggleStrike() {
+		editor?.chain().focus().toggleStrike().run();
+	}
+	function toggleCode() {
+		editor?.chain().focus().toggleCode().run();
+	}
 	function toggleHeading(level: 2 | 3 | 4) {
 		editor?.chain().focus().toggleHeading({ level }).run();
 	}
-	function toggleBulletList() { editor?.chain().focus().toggleBulletList().run(); }
-	function toggleOrderedList() { editor?.chain().focus().toggleOrderedList().run(); }
-	function toggleCodeBlock() { editor?.chain().focus().toggleCodeBlock().run(); }
-	function toggleBlockquote() { editor?.chain().focus().toggleBlockquote().run(); }
-	function undo() { editor?.chain().focus().undo().run(); }
-	function redo() { editor?.chain().focus().redo().run(); }
+	function toggleBulletList() {
+		editor?.chain().focus().toggleBulletList().run();
+	}
+	function toggleOrderedList() {
+		editor?.chain().focus().toggleOrderedList().run();
+	}
+	function toggleCodeBlock() {
+		editor?.chain().focus().toggleCodeBlock().run();
+	}
+	function toggleBlockquote() {
+		editor?.chain().focus().toggleBlockquote().run();
+	}
+	function undo() {
+		editor?.chain().focus().undo().run();
+	}
+	function redo() {
+		editor?.chain().focus().redo().run();
+	}
 
 	function setLink() {
 		const url = prompt('Enter URL:');
@@ -139,10 +162,38 @@
 <div class="editor-wrapper">
 	<div class="editor-toolbar">
 		<div class="toolbar-group">
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('bold')} onclick={toggleBold} title="Bold"><strong>B</strong></button>
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('italic')} onclick={toggleItalic} title="Italic"><em>I</em></button>
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('strike')} onclick={toggleStrike} title="Strikethrough"><s>S</s></button>
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('code')} onclick={toggleCode} title="Inline Code"><code>&lt;/&gt;</code></button>
+			<button
+				type="button"
+				class="toolbar-btn"
+				class:active={editor?.isActive('bold')}
+				onclick={toggleBold}
+				title="Bold">
+				<strong>B</strong>
+			</button>
+			<button
+				type="button"
+				class="toolbar-btn"
+				class:active={editor?.isActive('italic')}
+				onclick={toggleItalic}
+				title="Italic">
+				<em>I</em>
+			</button>
+			<button
+				type="button"
+				class="toolbar-btn"
+				class:active={editor?.isActive('strike')}
+				onclick={toggleStrike}
+				title="Strikethrough">
+				<s>S</s>
+			</button>
+			<button
+				type="button"
+				class="toolbar-btn"
+				class:active={editor?.isActive('code')}
+				onclick={toggleCode}
+				title="Inline Code">
+				<code>&lt;/&gt;</code>
+			</button>
 		</div>
 
 		<div class="toolbar-separator"></div>
@@ -151,15 +202,41 @@
 			<!-- Display labels are the author-facing heading rank ("H1" = biggest
 			     in-content heading). The actual node level is shifted by one
 			     because the post title owns the document's real <h1>. -->
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('heading', { level: 2 })} onclick={() => toggleHeading(2)} title="Heading 1">H1</button>
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('heading', { level: 3 })} onclick={() => toggleHeading(3)} title="Heading 2">H2</button>
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('heading', { level: 4 })} onclick={() => toggleHeading(4)} title="Heading 3">H3</button>
+			<button
+				type="button"
+				class="toolbar-btn"
+				class:active={editor?.isActive('heading', { level: 2 })}
+				onclick={() => toggleHeading(2)}
+				title="Heading 1">
+				H1
+			</button>
+			<button
+				type="button"
+				class="toolbar-btn"
+				class:active={editor?.isActive('heading', { level: 3 })}
+				onclick={() => toggleHeading(3)}
+				title="Heading 2">
+				H2
+			</button>
+			<button
+				type="button"
+				class="toolbar-btn"
+				class:active={editor?.isActive('heading', { level: 4 })}
+				onclick={() => toggleHeading(4)}
+				title="Heading 3">
+				H3
+			</button>
 		</div>
 
 		<div class="toolbar-separator"></div>
 
 		<div class="toolbar-group">
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('bulletList')} onclick={toggleBulletList} title="Bullet List">
+			<button
+				type="button"
+				class="toolbar-btn"
+				class:active={editor?.isActive('bulletList')}
+				onclick={toggleBulletList}
+				title="Bullet List">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 					<line x1="8" y1="6" x2="21" y2="6" />
 					<line x1="8" y1="12" x2="21" y2="12" />
@@ -169,7 +246,12 @@
 					<circle cx="4" cy="18" r="1" fill="currentColor" />
 				</svg>
 			</button>
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('orderedList')} onclick={toggleOrderedList} title="Numbered List">
+			<button
+				type="button"
+				class="toolbar-btn"
+				class:active={editor?.isActive('orderedList')}
+				onclick={toggleOrderedList}
+				title="Numbered List">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 					<line x1="10" y1="6" x2="21" y2="6" />
 					<line x1="10" y1="12" x2="21" y2="12" />
@@ -179,13 +261,25 @@
 					<text x="2" y="20" font-size="8" fill="currentColor">3</text>
 				</svg>
 			</button>
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('blockquote')} onclick={toggleBlockquote} title="Quote">
+			<button
+				type="button"
+				class="toolbar-btn"
+				class:active={editor?.isActive('blockquote')}
+				onclick={toggleBlockquote}
+				title="Quote">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21" />
-					<path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v4" />
+					<path
+						d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21" />
+					<path
+						d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v4" />
 				</svg>
 			</button>
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('codeBlock')} onclick={toggleCodeBlock} title="Code Block">
+			<button
+				type="button"
+				class="toolbar-btn"
+				class:active={editor?.isActive('codeBlock')}
+				onclick={toggleCodeBlock}
+				title="Code Block">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 					<polyline points="16 18 22 12 16 6" />
 					<polyline points="8 6 2 12 8 18" />
@@ -196,13 +290,22 @@
 		<div class="toolbar-separator"></div>
 
 		<div class="toolbar-group">
-			<button type="button" class="toolbar-btn" class:active={editor?.isActive('link')} onclick={setLink} title="Add Link">
+			<button
+				type="button"
+				class="toolbar-btn"
+				class:active={editor?.isActive('link')}
+				onclick={setLink}
+				title="Add Link">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 					<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
 					<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
 				</svg>
 			</button>
-			<button type="button" class="toolbar-btn" onclick={openMediaLibrary} title="Insert Image from Media Library">
+			<button
+				type="button"
+				class="toolbar-btn"
+				onclick={openMediaLibrary}
+				title="Insert Image from Media Library">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 					<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
 					<circle cx="8.5" cy="8.5" r="1.5" />
@@ -229,7 +332,8 @@
 		</div>
 	</div>
 
-	<div class="editor-content" bind:this={editorElement} data-placeholder={placeholder}></div>
+	<div class="editor-content" bind:this={editorElement} data-placeholder={placeholder}>
+	</div>
 </div>
 
 <MediaLibrary bind:open={libraryOpen} onSelect={insertFromLibrary} title="Insert Image" />
@@ -266,7 +370,9 @@
 		border-radius: var(--radius-sm);
 		color: var(--color-text-secondary);
 		font-size: var(--text-sm);
-		transition: background-color var(--transition-fast), color var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			color var(--transition-fast);
 	}
 
 	.toolbar-btn:hover {
@@ -441,7 +547,9 @@
 	}
 
 	@keyframes blog-img-spin {
-		to { transform: rotate(360deg); }
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	.editor-content :global(figure.blog-img .blog-img-handle) {

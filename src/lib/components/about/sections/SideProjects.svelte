@@ -1,25 +1,22 @@
 <script lang="ts">
-	import SectionShell from "../primitives/SectionShell.svelte";
-	import YearMark from "../primitives/YearMark.svelte";
-	import Reveal from "../primitives/Reveal.svelte";
-	import LazyMedia from "../primitives/LazyMedia.svelte";
+	import SectionShell from '../primitives/SectionShell.svelte';
+	import YearMark from '../primitives/YearMark.svelte';
+	import Reveal from '../primitives/Reveal.svelte';
+	import LazyMedia from '../primitives/LazyMedia.svelte';
 </script>
 
 <SectionShell id="side-projects" year="Now" label="Side projects" theme="side">
 	<div class="container">
 		<Reveal>
-			<YearMark
-				year="2026 →"
-				subtitle="Side projects · for fun"
-				color="#a78bfa"
-			/>
+			<YearMark year="2026 →" subtitle="Side projects · for fun" color="#a78bfa" />
 		</Reveal>
 
 		<div class="lockup">
 			<Reveal>
 				<div class="eyebrow">FOR THE LOVE OF IT</div>
 				<h2 class="title">
-					Things I built<br />
+					Things I built
+					<br />
 					<span class="grad">because I felt like it.</span>
 				</h2>
 			</Reveal>
@@ -30,27 +27,24 @@
 				<article class="card terminal">
 					<header>
 						<div class="terminal-bar">
-							<span class="dot r"></span><span class="dot y"></span><span
-								class="dot g"
-							></span>
+							<span class="dot r"></span>
+							<span class="dot y"></span>
+							<span class="dot g"></span>
 							<span class="terminal-title">~/projects/ghtui — bash</span>
 						</div>
 					</header>
 					<div class="card-body">
 						<h3>ghtui</h3>
-						<p class="card-tagline">
-							A fast, minimal terminal UI for managing GitHub.
-						</p>
+						<p class="card-tagline">A fast, minimal terminal UI for managing GitHub.</p>
 						<p>
-							Triage your inbox without leaving the terminal. Open PRs, comment,
-							review, merge — all keyboard-first.
+							Triage your inbox without leaving the terminal. Open PRs, comment, review,
+							merge — all keyboard-first.
 						</p>
 						<a
 							class="card-link"
 							href="https://github.com/brianschwabauer/ghtui"
 							target="_blank"
-							rel="noopener"
-						>
+							rel="noopener">
 							github.com/brianschwabauer/ghtui
 							<svg viewBox="0 0 24 24" aria-hidden="true">
 								<path
@@ -59,15 +53,13 @@
 									stroke="currentColor"
 									stroke-width="2"
 									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
+									stroke-linejoin="round" />
 							</svg>
 						</a>
 						<LazyMedia
 							src="2026-01-01_ghtui_screen_recording.avif"
 							alt="ghtui in action"
-							ratio="16 / 10"
-						/>
+							ratio="16 / 10" />
 					</div>
 				</article>
 			</Reveal>
@@ -79,21 +71,18 @@
 					</header>
 					<div class="card-body">
 						<h3>Video Curator</h3>
-						<p class="card-tagline">
-							Intelligent curation for action-camera footage.
-						</p>
+						<p class="card-tagline">Intelligent curation for action-camera footage.</p>
 						<p>
-							Processes huge volumes of footage automatically: drops pocket
-							shots, surfaces high-quality clips and stills, and picks out
-							moments where children are smiling or laughing. Mostly used to
-							wrangle GoPro footage from family trips.
+							Processes huge volumes of footage automatically: drops pocket shots,
+							surfaces high-quality clips and stills, and picks out moments where children
+							are smiling or laughing. Mostly used to wrangle GoPro footage from family
+							trips.
 						</p>
 						<a
 							class="card-link"
 							href="https://github.com/brianschwabauer/videocurator"
 							target="_blank"
-							rel="noopener"
-						>
+							rel="noopener">
 							github.com/brianschwabauer/videocurator
 							<svg viewBox="0 0 24 24" aria-hidden="true">
 								<path
@@ -102,21 +91,18 @@
 									stroke="currentColor"
 									stroke-width="2"
 									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
+									stroke-linejoin="round" />
 							</svg>
 						</a>
 						<div class="screens">
 							<LazyMedia
 								src="2026-01-01_video_curator_screenshot-dashboard.avif"
 								alt="Video Curator dashboard"
-								ratio="16 / 10"
-							/>
+								ratio="16 / 10" />
 							<LazyMedia
 								src="2026-01-01_video_curator_screenshot-clips_page.avif"
 								alt="Video Curator clips page"
-								ratio="16 / 10"
-							/>
+								ratio="16 / 10" />
 						</div>
 					</div>
 				</article>
@@ -126,24 +112,22 @@
 		<div class="family">
 			<Reveal>
 				<div class="family-eyebrow">PERSONAL · FAMILY</div>
-				<h3 class="sub">
-					There's a separate, less professional version of all this.
-				</h3>
+				<h3 class="sub">There's a separate, less professional version of all this.</h3>
 				<p>
-					<a href="https://schwabauer.family" target="_blank" rel="noopener"
-						>schwabauer.family</a
-					> is where the rest of my life lives. Wedding photos and films. Blog posts.
-					Family photos. A short film I made for fun called "Socially Distant Halloween".
-					Photos of the treehouse I've been building in the backyard. Our family cookbook
-					(with the PDF you can download). The renovation of our house. The slow domestic
-					accretion that turns out to be most of life.
+					<a href="https://schwabauer.family" target="_blank" rel="noopener">
+						schwabauer.family
+					</a>
+					is where the rest of my life lives. Wedding photos and films. Blog posts. Family photos.
+					A short film I made for fun called "Socially Distant Halloween". Photos of the treehouse
+					I've been building in the backyard. Our family cookbook (with the PDF you can download).
+					The renovation of our house. The slow domestic accretion that turns out to be most
+					of life.
 				</p>
 				<a
 					class="family-link"
 					href="https://schwabauer.family"
 					target="_blank"
-					rel="noopener"
-				>
+					rel="noopener">
 					schwabauer.family
 					<svg viewBox="0 0 24 24" aria-hidden="true">
 						<path
@@ -152,8 +136,7 @@
 							stroke="currentColor"
 							stroke-width="2"
 							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
+							stroke-linejoin="round" />
 					</svg>
 				</a>
 			</Reveal>
@@ -163,17 +146,15 @@
 			<Reveal>
 				<div class="closing-line"></div>
 				<p class="closing-text">
-					I started this page in 2006 with a stuffed-animal puppet show on a
-					miniDV tape. I'm wrapping it up in
-					{new Date().getFullYear()} with a property delivery platform that pays my
-					bills. Somewhere in between, every "useless" detour — Flash games, fake
-					newscasts, lego stop-motion, Hall View, NODE, the Pacman PowerPoint trick
-					— became a piece of the next thing.
+					I started this page in 2006 with a stuffed-animal puppet show on a miniDV tape.
+					I'm wrapping it up in
+					{new Date().getFullYear()} with a property delivery platform that pays my bills. Somewhere
+					in between, every "useless" detour — Flash games, fake newscasts, lego stop-motion,
+					Hall View, NODE, the Pacman PowerPoint trick — became a piece of the next thing.
 				</p>
 				<p class="closing-text">
-					The loop hasn't changed. Pick a thing I've never done. Try it. Fail in
-					public. Add it to the toolbag. Use it later in something that matters
-					more.
+					The loop hasn't changed. Pick a thing I've never done. Try it. Fail in public.
+					Add it to the toolbag. Use it later in something that matters more.
 				</p>
 				<p class="closing-sign">— Brian</p>
 			</Reveal>
@@ -182,13 +163,9 @@
 </SectionShell>
 
 <style>
-	:global([data-theme="side"]) {
+	:global([data-theme='side']) {
 		background:
-			radial-gradient(
-				ellipse at top,
-				rgba(167, 139, 250, 0.06),
-				transparent 50%
-			),
+			radial-gradient(ellipse at top, rgba(167, 139, 250, 0.06), transparent 50%),
 			linear-gradient(180deg, #08060f, #100b1a 50%, #060410);
 		color: #efe6ff;
 	}
@@ -403,7 +380,7 @@
 		opacity: 0.92;
 	}
 	.closing-sign {
-		font-family: "Caveat", cursive, var(--font-sans);
+		font-family: 'Caveat', cursive, var(--font-sans);
 		font-size: 1.8rem;
 		color: #a78bfa;
 		margin-top: 2rem;

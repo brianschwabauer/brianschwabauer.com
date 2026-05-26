@@ -5,8 +5,7 @@
 
 	// material-style ripple for the bar buttons — gated to the mobile bottom
 	// bar (the desktop top bar is left as it was)
-	const navRipple = () =>
-		ripple({ enabled: window.innerWidth <= 768, zIndex: 1 });
+	const navRipple = () => ripple({ enabled: window.innerWidth <= 768, zIndex: 1 });
 
 	type Stop = { id: string; year: string; label: string };
 
@@ -20,14 +19,12 @@
 	let listEl: HTMLUListElement | undefined = $state();
 
 	const collectStops = () => {
-		const els = Array.from(
-			document.querySelectorAll<HTMLElement>('[data-section]')
-		);
+		const els = Array.from(document.querySelectorAll<HTMLElement>('[data-section]'));
 		stops = els
 			.map((el) => ({
 				id: el.id,
 				year: el.dataset.sectionYear ?? '',
-				label: el.dataset.sectionLabel ?? el.id
+				label: el.dataset.sectionLabel ?? el.id,
 			}))
 			.filter((s) => s.id);
 	};
@@ -159,8 +156,7 @@
 			class="up"
 			onclick={scrollToTop}
 			aria-label="Scroll to top of page"
-			{@attach navRipple()}
-		>
+			{@attach navRipple()}>
 			<svg viewBox="0 0 24 24" aria-hidden="true">
 				<path
 					d="M12 19V5M6 11l6-6 6 6"
@@ -168,8 +164,7 @@
 					stroke="currentColor"
 					stroke-width="2.2"
 					stroke-linecap="round"
-					stroke-linejoin="round"
-				/>
+					stroke-linejoin="round" />
 			</svg>
 		</button>
 
@@ -183,8 +178,7 @@
 				aria-haspopup="listbox"
 				aria-expanded={open}
 				aria-label="Jump to section"
-				{@attach navRipple()}
-			>
+				{@attach navRipple()}>
 				{#if active}
 					<span class="year">{active.year || '—'}</span>
 					<span class="sep">·</span>
@@ -199,8 +193,7 @@
 						stroke="currentColor"
 						stroke-width="2"
 						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
+						stroke-linejoin="round" />
 				</svg>
 			</button>
 
@@ -211,8 +204,7 @@
 					role="listbox"
 					tabindex="-1"
 					aria-label="Page sections"
-					onkeydown={onListKeydown}
-				>
+					onkeydown={onListKeydown}>
 					{#each stops as stop, i (stop.id)}
 						<li role="presentation">
 							<button
@@ -221,8 +213,7 @@
 								aria-selected={i === activeIndex}
 								class:active={i === activeIndex}
 								data-stop-item
-								onclick={() => jumpTo(stop.id)}
-							>
+								onclick={() => jumpTo(stop.id)}>
 								<span class="opt-year">{stop.year || '—'}</span>
 								<span class="opt-label">{stop.label}</span>
 							</button>
@@ -240,15 +231,13 @@
 				class="action-icon"
 				onclick={() => ($searchOpen = true)}
 				aria-label="Search the site"
-				{@attach navRipple()}
-			>
+				{@attach navRipple()}>
 				<svg
 					viewBox="0 0 24 24"
 					fill="none"
 					stroke="currentColor"
 					stroke-width="2"
-					aria-hidden="true"
-				>
+					aria-hidden="true">
 					<circle cx="11" cy="11" r="7" />
 					<path d="m20 20-3.5-3.5" />
 				</svg>
@@ -275,7 +264,9 @@
 		-webkit-tap-highlight-color: transparent;
 	}
 	@media (min-width: 768px) {
-		.bar { padding: 0 var(--space-8); }
+		.bar {
+			padding: 0 var(--space-8);
+		}
 	}
 
 	.up,
@@ -294,7 +285,10 @@
 		-webkit-backdrop-filter: blur(10px);
 		border-radius: 999px;
 		cursor: pointer;
-		transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+		transition:
+			background 180ms ease,
+			border-color 180ms ease,
+			transform 180ms ease;
 	}
 	.up:hover,
 	.trigger:hover,
@@ -321,10 +315,18 @@
 		padding: 0;
 		flex-shrink: 0;
 	}
-	.up svg { width: 18px; height: 18px; }
-	.action-icon svg { width: 17px; height: 17px; }
+	.up svg {
+		width: 18px;
+		height: 18px;
+	}
+	.action-icon svg {
+		width: 17px;
+		height: 17px;
+	}
 	.up:hover,
-	.action-icon:hover { transform: translateY(-2px); }
+	.action-icon:hover {
+		transform: translateY(-2px);
+	}
 
 	/* Blog + search for the mobile bottom bar — hidden on desktop, where the
 	   header carries them. */
@@ -358,7 +360,9 @@
 		font-variant-numeric: tabular-nums;
 		letter-spacing: 0.02em;
 	}
-	.trigger .sep { color: rgba(255, 255, 255, 0.4); }
+	.trigger .sep {
+		color: rgba(255, 255, 255, 0.4);
+	}
 	.trigger .label {
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -375,7 +379,9 @@
 		transition: transform 180ms ease;
 		flex-shrink: 0;
 	}
-	.trigger .caret.open { transform: rotate(180deg); }
+	.trigger .caret.open {
+		transform: rotate(180deg);
+	}
 
 	.menu {
 		pointer-events: auto;
@@ -398,13 +404,25 @@
 		animation: menu-in 160ms ease-out;
 	}
 	@keyframes menu-in {
-		from { opacity: 0; transform: translateY(-6px); }
-		to { opacity: 1; transform: translateY(0); }
+		from {
+			opacity: 0;
+			transform: translateY(-6px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 	/* the mobile bottom bar slides up + fades in when it first appears */
 	@keyframes bar-in {
-		from { opacity: 0; transform: translateY(16px); }
-		to { opacity: 1; transform: translateY(0); }
+		from {
+			opacity: 0;
+			transform: translateY(16px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 	.dropdown-root {
 		position: relative;
@@ -427,7 +445,9 @@
 		letter-spacing: 0.03em;
 		text-align: left;
 		cursor: pointer;
-		transition: background 140ms ease, color 140ms ease;
+		transition:
+			background 140ms ease,
+			color 140ms ease;
 	}
 	.menu button:hover,
 	.menu button:focus-visible {
@@ -457,7 +477,9 @@
 			padding: 0 0.75rem;
 			max-width: calc(100vw - 90px);
 		}
-		.trigger .label { font-size: 0.68rem; }
+		.trigger .label {
+			font-size: 0.68rem;
+		}
 		.menu {
 			min-width: calc(100vw - 1.5rem);
 			max-width: calc(100vw - 1.5rem);
@@ -516,7 +538,12 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.bar, .menu { animation: none; }
-		.trigger .caret { transition: none; }
+		.bar,
+		.menu {
+			animation: none;
+		}
+		.trigger .caret {
+			transition: none;
+		}
 	}
 </style>

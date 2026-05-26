@@ -61,12 +61,20 @@ export const imageDropHandler = Extension.create<ImageDropOptions>({
 	},
 });
 
-async function handleFiles(editor: Editor, files: File[], pos: number, opts: ImageDropOptions) {
+async function handleFiles(
+	editor: Editor,
+	files: File[],
+	pos: number,
+	opts: ImageDropOptions,
+) {
 	// Insert placeholders sequentially so multi-drops land in source order.
 	for (const file of files) {
 		const uploadId = generateUploadId();
 		const blobUrl = URL.createObjectURL(file);
-		const dims = await readImageDimensions(blobUrl).catch(() => ({ width: 0, height: 0 }));
+		const dims = await readImageDimensions(blobUrl).catch(() => ({
+			width: 0,
+			height: 0,
+		}));
 
 		// Insert the placeholder right away — drag-drop is supposed to feel
 		// instant, even if the container takes 5–15s to spin up on first use.
@@ -166,7 +174,8 @@ function removeUploadingNode(editor: Editor, uploadId: string) {
 function readImageDimensions(url: string): Promise<{ width: number; height: number }> {
 	return new Promise((resolve, reject) => {
 		const probe = new Image();
-		probe.onload = () => resolve({ width: probe.naturalWidth, height: probe.naturalHeight });
+		probe.onload = () =>
+			resolve({ width: probe.naturalWidth, height: probe.naturalHeight });
 		probe.onerror = () => reject(new Error('Could not read image dimensions'));
 		probe.src = url;
 	});

@@ -2,7 +2,7 @@
 	let {
 		year,
 		color = '#ffffff',
-		height = '60vh'
+		height = '60vh',
 	}: {
 		year: string | number;
 		color?: string;
@@ -44,8 +44,7 @@
 	style:--drift="{drift}vw"
 	style:--year-color={color}
 	style:--block-height={height}
-	aria-hidden="true"
->
+	aria-hidden="true">
 	<span class="tick tick-l"></span>
 	<span class="year">{year}</span>
 	<span class="tick tick-r"></span>
@@ -76,7 +75,9 @@
 		-webkit-text-stroke: 2px var(--year-color);
 		opacity: calc(0.15 + var(--w) * 0.55);
 		transform: translateX(var(--drift)) scale(calc(0.78 + var(--w) * 0.22));
-		transition: opacity 80ms linear, transform 80ms linear;
+		transition:
+			opacity 80ms linear,
+			transform 80ms linear;
 		font-variant-numeric: tabular-nums;
 	}
 	.tick {
@@ -84,12 +85,7 @@
 		height: 1px;
 		flex: 1;
 		max-width: 22vw;
-		background: linear-gradient(
-			90deg,
-			transparent,
-			var(--year-color) 50%,
-			transparent
-		);
+		background: linear-gradient(90deg, transparent, var(--year-color) 50%, transparent);
 		opacity: calc(var(--w) * 0.5);
 	}
 	@media (max-width: 640px) {

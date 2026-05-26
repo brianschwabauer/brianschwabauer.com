@@ -135,11 +135,12 @@
 		{#if message}
 			<p class="prompt-message">{message}</p>
 		{/if}
-		<div class="prompt-field" bind:this={inputEl} onkeydown={handleKey} role="presentation">
-			<Input
-				type={multiline ? 'textarea' : 'text'}
-				bind:value
-				{placeholder} />
+		<div
+			class="prompt-field"
+			bind:this={inputEl}
+			onkeydown={handleKey}
+			role="presentation">
+			<Input type={multiline ? 'textarea' : 'text'} bind:value {placeholder} />
 		</div>
 		<div class="prompt-actions">
 			<Button translucent onclick={handleCancel}>{cancelText}</Button>

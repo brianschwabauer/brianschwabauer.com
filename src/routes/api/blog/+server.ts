@@ -45,7 +45,8 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	const { title, content, contentText, summary, tags, status, slug, publishedAt } = data;
 
 	if (!title || typeof title !== 'string') throw error(400, 'Title is required');
-	if (!content || typeof content !== 'object') throw error(400, 'Content (JSON doc) is required');
+	if (!content || typeof content !== 'object')
+		throw error(400, 'Content (JSON doc) is required');
 	if (typeof contentText !== 'string') throw error(400, 'contentText is required');
 
 	const env = platform.env;
@@ -66,7 +67,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			title,
 			content: contentText,
 			userSummary: summary ?? null,
-			existing
+			existing,
 		});
 
 		const post = await savePost(env.KV, {
@@ -76,7 +77,9 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			contentText,
 			summary: summary || null,
 			aiSummary,
-			tags: Array.isArray(tags) ? tags.filter((t): t is string => typeof t === 'string') : [],
+			tags: Array.isArray(tags)
+				? tags.filter((t): t is string => typeof t === 'string')
+				: [],
 			status: status || 'draft',
 			featuredImage: data.featuredImage ?? null,
 			coverFocalX: data.coverFocalX,
@@ -88,12 +91,12 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 						? null
 						: undefined,
 			contentHash,
-			embedding
+			embedding,
 		});
 		await Promise.all([
 			rebuildIndex(env.KV),
 			rebuildVectorIndex(env.KV),
-			refreshAdminTags(env.KV)
+			refreshAdminTags(env.KV),
 		]);
 		return json({ post });
 	} catch (err) {

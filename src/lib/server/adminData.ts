@@ -20,7 +20,7 @@ export async function loadAdminData(kv: KVNamespace): Promise<AdminData> {
 	const raw = (await kv.get(ADMIN_KEY, 'json')) as Partial<AdminData> | null;
 	if (!raw) return empty;
 	return {
-		tags: Array.isArray(raw.tags) ? normalizeTagList(raw.tags) : []
+		tags: Array.isArray(raw.tags) ? normalizeTagList(raw.tags) : [],
 	};
 }
 

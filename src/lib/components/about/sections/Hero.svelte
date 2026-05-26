@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-	import { media } from "../media";
-	import { STARFIELD_IMAGES } from "../starfield-images";
-	import HeroMascot from "./HeroMascot.svelte";
-	import HeroExplosion from "./HeroExplosion.svelte";
+	import { onMount } from 'svelte';
+	import { media } from '../media';
+	import { STARFIELD_IMAGES } from '../starfield-images';
+	import HeroMascot from './HeroMascot.svelte';
+	import HeroExplosion from './HeroExplosion.svelte';
 
 	// `isMobile` comes from the server (User-Agent) so the seeded starfield is
 	// placed identically on server and client — see the anchor buffers below.
@@ -99,10 +99,7 @@
 	// Best-candidate sampling: try a handful of anchors and keep the one
 	// sitting furthest from every other tile, so a new star drops into the
 	// emptiest gap instead of piling onto its neighbours.
-	function placeStar(
-		rand: () => number,
-		others: Star[],
-	): { x: number; y: number } {
+	function placeStar(rand: () => number, others: Star[]): { x: number; y: number } {
 		let best = { x: 50, y: 50 };
 		let bestDist = -1;
 		for (let c = 0; c < 9; c++) {
@@ -198,7 +195,7 @@
 	// recycles tiles that reach the end, and writes transform/opacity/filter
 	// straight to the DOM. It runs only while the hero is on screen.
 	onMount(() => {
-		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
 		// per-tile warp position, and whether it has been swept out and parked
 		const u = seededU.slice();
@@ -218,7 +215,7 @@
 
 		// pin geometry only shifts on resize — measure it then, not per frame
 		function measure() {
-			const hero = document.getElementById("hero");
+			const hero = document.getElementById('hero');
 			if (!pinRef || !hero) return;
 			pinTop = pinRef.getBoundingClientRect().top + window.scrollY;
 			pinDist = Math.max(1, pinRef.offsetHeight - hero.offsetHeight);
@@ -251,10 +248,7 @@
 			for (let k = 0; k < items.length; k++) {
 				const el = items[k] as HTMLElement | undefined;
 				if (!el) continue;
-				const local = Math.min(
-					1,
-					Math.max(0, (p - k * FRAG_STAGGER) / FRAG_SPAN),
-				);
+				const local = Math.min(1, Math.max(0, (p - k * FRAG_STAGGER) / FRAG_SPAN));
 				const e = local * local * (3 - 2 * local); // smoothstep
 				const lift = -e * (FRAG_LIFT - k * FRAG_LIFT_STEP);
 				el.style.transform = `translate3d(0, ${lift.toFixed(1)}px, 0) scale(${(1 - e * 0.04).toFixed(3)})`;
@@ -265,12 +259,12 @@
 		function tick(now: number) {
 			// once the button is pushed, release the tiles to the CSS blast
 			// animation (clear the inline `animation: none`) and stop the loop
-			if (phase === "boom" || phase === "aftermath") {
+			if (phase === 'boom' || phase === 'aftermath') {
 				const blasting = warpRef?.children;
 				if (blasting) {
 					for (let i = 0; i < STAR_COUNT; i++) {
 						const el = blasting[i] as HTMLElement | undefined;
-						if (el) el.style.animation = "";
+						if (el) el.style.animation = '';
 					}
 				}
 				raf = 0;
@@ -353,10 +347,10 @@
 					const el = tiles[i] as HTMLElement | undefined;
 					if (!el) continue;
 					if (parked[i]) {
-						el.style.visibility = "hidden";
+						el.style.visibility = 'hidden';
 						continue;
 					}
-					el.style.visibility = "visible";
+					el.style.visibility = 'visible';
 					const v = starVisual(u[i], stars[i].rot);
 					el.style.transform = v.transform;
 					el.style.opacity = v.opacity;
@@ -371,7 +365,7 @@
 		}
 
 		function pump() {
-			if (raf || phase === "boom" || phase === "aftermath") return;
+			if (raf || phase === 'boom' || phase === 'aftermath') return;
 			lastT = performance.now();
 			raf = requestAnimationFrame(tick);
 		}
@@ -383,12 +377,12 @@
 		}
 
 		measure();
-		window.addEventListener("scroll", onScroll, { passive: true });
-		window.addEventListener("resize", measure);
+		window.addEventListener('scroll', onScroll, { passive: true });
+		window.addEventListener('resize', measure);
 
 		// pause the whole loop whenever the hero is off screen — no warp work,
 		// no graphics resources spent while the field can't be seen
-		const hero = document.getElementById("hero");
+		const hero = document.getElementById('hero');
 		const io = hero
 			? new IntersectionObserver(([entry]) => {
 					heroVisible = entry.isIntersecting;
@@ -417,11 +411,9 @@
 				// the CSS animation's current iteration progress IS the tile's
 				// warp position (delay and all) — pick it up exactly so there
 				// is no jump and the seeded spread is preserved
-				const prog = el
-					.getAnimations()[0]
-					?.effect?.getComputedTiming()?.progress;
-				if (typeof prog === "number") u[i] = prog;
-				el.style.animation = "none";
+				const prog = el.getAnimations()[0]?.effect?.getComputedTiming()?.progress;
+				if (typeof prog === 'number') u[i] = prog;
+				el.style.animation = 'none';
 				const v = starVisual(u[i], stars[i].rot);
 				el.style.transform = v.transform;
 				el.style.opacity = v.opacity;
@@ -432,8 +424,8 @@
 		pump();
 
 		return () => {
-			window.removeEventListener("scroll", onScroll);
-			window.removeEventListener("resize", measure);
+			window.removeEventListener('scroll', onScroll);
+			window.removeEventListener('resize', measure);
 			io?.disconnect();
 			if (raf) cancelAnimationFrame(raf);
 		};
@@ -442,9 +434,9 @@
 	const currentYear = new Date().getFullYear();
 
 	// ---- destruction sequence ----------------------------------------------
-	type Phase = "idle" | "awake" | "pumping" | "boom" | "aftermath";
+	type Phase = 'idle' | 'awake' | 'pumping' | 'boom' | 'aftermath';
 
-	let phase = $state<Phase>("idle");
+	let phase = $state<Phase>('idle');
 	let pumpCount = $state(0);
 	let pumpStroke = $state(0); // 0 = up, 1 = down
 	let explosionTick = $state(0);
@@ -456,17 +448,17 @@
 	const buttonScale = $derived(1 + pumpCount * 0.55);
 
 	const buttonLabel = $derived(
-		phase === "idle" && !warned
+		phase === 'idle' && !warned
 			? "Don't push this button"
-			: phase === "idle" && warned
-				? "Seriously, don’t."
-				: phase === "awake"
-					? "uh oh"
-					: phase === "pumping" && pumpCount < 3
-						? "hey, stop"
-						: phase === "pumping"
-							? "HELP"
-							: "",
+			: phase === 'idle' && warned
+				? 'Seriously, don’t.'
+				: phase === 'awake'
+					? 'uh oh'
+					: phase === 'pumping' && pumpCount < 3
+						? 'hey, stop'
+						: phase === 'pumping'
+							? 'HELP'
+							: '',
 	);
 
 	function sleep(ms: number) {
@@ -474,13 +466,13 @@
 	}
 
 	async function startDestruction() {
-		if (phase !== "idle") return;
+		if (phase !== 'idle') return;
 
 		const reduce =
-			typeof window !== "undefined" &&
-			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			typeof window !== 'undefined' &&
+			window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		if (reduce) {
-			phase = "aftermath";
+			phase = 'aftermath';
 			explosionTick++;
 			return;
 		}
@@ -490,11 +482,11 @@
 		await sleep(180);
 		prePress = false;
 
-		phase = "awake";
+		phase = 'awake';
 		// mascot springs up + settles
 		await sleep(1500);
 
-		phase = "pumping";
+		phase = 'pumping';
 		const pumps = 4;
 		for (let i = 0; i < pumps; i++) {
 			// stroke down (arm pushes pump handle)
@@ -511,51 +503,51 @@
 		// pre-boom held breath — button shudders
 		await sleep(420);
 
-		phase = "boom";
+		phase = 'boom';
 		explosionTick++;
 		await sleep(1500);
 
-		phase = "aftermath";
+		phase = 'aftermath';
 	}
 
 	// ---- contact form ------------------------------------------------------
-	let name = $state("");
-	let email = $state("");
-	let message = $state("");
-	let formState = $state<"idle" | "sending" | "sent" | "error">("idle");
-	let formError = $state("");
+	let name = $state('');
+	let email = $state('');
+	let message = $state('');
+	let formState = $state<'idle' | 'sending' | 'sent' | 'error'>('idle');
+	let formError = $state('');
 
 	async function submitContact(e: SubmitEvent) {
 		e.preventDefault();
-		if (formState === "sending") return;
+		if (formState === 'sending') return;
 		if (!name.trim() || !email.trim() || !message.trim()) {
-			formError = "Please fill in every field.";
-			formState = "error";
+			formError = 'Please fill in every field.';
+			formState = 'error';
 			return;
 		}
-		formState = "sending";
-		formError = "";
+		formState = 'sending';
+		formError = '';
 		try {
-			const res = await fetch("/api/contact", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
+			const res = await fetch('/api/contact', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ name, email, message }),
 			});
 			if (!res.ok) {
-				const txt = await res.text().catch(() => "");
+				const txt = await res.text().catch(() => '');
 				throw new Error(txt || `Send failed (${res.status})`);
 			}
-			formState = "sent";
+			formState = 'sent';
 		} catch (err) {
-			formState = "error";
-			formError = err instanceof Error ? err.message : "Send failed";
+			formState = 'error';
+			formError = err instanceof Error ? err.message : 'Send failed';
 		}
 	}
 
 	function scrollNext() {
-		const hero = document.getElementById("hero");
+		const hero = document.getElementById('hero');
 		// the hero is pinned inside .hero-pin — skip past the whole pin zone
-		const pin = hero?.closest(".hero-pin") ?? hero;
+		const pin = hero?.closest('.hero-pin') ?? hero;
 		const next = pin?.nextElementSibling as HTMLElement | null;
 		const target = next ?? pin;
 		if (!target) return;
@@ -566,30 +558,27 @@
 
 <div
 	class="hero-pin"
-	class:unpinned={phase === "boom" || phase === "aftermath"}
-	bind:this={pinRef}
->
+	class:unpinned={phase === 'boom' || phase === 'aftermath'}
+	bind:this={pinRef}>
 	<section
 		class="hero"
 		id="hero"
 		data-section
 		data-section-label="Today"
 		data-section-year={currentYear}
-		class:shake={phase === "boom"}
-		data-phase={phase}
-	>
+		class:shake={phase === 'boom'}
+		data-phase={phase}>
 		<div
 			class="starfield"
-			class:scattering={phase === "boom" || phase === "aftermath"}
-			aria-hidden="true"
-		>
+			class:scattering={phase === 'boom' || phase === 'aftermath'}
+			aria-hidden="true">
 			<div class="star-warp" bind:this={warpRef}>
 				{#each stars as star, i (star.id)}
 					<img
 						class="star"
 						src={media(star.src)}
 						alt=""
-						loading={i < 8 ? "eager" : "lazy"}
+						loading={i < 8 ? 'eager' : 'lazy'}
 						decoding="async"
 						style:--x="{star.x}%"
 						style:--y="{star.y}%"
@@ -601,28 +590,25 @@
 						style:opacity={seedStyles[i].opacity}
 						style:filter={seedStyles[i].filter}
 						style:--blast-spin="{star.rot * 8}deg"
-						style:--blast-delay="{(i % 9) * 22}ms"
-					/>
+						style:--blast-delay="{(i % 9) * 22}ms" />
 				{/each}
 			</div>
 			<div class="vignette"></div>
 		</div>
 
 		<!-- BEFORE: the original content (badge, headline, lede, button) -->
-		{#if phase !== "aftermath"}
+		{#if phase !== 'aftermath'}
 			<div
 				class="hero-inner before"
-				class:exploding={phase === "boom"}
-				bind:this={beforeRef}
-			>
+				class:exploding={phase === 'boom'}
+				bind:this={beforeRef}>
 				<div class="badge" data-frag>
 					<span class="avatar" aria-hidden="true">
 						<img
 							src="/profile_picture2.webp"
 							alt="Selfie of Brian Schwabauer"
 							loading="eager"
-							decoding="async"
-						/>
+							decoding="async" />
 					</span>
 					<span>Hi, I'm Brian Schwabauer</span>
 				</div>
@@ -633,9 +619,8 @@
 				</h1>
 
 				<p class="lede" data-frag>
-					For as long as I have lived, I have loved to create. I've built
-					startups, developed apps, and produced videos. I live to create. I
-					work to delight.
+					For as long as I have lived, I have loved to create. I've built startups,
+					developed apps, and produced videos. I live to create. I work to delight.
 				</p>
 
 				<div class="button-stage" data-frag>
@@ -643,20 +628,17 @@
 						class="boom-btn"
 						class:warn={warned}
 						class:pre-press={prePress}
-						class:wobble={phase === "pumping" && pumpCount > 0}
-						class:shudder={phase === "pumping" && pumpCount >= 4}
-						class:popped={phase === "boom"}
+						class:wobble={phase === 'pumping' && pumpCount > 0}
+						class:shudder={phase === 'pumping' && pumpCount >= 4}
+						class:popped={phase === 'boom'}
 						type="button"
 						onmouseenter={() => (warned = true)}
-						onmouseleave={() => (warned = phase !== "idle")}
+						onmouseleave={() => (warned = phase !== 'idle')}
 						onfocus={() => (warned = true)}
 						onclick={startDestruction}
-						disabled={phase !== "idle"}
-						aria-label={phase === "idle"
-							? "Don't push this button"
-							: "Boom in progress"}
-						style:--scale={buttonScale}
-					>
+						disabled={phase !== 'idle'}
+						aria-label={phase === 'idle' ? "Don't push this button" : 'Boom in progress'}
+						style:--scale={buttonScale}>
 						<span class="boom-btn-skin"></span>
 						<span class="boom-btn-label" aria-live="polite">
 							{#key buttonLabel}
@@ -673,26 +655,24 @@
 		<HeroExplosion trigger={explosionTick} origin={{ x: 0.5, y: 0.62 }} />
 
 		<!-- AFTERMATH: shown after the dust settles -->
-		{#if phase === "aftermath"}
+		{#if phase === 'aftermath'}
 			<div class="hero-inner aftermath">
 				<h1 class="aftermath-h1">
 					<span class="line line-1">You destroyed</span>
 					<span class="line line-2">my site.</span>
 				</h1>
 				<p class="aftermath-lede">
-					Well&hellip; that escalated. I told you not to press the button 🤣.
-					Anyway, now that you've completely destroyed my website, let's build
-					something new together. Let me know your name/email and I'll get back
-					to you.
+					Well&hellip; that escalated. I told you not to press the button 🤣. Anyway, now
+					that you've completely destroyed my website, let's build something new together.
+					Let me know your name/email and I'll get back to you.
 				</p>
 
 				<form
 					class="contact-form"
 					onsubmit={submitContact}
-					class:sent={formState === "sent"}
-					class:err={formState === "error"}
-				>
-					{#if formState === "sent"}
+					class:sent={formState === 'sent'}
+					class:err={formState === 'error'}>
+					{#if formState === 'sent'}
 						<div class="form-success">
 							<svg viewBox="0 0 24 24" aria-hidden="true" class="success-check">
 								<path
@@ -701,11 +681,10 @@
 									stroke="currentColor"
 									stroke-width="3"
 									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
+									stroke-linejoin="round" />
 							</svg>
 							<h3>Message received.</h3>
-							<p>Thanks, {name || "friend"}. I'll be in touch soon.</p>
+							<p>Thanks, {name || 'friend'}. I'll be in touch soon.</p>
 						</div>
 					{:else}
 						<label class="field">
@@ -717,8 +696,7 @@
 								maxlength="100"
 								autocomplete="name"
 								placeholder="Johnny Appleseed"
-								disabled={formState === "sending"}
-							/>
+								disabled={formState === 'sending'} />
 						</label>
 						<label class="field">
 							<span>Email</span>
@@ -729,8 +707,7 @@
 								maxlength="200"
 								autocomplete="email"
 								placeholder="johnny@example.com"
-								disabled={formState === "sending"}
-							/>
+								disabled={formState === 'sending'} />
 						</label>
 						<label class="field">
 							<span>Message</span>
@@ -740,20 +717,16 @@
 								maxlength="5000"
 								rows="4"
 								placeholder="Tell me about your idea, the dream, or just say hi."
-								disabled={formState === "sending"}
-							></textarea>
+								disabled={formState === 'sending'}>
+							</textarea>
 						</label>
 
 						{#if formError}
 							<div class="form-error" role="alert">{formError}</div>
 						{/if}
 
-						<button
-							class="send-btn"
-							type="submit"
-							disabled={formState === "sending"}
-						>
-							{formState === "sending" ? "Sending…" : "Send it"}
+						<button class="send-btn" type="submit" disabled={formState === 'sending'}>
+							{formState === 'sending' ? 'Sending…' : 'Send it'}
 							<svg viewBox="0 0 24 24" aria-hidden="true">
 								<path
 									d="M5 12h14M13 6l6 6-6 6"
@@ -761,8 +734,7 @@
 									stroke="currentColor"
 									stroke-width="2"
 									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
+									stroke-linejoin="round" />
 							</svg>
 						</button>
 					{/if}
@@ -772,11 +744,10 @@
 
 		<button
 			class="scroll-cue"
-			class:hidden={phase === "boom"}
+			class:hidden={phase === 'boom'}
 			type="button"
 			onclick={scrollNext}
-			aria-label="Scroll to next section"
-		>
+			aria-label="Scroll to next section">
 			<span class="cue-label">More below</span>
 			<span class="cue-arrow" aria-hidden="true">
 				<svg viewBox="0 0 24 24">
@@ -786,8 +757,7 @@
 						stroke="currentColor"
 						stroke-width="2.4"
 						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
+						stroke-linejoin="round" />
 				</svg>
 			</span>
 		</button>
@@ -904,26 +874,22 @@
 	   breakpoints, linear between) so the JS loop can take over mid-stream */
 	@keyframes star-warp-idle {
 		0% {
-			transform: translate(-50%, -50%) translateZ(-260px)
-				rotate(var(--rot, 0deg));
+			transform: translate(-50%, -50%) translateZ(-260px) rotate(var(--rot, 0deg));
 			opacity: 0;
 			filter: saturate(0.45) brightness(0.7);
 		}
 		12% {
-			transform: translate(-50%, -50%) translateZ(-190.4px)
-				rotate(var(--rot, 0deg));
+			transform: translate(-50%, -50%) translateZ(-190.4px) rotate(var(--rot, 0deg));
 			opacity: 0.9;
 			filter: saturate(1.1) brightness(0.766);
 		}
 		72% {
-			transform: translate(-50%, -50%) translateZ(157.6px)
-				rotate(var(--rot, 0deg));
+			transform: translate(-50%, -50%) translateZ(157.6px) rotate(var(--rot, 0deg));
 			opacity: 0.9;
 			filter: saturate(1.1) brightness(1.096);
 		}
 		100% {
-			transform: translate(-50%, -50%) translateZ(320px)
-				rotate(var(--rot, 0deg));
+			transform: translate(-50%, -50%) translateZ(320px) rotate(var(--rot, 0deg));
 			opacity: 0;
 			filter: saturate(1.1) brightness(1.25);
 		}
@@ -949,8 +915,7 @@
 		}
 		30% {
 			opacity: 1;
-			transform: translate(-50%, -50%) translateZ(150px)
-				rotate(var(--rot, 0deg));
+			transform: translate(-50%, -50%) translateZ(150px) rotate(var(--rot, 0deg));
 			filter: brightness(2.6) saturate(1.6);
 		}
 		100% {
@@ -970,16 +935,8 @@
 				rgba(8, 8, 14, 0.78) 65%,
 				#06060a 100%
 			),
-			radial-gradient(
-				circle at 20% 30%,
-				rgba(108, 99, 255, 0.18),
-				transparent 55%
-			),
-			radial-gradient(
-				circle at 80% 70%,
-				rgba(0, 244, 195, 0.16),
-				transparent 55%
-			);
+			radial-gradient(circle at 20% 30%, rgba(108, 99, 255, 0.18), transparent 55%),
+			radial-gradient(circle at 80% 70%, rgba(0, 244, 195, 0.16), transparent 55%);
 		pointer-events: none;
 	}
 
@@ -1030,7 +987,7 @@
 		display: block;
 	}
 	h1 {
-		font-family: "Nunito Sans", sans-serif;
+		font-family: 'Nunito Sans', sans-serif;
 		font-size: clamp(3rem, 19vw, 5.5rem);
 		font-weight: 900;
 		line-height: 0.9;
@@ -1293,8 +1250,7 @@
 			opacity: 1;
 		}
 		100% {
-			transform: translate(var(--fx, 0), var(--fy, 0)) rotate(var(--fr, 0))
-				scale(0.6);
+			transform: translate(var(--fx, 0), var(--fy, 0)) rotate(var(--fr, 0)) scale(0.6);
 			opacity: 0;
 			filter: blur(4px);
 		}
@@ -1318,7 +1274,7 @@
 		}
 	}
 	.aftermath-h1 {
-		font-family: "Nunito Sans", sans-serif;
+		font-family: 'Nunito Sans', sans-serif;
 		font-size: clamp(2.6rem, 10vw, 5.5rem);
 		font-weight: 900;
 		line-height: 0.95;

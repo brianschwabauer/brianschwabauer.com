@@ -11,7 +11,9 @@ interface EmbeddingResponse {
 
 export async function embedText(ai: Ai, text: string): Promise<number[]> {
 	const trimmed = text.replace(/\s+/g, ' ').trim().slice(0, 4000);
-	const result = (await ai.run(EMBEDDING_MODEL, { text: [trimmed] })) as EmbeddingResponse;
+	const result = (await ai.run(EMBEDDING_MODEL, {
+		text: [trimmed],
+	})) as EmbeddingResponse;
 	const vector = result.data?.[0];
 	if (!vector || vector.length !== EMBEDDING_DIM) {
 		throw new Error(`Embedding response missing or wrong dimension (${vector?.length})`);

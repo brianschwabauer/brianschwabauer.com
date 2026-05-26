@@ -12,17 +12,17 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	build: {
 		rollupOptions: {
-			external: [/^cloudflare:/]
-		}
+			external: [/^cloudflare:/],
+		},
 	},
 	server: {
 		port: 5180,
 		fs: {
-			allow: ['delightstack']
+			allow: ['delightstack'],
 		},
 		proxy: {
 			'/api/images': { target: IMAGE_WORKER_URL, changeOrigin: true },
-			'/cdn/image': { target: IMAGE_WORKER_URL, changeOrigin: true }
-		}
-	}
+			'/cdn/image': { target: IMAGE_WORKER_URL, changeOrigin: true },
+		},
+	},
 });

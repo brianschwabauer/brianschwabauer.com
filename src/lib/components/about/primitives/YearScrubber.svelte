@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 
 	let {
-		stops
+		stops,
 	}: {
 		stops: Array<{ id: string; year: string; label: string }>;
 	} = $props();
@@ -59,8 +59,7 @@
 				<button
 					type="button"
 					class:active={activeId === stop.id}
-					onclick={() => jump(stop.id)}
-				>
+					onclick={() => jump(stop.id)}>
 					<span class="year">{stop.year}</span>
 					<span class="label">{stop.label}</span>
 					<span class="dot" aria-hidden="true"></span>
@@ -110,7 +109,9 @@
 		overflow-y: auto;
 		scrollbar-width: none;
 	}
-	ul::-webkit-scrollbar { display: none; }
+	ul::-webkit-scrollbar {
+		display: none;
+	}
 	button {
 		all: unset;
 		cursor: pointer;
@@ -140,7 +141,9 @@
 		text-overflow: ellipsis;
 		opacity: 0;
 		text-transform: uppercase;
-		transition: max-width 250ms ease, opacity 250ms ease;
+		transition:
+			max-width 250ms ease,
+			opacity 250ms ease;
 	}
 	button:hover .label,
 	button.active .label {
@@ -154,7 +157,9 @@
 		border-radius: 50%;
 		background: rgba(255, 255, 255, 0.25);
 		box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.4);
-		transition: background 200ms ease, transform 200ms ease;
+		transition:
+			background 200ms ease,
+			transform 200ms ease;
 	}
 	button.active .dot {
 		background: #00f2c3;
@@ -166,6 +171,8 @@
 	/* On mobile the rail crowds the section content — section jumping is
 	   handled by the bottom nav dropdown there instead. */
 	@media (max-width: 768px) {
-		.year-scrubber { display: none; }
+		.year-scrubber {
+			display: none;
+		}
 	}
 </style>

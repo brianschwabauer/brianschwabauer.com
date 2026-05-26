@@ -23,7 +23,8 @@ function createThemeStore() {
 		subscribe,
 		toggle() {
 			if (!browser) return;
-			const next: Theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+			const next: Theme =
+				document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
 			localStorage.setItem('theme', next);
 			document.documentElement.dataset.theme = next;
 			set(next);
@@ -39,7 +40,7 @@ function createThemeStore() {
 			const applied: Theme = value ?? readStoredPreference();
 			document.documentElement.dataset.theme = applied;
 			set(applied);
-		}
+		},
 	};
 }
 

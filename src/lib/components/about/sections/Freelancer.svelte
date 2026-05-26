@@ -9,47 +9,81 @@
 	import Expandable from '../primitives/Expandable.svelte';
 
 	const reel = [
-		{ src: '2015-08-24_brian_demo_reel_2015-logo_animation_over_sunset_timelapse.avif', label: '2015 demo reel · open' },
-		{ src: '2014-07-25_missouri_reverse_transfer-animated_character_and_graphics.avif', label: 'MO Reverse Transfer · motion graphics' },
-		{ src: '2014-07-25_missouri_reverse_transfer-logo_animation.avif', label: 'MO Reverse Transfer · logo' },
-		{ src: '2014-10-05_decisionfx_logo_animation.avif', label: 'DecisionFX · logo animation' },
+		{
+			src: '2015-08-24_brian_demo_reel_2015-logo_animation_over_sunset_timelapse.avif',
+			label: '2015 demo reel · open',
+		},
+		{
+			src: '2014-07-25_missouri_reverse_transfer-animated_character_and_graphics.avif',
+			label: 'MO Reverse Transfer · motion graphics',
+		},
+		{
+			src: '2014-07-25_missouri_reverse_transfer-logo_animation.avif',
+			label: 'MO Reverse Transfer · logo',
+		},
+		{
+			src: '2014-10-05_decisionfx_logo_animation.avif',
+			label: 'DecisionFX · logo animation',
+		},
 		{ src: '2014-11-24_ursa_promo-logo_animation.avif', label: 'URSA · promo' },
-		{ src: '2015-02-08_engage_mobile_5_logo_animation.avif', label: 'Engage Mobile · 5yr anniversary' },
-		{ src: '2015-04-25_humane_society-logo_animation.avif', label: 'Humane Society · logo' },
-		{ src: '2015-08-04_adpi_recruitment_video_2015-women_jumping_off_fountain_ledge_in_slowmo.avif', label: 'ADPi · recruitment' },
-		{ src: '2015-08-04_adpi_recruitment_video_2015-women_dancing_and_laughing_with_fireworks.avif', label: 'ADPi · recruitment 2' },
-		{ src: '2012-03-22_holy_cross_lutheran_church_tshirt_commericial-angel_appears.avif', label: 'Holy Cross · t-shirt commercial' }
+		{
+			src: '2015-02-08_engage_mobile_5_logo_animation.avif',
+			label: 'Engage Mobile · 5yr anniversary',
+		},
+		{
+			src: '2015-04-25_humane_society-logo_animation.avif',
+			label: 'Humane Society · logo',
+		},
+		{
+			src: '2015-08-04_adpi_recruitment_video_2015-women_jumping_off_fountain_ledge_in_slowmo.avif',
+			label: 'ADPi · recruitment',
+		},
+		{
+			src: '2015-08-04_adpi_recruitment_video_2015-women_dancing_and_laughing_with_fireworks.avif',
+			label: 'ADPi · recruitment 2',
+		},
+		{
+			src: '2012-03-22_holy_cross_lutheran_church_tshirt_commericial-angel_appears.avif',
+			label: 'Holy Cross · t-shirt commercial',
+		},
 	];
 
 	const weddingShots = [
 		'2015-08-24_brian_demo_reel_2015-wedding_footage_of_bride_in_dress_smiling.avif',
-		'2015-08-24_brian_demo_reel_2015-wedding_footage_bride_walks_towards_smiling_groom.avif'
+		'2015-08-24_brian_demo_reel_2015-wedding_footage_bride_walks_towards_smiling_groom.avif',
 	].map((src) => ({ src }));
 </script>
 
 <SectionShell id="freelancer" year="2016" label="Freelancer" theme="hustle">
 	<div class="container">
 		<Reveal>
-			<YearMark year="2016" subtitle="Freelancer · Wedding Films · Brand Work" color="#ffb84d" />
+			<YearMark
+				year="2016"
+				subtitle="Freelancer · Wedding Films · Brand Work"
+				color="#ffb84d" />
 		</Reveal>
 
 		<div class="lockup">
 			<Reveal>
 				<div class="eyebrow">POST-GRAD HUSTLE</div>
 				<h2 class="title">
-					I bought<br />
+					I bought
+					<br />
 					<span class="grad">business cards.</span>
 				</h2>
 				<p class="lede">
-					College ended. I was freelancing full time. New site. New cards. A whole 2015 demo reel cut
-					specifically to land me freelance gigs. I was technically a "videographer", but in practice the gigs
-					would shape-shift — sometimes it was a logo animation, sometimes a kickstarter video, sometimes a
-					promotional motion-graphics piece, sometimes a wedding film, sometimes a WordPress theme.
+					College ended. I was freelancing full time. New site. New cards. A whole 2015
+					demo reel cut specifically to land me freelance gigs. I was technically a
+					"videographer", but in practice the gigs would shape-shift — sometimes it was a
+					logo animation, sometimes a kickstarter video, sometimes a promotional
+					motion-graphics piece, sometimes a wedding film, sometimes a WordPress theme.
 				</p>
 				<p class="lede">
-					Most freelance videographers eventually get to wedding films. I did too. Kevin and I tried to spin a
-					wedding business out of it called <strong>Schwikes</strong> — I'd shoot, he'd DJ. It didn't really
-					work. The wedding films themselves did, though.
+					Most freelance videographers eventually get to wedding films. I did too. Kevin
+					and I tried to spin a wedding business out of it called <strong>
+						Schwikes
+					</strong>
+					— I'd shoot, he'd DJ. It didn't really work. The wedding films themselves did, though.
 				</p>
 			</Reveal>
 		</div>
@@ -62,7 +96,10 @@
 					<div class="biz-cut"></div>
 					<div class="biz-meta">brian@brianschwabauer.com</div>
 				</div>
-				<LazyMedia src="2013-03-12_brian_schwabauer_business_card.avif" alt="The actual business card" ratio="16 / 9" />
+				<LazyMedia
+					src="2013-03-12_brian_schwabauer_business_card.avif"
+					alt="The actual business card"
+					ratio="16 / 9" />
 			</Reveal>
 		</div>
 
@@ -88,17 +125,54 @@
 			<Reveal>
 				<h3 class="sub">More, for the curious</h3>
 				<ul>
-					<li><strong>Net Price Calculator</strong> — a typography motion-graphics piece for the U.S. Department of Education's Net Price Calculator video contest. <em>1st place.</em></li>
-					<li><strong>Missouri Reverse Transfer</strong> — promo for a State of Missouri program that lets 4-year students retroactively earn their associates.</li>
-					<li><strong>Bioblitz 2014</strong> — highlight video for a local environment-awareness event.</li>
-					<li><strong>DecisionFX</strong> — logo animation for a Kansas City data-collection company.</li>
-					<li><strong>URSA Experience</strong> — promo animation for MSU's first-year summer program.</li>
-					<li><strong>Engage Mobile</strong> — 5-year anniversary logo piece using one icon from every app they'd ever built.</li>
-					<li><strong>Humane Society</strong> — promo for the Southwest Missouri branch.</li>
-					<li><strong>ADPi Recruitment</strong> — sorority recruitment video at MSU.</li>
-					<li><strong>"Met You" by Tamish</strong> — official music video; I did the post, another videographer shot.</li>
-					<li><strong>121 Live</strong> — Kickstarter video for a startup that wanted to share private live streams across the world.</li>
-					<li><strong>Wedding films</strong> — many. The Schwikes brand never took off. The work was great.</li>
+					<li>
+						<strong>Net Price Calculator</strong>
+						— a typography motion-graphics piece for the U.S. Department of Education's Net
+						Price Calculator video contest.
+						<em>1st place.</em>
+					</li>
+					<li>
+						<strong>Missouri Reverse Transfer</strong>
+						— promo for a State of Missouri program that lets 4-year students retroactively
+						earn their associates.
+					</li>
+					<li>
+						<strong>Bioblitz 2014</strong>
+						— highlight video for a local environment-awareness event.
+					</li>
+					<li>
+						<strong>DecisionFX</strong>
+						— logo animation for a Kansas City data-collection company.
+					</li>
+					<li>
+						<strong>URSA Experience</strong>
+						— promo animation for MSU's first-year summer program.
+					</li>
+					<li>
+						<strong>Engage Mobile</strong>
+						— 5-year anniversary logo piece using one icon from every app they'd ever built.
+					</li>
+					<li>
+						<strong>Humane Society</strong>
+						— promo for the Southwest Missouri branch.
+					</li>
+					<li>
+						<strong>ADPi Recruitment</strong>
+						— sorority recruitment video at MSU.
+					</li>
+					<li>
+						<strong>"Met You" by Tamish</strong>
+						— official music video; I did the post, another videographer shot.
+					</li>
+					<li>
+						<strong>121 Live</strong>
+						— Kickstarter video for a startup that wanted to share private live streams across
+						the world.
+					</li>
+					<li>
+						<strong>Wedding films</strong>
+						— many. The Schwikes brand never took off. The work was great.
+					</li>
 				</ul>
 			</Reveal>
 		</div>
@@ -115,26 +189,25 @@
 		<div class="archives">
 			<Reveal>
 				<h3 class="sub">Sites I built and archived</h3>
-				<p>A handful of small-business marketing sites I designed and built during this stretch. All of these
-					still load — open them up.</p>
+				<p>
+					A handful of small-business marketing sites I designed and built during this
+					stretch. All of these still load — open them up.
+				</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="archive-stack">
 					<ArchiveFrame
 						src="http://cdn.brianschwabauer.com/site/schwikes/index.html"
 						title="Schwikes — the wedding business that didn't quite happen"
-						label="Open Schwikes"
-					/>
+						label="Open Schwikes" />
 					<ArchiveFrame
 						src="https://cdn.brianschwabauer.com/site/nortonschmidt/v2/index.html"
 						title="Norton & Schmidt — engineering firm in KC"
-						label="Open Norton & Schmidt"
-					/>
+						label="Open Norton & Schmidt" />
 					<ArchiveFrame
 						src="https://cdn.brianschwabauer.com/site/soundraiser/index.html"
 						title="SoundRaiser — fundraising platform for music programs"
-						label="Open SoundRaiser"
-					/>
+						label="Open SoundRaiser" />
 				</div>
 			</Reveal>
 		</div>
@@ -153,7 +226,9 @@
 		margin: 0 auto;
 		padding: 0 clamp(1rem, 3vw, 2rem);
 	}
-	.lockup { margin-bottom: 4rem; }
+	.lockup {
+		margin-bottom: 4rem;
+	}
 	.eyebrow {
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
@@ -180,7 +255,9 @@
 		max-width: 44rem;
 		margin-bottom: 1rem;
 	}
-	.lede strong { color: #ffb84d; }
+	.lede strong {
+		color: #ffb84d;
+	}
 
 	.card-stack {
 		display: grid;
@@ -190,13 +267,14 @@
 		margin: 3rem 0 4rem;
 	}
 	@media (max-width: 768px) {
-		.card-stack { grid-template-columns: 1fr; }
+		.card-stack {
+			grid-template-columns: 1fr;
+		}
 	}
 	.biz-card {
 		aspect-ratio: 16 / 9;
 		max-width: 360px;
-		background:
-			linear-gradient(135deg, #1e1814, #0d0a08);
+		background: linear-gradient(135deg, #1e1814, #0d0a08);
 		border: 1px solid rgba(255, 184, 77, 0.3);
 		border-radius: 10px;
 		padding: 1.6rem;
@@ -232,7 +310,10 @@
 		color: rgba(250, 242, 226, 0.7);
 	}
 
-	.reel-block, .portfolio-list, .weddings, .archives {
+	.reel-block,
+	.portfolio-list,
+	.weddings,
+	.archives {
 		margin: 4rem 0;
 	}
 	.sub {
@@ -271,7 +352,9 @@
 		opacity: 0;
 		transition: opacity 200ms ease;
 	}
-	.reel-card:hover figcaption { opacity: 1; }
+	.reel-card:hover figcaption {
+		opacity: 1;
+	}
 
 	.portfolio-list ul {
 		list-style: none;
@@ -289,8 +372,13 @@
 		font-size: 0.92rem;
 		line-height: 1.5;
 	}
-	.portfolio-list strong { color: #ffb84d; }
-	.portfolio-list em { color: #ffd934; font-style: italic; }
+	.portfolio-list strong {
+		color: #ffb84d;
+	}
+	.portfolio-list em {
+		color: #ffd934;
+		font-style: italic;
+	}
 
 	.archive-stack {
 		display: flex;

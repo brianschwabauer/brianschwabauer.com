@@ -70,13 +70,13 @@ cp .dev.vars.example .dev.vars
 
 `.dev.vars` is gitignored. The variables it documents:
 
-| Variable | Purpose |
-| --- | --- |
-| `AUTH_SECRET` | Auth.js session secret (`openssl rand -base64 32`) |
-| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Google OAuth credentials |
-| `ANTHROPIC_API_KEY` | AI assistance in the blog editor |
-| `ADMIN_EMAILS` | Comma-separated emails allowed into `/admin` |
-| `CONTACT_FROM_EMAIL` / `CONTACT_TO_EMAIL` | Contact-form sender / recipient |
+| Variable                                  | Purpose                                            |
+| ----------------------------------------- | -------------------------------------------------- |
+| `AUTH_SECRET`                             | Auth.js session secret (`openssl rand -base64 32`) |
+| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET`   | Google OAuth credentials                           |
+| `ANTHROPIC_API_KEY`                       | AI assistance in the blog editor                   |
+| `ADMIN_EMAILS`                            | Comma-separated emails allowed into `/admin`       |
+| `CONTACT_FROM_EMAIL` / `CONTACT_TO_EMAIL` | Contact-form sender / recipient                    |
 
 In production these are set as Cloudflare secrets, not committed:
 
