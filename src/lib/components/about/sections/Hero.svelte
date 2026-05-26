@@ -164,13 +164,12 @@
 		const fadeIn = Math.min(1, Math.max(0, u / 0.12));
 		const fadeOut = Math.min(1, Math.max(0, (1 - u) / 0.28));
 		const vis = u <= 0 || u >= 1 ? 0 : Math.min(fadeIn, fadeOut);
-		const blur = 5 * (1 - fadeIn) + 1.5 * (1 - fadeOut);
 		const sat = 0.45 + 0.65 * fadeIn;
 		const bright = 0.7 + 0.55 * u;
 		return {
 			transform: `translate(-50%, -50%) translateZ(${z.toFixed(1)}px) rotate(${rot}deg)`,
 			opacity: (0.9 * vis).toFixed(3),
-			filter: `blur(${blur.toFixed(2)}px) saturate(${sat.toFixed(2)}) brightness(${bright.toFixed(2)})`,
+			filter: `saturate(${sat.toFixed(2)}) brightness(${bright.toFixed(2)})`,
 		};
 	}
 
@@ -891,7 +890,7 @@
 			0 10px 32px rgba(0, 0, 0, 0.5);
 		transform: translate(-50%, -50%);
 		transform-origin: center;
-		will-change: transform, opacity, filter;
+		will-change: transform, opacity;
 		opacity: 0;
 		/* Before hydration this CSS animation runs the idle drift, so the field
 		   is alive the instant the page paints — no waiting for JS. --u0 (the
@@ -908,25 +907,33 @@
 			transform: translate(-50%, -50%) translateZ(-260px)
 				rotate(var(--rot, 0deg));
 			opacity: 0;
-			filter: blur(5px) saturate(0.45) brightness(0.7);
+			filter: saturate(0.45) brightness(0.7);
 		}
 		12% {
 			transform: translate(-50%, -50%) translateZ(-190.4px)
 				rotate(var(--rot, 0deg));
 			opacity: 0.9;
-			filter: blur(0px) saturate(1.1) brightness(0.766);
+			filter: saturate(1.1) brightness(0.766);
 		}
 		72% {
 			transform: translate(-50%, -50%) translateZ(157.6px)
 				rotate(var(--rot, 0deg));
 			opacity: 0.9;
-			filter: blur(0px) saturate(1.1) brightness(1.096);
+			filter: saturate(1.1) brightness(1.096);
 		}
 		100% {
 			transform: translate(-50%, -50%) translateZ(320px)
 				rotate(var(--rot, 0deg));
 			opacity: 0;
-			filter: blur(1.5px) saturate(1.1) brightness(1.25);
+			filter: saturate(1.1) brightness(1.25);
+		}
+	}
+	/* Mobile keeps the GPU happy by skipping the back half of the field —
+	   display:none drops them out of compositing entirely. Anchors are
+	   still placed against all 24 so the visible 12 stay well-spread. */
+	@media (max-width: 767px) {
+		.star:nth-child(n + 13) {
+			display: none;
 		}
 	}
 	/* when boom triggers, kill the warp loop and blast each star outward */
