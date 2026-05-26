@@ -114,14 +114,6 @@
 </script>
 
 <SectionShell id="power-rangers" year="2008" label="Power Rangers 360" theme="ranger">
-	<div class="prismatic" aria-hidden="true">
-		<span class="band red"></span>
-		<span class="band blue"></span>
-		<span class="band yellow"></span>
-		<span class="band pink"></span>
-		<span class="band black"></span>
-	</div>
-
 	<div class="container">
 		<Reveal>
 			<YearMark year="2008" subtitle="Feature Length" color="#ffcc33" />
@@ -145,7 +137,7 @@
 		</div>
 
 		<div class="rangers">
-			{#each [{ name: 'RED', who: 'Brian', color: '#ff3a3a' }, { name: 'BLUE', who: 'Kevin', color: '#3a8cff' }, { name: 'YELLOW', who: 'Emma', color: '#ffd934' }, { name: 'PINK', who: 'Amanda', color: '#ff5fb3' }] as r, i}
+			{#each [{ name: 'RED', who: 'Brian', color: '#ff3a3a' }, { name: 'BLUE', who: 'Kevin', color: '#3a8cff' }, { name: 'YELLOW', who: 'Emma', color: '#ffd934' }, { name: 'WHITE', who: 'Amanda', color: '#ffffff' }] as r, i}
 				<Reveal variant="up" delay={i * 90}>
 					<div class="ranger-card" style:--c={r.color}>
 						<div class="ranger-helmet">
@@ -279,62 +271,10 @@
 <style>
 	:global([data-theme='ranger']) {
 		background:
-			radial-gradient(ellipse at top, rgba(255, 60, 60, 0.08), transparent 50%),
-			radial-gradient(ellipse at bottom, rgba(58, 140, 255, 0.08), transparent 60%),
+			radial-gradient(ellipse at 20% 10%, rgba(255, 58, 58, 0.2), transparent 55%),
+			radial-gradient(ellipse at 80% 90%, rgba(80, 160, 255, 0.32), transparent 60%),
 			linear-gradient(180deg, #0a0710 0%, #100612 50%, #06080f 100%);
 		color: #f4ecff;
-	}
-	.prismatic {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		flex-direction: column;
-		pointer-events: none;
-		mix-blend-mode: screen;
-		opacity: 0.3;
-	}
-	.prismatic .band {
-		flex: 1;
-		mix-blend-mode: screen;
-	}
-	.prismatic .red {
-		background: linear-gradient(
-			90deg,
-			transparent,
-			#ff3a3a 40%,
-			#ff3a3a 60%,
-			transparent
-		);
-	}
-	.prismatic .blue {
-		background: linear-gradient(
-			90deg,
-			transparent,
-			#3a8cff 40%,
-			#3a8cff 60%,
-			transparent
-		);
-	}
-	.prismatic .yellow {
-		background: linear-gradient(
-			90deg,
-			transparent,
-			#ffd934 40%,
-			#ffd934 60%,
-			transparent
-		);
-	}
-	.prismatic .pink {
-		background: linear-gradient(
-			90deg,
-			transparent,
-			#ff5fb3 40%,
-			#ff5fb3 60%,
-			transparent
-		);
-	}
-	.prismatic .black {
-		background: linear-gradient(90deg, transparent, #444 40%, #444 60%, transparent);
 	}
 
 	.container {
