@@ -9,9 +9,15 @@
 
 	interface Props {
 		open: boolean;
+		/**
+		 * If set, the query input is seeded with this string each time the modal
+		 * opens. Used by the 404 page to pre-fill the unmatched slug so the user
+		 * can refine without retyping.
+		 */
+		initialQuery?: string;
 	}
 
-	let { open = $bindable() }: Props = $props();
+	let { open = $bindable(), initialQuery = '' }: Props = $props();
 
 	type Hit = SearchEntry & { score?: number };
 
@@ -218,8 +224,14 @@
 
 	$effect(() => {
 		if (open) {
+			query = initialQuery;
 			loadIndex();
-			tick().then(() => inputEl?.focus());
+			tick().then(() => {
+				inputEl?.focus();
+				// Select the seeded text so the user can either replace it or keep
+				// editing — feels like a real "search this for me" handoff.
+				if (initialQuery) inputEl?.select();
+			});
 			if (typeof document !== 'undefined') {
 				document.body.style.overflow = 'hidden';
 			}

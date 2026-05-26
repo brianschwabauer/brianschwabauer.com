@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listLatest, listAllAdmin, savePost, getPost, slugify } from '$lib/server/blog';
 import { rebuildIndex, rebuildVectorIndex } from '$lib/server/searchIndex';
+import { invalidateFuzzyCache } from '$lib/server/fuzzyRedirect';
 import { refreshAdminTags } from '$lib/server/adminData';
 import { augmentWithAi } from '$lib/server/blogAi';
 import type { TipTapDoc } from '$lib/server/renderDoc';
@@ -98,6 +99,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			rebuildVectorIndex(env.KV),
 			refreshAdminTags(env.KV),
 		]);
+		invalidateFuzzyCache();
 		return json({ post });
 	} catch (err) {
 		console.error('Failed to create blog post:', err);

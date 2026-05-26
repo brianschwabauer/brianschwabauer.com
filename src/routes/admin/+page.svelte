@@ -181,6 +181,7 @@
 		<img src="/logo.svg" alt="Brian Schwabauer" class="brand-img" />
 	</a>
 	<div class="page-actions">
+		<Button href="/admin/redirects" transparent>Redirects</Button>
 		<Button href="/admin/blog/new">New Post</Button>
 	</div>
 </div>
