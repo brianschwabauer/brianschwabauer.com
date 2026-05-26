@@ -111,12 +111,7 @@
 	];
 </script>
 
-<SectionShell
-	id="showandtour"
-	year="2019-now"
-	label="Show&Tour · Today"
-	theme="snt"
->
+<SectionShell id="showandtour" year="2019" label="Show&Tour" theme="snt">
 	<div class="snt-bg" aria-hidden="true"></div>
 
 	<div class="container">

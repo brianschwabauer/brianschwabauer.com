@@ -33,10 +33,10 @@
 	});
 </script>
 
-<SectionShell id="college" year="2011-2015" label="College" theme="college">
+<SectionShell id="college" year="2012" label="College" theme="college">
 	<div class="container">
 		<Reveal>
-			<YearMark year="2011 – 2015" subtitle="Missouri State · Electronic Arts" color="#7a4dff" />
+			<YearMark year="2012" subtitle="Missouri State · Electronic Arts" color="#7a4dff" />
 		</Reveal>
 
 		<div class="lockup">

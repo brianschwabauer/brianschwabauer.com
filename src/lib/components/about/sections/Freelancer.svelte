@@ -27,10 +27,10 @@
 	].map((src) => ({ src }));
 </script>
 
-<SectionShell id="freelancer" year="2015-2019" label="Freelancer" theme="hustle">
+<SectionShell id="freelancer" year="2016" label="Freelancer" theme="hustle">
 	<div class="container">
 		<Reveal>
-			<YearMark year="2015 – 2019" subtitle="Freelancer · Wedding Films · Brand Work" color="#ffb84d" />
+			<YearMark year="2016" subtitle="Freelancer · Wedding Films · Brand Work" color="#ffb84d" />
 		</Reveal>
 
 		<div class="lockup">

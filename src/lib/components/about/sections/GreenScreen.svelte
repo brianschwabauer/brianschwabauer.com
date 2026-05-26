@@ -38,7 +38,7 @@
 	<div class="bg-grid" aria-hidden="true"></div>
 	<div class="container">
 		<Reveal>
-			<YearMark year="2007 – 2008" subtitle="Early Technical Tests" color="#22ff90" />
+			<YearMark year="2007" subtitle="Early Technical Tests" color="#22ff90" />
 		</Reveal>
 
 		<div class="grid-2">

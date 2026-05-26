@@ -44,10 +44,10 @@
 	}));
 </script>
 
-<SectionShell id="festivals-ksms" year="2009-2011" label="Festivals & KSMS" theme="broadcast">
+<SectionShell id="festivals-ksms" year="2011" label="Festivals & KSMS" theme="broadcast">
 	<div class="container">
 		<Reveal>
-			<YearMark year="2009 – 2011" subtitle="Festivals · KSMS · Live TV" color="#ff3a3a" />
+			<YearMark year="2011" subtitle="Festivals · KSMS · Live TV" color="#ff3a3a" />
 		</Reveal>
 
 		<div class="award-banner">

@@ -53,7 +53,7 @@
 	].map((src) => ({ src }));
 </script>
 
-<SectionShell id="what-makes-us-human" year="2014-2015" label="Senior Thesis" theme="thesis">
+<SectionShell id="what-makes-us-human" year="2015" label="Senior Thesis" theme="thesis">
 	<div class="scan" aria-hidden="true">
 		<div class="scan-line"></div>
 	</div>
