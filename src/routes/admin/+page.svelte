@@ -2,7 +2,13 @@
 	import { onMount, untrack } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { Button, alert } from '@delightstack/components/actions';
-	import { create, insertMultiple, search, type AnyOrama, type Results } from '@orama/orama';
+	import {
+		create,
+		insertMultiple,
+		search,
+		type AnyOrama,
+		type Results,
+	} from '@orama/orama';
 	import type { BlogPostMeta, BlogStatus } from '$lib/server/blog';
 
 	let { data } = $props();
@@ -14,7 +20,7 @@
 		id: 'string',
 		title: 'string',
 		summary: 'string',
-		tags: 'string[]'
+		tags: 'string[]',
 	} as const;
 
 	interface AdminSearchDoc {
@@ -40,7 +46,7 @@
 			id: p.slug,
 			title: p.title,
 			summary: p.summary ?? p.aiSummary ?? '',
-			tags: p.tags ?? []
+			tags: p.tags ?? [],
 		}));
 		if (docs.length > 0) {
 			await insertMultiple(next, docs as unknown as Record<string, unknown>[]);
@@ -62,7 +68,7 @@
 					term,
 					properties: ['title', 'summary', 'tags'],
 					limit: 200,
-					tolerance: 1
+					tolerance: 1,
 				})) as Results<AdminSearchDoc>;
 				const ids = new Set(r.hits.map((h) => h.document.id));
 				matchedIds = ids;
@@ -94,12 +100,12 @@
 				break;
 			case 'date-desc':
 				sorted.sort(
-					(a, b) => (b.publishedAt ?? b.createdAt) - (a.publishedAt ?? a.createdAt)
+					(a, b) => (b.publishedAt ?? b.createdAt) - (a.publishedAt ?? a.createdAt),
 				);
 				break;
 			case 'date-asc':
 				sorted.sort(
-					(a, b) => (a.publishedAt ?? a.createdAt) - (b.publishedAt ?? b.createdAt)
+					(a, b) => (a.publishedAt ?? a.createdAt) - (b.publishedAt ?? b.createdAt),
 				);
 				break;
 			case 'title-asc':
@@ -120,7 +126,7 @@
 		return new Date(date).toLocaleDateString('en-US', {
 			month: 'short',
 			day: 'numeric',
-			year: 'numeric'
+			year: 'numeric',
 		});
 	}
 
@@ -132,7 +138,7 @@
 			const res = await fetch(`/api/blog/${post.slug}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ pinned: !post.pinned })
+				body: JSON.stringify({ pinned: !post.pinned }),
 			});
 			if (!res.ok) throw new Error(`Pin failed (${res.status})`);
 			await invalidateAll();
@@ -181,7 +187,12 @@
 
 <div class="controls">
 	<div class="search">
-		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			aria-hidden="true">
 			<circle cx="11" cy="11" r="7" />
 			<path d="m20 20-3.5-3.5" />
 		</svg>
@@ -191,8 +202,7 @@
 			placeholder="Search title, summary, tags…"
 			autocomplete="off"
 			spellcheck="false"
-			aria-label="Search posts"
-		/>
+			aria-label="Search posts" />
 	</div>
 	<div class="filters">
 		<label class="control">
@@ -234,25 +244,41 @@
 {#if visiblePosts.length > 0}
 	<div class="posts-list">
 		{#each visiblePosts as post (post.slug)}
-			<div class="post-item" class:pinned={post.pinned} class:busy={busySlug === post.slug}>
+			<div
+				class="post-item"
+				class:pinned={post.pinned}
+				class:busy={busySlug === post.slug}>
 				<a href="/admin/blog/{post.slug}" class="post-link">
 					<div class="post-info">
 						<h3 class="post-title">
 							{#if post.pinned}
 								<span class="pin-badge" title="Pinned to top of blog" aria-label="Pinned">
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true">
 										<line x1="12" x2="12" y1="17" y2="22" />
-										<path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
+										<path
+											d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
 									</svg>
 								</span>
 							{/if}
 							{post.title}
 						</h3>
 						<div class="post-meta">
-							<span class="post-status" class:published={post.status === 'published'} class:archived={post.status === 'archived'}>
+							<span
+								class="post-status"
+								class:published={post.status === 'published'}
+								class:archived={post.status === 'archived'}>
 								{post.status}
 							</span>
-							<span class="post-date">{formatDate(post.publishedAt ?? post.updatedAt)}</span>
+							<span class="post-date">
+								{formatDate(post.publishedAt ?? post.updatedAt)}
+							</span>
 							{#if post.tags && post.tags.length > 0}
 								<span class="post-tags">
 									{#each post.tags.slice(0, 3) as tag (tag)}
@@ -273,24 +299,48 @@
 						popoverPlacement="bottom-end"
 						popoverCloseOnInsideClick
 						aria-label="More actions for {post.title}"
-						disabled={busySlug === post.slug}
-					>
-						<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="more-icon">
+						disabled={busySlug === post.slug}>
+						<svg
+							viewBox="0 0 24 24"
+							fill="currentColor"
+							aria-hidden="true"
+							class="more-icon">
 							<circle cx="5" cy="12" r="2" />
 							<circle cx="12" cy="12" r="2" />
 							<circle cx="19" cy="12" r="2" />
 						</svg>
 						{#snippet menu()}
 							<div class="menu">
-								<button type="button" class="menu-item" onclick={() => togglePinned(post)}>
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="menu-icon">
+								<button
+									type="button"
+									class="menu-item"
+									onclick={() => togglePinned(post)}>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+										class="menu-icon">
 										<line x1="12" x2="12" y1="17" y2="22" />
-										<path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
+										<path
+											d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
 									</svg>
 									{post.pinned ? 'Unpin from top' : 'Pin to top'}
 								</button>
-								<button type="button" class="menu-item danger" onclick={() => deletePost(post)}>
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="menu-icon">
+								<button
+									type="button"
+									class="menu-item danger"
+									onclick={() => deletePost(post)}>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										aria-hidden="true"
+										class="menu-icon">
 										<polyline points="3 6 5 6 21 6" />
 										<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
 										<path d="M10 11v6" />
@@ -469,7 +519,10 @@
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
-		transition: border-color var(--transition-fast), background-color var(--transition-fast), opacity var(--transition-fast);
+		transition:
+			border-color var(--transition-fast),
+			background-color var(--transition-fast),
+			opacity var(--transition-fast);
 	}
 
 	.post-item:hover {
@@ -606,7 +659,9 @@
 		font-size: var(--text-sm);
 		text-align: left;
 		cursor: pointer;
-		transition: background-color var(--transition-fast), color var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			color var(--transition-fast);
 	}
 
 	.menu-item:hover {

@@ -60,7 +60,8 @@ export async function deleteImage(path: string): Promise<void> {
 // ── URL helpers ─────────────────────────────────────────────────────────────
 
 export function thumbnailURL(record: ImageRecord): string {
-	const variant = record.variants.find((v) => v.name === 'thumbnail') ?? record.variants[0];
+	const variant =
+		record.variants.find((v) => v.name === 'thumbnail') ?? record.variants[0];
 	const name = variant?.name ?? 'default';
 	return `/cdn/image/${record.path}/${name}`;
 }

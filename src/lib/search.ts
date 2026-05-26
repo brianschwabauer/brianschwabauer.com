@@ -10,7 +10,7 @@ export const indexSchema = {
 	body: 'string',
 	tags: 'string[]',
 	date: 'number',
-	url: 'string'
+	url: 'string',
 } as const;
 
 export const vectorIndexSchema = {
@@ -21,7 +21,7 @@ export const vectorIndexSchema = {
 	tags: 'string[]',
 	date: 'number',
 	url: 'string',
-	embedding: `vector[${EMBEDDING_DIM}]`
+	embedding: `vector[${EMBEDDING_DIM}]`,
 } as const;
 
 export type SearchEntryType = 'blog' | 'home';

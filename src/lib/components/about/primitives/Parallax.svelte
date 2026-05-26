@@ -4,7 +4,7 @@
 	let {
 		children,
 		speed = 0.3,
-		class: klass = ''
+		class: klass = '',
 	}: { children: Snippet; speed?: number; class?: string } = $props();
 
 	let el = $state<HTMLElement | null>(null);
@@ -36,6 +36,8 @@
 		will-change: transform;
 	}
 	@media (prefers-reduced-motion: reduce) {
-		.parallax { transform: none !important; }
+		.parallax {
+			transform: none !important;
+		}
 	}
 </style>

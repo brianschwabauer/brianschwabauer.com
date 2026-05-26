@@ -3,7 +3,7 @@
 		year,
 		subtitle = '',
 		color = 'currentColor',
-		size = 'clamp(7rem, 22vw, 18rem)'
+		size = 'clamp(7rem, 22vw, 18rem)',
 	}: {
 		year: string;
 		subtitle?: string;
@@ -38,8 +38,7 @@
 	class="year-mark"
 	style:--p={progress}
 	style:--year-color={color}
-	style:--year-size={size}
->
+	style:--year-size={size}>
 	<span class="year" aria-hidden="true">{year}</span>
 	{#if subtitle}
 		<span class="subtitle">{subtitle}</span>

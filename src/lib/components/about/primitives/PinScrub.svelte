@@ -4,7 +4,7 @@
 	let {
 		children,
 		height = '300vh',
-		class: klass = ''
+		class: klass = '',
 	}: {
 		children: Snippet<[{ progress: number }]>;
 		height?: string;
@@ -33,7 +33,7 @@
 	});
 </script>
 
-<div bind:this={outer} class="pin-outer {klass}" style:height={height}>
+<div bind:this={outer} class="pin-outer {klass}" style:height>
 	<div class="pin-inner">
 		{@render children({ progress })}
 	</div>

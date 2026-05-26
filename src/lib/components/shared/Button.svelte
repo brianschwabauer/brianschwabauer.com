@@ -41,7 +41,11 @@
 		</span>
 	</a>
 {:else}
-	<button class="btn {variant} {size}" class:loading disabled={loading || rest.disabled} {...rest}>
+	<button
+		class="btn {variant} {size}"
+		class:loading
+		disabled={loading || rest.disabled}
+		{...rest}>
 		{#if loading}
 			<span class="spinner"></span>
 		{/if}
@@ -60,8 +64,11 @@
 		gap: var(--space-2);
 		font-weight: 500;
 		border-radius: var(--radius-md);
-		transition: background-color var(--transition-fast), color var(--transition-fast),
-			transform var(--transition-fast), box-shadow var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			color var(--transition-fast),
+			transform var(--transition-fast),
+			box-shadow var(--transition-fast);
 		cursor: pointer;
 		text-decoration: none;
 	}

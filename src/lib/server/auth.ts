@@ -7,11 +7,14 @@ function parseAdminEmails(raw: string | undefined): Set<string> {
 		raw
 			.split(',')
 			.map((email) => email.trim().toLowerCase())
-			.filter(Boolean)
+			.filter(Boolean),
 	);
 }
 
-export function isAdminEmail(email: string | null | undefined, adminList: string | undefined) {
+export function isAdminEmail(
+	email: string | null | undefined,
+	adminList: string | undefined,
+) {
 	if (!email) return false;
 	return parseAdminEmails(adminList).has(email.toLowerCase());
 }
@@ -31,15 +34,17 @@ export function createAuth(platform: App.Platform | undefined) {
 			Google({
 				clientId: env.AUTH_GOOGLE_ID,
 				clientSecret: env.AUTH_GOOGLE_SECRET,
-				authorization: { params: { prompt: 'select_account' } }
-			})
+				authorization: { params: { prompt: 'select_account' } },
+			}),
 		],
 		secret: env.AUTH_SECRET,
 		trustHost: true,
 		callbacks: {
 			async jwt({ token, user }) {
 				if (user?.email) token.email = user.email;
-				token.role = isAdminEmail(token.email as string | undefined, adminEmails) ? 'admin' : 'user';
+				token.role = isAdminEmail(token.email as string | undefined, adminEmails)
+					? 'admin'
+					: 'user';
 				return token;
 			},
 			async session({ session, token }) {
@@ -47,7 +52,7 @@ export function createAuth(platform: App.Platform | undefined) {
 					(session.user as { role?: string }).role = (token.role as string) ?? 'user';
 				}
 				return session;
-			}
-		}
+			},
+		},
 	});
 }

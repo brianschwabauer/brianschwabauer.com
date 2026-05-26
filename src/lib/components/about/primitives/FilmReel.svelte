@@ -5,7 +5,7 @@
 		images,
 		height = 200,
 		speed = 60,
-		direction = 'left'
+		direction = 'left',
 	}: {
 		images: Array<string | { src: string; caption?: string }>;
 		height?: number;
@@ -14,7 +14,7 @@
 	} = $props();
 
 	const normalized = $derived(
-		images.map((i) => (typeof i === 'string' ? { src: i } : i))
+		images.map((i) => (typeof i === 'string' ? { src: i } : i)),
 	);
 	const doubled = $derived([...normalized, ...normalized]);
 </script>
@@ -23,8 +23,7 @@
 	class="film-reel"
 	style:--reel-height="{height}px"
 	style:--reel-duration="{speed}s"
-	style:--reel-direction={direction === 'right' ? 'reverse' : 'normal'}
->
+	style:--reel-direction={direction === 'right' ? 'reverse' : 'normal'}>
 	<div class="perforations top" aria-hidden="true">
 		{#each Array(40) as _}<span></span>{/each}
 	</div>
@@ -35,8 +34,7 @@
 					src={item.src.startsWith('http') ? item.src : media(item.src)}
 					alt={item.caption ?? ''}
 					loading="lazy"
-					decoding="async"
-				/>
+					decoding="async" />
 				{#if item.caption}<figcaption>{item.caption}</figcaption>{/if}
 			</figure>
 		{/each}
@@ -82,8 +80,12 @@
 		animation-play-state: paused;
 	}
 	@keyframes scroll {
-		from { transform: translateX(0); }
-		to { transform: translateX(-50%); }
+		from {
+			transform: translateX(0);
+		}
+		to {
+			transform: translateX(-50%);
+		}
 	}
 	.frame {
 		flex: 0 0 auto;
@@ -114,8 +116,12 @@
 		opacity: 0;
 		transition: opacity 200ms ease;
 	}
-	.frame:hover figcaption { opacity: 1; }
+	.frame:hover figcaption {
+		opacity: 1;
+	}
 	@media (prefers-reduced-motion: reduce) {
-		.track { animation: none; }
+		.track {
+			animation: none;
+		}
 	}
 </style>

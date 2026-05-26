@@ -15,16 +15,16 @@
 		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_05.avif',
 		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_06.avif',
 		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_07.avif',
-		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_08.jpg'
+		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_08.jpg',
 	].map((src) => ({ src }));
 
 	const messages = [
-		{ from: '+1 (913) ••• 4451', text: "this is HILARIOUS" },
+		{ from: '+1 (913) ••• 4451', text: 'this is HILARIOUS' },
 		{ from: '+1 (816) ••• 8210', text: 'Why is Zordon a dog' },
 		{ from: '+1 (913) ••• 2199', text: 'cried laughing at the PR3 trailer' },
 		{ from: '+1 (785) ••• 0772', text: 'I love this so much' },
 		{ from: '+1 (816) ••• 5621', text: 'Brian and Kevin forever ❤️' },
-		{ from: '+1 (913) ••• 9088', text: 'Oscars who?' }
+		{ from: '+1 (913) ••• 9088', text: 'Oscars who?' },
 	];
 </script>
 
@@ -43,26 +43,33 @@
 					<span class="grow w3">Oscars.</span>
 				</h2>
 				<p class="lede">
-					High school was wrapping up. Kevin was going to Baylor. I was going to Missouri State. We knew we'd see
-					each other again — eventually — but Hunky Spunky Productions, the version with our childhood in it, was
-					done.
+					High school was wrapping up. Kevin was going to Baylor. I was going to Missouri
+					State. We knew we'd see each other again — eventually — but Hunky Spunky
+					Productions, the version with our childhood in it, was done.
 				</p>
 				<p class="lede">
-					So we sent it off the only way we knew how: <strong>The Spunksters</strong> — an awards show, modeled
-					after the Oscars, for ourselves. Awards in every category. Speeches. Live-streamed. Projected on the
-					side of a house. Forty friends in a backyard, watching a live video feed of Kevin hosting from inside,
-					so the host appeared on a twenty-foot tall projection like a giant.
+					So we sent it off the only way we knew how: <strong>The Spunksters</strong>
+					— an awards show, modeled after the Oscars, for ourselves. Awards in every category.
+					Speeches. Live-streamed. Projected on the side of a house. Forty friends in a backyard,
+					watching a live video feed of Kevin hosting from inside, so the host appeared on a
+					twenty-foot tall projection like a giant.
 				</p>
 			</Reveal>
 		</div>
 
 		<div class="logo-stage">
 			<Reveal variant="up">
-				<LazyMedia src="2013-06-22_the_spunksters-logo_animation.avif" alt="The Spunksters logo animation" ratio="16 / 9" />
+				<LazyMedia
+					src="2013-06-22_the_spunksters-logo_animation.avif"
+					alt="The Spunksters logo animation"
+					ratio="16 / 9" />
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="inline-video">
-					<VideoPlayer slug="2013-06-22_the_spunksters" title="The Spunksters (2013) — the live awards show" ratio="16 / 9" />
+					<VideoPlayer
+						slug="2013-06-22_the_spunksters"
+						title="The Spunksters (2013) — the live awards show"
+						ratio="16 / 9" />
 				</div>
 			</Reveal>
 		</div>
@@ -72,17 +79,20 @@
 				<div class="sms-grid">
 					<div class="sms-text">
 						<div class="sms-eyebrow">A SMALL, RIDICULOUS THING I'M PROUD OF</div>
-						<h3 class="sub">An SMS feature, hacked together because Google Voice doesn't have an API.</h3>
+						<h3 class="sub">
+							An SMS feature, hacked together because Google Voice doesn't have an API.
+						</h3>
 						<p>
-							I wanted viewers to be able to text in their reactions and have them appear on the projected
-							wall. Google Voice didn't (and doesn't) expose an API. But it can forward incoming texts to
-							email. So: text → Google Voice → email → my little polling script → OBS overlay. Untested
-							until the moment it had to work. It worked.
+							I wanted viewers to be able to text in their reactions and have them appear
+							on the projected wall. Google Voice didn't (and doesn't) expose an API. But
+							it can forward incoming texts to email. So: text → Google Voice → email → my
+							little polling script → OBS overlay. Untested until the moment it had to
+							work. It worked.
 						</p>
 						<p class="aside">
-							I deeply believe in this: live life all the way through, even the parts that don't matter.
-							Backyard awards shows are nothing. It is so much more fun to take them seriously than to phone
-							them in.
+							I deeply believe in this: live life all the way through, even the parts that
+							don't matter. Backyard awards shows are nothing. It is so much more fun to
+							take them seriously than to phone them in.
 						</p>
 					</div>
 					<div class="phone">
@@ -111,20 +121,28 @@
 
 		<div class="bubbly-bros">
 			<Reveal variant="left">
-				<LazyMedia src="2013-06-22_bubbly_bros-kevin_jumps_up_and_down.avif" alt="Kevin from Bubbly Bros" ratio="4 / 3" />
+				<LazyMedia
+					src="2013-06-22_bubbly_bros-kevin_jumps_up_and_down.avif"
+					alt="Kevin from Bubbly Bros"
+					ratio="4 / 3" />
 			</Reveal>
 			<Reveal>
 				<h3 class="sub">Bubbly Bros — the unofficial encore</h3>
 				<p>
-					For the show, Kevin and I wrote a song called "Bubbly Bros". A rap song about two guys who love blowing
-					bubbles. It sounds like a constant innuendo. It is not. We're really just rapping about bubbles.
+					For the show, Kevin and I wrote a song called "Bubbly Bros". A rap song about
+					two guys who love blowing bubbles. It sounds like a constant innuendo. It is
+					not. We're really just rapping about bubbles.
 				</p>
 				<p>
-					We ran out of time to shoot a real music video, so we did a photo shoot, set it to the song, and called
-					it done. It got cheers from a backyard. It belongs there.
+					We ran out of time to shoot a real music video, so we did a photo shoot, set it
+					to the song, and called it done. It got cheers from a backyard. It belongs
+					there.
 				</p>
 				<div class="bubbly-video">
-					<VideoPlayer slug="2013-06-22_bubbly_bros" title="Bubbly Bros (2013) — photo music video" ratio="16 / 9" />
+					<VideoPlayer
+						slug="2013-06-22_bubbly_bros"
+						title="Bubbly Bros (2013) — photo music video"
+						ratio="16 / 9" />
 				</div>
 			</Reveal>
 		</div>
@@ -133,21 +151,31 @@
 			<Reveal variant="up">
 				<h3 class="sub">A fake Power Rangers III trailer</h3>
 				<p>
-					For The Spunksters we also cut a fake trailer for a "Power Rangers III". An adult Kevin — the blue
-					ranger from our childhood movies — has not let his glory days go. The other rangers have grown up. They
-					have kids. They have jobs. Kevin doesn't. The trailer ends with a gag where the words "in 3D" break the
-					letterbox bars. It still kills me.
+					For The Spunksters we also cut a fake trailer for a "Power Rangers III". An
+					adult Kevin — the blue ranger from our childhood movies — has not let his glory
+					days go. The other rangers have grown up. They have kids. They have jobs. Kevin
+					doesn't. The trailer ends with a gag where the words "in 3D" break the letterbox
+					bars. It still kills me.
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="trailer-pair">
-					<LazyMedia src="2013-06-22_power_rangers_iii_trailer-logo_animation.avif" alt="Power Rangers III logo animation" ratio="16 / 9" />
-					<LazyMedia src="2013-06-22_power_rangers_iii_trailer-kevin_visits_zordons_grave.avif" alt="Kevin visits Zordon's grave" ratio="16 / 9" />
+					<LazyMedia
+						src="2013-06-22_power_rangers_iii_trailer-logo_animation.avif"
+						alt="Power Rangers III logo animation"
+						ratio="16 / 9" />
+					<LazyMedia
+						src="2013-06-22_power_rangers_iii_trailer-kevin_visits_zordons_grave.avif"
+						alt="Kevin visits Zordon's grave"
+						ratio="16 / 9" />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={140}>
 				<div class="inline-video">
-					<VideoPlayer slug="2013-06-22_power_rangers_iii_trailer" title="Power Rangers 360 III — fake trailer (2013)" ratio="16 / 9" />
+					<VideoPlayer
+						slug="2013-06-22_power_rangers_iii_trailer"
+						title="Power Rangers 360 III — fake trailer (2013)"
+						ratio="16 / 9" />
 				</div>
 			</Reveal>
 		</div>
@@ -177,7 +205,10 @@
 		margin: 0 auto;
 		padding: 0 clamp(1rem, 3vw, 2rem);
 	}
-	.lockup { text-align: center; margin-bottom: 3rem; }
+	.lockup {
+		text-align: center;
+		margin-bottom: 3rem;
+	}
 	.eyebrow {
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
@@ -209,14 +240,18 @@
 		max-width: 48rem;
 		margin: 0 auto 1rem;
 	}
-	.lede strong { color: #ffd934; }
+	.lede strong {
+		color: #ffd934;
+	}
 
 	.logo-stage {
 		max-width: 800px;
 		margin: 3rem auto 4rem;
 	}
 
-	.sms-block { margin: 4rem 0; }
+	.sms-block {
+		margin: 4rem 0;
+	}
 	.sms-grid {
 		display: grid;
 		grid-template-columns: 1.3fr 1fr;
@@ -224,7 +259,9 @@
 		align-items: center;
 	}
 	@media (max-width: 768px) {
-		.sms-grid { grid-template-columns: 1fr; }
+		.sms-grid {
+			grid-template-columns: 1fr;
+		}
 	}
 	.sms-eyebrow {
 		font-family: var(--font-mono);
@@ -239,7 +276,11 @@
 		margin: 0 0 0.6rem;
 		line-height: 1.2;
 	}
-	.sms-text p { line-height: 1.6; margin-bottom: 1rem; max-width: 36rem; }
+	.sms-text p {
+		line-height: 1.6;
+		margin-bottom: 1rem;
+		max-width: 36rem;
+	}
 	.aside {
 		padding: 1rem 1.2rem;
 		background: rgba(255, 217, 52, 0.06);
@@ -284,7 +325,10 @@
 		animation-delay: calc(var(--i) * 0.6s);
 	}
 	@keyframes msgIn {
-		to { opacity: 1; transform: translateY(0); }
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 	.from {
 		font-family: var(--font-mono);
@@ -325,19 +369,33 @@
 		border-radius: 14px;
 	}
 	@media (max-width: 768px) {
-		.bubbly-bros { grid-template-columns: 1fr; }
+		.bubbly-bros {
+			grid-template-columns: 1fr;
+		}
 	}
-	.bubbly-bros p { line-height: 1.6; margin-bottom: 1rem; max-width: 36rem; }
+	.bubbly-bros p {
+		line-height: 1.6;
+		margin-bottom: 1rem;
+		max-width: 36rem;
+	}
 
-	.prtrailer { margin: 4rem 0; }
-	.prtrailer p { max-width: 56rem; line-height: 1.6; margin-bottom: 1.5rem; }
+	.prtrailer {
+		margin: 4rem 0;
+	}
+	.prtrailer p {
+		max-width: 56rem;
+		line-height: 1.6;
+		margin-bottom: 1.5rem;
+	}
 	.trailer-pair {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 0.8rem;
 	}
 	@media (max-width: 640px) {
-		.trailer-pair { grid-template-columns: 1fr; }
+		.trailer-pair {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	.endcap {
@@ -372,5 +430,7 @@
 		max-width: 880px;
 		margin: 2rem auto 0;
 	}
-	.bubbly-video { margin-top: 1.2rem; }
+	.bubbly-video {
+		margin-top: 1.2rem;
+	}
 </style>

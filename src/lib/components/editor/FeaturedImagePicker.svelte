@@ -13,13 +13,7 @@
 		onFocalChange?: (x: number, y: number) => void;
 	}
 
-	let {
-		image,
-		focalX = 50,
-		focalY = 50,
-		onChange,
-		onFocalChange,
-	}: Props = $props();
+	let { image, focalX = 50, focalY = 50, onChange, onFocalChange }: Props = $props();
 
 	let libraryOpen = $state(false);
 	let focused = $state(false);
@@ -64,7 +58,8 @@
 		if (!image) return;
 		const next = await prompt({
 			title: 'Cover image alt text',
-			message: 'A short description used by screen readers and shown if the image fails to load.',
+			message:
+				'A short description used by screen readers and shown if the image fails to load.',
 			value: image.alt_text ?? '',
 			placeholder: 'Describe the image…',
 		});
@@ -199,7 +194,8 @@
 		if (!image || !image.width || !image.height) return '';
 		const COVER_RATIO = 2.35;
 		const imgR = image.width / image.height;
-		if (Math.abs(imgR - COVER_RATIO) < 0.01) return 'This image already fits the 2.35:1 frame.';
+		if (Math.abs(imgR - COVER_RATIO) < 0.01)
+			return 'This image already fits the 2.35:1 frame.';
 		if (imgR > COVER_RATIO) return 'Drag left or right to choose what to show.';
 		return 'Drag up or down to choose what to show.';
 	});
@@ -264,21 +260,47 @@
 					onkeydown={(e) => e.stopPropagation()}
 					onpointerdown={(e) => e.stopPropagation()}>
 					<button type="button" class="ft-btn" onclick={recenter} title="Center">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							width="14"
+							height="14">
 							<circle cx="12" cy="12" r="9" />
 							<circle cx="12" cy="12" r="1.5" fill="currentColor" />
 						</svg>
 						<span>Center</span>
 					</button>
-					<button type="button" class="ft-btn" onclick={cancelReposition} title="Cancel (Esc)">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+					<button
+						type="button"
+						class="ft-btn"
+						onclick={cancelReposition}
+						title="Cancel (Esc)">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							width="14"
+							height="14">
 							<line x1="18" y1="6" x2="6" y2="18" />
 							<line x1="6" y1="6" x2="18" y2="18" />
 						</svg>
 						<span>Cancel</span>
 					</button>
-					<button type="button" class="ft-btn primary" onclick={toggleReposition} title="Save focus (Enter)">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+					<button
+						type="button"
+						class="ft-btn primary"
+						onclick={toggleReposition}
+						title="Save focus (Enter)">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							width="14"
+							height="14">
 							<polyline points="20 6 9 17 4 12" />
 						</svg>
 						<span>Done</span>
@@ -292,8 +314,18 @@
 					aria-label="Cover image controls"
 					onclick={(e) => e.stopPropagation()}
 					onkeydown={(e) => e.stopPropagation()}>
-					<button type="button" class="ft-btn" onclick={toggleReposition} title="Drag to choose what part of the image is shown">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+					<button
+						type="button"
+						class="ft-btn"
+						onclick={toggleReposition}
+						title="Drag to choose what part of the image is shown">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							width="14"
+							height="14">
 							<polyline points="5 9 2 12 5 15" />
 							<polyline points="9 5 12 2 15 5" />
 							<polyline points="15 19 12 22 9 19" />
@@ -303,24 +335,57 @@
 						</svg>
 						<span>Reposition</span>
 					</button>
-					<button type="button" class="ft-btn" onclick={openLibrary} title="Replace image">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+					<button
+						type="button"
+						class="ft-btn"
+						onclick={openLibrary}
+						title="Replace image">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							width="14"
+							height="14">
 							<polyline points="23 4 23 10 17 10" />
 							<polyline points="1 20 1 14 7 14" />
-							<path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+							<path
+								d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
 						</svg>
 						<span>Replace</span>
 					</button>
-					<button type="button" class="ft-btn" onclick={handleAltEdit} title="Edit alt text">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-							<path d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+					<button
+						type="button"
+						class="ft-btn"
+						onclick={handleAltEdit}
+						title="Edit alt text">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							width="14"
+							height="14">
+							<path
+								d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
 						</svg>
 						<span>Alt</span>
 					</button>
-					<button type="button" class="ft-btn danger" onclick={clearImage} title="Remove cover">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+					<button
+						type="button"
+						class="ft-btn danger"
+						onclick={clearImage}
+						title="Remove cover">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							width="14"
+							height="14">
 							<polyline points="3 6 5 6 21 6" />
-							<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+							<path
+								d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
 						</svg>
 					</button>
 				</div>
@@ -328,14 +393,23 @@
 		</figure>
 	{:else}
 		<div class="placeholder">
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="42" height="42" aria-hidden="true">
+			<svg
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.5"
+				width="42"
+				height="42"
+				aria-hidden="true">
 				<rect x="3" y="3" width="18" height="18" rx="2" />
 				<circle cx="8.5" cy="8.5" r="1.5" />
 				<polyline points="21 15 16 10 5 21" />
 			</svg>
 			<div class="placeholder-text">
 				<div class="placeholder-title">Add a cover image</div>
-				<div class="placeholder-sub">Click to choose from your media library or upload a new one</div>
+				<div class="placeholder-sub">
+					Click to choose from your media library or upload a new one
+				</div>
 			</div>
 		</div>
 	{/if}
@@ -376,7 +450,10 @@
 		border-radius: var(--radius-lg);
 		color: var(--color-text-secondary);
 		background: var(--color-bg-secondary);
-		transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+		transition:
+			border-color 150ms ease,
+			color 150ms ease,
+			background 150ms ease;
 		aspect-ratio: 2.35;
 		justify-content: center;
 	}
@@ -507,8 +584,17 @@
 		transition: background 120ms ease;
 	}
 
-	.ft-btn:hover { background: rgba(255, 255, 255, 0.18); }
-	.ft-btn.primary { background: var(--color-accent); }
-	.ft-btn.primary:hover { background: var(--color-accent); filter: brightness(1.1); }
-	.ft-btn.danger:hover { background: var(--color-error); }
+	.ft-btn:hover {
+		background: rgba(255, 255, 255, 0.18);
+	}
+	.ft-btn.primary {
+		background: var(--color-accent);
+	}
+	.ft-btn.primary:hover {
+		background: var(--color-accent);
+		filter: brightness(1.1);
+	}
+	.ft-btn.danger:hover {
+		background: var(--color-error);
+	}
 </style>

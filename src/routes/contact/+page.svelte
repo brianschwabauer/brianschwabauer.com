@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-	import { Button } from "@delightstack/components/actions";
+	import { onMount } from 'svelte';
+	import { Button } from '@delightstack/components/actions';
 
 	// ---- rotating headline -------------------------------------------------
 	// The headline cycles every few seconds — gives the page a little life
 	// without screaming for attention. Pauses on hover so a curious visitor
 	// can read the current one without it sliding out from under them.
 	const headlines = [
-		"Say hello.",
-		"Pitch a wild idea.",
-		"Tell me a joke.",
-		"Send a postcard.",
+		'Say hello.',
+		'Pitch a wild idea.',
+		'Tell me a joke.',
+		'Send a postcard.',
 	];
 	let headlineIdx = $state(0);
 	let headlinePaused = $state(false);
@@ -25,38 +25,36 @@
 	// `submitting` mirrors the in-flight network request — the delightstack
 	// <Button> tracks its own loading via the onclick promise, but we still
 	// need this to disable the inputs while the request is in the air.
-	let name = $state("");
-	let email = $state("");
-	let message = $state("");
-	let formState = $state<"idle" | "sent">("idle");
+	let name = $state('');
+	let email = $state('');
+	let message = $state('');
+	let formState = $state<'idle' | 'sent'>('idle');
 	let submitting = $state(false);
-	let formError = $state("");
+	let formError = $state('');
 
 	// Sassy meter that reacts to message length — gives writing a little
 	// dopamine without being annoying. Tiers are deliberately wide so the
 	// label doesn't flicker character-by-character.
 	const vibe = $derived.by(() => {
 		const len = message.trim().length;
-		if (len === 0)
-			return { label: "Awaiting your words…", tone: "idle" as const };
+		if (len === 0) return { label: 'Awaiting your words…', tone: 'idle' as const };
 		if (len < 20)
 			return {
-				label: "Brief and to the point. I like it.",
-				tone: "short" as const,
+				label: 'Brief and to the point. I like it.',
+				tone: 'short' as const,
 			};
-		if (len < 120)
-			return { label: "Now we’re talking.", tone: "good" as const };
-		if (len < 500) return { label: "A proper note. ✍️", tone: "good" as const };
+		if (len < 120) return { label: 'Now we’re talking.', tone: 'good' as const };
+		if (len < 500) return { label: 'A proper note. ✍️', tone: 'good' as const };
 		if (len < 1500)
-			return { label: "An epic. I’ll bring snacks.", tone: "long" as const };
+			return { label: 'An epic. I’ll bring snacks.', tone: 'long' as const };
 		if (len < 4500)
 			return {
-				label: "A novella! Cancel my afternoon.",
-				tone: "long" as const,
+				label: 'A novella! Cancel my afternoon.',
+				tone: 'long' as const,
 			};
 		return {
-			label: "You’re flirting with the 5,000 char limit.",
-			tone: "warn" as const,
+			label: 'You’re flirting with the 5,000 char limit.',
+			tone: 'warn' as const,
 		};
 	});
 
@@ -69,24 +67,24 @@
 	async function submit() {
 		if (submitting) return;
 		if (!name.trim() || !email.trim() || !message.trim()) {
-			formError = "Name, email, and message — none of them optional.";
+			formError = 'Name, email, and message — none of them optional.';
 			throw new Error(formError);
 		}
 		submitting = true;
-		formError = "";
+		formError = '';
 		try {
-			const res = await fetch("/api/contact", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
+			const res = await fetch('/api/contact', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ name, email, message }),
 			});
 			if (!res.ok) {
-				const txt = await res.text().catch(() => "");
+				const txt = await res.text().catch(() => '');
 				throw new Error(txt || `Send failed (${res.status})`);
 			}
-			formState = "sent";
+			formState = 'sent';
 		} catch (err) {
-			formError = err instanceof Error ? err.message : "Send failed";
+			formError = err instanceof Error ? err.message : 'Send failed';
 			throw err;
 		} finally {
 			submitting = false;
@@ -94,22 +92,22 @@
 	}
 
 	function resetForm() {
-		name = "";
-		email = "";
-		message = "";
-		formError = "";
-		formState = "idle";
+		name = '';
+		email = '';
+		message = '';
+		formError = '';
+		formState = 'idle';
 	}
 
 	// First-name greeting on the success screen — feels personal without
 	// echoing the whole submitted string back at them.
-	const firstName = $derived(name.trim().split(/\s+/)[0] || "friend");
+	const firstName = $derived(name.trim().split(/\s+/)[0] || 'friend');
 
 	// Tiny Easter egg: focus the name field on mount so they can just start
 	// typing. Skipped on touch devices where it would yank up the keyboard
 	// before they've decided to engage.
 	onMount(() => {
-		if (matchMedia("(hover: hover)").matches) {
+		if (matchMedia('(hover: hover)').matches) {
 			document.querySelector<HTMLInputElement>('input[name="name"]')?.focus();
 		}
 	});
@@ -119,8 +117,7 @@
 	<title>Contact - Brian Schwabauer</title>
 	<meta
 		name="description"
-		content="Send Brian Schwabauer a message — collaboration ideas, opportunities, or just a hello."
-	/>
+		content="Send Brian Schwabauer a message — collaboration ideas, opportunities, or just a hello." />
 </svelte:head>
 
 <div class="contact-page">
@@ -128,8 +125,7 @@
 		<h1
 			class="title"
 			onmouseenter={() => (headlinePaused = true)}
-			onmouseleave={() => (headlinePaused = false)}
-		>
+			onmouseleave={() => (headlinePaused = false)}>
 			{#each headlines as line, i (line)}
 				{#if i === headlineIdx}
 					<span class="title-line" aria-live="polite">{line}</span>
@@ -137,12 +133,12 @@
 			{/each}
 		</h1>
 		<p class="lede">
-			This goes straight to my inbox. No chatbot, no CRM, no “we’ll get back to
-			you” auto-reply. Just me, on the other side of a keyboard.
+			This goes straight to my inbox. No chatbot, no CRM, no “we’ll get back to you”
+			auto-reply. Just me, on the other side of a keyboard.
 		</p>
 	</header>
 
-	{#if formState === "sent"}
+	{#if formState === 'sent'}
 		<div class="card success" role="status">
 			<div class="plane-stage" aria-hidden="true">
 				<svg class="plane" viewBox="0 0 64 64">
@@ -151,17 +147,13 @@
 						fill="currentColor"
 						stroke="currentColor"
 						stroke-width="1.5"
-						stroke-linejoin="round"
-					/>
-					<path
-						d="M34 38 L62 4"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="1.5"
-					/>
+						stroke-linejoin="round" />
+					<path d="M34 38 L62 4" fill="none" stroke="currentColor" stroke-width="1.5" />
 				</svg>
 				<div class="trail">
-					<span></span><span></span><span></span>
+					<span></span>
+					<span></span>
+					<span></span>
 				</div>
 			</div>
 			<h2>Message launched.</h2>
@@ -169,9 +161,7 @@
 				Thanks, {firstName}. I'll write back to you in hopefully a timely manner
 				(sometimes I can be slow. Feel free to keep bugging me).
 			</p>
-			<button type="button" class="ghost-btn" onclick={resetForm}
-				>Send another</button
-			>
+			<button type="button" class="ghost-btn" onclick={resetForm}>Send another</button>
 		</div>
 	{:else}
 		<form
@@ -184,8 +174,7 @@
 				// already surfaced in formError.
 				submit().catch(() => {});
 			}}
-			novalidate
-		>
+			novalidate>
 			<div class="field-row">
 				<label class="field">
 					<span class="field-label">Your name</span>
@@ -197,8 +186,7 @@
 						maxlength="100"
 						autocomplete="name"
 						placeholder="Johnny Appleseed"
-						disabled={submitting}
-					/>
+						disabled={submitting} />
 				</label>
 				<label class="field">
 					<span class="field-label">Email</span>
@@ -210,8 +198,7 @@
 						maxlength="200"
 						autocomplete="email"
 						placeholder="johnny@example.com"
-						disabled={submitting}
-					/>
+						disabled={submitting} />
 				</label>
 			</div>
 
@@ -226,8 +213,8 @@
 					maxlength="5000"
 					rows="7"
 					placeholder="Tell me about your idea, the dream, or just say hi."
-					disabled={submitting}
-				></textarea>
+					disabled={submitting}>
+				</textarea>
 				<span class="char-count" class:near={message.length > 4500}>
 					{message.length} / 5000
 				</span>
@@ -243,10 +230,9 @@
 					fullWidth
 					size="2"
 					disabled={!name.trim() || !message.trim() || !email.trim()}
-					onclick={submit}
-				>
+					onclick={submit}>
 					{#snippet children({ isLoading, isLoadingSuccess })}
-						{isLoading ? "Sending…" : isLoadingSuccess ? "Sent" : "Send it"}
+						{isLoading ? 'Sending…' : isLoadingSuccess ? 'Sent' : 'Send it'}
 						{#if !isLoading && !isLoadingSuccess}
 							<svg class="send-arrow" viewBox="0 0 24 24" aria-hidden="true">
 								<path
@@ -255,21 +241,17 @@
 									stroke="currentColor"
 									stroke-width="2"
 									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
+									stroke-linejoin="round" />
 							</svg>
 						{/if}
 					{/snippet}
 				</Button>
 				<p class="fine-print">
 					No tracking, no list, no spam. Promise written in actual code:
-					<a
-						href="https://github.com/brianschwabauer"
-						target="_blank"
-						rel="noopener"
-					>
-						read the source</a
-					>.
+					<a href="https://github.com/brianschwabauer" target="_blank" rel="noopener">
+						read the source
+					</a>
+					.
 				</p>
 			</div>
 		</form>
@@ -312,11 +294,7 @@
 	.title-line {
 		display: inline-block;
 		padding-bottom: 0.1em;
-		background: linear-gradient(
-			95deg,
-			var(--color-text) 0%,
-			var(--color-accent) 90%
-		);
+		background: linear-gradient(95deg, var(--color-text) 0%, var(--color-accent) 90%);
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
@@ -452,16 +430,16 @@
 		color: var(--color-text-muted);
 		transition: color 200ms ease;
 	}
-	.vibe[data-tone="short"] {
+	.vibe[data-tone='short'] {
 		color: var(--color-accent);
 	}
-	.vibe[data-tone="good"] {
+	.vibe[data-tone='good'] {
 		color: var(--color-success);
 	}
-	.vibe[data-tone="long"] {
+	.vibe[data-tone='long'] {
 		color: #d97706; /* amber-600, readable against both themes */
 	}
-	.vibe[data-tone="warn"] {
+	.vibe[data-tone='warn'] {
 		color: var(--color-error);
 	}
 
@@ -489,8 +467,7 @@
 	.fine-print a {
 		color: var(--color-accent);
 		text-decoration: none;
-		border-bottom: 1px dotted
-			color-mix(in srgb, var(--color-accent) 50%, transparent);
+		border-bottom: 1px dotted color-mix(in srgb, var(--color-accent) 50%, transparent);
 	}
 	.fine-print a:hover {
 		border-bottom-color: var(--color-accent);

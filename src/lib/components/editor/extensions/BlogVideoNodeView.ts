@@ -134,7 +134,7 @@ export function createBlogVideoNodeView(): NodeViewRenderer {
 				const snapPoints: SnapPoint[] = [
 					{ px: colWidth, mode: 'normal', pct: 100 },
 					{ px: WIDE_PX, mode: 'wide', pct: 100 },
-					{ px: viewport, mode: 'full', pct: 100 }
+					{ px: viewport, mode: 'full', pct: 100 },
 				];
 				let snappedTo: SnapPoint | null = null;
 
@@ -202,7 +202,11 @@ export function createBlogVideoNodeView(): NodeViewRenderer {
 					}
 
 					dom.classList.add('is-snapping');
-					applyAttrs({ ...latestAttrs, widthMode: finalState.mode, widthPct: finalState.pct });
+					applyAttrs({
+						...latestAttrs,
+						widthMode: finalState.mode,
+						widthPct: finalState.pct,
+					});
 					updateAttrs({ widthMode: finalState.mode, widthPct: finalState.pct });
 					requestAnimationFrame(() => {
 						dom.classList.remove('is-dragging');
@@ -248,7 +252,7 @@ export function createBlogVideoNodeView(): NodeViewRenderer {
 			},
 			ignoreMutation() {
 				return true;
-			}
+			},
 		};
 	};
 }

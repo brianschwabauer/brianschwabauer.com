@@ -8,36 +8,108 @@
 	import FilmReel from '../primitives/FilmReel.svelte';
 
 	const pr1Shots = [
-		{ src: '2007-07-26_power_rangers_360-power_rangers_start_the_morphin_time.avif', caption: 'Morphin time' },
-		{ src: '2007-07-26_power_rangers_360-amanda_morphs_on_green_screen_graphic.avif', caption: 'Amanda morphs (greenscreen graphic)' },
-		{ src: '2007-07-26_power_rangers_360-brian_morphs_on_green_screen_graphic.avif', caption: 'Brian morphs' },
-		{ src: '2007-07-26_power_rangers_360-emma_morphs_on_green_screen_graphic.avif', caption: 'Emma morphs' },
-		{ src: '2007-07-26_power_rangers_360-kevin_morphs_on_green_screen_graphic.avif', caption: 'Kevin morphs' },
-		{ src: '2007-07-26_power_rangers_360-brian_and_kevin_sword_fight.avif', caption: 'Red vs Blue, the duel' },
-		{ src: '2007-07-26_power_rangers_360-vino_kicks_brian_in_360_move.avif', caption: 'Vino lands the "360"' },
-		{ src: '2007-07-26_power_rangers_360-vino_summons_fallen_broom_stick_reversed_footage_visual_effect.avif', caption: 'Reversed-footage summoning' },
-		{ src: '2007-07-26_power_rangers_360-vino_disappears_visual_effect.avif', caption: 'Vino vanishes' },
-		{ src: '2007-07-26_power_rangers_360-brian_pulls_out_knife.avif', caption: 'The final duel begins' }
+		{
+			src: '2007-07-26_power_rangers_360-power_rangers_start_the_morphin_time.avif',
+			caption: 'Morphin time',
+		},
+		{
+			src: '2007-07-26_power_rangers_360-amanda_morphs_on_green_screen_graphic.avif',
+			caption: 'Amanda morphs (greenscreen graphic)',
+		},
+		{
+			src: '2007-07-26_power_rangers_360-brian_morphs_on_green_screen_graphic.avif',
+			caption: 'Brian morphs',
+		},
+		{
+			src: '2007-07-26_power_rangers_360-emma_morphs_on_green_screen_graphic.avif',
+			caption: 'Emma morphs',
+		},
+		{
+			src: '2007-07-26_power_rangers_360-kevin_morphs_on_green_screen_graphic.avif',
+			caption: 'Kevin morphs',
+		},
+		{
+			src: '2007-07-26_power_rangers_360-brian_and_kevin_sword_fight.avif',
+			caption: 'Red vs Blue, the duel',
+		},
+		{
+			src: '2007-07-26_power_rangers_360-vino_kicks_brian_in_360_move.avif',
+			caption: 'Vino lands the "360"',
+		},
+		{
+			src: '2007-07-26_power_rangers_360-vino_summons_fallen_broom_stick_reversed_footage_visual_effect.avif',
+			caption: 'Reversed-footage summoning',
+		},
+		{
+			src: '2007-07-26_power_rangers_360-vino_disappears_visual_effect.avif',
+			caption: 'Vino vanishes',
+		},
+		{
+			src: '2007-07-26_power_rangers_360-brian_pulls_out_knife.avif',
+			caption: 'The final duel begins',
+		},
 	];
 
 	const pr2BTS = [
-		{ src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_03-clapper.avif', caption: 'A real clapper this time' },
-		{ src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_01.avif', caption: 'On set, take whatever' },
-		{ src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_02.avif', caption: 'Stunt prep' },
-		{ src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_filming_a_dog.avif', caption: 'Yes, Zordon was played by a dog' },
-		{ src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_green_screen_super_hero.avif', caption: 'Flight comp, greenscreen' },
-		{ src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_04.avif', caption: 'More set life' }
+		{
+			src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_03-clapper.avif',
+			caption: 'A real clapper this time',
+		},
+		{
+			src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_01.avif',
+			caption: 'On set, take whatever',
+		},
+		{
+			src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_02.avif',
+			caption: 'Stunt prep',
+		},
+		{
+			src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_filming_a_dog.avif',
+			caption: 'Yes, Zordon was played by a dog',
+		},
+		{
+			src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_green_screen_super_hero.avif',
+			caption: 'Flight comp, greenscreen',
+		},
+		{
+			src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_04.avif',
+			caption: 'More set life',
+		},
 	];
 
 	const pr2Stills = [
-		{ src: '2008-08-15_power_rangers_360_ii-all_power_rangers_charge_towards_bad_guys.avif', caption: 'The charge' },
-		{ src: '2008-08-15_power_rangers_360_ii-all_power_rangers_pull_out_their_knifes.avif', caption: 'Blades out' },
-		{ src: '2008-08-15_power_rangers_360_ii-brian_and_grant_fight_with_swords.avif', caption: 'Red vs henchman' },
-		{ src: '2008-08-15_power_rangers_360_ii-brian_flies_towards_camera_using_green_screen_visual_effect.avif', caption: 'Flight, greenscreen' },
-		{ src: '2008-08-15_power_rangers_360_ii-brian_flies_through_clouds_visual_effect.avif', caption: 'Through the clouds' },
-		{ src: '2008-08-15_power_rangers_360_ii-vino_appears_by_tree_visual_effect.avif', caption: 'Vino, back from "the dead"' },
-		{ src: '2008-08-15_power_rangers_360_ii-all_power_rangers_charge_towards_bad_guys_profile_shot.avif', caption: 'Profile shot' },
-		{ src: '2008-08-15_power_rangers_360_ii-brian_flies_and_lands_on_ground_visual_effect.avif', caption: 'Landing' }
+		{
+			src: '2008-08-15_power_rangers_360_ii-all_power_rangers_charge_towards_bad_guys.avif',
+			caption: 'The charge',
+		},
+		{
+			src: '2008-08-15_power_rangers_360_ii-all_power_rangers_pull_out_their_knifes.avif',
+			caption: 'Blades out',
+		},
+		{
+			src: '2008-08-15_power_rangers_360_ii-brian_and_grant_fight_with_swords.avif',
+			caption: 'Red vs henchman',
+		},
+		{
+			src: '2008-08-15_power_rangers_360_ii-brian_flies_towards_camera_using_green_screen_visual_effect.avif',
+			caption: 'Flight, greenscreen',
+		},
+		{
+			src: '2008-08-15_power_rangers_360_ii-brian_flies_through_clouds_visual_effect.avif',
+			caption: 'Through the clouds',
+		},
+		{
+			src: '2008-08-15_power_rangers_360_ii-vino_appears_by_tree_visual_effect.avif',
+			caption: 'Vino, back from "the dead"',
+		},
+		{
+			src: '2008-08-15_power_rangers_360_ii-all_power_rangers_charge_towards_bad_guys_profile_shot.avif',
+			caption: 'Profile shot',
+		},
+		{
+			src: '2008-08-15_power_rangers_360_ii-brian_flies_and_lands_on_ground_visual_effect.avif',
+			caption: 'Landing',
+		},
 	];
 </script>
 
@@ -64,25 +136,25 @@
 					<span class="word w3">360</span>
 				</h2>
 				<p class="lede">
-					We'd spent two summers on short films. We were ready for the big one — a Hollywood feature-length movie.
-					We didn't know how long a script needed to be, so we wrote until we couldn't write anymore. We didn't
-					want to invent characters or world-building, so we borrowed an existing IP. We were thirteen.
+					We'd spent two summers on short films. We were ready for the big one — a
+					Hollywood feature-length movie. We didn't know how long a script needed to be,
+					so we wrote until we couldn't write anymore. We didn't want to invent characters
+					or world-building, so we borrowed an existing IP. We were thirteen.
 				</p>
 			</Reveal>
 		</div>
 
 		<div class="rangers">
-			{#each [
-				{ name: 'RED', who: 'Brian', color: '#ff3a3a' },
-				{ name: 'BLUE', who: 'Kevin', color: '#3a8cff' },
-				{ name: 'YELLOW', who: 'Emma', color: '#ffd934' },
-				{ name: 'PINK', who: 'Amanda', color: '#ff5fb3' }
-			] as r, i}
+			{#each [{ name: 'RED', who: 'Brian', color: '#ff3a3a' }, { name: 'BLUE', who: 'Kevin', color: '#3a8cff' }, { name: 'YELLOW', who: 'Emma', color: '#ffd934' }, { name: 'PINK', who: 'Amanda', color: '#ff5fb3' }] as r, i}
 				<Reveal variant="up" delay={i * 90}>
 					<div class="ranger-card" style:--c={r.color}>
 						<div class="ranger-helmet">
 							<svg viewBox="0 0 100 110" aria-hidden="true">
-								<path d="M50 8 L82 26 L82 62 Q82 100 50 100 Q18 100 18 62 L18 26 Z" fill="var(--c)" stroke="#000" stroke-width="2" />
+								<path
+									d="M50 8 L82 26 L82 62 Q82 100 50 100 Q18 100 18 62 L18 26 Z"
+									fill="var(--c)"
+									stroke="#000"
+									stroke-width="2" />
 								<rect x="28" y="46" width="44" height="14" fill="#000" />
 								<path d="M50 8 L62 26 L38 26 Z" fill="#fff" opacity="0.18" />
 							</svg>
@@ -98,12 +170,14 @@
 			<Reveal>
 				<h3 class="sub">Power Rangers 360 (2007)</h3>
 				<p>
-					Thirty minutes. Our first "feature". The blue ranger goes rogue, joins the villain Vino, fights the red
-					ranger, dies in his arms. Our friends gave up their summer to be in it.
+					Thirty minutes. Our first "feature". The blue ranger goes rogue, joins the
+					villain Vino, fights the red ranger, dies in his arms. Our friends gave up their
+					summer to be in it.
 				</p>
 				<p>
-					We held the premiere in my backyard. Bed sheets over the windows, a projector on a borrowed light stand,
-					sundown. The "screen" was 20 feet tall. It was the biggest moment of either of our lives at that point.
+					We held the premiere in my backyard. Bed sheets over the windows, a projector on
+					a borrowed light stand, sundown. The "screen" was 20 feet tall. It was the
+					biggest moment of either of our lives at that point.
 				</p>
 			</Reveal>
 			<Reveal variant="right" delay={100}>
@@ -111,9 +185,10 @@
 					<LazyMedia
 						src="2007-06-16_power_rangers_360-premiere-power_rangers_group_photo_1.jpg"
 						alt="The Power Rangers cast"
-						ratio="4 / 3"
-					/>
-					<div class="premiere-cap">Premiere · summer 2007 · backyard cinema · ~40 friends and family</div>
+						ratio="4 / 3" />
+					<div class="premiere-cap">
+						Premiere · summer 2007 · backyard cinema · ~40 friends and family
+					</div>
 				</div>
 			</Reveal>
 		</div>
@@ -128,7 +203,9 @@
 		<div class="seq-divider">
 			<span></span>
 			<div class="seq-text">
-				ONE YEAR LATER<br /><strong>WE TRIED IT AGAIN — BIGGER</strong>
+				ONE YEAR LATER
+				<br />
+				<strong>WE TRIED IT AGAIN — BIGGER</strong>
 			</div>
 			<span></span>
 		</div>
@@ -137,13 +214,14 @@
 			<Reveal>
 				<h3 class="sub">Power Rangers 360 II (2008)</h3>
 				<p>
-					We spent weeks writing. The script hit 60+ pages, printed into binders and handed out to a cast that, by
-					then, had grown to a small army of friends. The result was 64 minutes long — counting the credits and a
-					handful of scenes we left way too long because we were chasing a runtime. Worth it.
+					We spent weeks writing. The script hit 60+ pages, printed into binders and
+					handed out to a cast that, by then, had grown to a small army of friends. The
+					result was 64 minutes long — counting the credits and a handful of scenes we
+					left way too long because we were chasing a runtime. Worth it.
 				</p>
 				<p>
-					Zordon, the rangers' leader, was played by Kevin's dog. We filmed him "talking" via peanut butter and
-					comped him into the scene with — what else — greenscreen.
+					Zordon, the rangers' leader, was played by Kevin's dog. We filmed him "talking"
+					via peanut butter and comped him into the scene with — what else — greenscreen.
 				</p>
 			</Reveal>
 
@@ -166,15 +244,13 @@
 					<LazyMedia
 						src="2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif"
 						alt="The PR360 II premiere projector setup"
-						ratio="4 / 3"
-					/>
+						ratio="4 / 3" />
 				</Reveal>
 				<Reveal variant="right" delay={100}>
 					<LazyMedia
 						src="2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg"
 						alt="Brian and Kevin at the PR360 II premiere"
-						ratio="4 / 3"
-					/>
+						ratio="4 / 3" />
 				</Reveal>
 			</div>
 		</div>
@@ -183,14 +259,16 @@
 			<Expandable label="What we learned filming for two months in a row">
 				<div class="prose">
 					<p>
-						Filming day after day in midwestern August heat is a different kind of work. By week three, everyone
-						is tired. Performances slip. Composition slips. Patience slips. We learned to plan harder. We learned
-						what call sheets were for. We learned what an actual production day's energy looks like. None of
+						Filming day after day in midwestern August heat is a different kind of work.
+						By week three, everyone is tired. Performances slip. Composition slips.
+						Patience slips. We learned to plan harder. We learned what call sheets were
+						for. We learned what an actual production day's energy looks like. None of
 						that is in a film school book — you can only learn it by doing it.
 					</p>
 					<p>
-						Looking back, neither of these movies is good. But I'm still proud of them. They were the first time
-						we tried something that should have been out of reach, and finished it.
+						Looking back, neither of these movies is good. But I'm still proud of them.
+						They were the first time we tried something that should have been out of
+						reach, and finished it.
 					</p>
 				</div>
 			</Expandable>
@@ -219,11 +297,45 @@
 		flex: 1;
 		mix-blend-mode: screen;
 	}
-	.prismatic .red { background: linear-gradient(90deg, transparent, #ff3a3a 40%, #ff3a3a 60%, transparent); }
-	.prismatic .blue { background: linear-gradient(90deg, transparent, #3a8cff 40%, #3a8cff 60%, transparent); }
-	.prismatic .yellow { background: linear-gradient(90deg, transparent, #ffd934 40%, #ffd934 60%, transparent); }
-	.prismatic .pink { background: linear-gradient(90deg, transparent, #ff5fb3 40%, #ff5fb3 60%, transparent); }
-	.prismatic .black { background: linear-gradient(90deg, transparent, #444 40%, #444 60%, transparent); }
+	.prismatic .red {
+		background: linear-gradient(
+			90deg,
+			transparent,
+			#ff3a3a 40%,
+			#ff3a3a 60%,
+			transparent
+		);
+	}
+	.prismatic .blue {
+		background: linear-gradient(
+			90deg,
+			transparent,
+			#3a8cff 40%,
+			#3a8cff 60%,
+			transparent
+		);
+	}
+	.prismatic .yellow {
+		background: linear-gradient(
+			90deg,
+			transparent,
+			#ffd934 40%,
+			#ffd934 60%,
+			transparent
+		);
+	}
+	.prismatic .pink {
+		background: linear-gradient(
+			90deg,
+			transparent,
+			#ff5fb3 40%,
+			#ff5fb3 60%,
+			transparent
+		);
+	}
+	.prismatic .black {
+		background: linear-gradient(90deg, transparent, #444 40%, #444 60%, transparent);
+	}
 
 	.container {
 		max-width: 80rem;
@@ -264,12 +376,26 @@
 		text-shadow: 0 0 60px rgba(255, 217, 52, 0.15);
 		transform-origin: center;
 	}
-	.w1 { animation: slamIn 1s cubic-bezier(.2,1,.3,1.2) both; }
-	.w2 { animation: slamIn 1s cubic-bezier(.2,1,.3,1.2) 0.15s both; }
-	.w3 { animation: slamIn 1s cubic-bezier(.2,1,.3,1.2) 0.3s both; color: #fff; -webkit-text-stroke: 2px #ffcc33; }
+	.w1 {
+		animation: slamIn 1s cubic-bezier(0.2, 1, 0.3, 1.2) both;
+	}
+	.w2 {
+		animation: slamIn 1s cubic-bezier(0.2, 1, 0.3, 1.2) 0.15s both;
+	}
+	.w3 {
+		animation: slamIn 1s cubic-bezier(0.2, 1, 0.3, 1.2) 0.3s both;
+		color: #fff;
+		-webkit-text-stroke: 2px #ffcc33;
+	}
 	@keyframes slamIn {
-		from { transform: scale(1.25); opacity: 0; }
-		to { transform: scale(1); opacity: 1; }
+		from {
+			transform: scale(1.25);
+			opacity: 0;
+		}
+		to {
+			transform: scale(1);
+			opacity: 1;
+		}
 	}
 	.lede {
 		max-width: 44rem;
@@ -286,7 +412,9 @@
 		margin: 0 0 4rem;
 	}
 	@media (max-width: 720px) {
-		.rangers { grid-template-columns: repeat(2, 1fr); }
+		.rangers {
+			grid-template-columns: repeat(2, 1fr);
+		}
 	}
 	.ranger-card {
 		text-align: center;
@@ -334,7 +462,9 @@
 		margin-bottom: 3rem;
 	}
 	@media (max-width: 768px) {
-		.pr-grid { grid-template-columns: 1fr; }
+		.pr-grid {
+			grid-template-columns: 1fr;
+		}
 	}
 	.premiere-cap {
 		font-family: var(--font-mono);
@@ -372,7 +502,12 @@
 		display: block;
 		flex: 1;
 		height: 1px;
-		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+		background: linear-gradient(
+			90deg,
+			transparent,
+			rgba(255, 255, 255, 0.3),
+			transparent
+		);
 	}
 	.seq-text {
 		text-align: center;
@@ -389,8 +524,13 @@
 		margin-top: 0.2rem;
 	}
 
-	.pr2-block { margin-bottom: 3rem; }
-	.pr2-block p { max-width: 56rem; line-height: 1.6; }
+	.pr2-block {
+		margin-bottom: 3rem;
+	}
+	.pr2-block p {
+		max-width: 56rem;
+		line-height: 1.6;
+	}
 
 	.bts-strip {
 		margin: 2rem 0;
@@ -410,8 +550,13 @@
 		margin-top: 2rem;
 	}
 	@media (max-width: 640px) {
-		.premiere-2 { grid-template-columns: 1fr; }
+		.premiere-2 {
+			grid-template-columns: 1fr;
+		}
 	}
 
-	.prose p { line-height: 1.65; margin-bottom: 1rem; }
+	.prose p {
+		line-height: 1.65;
+		margin-bottom: 1rem;
+	}
 </style>

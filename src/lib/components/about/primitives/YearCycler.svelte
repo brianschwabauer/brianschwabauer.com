@@ -1,9 +1,9 @@
 <script lang="ts">
 	let {
 		years,
-		color = "#ffffff",
-		caption = "",
-		pinHeight = "100vh",
+		color = '#ffffff',
+		caption = '',
+		pinHeight = '100vh',
 	}: {
 		years: number[];
 		color?: string;
@@ -27,17 +27,15 @@
 			progress = span > 0 ? Math.max(0, Math.min(1, t / span)) : 0;
 		};
 		onScroll();
-		window.addEventListener("scroll", onScroll, { passive: true });
-		window.addEventListener("resize", onScroll);
+		window.addEventListener('scroll', onScroll, { passive: true });
+		window.addEventListener('resize', onScroll);
 		return () => {
-			window.removeEventListener("scroll", onScroll);
-			window.removeEventListener("resize", onScroll);
+			window.removeEventListener('scroll', onScroll);
+			window.removeEventListener('resize', onScroll);
 		};
 	});
 
-	const virtualIndex = $derived(
-		years.length > 1 ? progress * (years.length - 1) : 0,
-	);
+	const virtualIndex = $derived(years.length > 1 ? progress * (years.length - 1) : 0);
 </script>
 
 <div
@@ -45,18 +43,13 @@
 	class="year-cycler"
 	style:--c={color}
 	style:--pin-height={pinHeight}
-	aria-hidden="true"
->
+	aria-hidden="true">
 	<div class="sticky">
 		<div class="stage">
 			{#each years as y, i (y)}
 				{@const offset = i - virtualIndex}
 				{@const opacity = Math.max(0, 1 - Math.min(1, Math.abs(offset)))}
-				<span
-					class="year"
-					style:transform="translateY({offset * 100}%)"
-					style:opacity
-				>
+				<span class="year" style:transform="translateY({offset * 100}%)" style:opacity>
 					{y}
 				</span>
 			{/each}

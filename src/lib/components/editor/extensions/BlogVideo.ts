@@ -19,7 +19,8 @@ import { createBlogVideoNodeView } from './BlogVideoNodeView';
 const MEDIA_BASE = 'https://cdn.brianschwabauer.com/media';
 
 /** Public poster URL for a media slug. */
-export const videoPosterURL = (slug: string): string => `${MEDIA_BASE}/${slug}/poster.jpg`;
+export const videoPosterURL = (slug: string): string =>
+	`${MEDIA_BASE}/${slug}/poster.jpg`;
 
 export type VideoWidthMode = 'normal' | 'wide' | 'full';
 
@@ -36,7 +37,9 @@ declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
 		blogVideo: {
 			/** Insert a BlogVideo node for the given media slug. */
-			setBlogVideo: (attrs: Partial<BlogVideoAttrs> & { videoSlug: string }) => ReturnType;
+			setBlogVideo: (
+				attrs: Partial<BlogVideoAttrs> & { videoSlug: string },
+			) => ReturnType;
 		};
 	}
 }
@@ -119,7 +122,13 @@ export const BlogVideo = Node.create({
 				({ commands }) =>
 					commands.insertContent({
 						type: this.name,
-						attrs: { title: null, caption: null, widthMode: 'wide', widthPct: 100, ...attrs },
+						attrs: {
+							title: null,
+							caption: null,
+							widthMode: 'wide',
+							widthPct: 100,
+							...attrs,
+						},
 					}),
 		};
 	},

@@ -7,7 +7,7 @@
 		subtitle = '',
 		align = 'left',
 		accent = 'currentColor',
-		decoration = null
+		decoration = null,
 	}: {
 		eyebrow?: string;
 		title: string;
@@ -20,7 +20,10 @@
 
 <header class="heading" data-align={align} style:--accent={accent}>
 	{#if eyebrow}
-		<div class="eyebrow"><span class="dot"></span><span>{eyebrow}</span></div>
+		<div class="eyebrow">
+			<span class="dot"></span>
+			<span>{eyebrow}</span>
+		</div>
 	{/if}
 	<h2>{title}</h2>
 	{#if subtitle}

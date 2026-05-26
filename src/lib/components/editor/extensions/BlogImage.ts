@@ -69,7 +69,9 @@ declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
 		blogImage: {
 			/** Insert a BlogImage node from a record returned by the upload/media API. */
-			setBlogImage: (attrs: Partial<BlogImageAttrs> & { src: string; path: string }) => ReturnType;
+			setBlogImage: (
+				attrs: Partial<BlogImageAttrs> & { src: string; path: string },
+			) => ReturnType;
 		};
 	}
 }
@@ -96,16 +98,19 @@ export const BlogImage = Node.create({
 			},
 			width: {
 				default: 0,
-				parseHTML: (el) => Number(el.getAttribute('width')) || Number(el.dataset.width) || 0,
+				parseHTML: (el) =>
+					Number(el.getAttribute('width')) || Number(el.dataset.width) || 0,
 			},
 			height: {
 				default: 0,
-				parseHTML: (el) => Number(el.getAttribute('height')) || Number(el.dataset.height) || 0,
+				parseHTML: (el) =>
+					Number(el.getAttribute('height')) || Number(el.dataset.height) || 0,
 			},
 			thumbhash: {
 				default: null,
 				parseHTML: (el) => el.dataset.thumbhash || null,
-				renderHTML: (attrs) => (attrs.thumbhash ? { 'data-thumbhash': attrs.thumbhash } : {}),
+				renderHTML: (attrs) =>
+					attrs.thumbhash ? { 'data-thumbhash': attrs.thumbhash } : {},
 			},
 			bgColor: {
 				default: null,
@@ -115,7 +120,8 @@ export const BlogImage = Node.create({
 			fileName: {
 				default: null,
 				parseHTML: (el) => el.dataset.fileName || null,
-				renderHTML: (attrs) => (attrs.fileName ? { 'data-file-name': attrs.fileName } : {}),
+				renderHTML: (attrs) =>
+					attrs.fileName ? { 'data-file-name': attrs.fileName } : {},
 			},
 			widthMode: {
 				default: 'normal',
@@ -157,7 +163,8 @@ export const BlogImage = Node.create({
 			variants: {
 				default: '[]',
 				parseHTML: (el) => el.dataset.variants || '[]',
-				renderHTML: (attrs) => (attrs.variants ? { 'data-variants': attrs.variants } : {}),
+				renderHTML: (attrs) =>
+					attrs.variants ? { 'data-variants': attrs.variants } : {},
 			},
 			// Transient placeholder state — never parsed from or rendered to HTML
 			uploading: {

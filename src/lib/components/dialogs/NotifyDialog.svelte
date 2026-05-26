@@ -93,7 +93,11 @@
 		{/if}
 		<p class="notify-message">{message}</p>
 		<div class="notify-actions">
-			<Button accent={tone !== 'error'} error={tone === 'error'} fullWidth onclick={handleDismiss}>
+			<Button
+				accent={tone !== 'error'}
+				error={tone === 'error'}
+				fullWidth
+				onclick={handleDismiss}>
 				{dismissText}
 			</Button>
 		</div>

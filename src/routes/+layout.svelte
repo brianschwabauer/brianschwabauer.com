@@ -41,14 +41,17 @@
 
 		const from = navigation.from?.url.pathname ?? '';
 		const to = navigation.to?.url.pathname ?? '';
-		const isBlogListToPost = from === '/blog' && to.startsWith('/blog/') && to !== '/blog/rss.xml';
+		const isBlogListToPost =
+			from === '/blog' && to.startsWith('/blog/') && to !== '/blog/rss.xml';
 		const isPostToBlogList = from.startsWith('/blog/') && to === '/blog';
 		if (!isBlogListToPost && !isPostToBlogList) return;
 
 		return new Promise((resolve) => {
-			(document as Document & {
-				startViewTransition: (cb: () => Promise<void>) => unknown;
-			}).startViewTransition(async () => {
+			(
+				document as Document & {
+					startViewTransition: (cb: () => Promise<void>) => unknown;
+				}
+			).startViewTransition(async () => {
 				resolve();
 				await navigation.complete;
 			});
@@ -57,7 +60,9 @@
 </script>
 
 <svelte:head>
-	<meta name="description" content="Brian Schwabauer — Delivering Delight. Two decades of making things on screens, and the platform I'm building now." />
+	<meta
+		name="description"
+		content="Brian Schwabauer — Delivering Delight. Two decades of making things on screens, and the platform I'm building now." />
 </svelte:head>
 
 <div class="app">

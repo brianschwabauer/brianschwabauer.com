@@ -42,7 +42,11 @@
 
 {#if open}
 	<div class="modal-backdrop" onclick={handleBackdropClick} role="presentation">
-		<div class="modal" role="dialog" aria-modal="true" aria-labelledby={title ? 'modal-title' : undefined}>
+		<div
+			class="modal"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby={title ? 'modal-title' : undefined}>
 			{#if title}
 				<div class="modal-header">
 					<h2 id="modal-title" class="modal-title">{title}</h2>
@@ -54,7 +58,10 @@
 					</button>
 				</div>
 			{:else}
-				<button class="modal-close absolute" onclick={handleClose} aria-label="Close modal">
+				<button
+					class="modal-close absolute"
+					onclick={handleClose}
+					aria-label="Close modal">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 						<line x1="18" y1="6" x2="6" y2="18" />
 						<line x1="6" y1="6" x2="18" y2="18" />
@@ -116,7 +123,9 @@
 		height: 32px;
 		border-radius: var(--radius-md);
 		color: var(--color-text-secondary);
-		transition: background-color var(--transition-fast), color var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			color var(--transition-fast);
 	}
 
 	.modal-close:hover {

@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 	const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '10', 10) || 10, 50);
 	const similarity = Math.min(
 		Math.max(parseFloat(url.searchParams.get('similarity') ?? '0.6') || 0.6, 0),
-		1
+		1,
 	);
 
 	const queryVector = await embedText(platform.env.AI, q);
@@ -28,12 +28,12 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		vector: { value: queryVector, property: 'embedding' },
 		similarity,
 		limit,
-		includeVectors: false
+		includeVectors: false,
 	});
 
 	return json({
 		count: results.count,
 		elapsed: results.elapsed,
-		results: results.hits.map((h) => ({ id: h.id, score: h.score, doc: h.document }))
+		results: results.hits.map((h) => ({ id: h.id, score: h.score, doc: h.document })),
 	});
 };

@@ -29,15 +29,11 @@
 	let listEl: HTMLDivElement | null = $state(null);
 
 	const visibleResults = $derived(
-		vectorResults !== null
-			? vectorResults
-			: query.trim()
-				? keywordResults
-				: suggestions
+		vectorResults !== null ? vectorResults : query.trim() ? keywordResults : suggestions,
 	);
 
 	const showFullResultsButton = $derived(
-		Boolean(query.trim()) && vectorResults === null && !vectorLoading
+		Boolean(query.trim()) && vectorResults === null && !vectorLoading,
 	);
 
 	async function loadIndex() {
@@ -67,7 +63,7 @@
 				term: '',
 				where: { type: 'blog' },
 				sortBy: { property: 'date', order: 'DESC' },
-				limit: 5
+				limit: 5,
 			})) as Results<SearchEntry>;
 			suggestions = r.hits.map((h) => ({ ...h.document, score: h.score }));
 		} catch (err) {
@@ -106,7 +102,7 @@
 				const yr = (await search(db, {
 					term: '',
 					where: { date: { between: [start, end] } },
-					limit: 20
+					limit: 20,
 				})) as Results<SearchEntry>;
 				if (yr.hits.length > 0) {
 					keywordResults = yr.hits
@@ -119,7 +115,7 @@
 				term,
 				properties: ['title', 'summary', 'body', 'tags'],
 				limit: 20,
-				tolerance: 1
+				tolerance: 1,
 			})) as Results<SearchEntry>;
 			keywordResults = r.hits.map((h) => ({ ...h.document, score: h.score }));
 		} catch (err) {
@@ -257,11 +253,16 @@
 		role="presentation"
 		onclick={(e) => {
 			if (e.target === e.currentTarget) close();
-		}}
-	>
+		}}>
 		<div class="modal" role="dialog" aria-modal="true" aria-label="Search">
 			<div class="search-bar">
-				<svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+				<svg
+					class="search-icon"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					aria-hidden="true">
 					<circle cx="11" cy="11" r="7" />
 					<path d="m20 20-3.5-3.5" />
 				</svg>
@@ -272,8 +273,7 @@
 					placeholder="Search posts, films, projects…"
 					autocomplete="off"
 					spellcheck="false"
-					aria-label="Search"
-				/>
+					aria-label="Search" />
 				<button class="close-btn" type="button" onclick={close} aria-label="Close search">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 						<line x1="18" y1="6" x2="6" y2="18" />
@@ -292,7 +292,8 @@
 						No quick matches. Try a
 						<button class="inline-link" type="button" onclick={runVectorSearch}>
 							deep search
-						</button>.
+						</button>
+						.
 					</div>
 				{:else}
 					{#if vectorResults !== null}
@@ -308,8 +309,7 @@
 							class:active={i === activeIndex}
 							data-result-index={i}
 							onmouseenter={() => (activeIndex = i)}
-							onclick={() => navigate(hit)}
-						>
+							onclick={() => navigate(hit)}>
 							{#if hit.featuredImage}
 								<div class="result-thumb" style={bgStyle(hit.featuredImage)}>
 									<img src={thumbnailURL(hit.featuredImage)} alt="" loading="lazy" />
@@ -323,9 +323,9 @@
 								<div class="result-head">
 									<span class="result-category">{entryLabel(hit)}</span>
 									{#if hit.date && hit.type === 'blog'}
-										<time class="result-date" datetime={isoPostDate(hit.date)}
-											>{formatPostDate(hit.date)}</time
-										>
+										<time class="result-date" datetime={isoPostDate(hit.date)}>
+											{formatPostDate(hit.date)}
+										</time>
 									{/if}
 								</div>
 								<div class="result-title">{hit.title}</div>
@@ -354,21 +354,33 @@
 					<span class="footer-status">Searching deeper…</span>
 				{:else if showFullResultsButton}
 					<button class="full-btn" type="button" onclick={runVectorSearch}>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							aria-hidden="true">
 							<path d="M4 19V5a2 2 0 0 1 2-2h11l3 3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" />
 							<path d="M8 10h8M8 14h5" />
 						</svg>
 						Deep Search
 					</button>
 				{:else if vectorResults !== null}
-					<button class="full-btn ghost" type="button" onclick={() => (vectorResults = null)}>
+					<button
+						class="full-btn ghost"
+						type="button"
+						onclick={() => (vectorResults = null)}>
 						Back
 					</button>
 				{/if}
 				<span class="hint">
-					<kbd>↑</kbd><kbd>↓</kbd> navigate
-					<kbd>↵</kbd> open
-					<kbd>esc</kbd> close
+					<kbd>↑</kbd>
+					<kbd>↓</kbd>
+					navigate
+					<kbd>↵</kbd>
+					open
+					<kbd>esc</kbd>
+					close
 				</span>
 			</div>
 		</div>
@@ -446,7 +458,9 @@
 		height: 32px;
 		border-radius: var(--radius-md);
 		color: var(--color-text-muted);
-		transition: color var(--transition-fast), background-color var(--transition-fast);
+		transition:
+			color var(--transition-fast),
+			background-color var(--transition-fast);
 	}
 
 	.close-btn:hover {
@@ -608,7 +622,9 @@
 		color: var(--color-text);
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
-		transition: background-color var(--transition-fast), border-color var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast);
 	}
 
 	.full-btn:hover {

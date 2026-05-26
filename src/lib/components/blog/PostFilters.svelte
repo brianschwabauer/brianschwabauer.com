@@ -15,8 +15,7 @@
 		class="filter-btn"
 		class:active={activeTag === null}
 		onclick={() => onChange(null)}
-		{@attach ripple({ zIndex: 1 })}
-	>
+		{@attach ripple({ zIndex: 1 })}>
 		All Posts
 	</button>
 	{#each tags as tag (tag)}
@@ -24,8 +23,7 @@
 			class="filter-btn"
 			class:active={activeTag === tag}
 			onclick={() => onChange(tag)}
-			{@attach ripple({ zIndex: 1 })}
-		>
+			{@attach ripple({ zIndex: 1 })}>
 			{tag}
 		</button>
 	{/each}
@@ -52,8 +50,11 @@
 		font-size: var(--text-sm);
 		font-weight: 500;
 		cursor: pointer;
-		transition: background-color var(--transition-fast), color var(--transition-fast),
-			border-color var(--transition-fast), transform 200ms ease;
+		transition:
+			background-color var(--transition-fast),
+			color var(--transition-fast),
+			border-color var(--transition-fast),
+			transform 200ms ease;
 	}
 
 	.filter-btn:hover {
@@ -66,7 +67,8 @@
 	   point — otherwise a shared `perspective` on the parent makes edge
 	   chips tip toward the row's center instead of pushing straight back. */
 	.filter-btn:active:not(:disabled) {
-		transform: perspective(100px) translate3d(0, 1px, clamp(-10px, calc(0.2em - 12px), -2px));
+		transform: perspective(100px)
+			translate3d(0, 1px, clamp(-10px, calc(0.2em - 12px), -2px));
 	}
 
 	.filter-btn.active {

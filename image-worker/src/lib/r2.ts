@@ -12,7 +12,11 @@
 import type { R2Bucket, R2Object, R2ObjectBody } from '@cloudflare/workers-types';
 // Types are shared with the main app via a relative import (no $lib alias here —
 // this worker is built with its own wrangler config, not SvelteKit).
-import type { ImageRecord, ImageVariantInfo, OklchColor } from '../../../src/lib/types/images';
+import type {
+	ImageRecord,
+	ImageVariantInfo,
+	OklchColor,
+} from '../../../src/lib/types/images';
 
 export type { ImageRecord, ImageVariantInfo, OklchColor };
 
@@ -154,7 +158,10 @@ export function deserializeRecord(
 }
 
 export function recordFromObject(obj: R2Object | R2ObjectBody): ImageRecord | null {
-	return deserializeRecord(obj.key, obj.customMetadata as Record<string, string> | undefined);
+	return deserializeRecord(
+		obj.key,
+		obj.customMetadata as Record<string, string> | undefined,
+	);
 }
 
 // ── URL helpers ─────────────────────────────────────────────────────────────

@@ -15,15 +15,30 @@
 		'2014-06-04_what_makes_us_human-main_character_uses_futuristic_computer_hologram_ui_visual_effect.avif',
 		'2014-06-04_what_makes_us_human-transparent_tablet_ui_animation_visual_effect.avif',
 		'2014-06-04_what_makes_us_human-transparent_tablet_ui_animation_visual_effect_2.avif',
-		'2014-06-04_what_makes_us_human-villian_lectures_protagonist_in_high_tech_jail_cell.avif'
+		'2014-06-04_what_makes_us_human-villian_lectures_protagonist_in_high_tech_jail_cell.avif',
 	].map((src) => ({ src }));
 
 	const conceptArt = [
-		{ src: '2014-06-04_what_makes_us_human-concept_art-telescan_building.avif', caption: 'Telescan headquarters · concept art' },
-		{ src: '2014-06-04_what_makes_us_human-concept_art-disposal_room.jpg', caption: 'Disposal room' },
-		{ src: '2014-06-04_what_makes_us_human-concept_art-teleporter.jpg', caption: 'The teleporter' },
-		{ src: '2014-06-04_what_makes_us_human-concept_art-handcuffs.jpg', caption: 'Hi-tech restraints' },
-		{ src: '2014-06-04_what_makes_us_human-concept_art-main_characters_eye_recorder_close_up.jpg', caption: 'Eye-recorder UI' }
+		{
+			src: '2014-06-04_what_makes_us_human-concept_art-telescan_building.avif',
+			caption: 'Telescan headquarters · concept art',
+		},
+		{
+			src: '2014-06-04_what_makes_us_human-concept_art-disposal_room.jpg',
+			caption: 'Disposal room',
+		},
+		{
+			src: '2014-06-04_what_makes_us_human-concept_art-teleporter.jpg',
+			caption: 'The teleporter',
+		},
+		{
+			src: '2014-06-04_what_makes_us_human-concept_art-handcuffs.jpg',
+			caption: 'Hi-tech restraints',
+		},
+		{
+			src: '2014-06-04_what_makes_us_human-concept_art-main_characters_eye_recorder_close_up.jpg',
+			caption: 'Eye-recorder UI',
+		},
 	];
 
 	const btsPhotos = [
@@ -42,14 +57,14 @@
 		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-127.avif',
 		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-155.avif',
 		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-163.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-194.avif'
+		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-194.avif',
 	].map((src) => ({ src }));
 
 	const premierePhotos = [
 		'2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-empty_theater.avif',
 		'2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-crowd.avif',
 		'2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-brian_schwabauer_close_up.jpg',
-		'2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-what_makes_us_human_crew_group_photo.avif'
+		'2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-what_makes_us_human_crew_group_photo.avif',
 	].map((src) => ({ src }));
 </script>
 
@@ -65,16 +80,27 @@
 
 		<div class="lockup">
 			<Reveal>
-				<div class="film-poster" style:background-image="url(https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-film_poster_without_text.avif)"></div>
+				<div
+					class="film-poster"
+					style:background-image="url(https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-film_poster_without_text.avif)">
+				</div>
 				<div class="poster-text">
 					<div class="award-tag">
 						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<path d="M12 2l2.4 5 5.6.8-4 4 1 5.5L12 14.5l-5 2.8 1-5.5-4-4 5.6-.8z" fill="currentColor" />
+							<path
+								d="M12 2l2.4 5 5.6.8-4 4 1 5.5L12 14.5l-5 2.8 1-5.5-4-4 5.6-.8z"
+								fill="currentColor" />
 						</svg>
 						<span>MBEA · 1st Place · Screenwriting</span>
 					</div>
-					<h2 class="title">WHAT MAKES<br />US HUMAN</h2>
-					<div class="subtitle">A short film about teleportation, identity, and what gets left behind.</div>
+					<h2 class="title">
+						WHAT MAKES
+						<br />
+						US HUMAN
+					</h2>
+					<div class="subtitle">
+						A short film about teleportation, identity, and what gets left behind.
+					</div>
 				</div>
 			</Reveal>
 		</div>
@@ -83,20 +109,22 @@
 			<Reveal>
 				<h3 class="eyebrow">SYNOPSIS</h3>
 				<p>
-					Eve, a journalist, is digging into a new teleportation technology when she's forced to use a teleporter
-					in an emergency. The machine works by scanning your body at the molecular level, transmitting the data,
-					and "printing" you on the other end — then destroying the original. The public doesn't know that last
+					Eve, a journalist, is digging into a new teleportation technology when she's
+					forced to use a teleporter in an emergency. The machine works by scanning your
+					body at the molecular level, transmitting the data, and "printing" you on the
+					other end — then destroying the original. The public doesn't know that last
 					part.
 				</p>
 				<p>
-					The power flickers mid-scan. The machine prints a new Eve but fails to destroy the old one. Now there
-					are two of her, and the company has reasons to make sure nobody finds out. She eventually exposes the
-					secret to the world.
+					The power flickers mid-scan. The machine prints a new Eve but fails to destroy
+					the old one. Now there are two of her, and the company has reasons to make sure
+					nobody finds out. She eventually exposes the secret to the world.
 				</p>
 				<p class="aside">
-					<strong>The question the film never quite answers:</strong> if a perfect 1:1 copy of you exists, is the
-					original still "you"? What does this technology do to the meaning of being a person? We didn't try to
-					solve that on screen. We tried to let it sit in your stomach.
+					<strong>The question the film never quite answers:</strong>
+					if a perfect 1:1 copy of you exists, is the original still "you"? What does this technology
+					do to the meaning of being a person? We didn't try to solve that on screen. We tried
+					to let it sit in your stomach.
 				</p>
 			</Reveal>
 		</div>
@@ -114,7 +142,10 @@
 						</svg>
 						<span>WATCH THE FULL FILM · 15 MIN</span>
 					</div>
-					<VideoPlayer slug="2014-06-04_what_makes_us_human" title="What Makes Us Human (2014) — full senior thesis short" ratio="16 / 9" />
+					<VideoPlayer
+						slug="2014-06-04_what_makes_us_human"
+						title="What Makes Us Human (2014) — full senior thesis short"
+						ratio="16 / 9" />
 				</div>
 			</Reveal>
 		</div>
@@ -151,10 +182,11 @@
 			<Reveal>
 				<h3 class="big-sub">We approached it like a Hollywood film.</h3>
 				<p>
-					A 15-minute short, but with craft services, extras, multiple locations, a casting call, an Indiegogo
-					fundraising campaign, real camera rigs, multiple revisions on the script over months of preproduction.
-					Not because we needed all of that to deliver — but because we wanted to know what it felt like to
-					actually do it.
+					A 15-minute short, but with craft services, extras, multiple locations, a
+					casting call, an Indiegogo fundraising campaign, real camera rigs, multiple
+					revisions on the script over months of preproduction. Not because we needed all
+					of that to deliver — but because we wanted to know what it felt like to actually
+					do it.
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
@@ -166,8 +198,9 @@
 			<Reveal>
 				<h3 class="big-sub">Premiere · MSU Electronic Arts Showcase · May 2015</h3>
 				<p>
-					The end of college. A theater. A crowd. The film ran. People reacted to the beats we'd been building
-					toward for almost a year. It is, to this day, the single longest project I've ever shipped.
+					The end of college. A theater. A crowd. The film ran. People reacted to the
+					beats we'd been building toward for almost a year. It is, to this day, the
+					single longest project I've ever shipped.
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
@@ -197,13 +230,22 @@
 		left: 0;
 		right: 0;
 		height: 80px;
-		background: linear-gradient(180deg, transparent 0%, rgba(0, 242, 195, 0.3) 50%, transparent 100%);
+		background: linear-gradient(
+			180deg,
+			transparent 0%,
+			rgba(0, 242, 195, 0.3) 50%,
+			transparent 100%
+		);
 		filter: blur(8px);
 		animation: scan 8s linear infinite;
 	}
 	@keyframes scan {
-		from { transform: translateY(-80px); }
-		to { transform: translateY(120vh); }
+		from {
+			transform: translateY(-80px);
+		}
+		to {
+			transform: translateY(120vh);
+		}
 	}
 
 	.container {
@@ -254,7 +296,10 @@
 		font-weight: 700;
 		margin-bottom: 1.5rem;
 	}
-	.award-tag svg { width: 14px; height: 14px; }
+	.award-tag svg {
+		width: 14px;
+		height: 14px;
+	}
 	.title {
 		font-size: clamp(2.8rem, 8vw, 6rem);
 		font-weight: 900;
@@ -298,9 +343,14 @@
 		border-left: 3px solid #00f2c3;
 		border-radius: 0 8px 8px 0;
 	}
-	.aside strong { color: #00f2c3; }
+	.aside strong {
+		color: #00f2c3;
+	}
 
-	.film-grid, .concept-grid, .bts-block, .premiere-block {
+	.film-grid,
+	.concept-grid,
+	.bts-block,
+	.premiere-block {
 		margin: 4rem 0;
 	}
 
@@ -315,7 +365,9 @@
 		border-radius: 12px;
 	}
 	@media (max-width: 768px) {
-		.prod-stats > :global(.reveal) { grid-template-columns: repeat(2, 1fr); }
+		.prod-stats > :global(.reveal) {
+			grid-template-columns: repeat(2, 1fr);
+		}
 	}
 	.stat {
 		text-align: center;
@@ -338,7 +390,8 @@
 		font-weight: 800;
 		margin: 0 0 0.8rem;
 	}
-	.bts-block p, .premiere-block p {
+	.bts-block p,
+	.premiere-block p {
 		max-width: 56rem;
 		line-height: 1.65;
 		margin-bottom: 1.5rem;
@@ -362,5 +415,8 @@
 		color: #00f2c3;
 		margin-bottom: 0.8rem;
 	}
-	.full-film-eyebrow svg { width: 14px; height: 14px; }
+	.full-film-eyebrow svg {
+		width: 14px;
+		height: 14px;
+	}
 </style>

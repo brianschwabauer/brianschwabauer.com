@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-	import SectionShell from "../primitives/SectionShell.svelte";
-	import Reveal from "../primitives/Reveal.svelte";
+	import { onMount } from 'svelte';
+	import SectionShell from '../primitives/SectionShell.svelte';
+	import Reveal from '../primitives/Reveal.svelte';
 
 	const currentYear = new Date().getFullYear();
 	const START_YEAR = 2006;
@@ -12,7 +12,7 @@
 
 	onMount(() => {
 		if (!sectionEl) return;
-		if (typeof IntersectionObserver === "undefined") {
+		if (typeof IntersectionObserver === 'undefined') {
 			displayYear = START_YEAR;
 			return;
 		}
@@ -40,9 +40,7 @@
 		const tick = (t: number) => {
 			const p = Math.min(1, (t - start) / dur);
 			const eased = 1 - Math.pow(1 - p, 3);
-			displayYear = Math.round(
-				currentYear - (currentYear - START_YEAR) * eased,
-			);
+			displayYear = Math.round(currentYear - (currentYear - START_YEAR) * eased);
 			if (p < 1) {
 				raf = requestAnimationFrame(tick);
 			} else {
@@ -54,7 +52,7 @@
 	}
 
 	function scrollToOrigin() {
-		const el = document.getElementById("humble-beginnings");
+		const el = document.getElementById('humble-beginnings');
 		if (!el) return;
 		const top = el.getBoundingClientRect().top + window.scrollY - 64;
 		window.scrollTo({ top });
@@ -65,12 +63,7 @@
 	);
 </script>
 
-<SectionShell
-	id="rewind"
-	year={String(currentYear)}
-	label="Rewind"
-	theme="rewind"
->
+<SectionShell id="rewind" year={String(currentYear)} label="Rewind" theme="rewind">
 	<div class="bg" aria-hidden="true">
 		<div class="grid-overlay"></div>
 		<div class="vignette"></div>
@@ -83,15 +76,16 @@
 
 		<Reveal variant="up" delay={220}>
 			<p class="lede">
-				Before the startup, the apps, the company &mdash; there was a miniDV
-				camera, a bedroom wall painted green, and a friend named Kevin.
+				Before the startup, the apps, the company &mdash; there was a miniDV camera, a
+				bedroom wall painted green, and a friend named Kevin.
 			</p>
 		</Reveal>
 
 		<Reveal variant="up" delay={300}>
 			<div class="counter" class:animating>
 				<div class="counter-label">
-					<span class="rew" aria-hidden="true">◄◄</span> Rewinding…
+					<span class="rew" aria-hidden="true">◄◄</span>
+					Rewinding…
 				</div>
 				<div class="counter-number" aria-live="off">{displayYear}</div>
 				<div class="counter-rail">
@@ -107,18 +101,10 @@
 </SectionShell>
 
 <style>
-	:global([data-theme="rewind"]) {
+	:global([data-theme='rewind']) {
 		background:
-			radial-gradient(
-				circle at 50% 0%,
-				rgba(108, 99, 255, 0.18),
-				transparent 55%
-			),
-			radial-gradient(
-				circle at 50% 100%,
-				rgba(255, 156, 74, 0.1),
-				transparent 60%
-			),
+			radial-gradient(circle at 50% 0%, rgba(108, 99, 255, 0.18), transparent 55%),
+			radial-gradient(circle at 50% 100%, rgba(255, 156, 74, 0.1), transparent 60%),
 			linear-gradient(180deg, #050a10, #0a0a12 50%, #100a06);
 		color: #fff;
 	}

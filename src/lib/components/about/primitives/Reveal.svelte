@@ -10,7 +10,7 @@
 		distance = 60,
 		once = true,
 		threshold = 0.15,
-		class: klass = ''
+		class: klass = '',
 	}: {
 		children: Snippet;
 		variant?: Variant;
@@ -41,7 +41,7 @@
 					}
 				}
 			},
-			{ threshold, rootMargin: '0px 0px -10% 0px' }
+			{ threshold, rootMargin: '0px 0px -10% 0px' },
 		);
 		obs.observe(el);
 		return () => obs.disconnect();
@@ -49,14 +49,21 @@
 
 	function initial(v: Variant, d: number): string {
 		switch (v) {
-			case 'up': return `translateY(${d}px)`;
-			case 'down': return `translateY(-${d}px)`;
-			case 'left': return `translateX(${d}px)`;
-			case 'right': return `translateX(-${d}px)`;
-			case 'scale': return 'scale(0.85)';
-			case 'tilt': return 'perspective(800px) rotateX(15deg) translateY(40px)';
+			case 'up':
+				return `translateY(${d}px)`;
+			case 'down':
+				return `translateY(-${d}px)`;
+			case 'left':
+				return `translateX(${d}px)`;
+			case 'right':
+				return `translateX(-${d}px)`;
+			case 'scale':
+				return 'scale(0.85)';
+			case 'tilt':
+				return 'perspective(800px) rotateX(15deg) translateY(40px)';
 			case 'blur':
-			case 'fade': return 'none';
+			case 'fade':
+				return 'none';
 		}
 	}
 </script>
@@ -67,8 +74,7 @@
 	class:visible
 	style:--reveal-initial-transform={initial(variant, distance)}
 	style:--reveal-delay="{delay}ms"
-	style:--reveal-blur={variant === 'blur' ? '8px' : '0'}
->
+	style:--reveal-blur={variant === 'blur' ? '8px' : '0'}>
 	{@render children()}
 </div>
 

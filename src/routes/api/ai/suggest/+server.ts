@@ -35,12 +35,12 @@ Context: ${context || 'A technical blog post'}
 Text so far:
 ${currentText}
 
-Provide ONLY the suggested continuation, nothing else. Do not include any explanation or metadata.`
-				}
+Provide ONLY the suggested continuation, nothing else. Do not include any explanation or metadata.`,
+				},
 			],
 			system: `You are a writing assistant. Provide natural, contextual continuations for technical writing.
 					Keep suggestions concise and maintain the same tone and style as the existing text.
-					Do not repeat what was already written.`
+					Do not repeat what was already written.`,
 		});
 
 		const textContent = response.content.find((block) => block.type === 'text');

@@ -6,9 +6,13 @@
 	class="theme-toggle"
 	onclick={() => theme.toggle()}
 	aria-label="Toggle theme"
-	title="Toggle theme"
->
-	<svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+	title="Toggle theme">
+	<svg
+		class="sun-icon"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2">
 		<circle cx="12" cy="12" r="5" />
 		<line x1="12" y1="1" x2="12" y2="3" />
 		<line x1="12" y1="21" x2="12" y2="23" />
@@ -19,7 +23,12 @@
 		<line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
 		<line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
 	</svg>
-	<svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+	<svg
+		class="moon-icon"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2">
 		<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
 	</svg>
 </button>
@@ -35,7 +44,9 @@
 		border-radius: var(--radius-md);
 		border: 1px solid var(--color-border);
 		color: var(--color-text);
-		transition: background-color var(--transition-fast), border-color var(--transition-fast);
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast);
 	}
 
 	.theme-toggle:hover {
@@ -46,7 +57,9 @@
 	.theme-toggle svg {
 		width: 20px;
 		height: 20px;
-		transition: transform var(--transition-normal), opacity var(--transition-fast);
+		transition:
+			transform var(--transition-normal),
+			opacity var(--transition-fast);
 	}
 
 	.sun-icon {

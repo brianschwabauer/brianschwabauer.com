@@ -14,7 +14,7 @@ import { error } from '@sveltejs/kit';
  */
 export async function forwardToImageWorker(
 	request: Request,
-	platform: App.Platform | undefined
+	platform: App.Platform | undefined,
 ): Promise<Response> {
 	if (!platform?.env?.IMAGE_PROCESSOR) {
 		throw error(500, 'IMAGE_PROCESSOR service binding not configured');
@@ -29,6 +29,6 @@ export async function forwardToImageWorker(
 	return new Response(upstream.body, {
 		status: upstream.status,
 		statusText: upstream.statusText,
-		headers: new Headers(upstream.headers)
+		headers: new Headers(upstream.headers),
 	});
 }

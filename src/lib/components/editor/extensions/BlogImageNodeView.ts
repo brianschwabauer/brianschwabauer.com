@@ -104,7 +104,8 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 		const spinner = document.createElement('div');
 		spinner.className = 'blog-img-spinner';
 		spinner.setAttribute('aria-hidden', 'true');
-		spinner.innerHTML = '<div class="blog-img-spinner-ring"></div><div class="blog-img-spinner-label">Uploading…</div>';
+		spinner.innerHTML =
+			'<div class="blog-img-spinner-ring"></div><div class="blog-img-spinner-label">Uploading…</div>';
 		inner.appendChild(spinner);
 
 		const toolbar = document.createElement('div');
@@ -222,9 +223,10 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 			// Crop + focal point. is-cropped switches the inner to a forced
 			// aspect-ratio with object-fit:cover on the img; without it the
 			// img falls back to height:auto (original behavior).
-			const cropAspect = typeof attrs.cropAspect === 'number' && attrs.cropAspect > 0
-				? attrs.cropAspect
-				: null;
+			const cropAspect =
+				typeof attrs.cropAspect === 'number' && attrs.cropAspect > 0
+					? attrs.cropAspect
+					: null;
 			if (cropAspect) {
 				dom.style.setProperty('--blog-img-crop-aspect', String(cropAspect));
 				dom.classList.add('is-cropped');
@@ -401,7 +403,11 @@ export function createBlogImageNodeView(): NodeViewRenderer {
 					// is-dragging in the next frame — width animates from the
 					// pixel value to the committed mode's natural width.
 					dom.classList.add('is-snapping');
-					applyAttrs({ ...latestAttrs, widthMode: finalState.mode, widthPct: finalState.pct });
+					applyAttrs({
+						...latestAttrs,
+						widthMode: finalState.mode,
+						widthPct: finalState.pct,
+					});
 					updateAttrs({ widthMode: finalState.mode, widthPct: finalState.pct });
 					requestAnimationFrame(() => {
 						dom.classList.remove('is-dragging');

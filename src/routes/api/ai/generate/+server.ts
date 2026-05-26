@@ -43,7 +43,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			model: 'claude-sonnet-4-20250514',
 			max_tokens: 4000,
 			messages: [{ role: 'user', content: userPrompt }],
-			system: systemPrompt
+			system: systemPrompt,
 		});
 
 		const textContent = response.content.find((block) => block.type === 'text');

@@ -25,7 +25,7 @@ function buildMime(opts: {
 		'MIME-Version: 1.0',
 		'Content-Type: text/plain; charset=utf-8',
 		'',
-		opts.body
+		opts.body,
 	].join('\r\n');
 }
 
@@ -45,7 +45,8 @@ export const POST: RequestHandler = async ({ request, platform, getClientAddress
 
 	const { name, email, message } = await request.json();
 
-	if (!name || typeof name !== 'string' || name.length > 100) throw error(400, 'Invalid name');
+	if (!name || typeof name !== 'string' || name.length > 100)
+		throw error(400, 'Invalid name');
 	if (!email || typeof email !== 'string' || !email.includes('@') || email.length > 200) {
 		throw error(400, 'Invalid email');
 	}
@@ -62,7 +63,7 @@ export const POST: RequestHandler = async ({ request, platform, getClientAddress
 		to: env.CONTACT_TO_EMAIL,
 		replyTo: cleanEmail,
 		subject: `Portfolio contact from ${cleanName}`,
-		body: `From: ${cleanName} <${cleanEmail}>\n\n${cleanMessage}`
+		body: `From: ${cleanName} <${cleanEmail}>\n\n${cleanMessage}`,
 	});
 
 	try {

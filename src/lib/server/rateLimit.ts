@@ -22,7 +22,7 @@ export async function rateLimit(
 	kv: KVNamespace,
 	key: string,
 	limit: number,
-	windowSeconds: number
+	windowSeconds: number,
 ): Promise<RateLimitResult> {
 	const bucketKey = `ratelimit:${key}`;
 	const raw = await kv.get(bucketKey);
@@ -34,7 +34,7 @@ export async function rateLimit(
 
 	// KV requires expirationTtl >= 60.
 	await kv.put(bucketKey, String(count + 1), {
-		expirationTtl: Math.max(windowSeconds, 60)
+		expirationTtl: Math.max(windowSeconds, 60),
 	});
 	return { ok: true, retryAfter: 0 };
 }

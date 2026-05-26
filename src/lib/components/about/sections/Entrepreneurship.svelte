@@ -16,7 +16,7 @@
 		'2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_e1-panorama_page_zoomed_in.avif',
 		'2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_g1-location_info_page.avif',
 		'2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_d3-view_story_page.avif',
-		'2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_b1-location_selection.avif'
+		'2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_b1-location_selection.avif',
 	].map((src) => ({ src }));
 
 	const tapnotionShots = [
@@ -25,14 +25,14 @@
 		'2017-01-01_tapnotion_app_screenshot_challenge_page-completed_level.avif',
 		'2017-01-01_tapnotion_app_screenshot_game_over-win.avif',
 		'2017-01-01_tapnotion_app_screenshot_milestone-start.avif',
-		'2017-01-01_tapnotion_app_screenshot_question-multiple_choice-answer_revealed.avif'
+		'2017-01-01_tapnotion_app_screenshot_question-multiple_choice-answer_revealed.avif',
 	].map((src) => ({ src }));
 
 	const engagementShots = [
 		'2016-01-01_engagement_grower_settings_page_mockup.avif',
 		'2016-01-01_engagement_grower_settings_page_addons_mockup.avif',
 		'2016-01-01_engagement_grower_infinite_scroll_settings_page_mockup.avif',
-		'2016-01-01_engagement_grower-fresh_content_addon_animation_for_website.gif'
+		'2016-01-01_engagement_grower-fresh_content_addon_animation_for_website.gif',
 	].map((src) => ({ src }));
 
 	const markableShots = [
@@ -40,7 +40,7 @@
 		'2024-01-01_remarkably_organized_app-settings_popup_screenshot.avif',
 		'2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-close_up_on_navigation.avif',
 		'2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-shallow_depth_of_field_year_view.avif',
-		'2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-title_page_close_up.avif'
+		'2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-title_page_close_up.avif',
 	].map((src) => ({ src }));
 
 	const scrambledLetters = ['S', 'C', 'R', 'M', 'B', 'L', 'D'];
@@ -56,15 +56,18 @@
 			<Reveal>
 				<div class="eyebrow">FROM FREELANCER → FOUNDER</div>
 				<h2 class="title">
-					I stopped<br />
-					<span class="cross">selling time.</span><br />
+					I stopped
+					<br />
+					<span class="cross">selling time.</span>
+					<br />
 					<span class="grad">I started building things.</span>
 				</h2>
 				<p class="lede">
-					Somewhere in this stretch I stopped thinking of myself as a freelancer and started thinking of myself
-					as an entrepreneur. I wanted to build products, not deliver projects. I wanted to make things that
-					could keep running without me there. Some worked. Some didn't. Almost all of them taught me a thing I
-					used in the next one.
+					Somewhere in this stretch I stopped thinking of myself as a freelancer and
+					started thinking of myself as an entrepreneur. I wanted to build products, not
+					deliver projects. I wanted to make things that could keep running without me
+					there. Some worked. Some didn't. Almost all of them taught me a thing I used in
+					the next one.
 				</p>
 			</Reveal>
 		</div>
@@ -74,17 +77,20 @@
 				<Reveal>
 					<div class="year-tag">2016</div>
 					<h3 class="sub">
-						<span class="loc">[SA] </span>Tower of the Americas — a kiosk companion app
+						<span class="loc">[SA]</span>
+						Tower of the Americas — a kiosk companion app
 					</h3>
 					<p>
-						The Tower of the Americas (in San Antonio) hired me to build an immersive companion app. The idea:
-						visitors get a tablet on a kiosk mount, point it where they're looking out the windows, and the
-						app shows them a 360 panorama with landmark labels they can tap to learn more.
+						The Tower of the Americas (in San Antonio) hired me to build an immersive
+						companion app. The idea: visitors get a tablet on a kiosk mount, point it
+						where they're looking out the windows, and the app shows them a 360 panorama
+						with landmark labels they can tap to learn more.
 					</p>
 					<p>
-						I went up the tower, shot photos in every direction, stitched them into a massive 360 panorama,
-						and built the whole thing in Angular. The tablet's compass tracked which way it was pointed and
-						matched that to the panorama angle. Tap a landmark, get a video and info card.
+						I went up the tower, shot photos in every direction, stitched them into a
+						massive 360 panorama, and built the whole thing in Angular. The tablet's
+						compass tracked which way it was pointed and matched that to the panorama
+						angle. Tap a landmark, get a video and info card.
 					</p>
 				</Reveal>
 			</div>
@@ -97,14 +103,12 @@
 						src="2016-06-08_tower_of_the_americas_virtual_tour_app-panorama_shoot_behind_the_scenes-brian_with_camera.avif"
 						alt="Brian shooting the panorama"
 						ratio="16 / 9"
-						caption="Shooting the panorama on the observation deck"
-					/>
+						caption="Shooting the panorama on the observation deck" />
 					<LazyMedia
 						src="2016-06-30_tower_of_the_americas_virtual_tour_app-demo_video_on_tablet-rotate_tablet_360.avif"
 						alt="Demo on the tablet"
 						ratio="16 / 9"
-						caption="Demoed on the tablet"
-					/>
+						caption="Demoed on the tablet" />
 				</div>
 			</Reveal>
 		</div>
@@ -115,10 +119,11 @@
 					<div class="year-tag">2017–2019</div>
 					<h3 class="sub">TapNotion — gamified training for restaurants</h3>
 					<p>
-						A swipe-based flashcard game to onboard waiters and bartenders. A restaurant owner sets up their
-						menu and drinks in an admin dashboard, then invites new hires. The new hire learns through a quick
-						flashcard game with left/right swipes, points for correct answers, points for speed, and immediate
-						review of anything they got wrong. Owners see employee progress in the dashboard.
+						A swipe-based flashcard game to onboard waiters and bartenders. A restaurant
+						owner sets up their menu and drinks in an admin dashboard, then invites new
+						hires. The new hire learns through a quick flashcard game with left/right
+						swipes, points for correct answers, points for speed, and immediate review of
+						anything they got wrong. Owners see employee progress in the dashboard.
 					</p>
 				</Reveal>
 			</div>
@@ -139,9 +144,10 @@
 					<div class="year-tag">2016–2017</div>
 					<h3 class="sub">Engagement Grower — a smarter "related posts" plugin</h3>
 					<p>
-						A WordPress plugin that picks suggested posts intelligently. It tracks impressions, clicks, and
-						bounce rate on each suggestion, builds a model from that data, and serves the ones with the best
-						signal. The plugin didn't break out commercially. The data pipeline was a good build.
+						A WordPress plugin that picks suggested posts intelligently. It tracks
+						impressions, clicks, and bounce rate on each suggestion, builds a model from
+						that data, and serves the ones with the best signal. The plugin didn't break
+						out commercially. The data pipeline was a good build.
 					</p>
 				</Reveal>
 			</div>
@@ -152,8 +158,7 @@
 				<ArchiveFrame
 					src="http://cdn.brianschwabauer.com/site/engagementgrower/index.html"
 					title="Engagement Grower marketing site"
-					label="Open the archived marketing site"
-				/>
+					label="Open the archived marketing site" />
 			</Reveal>
 		</div>
 
@@ -163,8 +168,9 @@
 					<div class="year-tag">2017–2018</div>
 					<h3 class="sub">Wyoti — partnered WordPress agency</h3>
 					<p>
-						Spun out of the Engagement Grower work — we partnered with Wyoti to build custom WordPress sites
-						and plugins for clients. A solid bridge between freelance and product.
+						Spun out of the Engagement Grower work — we partnered with Wyoti to build
+						custom WordPress sites and plugins for clients. A solid bridge between
+						freelance and product.
 					</p>
 				</Reveal>
 			</div>
@@ -172,8 +178,7 @@
 				<ArchiveFrame
 					src="https://cdn.brianschwabauer.com/site/wyoti/index.html"
 					title="Wyoti — agency site"
-					label="Open Wyoti"
-				/>
+					label="Open Wyoti" />
 			</Reveal>
 		</div>
 
@@ -182,15 +187,23 @@
 				<Reveal>
 					<div class="year-tag">2024</div>
 					<h3 class="sub">
-						<a href="https://markable.page" target="_blank" rel="noopener">markable.page</a> — a PDF planner builder for e-ink tablets
+						<a href="https://markable.page" target="_blank" rel="noopener">
+							markable.page
+						</a>
+						— a PDF planner builder for e-ink tablets
 					</h3>
 					<p>
-						A planner builder that generates highly customizable PDFs with internal links, designed for
-						devices like the reMarkable. Originally called "Remarkably Organized". Open-sourced.
-						<strong>200+ stars on GitHub.</strong> Built with Svelte.
+						A planner builder that generates highly customizable PDFs with internal links,
+						designed for devices like the reMarkable. Originally called "Remarkably
+						Organized". Open-sourced.
+						<strong>200+ stars on GitHub.</strong>
+						Built with Svelte.
 					</p>
 					<p>
-						<a href="https://github.com/brianschwabauer/remarkably-organized" target="_blank" rel="noopener">
+						<a
+							href="https://github.com/brianschwabauer/remarkably-organized"
+							target="_blank"
+							rel="noopener">
 							github.com/brianschwabauer/remarkably-organized
 						</a>
 					</p>
@@ -206,12 +219,14 @@
 				<Reveal>
 					<div class="year-tag">2024+</div>
 					<h3 class="sub">
-						<a href="https://scrmbld.app" target="_blank" rel="noopener">SCRMBLD</a> — a daily word game in split-flap style
+						<a href="https://scrmbld.app" target="_blank" rel="noopener">SCRMBLD</a>
+						— a daily word game in split-flap style
 					</h3>
 					<p>
-						You're given 8 letters. One is a decoy. Unscramble the other 7 into the day's word. Letters animate
-						on like a split-flap display — I spent a stupid amount of time hand-crafting the look and feel of
-						that animation. Made for fun, not for money.
+						You're given 8 letters. One is a decoy. Unscramble the other 7 into the day's
+						word. Letters animate on like a split-flap display — I spent a stupid amount
+						of time hand-crafting the look and feel of that animation. Made for fun, not
+						for money.
 					</p>
 				</Reveal>
 			</div>
@@ -247,7 +262,9 @@
 		padding: 0 clamp(1rem, 3vw, 2rem);
 	}
 
-	.lockup { margin-bottom: 4rem; }
+	.lockup {
+		margin-bottom: 4rem;
+	}
 	.eyebrow {
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
@@ -339,9 +356,18 @@
 		display: inline-block;
 		transform: translateY(-3px);
 	}
-	.card p { line-height: 1.6; margin-bottom: 1rem; }
-	.card strong { color: #00f2c3; }
-	.card a { color: #00d6ff; text-decoration: underline; text-underline-offset: 4px; }
+	.card p {
+		line-height: 1.6;
+		margin-bottom: 1rem;
+	}
+	.card strong {
+		color: #00f2c3;
+	}
+	.card a {
+		color: #00d6ff;
+		text-decoration: underline;
+		text-underline-offset: 4px;
+	}
 
 	.bts-row {
 		display: grid;
@@ -350,7 +376,9 @@
 		margin-top: 0.8rem;
 	}
 	@media (max-width: 640px) {
-		.bts-row { grid-template-columns: 1fr; }
+		.bts-row {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	.phone-grid {
@@ -366,7 +394,9 @@
 		transform: rotate(calc((var(--i) - 2.5) * 1.2deg));
 		transition: transform 200ms ease;
 	}
-	.phone-mini:hover { transform: rotate(0deg) translateY(-4px); }
+	.phone-mini:hover {
+		transform: rotate(0deg) translateY(-4px);
+	}
 
 	.splitflap {
 		display: flex;
@@ -392,7 +422,8 @@
 		width: 100%;
 		height: 100%;
 	}
-	.flap-top, .flap-bottom {
+	.flap-top,
+	.flap-bottom {
 		position: absolute;
 		width: 100%;
 		height: 50%;
@@ -417,10 +448,19 @@
 		padding-top: 4%;
 	}
 	@keyframes flap {
-		0%, 20% { transform: rotateX(0); }
-		30% { transform: rotateX(-30deg); }
-		40% { transform: rotateX(0); }
-		100% { transform: rotateX(0); }
+		0%,
+		20% {
+			transform: rotateX(0);
+		}
+		30% {
+			transform: rotateX(-30deg);
+		}
+		40% {
+			transform: rotateX(0);
+		}
+		100% {
+			transform: rotateX(0);
+		}
 	}
 	.splitflap-tag {
 		font-family: var(--font-mono);

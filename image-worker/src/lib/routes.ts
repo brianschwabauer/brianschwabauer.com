@@ -66,7 +66,7 @@ export async function listImages(
 	// Sort newest first by updated_at
 	images.sort((a, b) => b.updated_at.localeCompare(a.updated_at));
 
-	return { images, cursor: result.truncated ? result.cursor ?? null : null };
+	return { images, cursor: result.truncated ? (result.cursor ?? null) : null };
 }
 
 // ── Get ─────────────────────────────────────────────────────────────────────
@@ -88,7 +88,10 @@ export interface UploadInput {
 	caption?: string;
 }
 
-export async function uploadImage(env: ImageEnv, input: UploadInput): Promise<ImageRecord> {
+export async function uploadImage(
+	env: ImageEnv,
+	input: UploadInput,
+): Promise<ImageRecord> {
 	const year = currentYear();
 	const baseSlug = slugifyFilename(input.file.name || 'image');
 	const slug = await allocateUniqueSlug(env.R2, year, baseSlug);
@@ -102,8 +105,20 @@ export async function uploadImage(env: ImageEnv, input: UploadInput): Promise<Im
 	const fileBytes = await input.file.arrayBuffer();
 	const result = await stub.process(fileBytes, {
 		variants: [
-			{ name: DEFAULT_VARIANT, max_dimension: 2048, format: 'avif', quality: 50, fit: 'inside' },
-			{ name: THUMBNAIL_VARIANT, max_dimension: 640, format: 'avif', quality: 50, fit: 'cover' },
+			{
+				name: DEFAULT_VARIANT,
+				max_dimension: 2048,
+				format: 'avif',
+				quality: 50,
+				fit: 'inside',
+			},
+			{
+				name: THUMBNAIL_VARIANT,
+				max_dimension: 640,
+				format: 'avif',
+				quality: 50,
+				fit: 'cover',
+			},
 		],
 		compress_original: false,
 	});
@@ -188,13 +203,17 @@ export async function updateImage(
 	const obj = await env.R2.get(key);
 	if (!obj) return null;
 
-	const existing = deserializeRecord(key, obj.customMetadata as Record<string, string> | undefined);
+	const existing = deserializeRecord(
+		key,
+		obj.customMetadata as Record<string, string> | undefined,
+	);
 	if (!existing) return null;
 
 	const updated: ImageRecord = {
 		...existing,
-		alt_text: patch.alt === undefined ? existing.alt_text : (patch.alt?.trim() || null),
-		caption: patch.caption === undefined ? existing.caption : (patch.caption?.trim() || null),
+		alt_text: patch.alt === undefined ? existing.alt_text : patch.alt?.trim() || null,
+		caption:
+			patch.caption === undefined ? existing.caption : patch.caption?.trim() || null,
 		updated_at: new Date().toISOString(),
 	};
 
@@ -225,7 +244,11 @@ export async function deleteImage(env: ImageEnv, path: string): Promise<boolean>
 
 const NOT_FOUND_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="#f0f0f0"/><text x="200" y="158" text-anchor="middle" fill="#999" font-family="system-ui,sans-serif" font-size="16">Image not found</text></svg>`;
 
-export async function serveImage(env: ImageEnv, request: Request, path: string): Promise<Response> {
+export async function serveImage(
+	env: ImageEnv,
+	request: Request,
+	path: string,
+): Promise<Response> {
 	const safe = sanitizePath(path, { allowVariant: true });
 	if (!safe) return notFoundResponse();
 
@@ -241,7 +264,10 @@ export async function serveImage(env: ImageEnv, request: Request, path: string):
 	if (!obj) return notFoundResponse();
 
 	const headers = new Headers();
-	headers.set('Content-Type', obj.httpMetadata?.contentType ?? 'application/octet-stream');
+	headers.set(
+		'Content-Type',
+		obj.httpMetadata?.contentType ?? 'application/octet-stream',
+	);
 	headers.set(
 		'Cache-Control',
 		obj.httpMetadata?.cacheControl ?? 'public, max-age=31536000, immutable',
@@ -250,7 +276,8 @@ export async function serveImage(env: ImageEnv, request: Request, path: string):
 	headers.set('X-Content-Type-Options', 'nosniff');
 	if (obj.size !== undefined) headers.set('Content-Length', String(obj.size));
 	if (obj.customMetadata?.width) headers.set('X-Image-Width', obj.customMetadata.width);
-	if (obj.customMetadata?.height) headers.set('X-Image-Height', obj.customMetadata.height);
+	if (obj.customMetadata?.height)
+		headers.set('X-Image-Height', obj.customMetadata.height);
 
 	return new Response(obj.body as unknown as BodyInit, { status: 200, headers });
 }

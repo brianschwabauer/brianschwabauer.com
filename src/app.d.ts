@@ -1,4 +1,10 @@
-import type { KVNamespace, Ai, SendEmail, R2Bucket, Fetcher } from '@cloudflare/workers-types';
+import type {
+	KVNamespace,
+	Ai,
+	SendEmail,
+	R2Bucket,
+	Fetcher,
+} from '@cloudflare/workers-types';
 
 declare global {
 	namespace App {
