@@ -1,0 +1,17 @@
+{
+	"$schema": "https://json.schemastore.org/claude-code-settings.json",
+	"hooks": {
+		"PostToolUse": [
+			{
+				"matcher": "Edit|Write|MultiEdit",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "jq -r '.tool_input.file_path // empty' | { read -r f; case \"$f\" in \"\"|*\"/delightstack/\"*|*\"/.svelte-kit/\"*|*\"/build/\"*|*\"/node_modules/\"*|*\"/.wrangler/\"*|*\"/.vercel/\"*|*\"/static/\"*|*\"/media/\"*|*\"/legacy-content/\"*|*\"/.claude/\"*) exit 0;; *.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs|*.svelte|*.json|*.jsonc|*.css|*.html|*.md|*.yaml|*.yml) node_modules/.bin/oxfmt \"$f\" 2>/dev/null || true;; esac; }",
+						"timeout": 15
+					}
+				]
+			}
+		]
+	}
+}
