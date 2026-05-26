@@ -173,6 +173,7 @@
 		transition: background 200ms ease;
 	}
 	.open-btn:hover {
+		transition-duration: 0s;
 		background: rgba(255, 255, 255, 0.16);
 	}
 	.stage {
@@ -241,6 +242,7 @@
 			background 200ms ease;
 	}
 	.ghost-launch:hover {
+		transition-duration: 0s;
 		transform: translateY(-2px);
 		background: #fff;
 	}

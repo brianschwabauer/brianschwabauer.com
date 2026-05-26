@@ -77,6 +77,7 @@
 		will-change: transform;
 	}
 	.film-reel:hover .track {
+		transition-duration: 0s;
 		animation-play-state: paused;
 	}
 	@keyframes scroll {
@@ -117,6 +118,7 @@
 		transition: opacity 200ms ease;
 	}
 	.frame:hover figcaption {
+		transition-duration: 0s;
 		opacity: 1;
 	}
 	@media (prefers-reduced-motion: reduce) {

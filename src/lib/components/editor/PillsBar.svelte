@@ -378,6 +378,7 @@
 	}
 
 	.pill:hover {
+		transition-duration: 0s;
 		border-color: var(--color-border);
 	}
 
@@ -420,11 +421,13 @@
 			border-color 120ms ease;
 	}
 	.tag-pill:hover {
+		transition-duration: 0s;
 		background: color-mix(in oklch, var(--color-error) 14%, transparent);
 		color: var(--color-error);
 		border-color: var(--color-error);
 	}
 	.tag-pill:hover .tag-remove {
+		transition-duration: 0s;
 		color: var(--color-error);
 	}
 
@@ -499,6 +502,7 @@
 
 	.suggestion:hover,
 	.suggestion.active {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 		color: var(--color-accent);
 	}

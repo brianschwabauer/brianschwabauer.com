@@ -178,6 +178,7 @@
 			visibility 0s linear 0s;
 	}
 	.logo:hover .logo-img {
+		transition-duration: 0s;
 		transform: scale(1.04);
 	}
 	.logo:active .logo-img {
@@ -224,6 +225,7 @@
 		.logo:active .logo-img,
 		.nav-link:active,
 		.search-btn:active {
+			transition-duration: 0s;
 			transform: none;
 		}
 	}
@@ -268,26 +270,31 @@
 		transform: scale(0.97);
 	}
 	.nav-link:hover {
+		transition-duration: 0s;
 		color: var(--color-text);
 		background: var(--color-surface);
+		border-color: var(--color-accent);
 	}
 	.nav-link.on-dark {
 		color: rgba(255, 255, 255, 0.78);
 		border-color: rgba(255, 255, 255, 0.22);
 	}
 	.nav-link.on-dark:hover {
+		transition-duration: 0s;
 		color: #fff;
 		background: rgba(255, 255, 255, 0.08);
 		border-color: rgba(0, 242, 195, 0.45);
 	}
 	.nav-link.active,
 	.nav-link.active:hover {
+		transition-duration: 0s;
 		color: var(--color-accent);
 		background: var(--color-accent-light);
 		border-color: var(--color-accent);
 	}
 	.nav-link.active.on-dark,
 	.nav-link.active.on-dark:hover {
+		transition-duration: 0s;
 		color: #fff;
 		background: rgba(0, 242, 195, 0.15);
 		border-color: rgba(0, 242, 195, 0.45);
@@ -311,6 +318,7 @@
 			border-color var(--transition-fast),
 			transform var(--transition-fast);
 		&:hover {
+			transition-duration: 0s;
 			color: var(--color-text);
 			background: var(--color-surface);
 			border-color: var(--color-accent);
@@ -329,6 +337,7 @@
 		border-color: rgba(255, 255, 255, 0.22);
 	}
 	.search-btn.on-dark:hover {
+		transition-duration: 0s;
 		color: #fff;
 		background: rgba(255, 255, 255, 0.08);
 		border-color: rgba(0, 242, 195, 0.45);

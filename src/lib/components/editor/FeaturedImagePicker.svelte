@@ -460,6 +460,7 @@
 
 	.featured:hover .placeholder,
 	.featured.focused .placeholder {
+		transition-duration: 0s;
 		border-color: var(--color-accent);
 		color: var(--color-accent);
 		background: var(--color-accent-light);
@@ -562,6 +563,7 @@
 	.featured:hover .featured-toolbar,
 	.featured.focused .featured-toolbar,
 	.featured.repositioning .featured-toolbar {
+		transition-duration: 0s;
 		opacity: 1;
 	}
 
@@ -585,16 +587,19 @@
 	}
 
 	.ft-btn:hover {
+		transition-duration: 0s;
 		background: rgba(255, 255, 255, 0.18);
 	}
 	.ft-btn.primary {
 		background: var(--color-accent);
 	}
 	.ft-btn.primary:hover {
+		transition-duration: 0s;
 		background: var(--color-accent);
 		filter: brightness(1.1);
 	}
 	.ft-btn.danger:hover {
+		transition-duration: 0s;
 		background: var(--color-error);
 	}
 </style>

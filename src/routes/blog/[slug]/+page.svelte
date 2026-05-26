@@ -198,6 +198,7 @@
 	}
 
 	.edit-post-fab:hover {
+		transition-duration: 0s;
 		color: var(--color-accent);
 		border-color: var(--color-accent);
 	}
@@ -283,6 +284,7 @@
 			transform var(--transition-fast);
 	}
 	.tag:hover {
+		transition-duration: 0s;
 		color: var(--color-text);
 		background: var(--color-surface);
 		border-color: var(--color-accent);

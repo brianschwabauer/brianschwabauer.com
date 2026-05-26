@@ -65,6 +65,7 @@
 		border: 1px solid rgba(255, 255, 255, 0.15);
 	}
 	.toggle.subtle:hover {
+		transition-duration: 0s;
 		background: rgba(255, 255, 255, 0.14);
 		transform: translateY(-1px);
 	}
@@ -74,6 +75,7 @@
 		border: 0;
 	}
 	.toggle.bold:hover {
+		transition-duration: 0s;
 		filter: brightness(1.1);
 		transform: translateY(-1px);
 	}
@@ -84,6 +86,7 @@
 		opacity: 0.85;
 	}
 	.toggle.ghost:hover {
+		transition-duration: 0s;
 		opacity: 1;
 	}
 	.chev {

@@ -386,6 +386,7 @@
 	}
 
 	.remove-btn:hover {
+		transition-duration: 0s;
 		color: #d33;
 		border-color: rgba(220, 60, 60, 0.3);
 		background: rgba(220, 60, 60, 0.08);

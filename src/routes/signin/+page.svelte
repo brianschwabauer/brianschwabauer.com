@@ -115,6 +115,7 @@
 	}
 
 	.provider-btn.google:hover {
+		transition-duration: 0s;
 		background: #f8f8f8;
 	}
 </style>

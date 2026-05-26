@@ -542,6 +542,7 @@
 	}
 	.sm-item.active,
 	.sm-item:hover {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 	}
 

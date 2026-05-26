@@ -398,6 +398,7 @@
 	}
 
 	.brand:hover {
+		transition-duration: 0s;
 		opacity: 0.75;
 	}
 
@@ -527,6 +528,7 @@
 	}
 
 	.post-item:hover {
+		transition-duration: 0s;
 		border-color: var(--color-accent);
 		background: var(--color-bg-secondary);
 	}
@@ -666,6 +668,7 @@
 	}
 
 	.menu-item:hover {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 	}
 
@@ -674,6 +677,7 @@
 	}
 
 	.menu-item.danger:hover {
+		transition-duration: 0s;
 		background: rgba(220, 60, 60, 0.08);
 	}
 

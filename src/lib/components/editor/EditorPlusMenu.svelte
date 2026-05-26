@@ -290,6 +290,7 @@
 	}
 	.plus-btn:hover,
 	.plus-btn.open {
+		transition-duration: 0s;
 		color: var(--color-accent);
 		border-color: var(--color-accent);
 		background: var(--color-accent-light);
@@ -330,6 +331,7 @@
 		cursor: pointer;
 	}
 	.pm-item:hover {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 	}
 	.pm-item svg,

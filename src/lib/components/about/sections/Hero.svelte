@@ -1133,6 +1133,7 @@
 	}
 
 	.boom-btn:hover:not(:disabled) .boom-btn-skin {
+		transition-duration: 0s;
 		transition: none;
 		background-color: white;
 		box-shadow:
@@ -1377,6 +1378,7 @@
 			opacity 200ms ease;
 	}
 	.send-btn:hover:not(:disabled) {
+		transition-duration: 0s;
 		transform: translateY(-2px);
 	}
 	.send-btn:disabled {
@@ -1454,6 +1456,7 @@
 			transform 380ms ease;
 	}
 	.scroll-cue:hover {
+		transition-duration: 0s;
 		color: #00f2c3;
 	}
 	.scroll-cue.hidden {

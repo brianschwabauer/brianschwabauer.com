@@ -50,6 +50,7 @@
 	}
 
 	.theme-toggle:hover {
+		transition-duration: 0s;
 		background: var(--color-bg-secondary);
 		border-color: var(--color-accent);
 	}

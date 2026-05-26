@@ -288,6 +288,7 @@
 		transition: transform 300ms ease;
 	}
 	.biz-card:hover {
+		transition-duration: 0s;
 		transform: rotate(0deg) scale(1.02);
 	}
 	.biz-name {
@@ -336,6 +337,7 @@
 		transition: transform 200ms ease;
 	}
 	.reel-card:hover {
+		transition-duration: 0s;
 		transform: translateY(-4px);
 	}
 	.reel-card figcaption {
@@ -353,6 +355,7 @@
 		transition: opacity 200ms ease;
 	}
 	.reel-card:hover figcaption {
+		transition-duration: 0s;
 		opacity: 1;
 	}
 

@@ -526,6 +526,7 @@
 
 	.tile:hover .tile-overlay,
 	.tile:focus-visible .tile-overlay {
+		transition-duration: 0s;
 		opacity: 1;
 	}
 
@@ -558,10 +559,12 @@
 	}
 
 	.overlay-btn:hover {
+		transition-duration: 0s;
 		background: rgba(255, 255, 255, 0.28);
 	}
 
 	.overlay-btn.danger:hover {
+		transition-duration: 0s;
 		background: var(--color-error);
 	}
 

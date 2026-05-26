@@ -355,6 +355,7 @@
 		transition: transform 200ms ease;
 	}
 	.family-link:hover {
+		transition-duration: 0s;
 		transform: translateY(-2px);
 	}
 	.family-link svg {

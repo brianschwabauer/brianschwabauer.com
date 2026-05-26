@@ -395,6 +395,7 @@
 		transition: transform 200ms ease;
 	}
 	.phone-mini:hover {
+		transition-duration: 0s;
 		transform: rotate(0deg) translateY(-4px);
 	}
 

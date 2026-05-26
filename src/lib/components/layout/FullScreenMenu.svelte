@@ -93,6 +93,7 @@
 
 	.menu-link:hover,
 	.menu-link.active {
+		transition-duration: 0s;
 		color: var(--color-accent);
 		transform: translateX(var(--space-2));
 	}

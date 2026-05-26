@@ -332,6 +332,7 @@
 		box-shadow: 0 10px 30px rgba(0, 242, 195, 0.3);
 	}
 	.cta-primary:hover {
+		transition-duration: 0s;
 		transform: translateY(-3px);
 		box-shadow: 0 14px 40px rgba(0, 242, 195, 0.45);
 	}
@@ -392,6 +393,7 @@
 			border-color 200ms ease;
 	}
 	.feature:hover {
+		transition-duration: 0s;
 		transform: translateY(-3px);
 		border-color: rgba(0, 242, 195, 0.4);
 	}

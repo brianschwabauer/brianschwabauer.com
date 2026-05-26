@@ -294,6 +294,7 @@
 	.trigger:hover,
 	.action-link:hover,
 	.action-icon:hover {
+		transition-duration: 0s;
 		background: rgba(20, 24, 36, 0.9);
 		border-color: rgba(0, 242, 195, 0.45);
 	}
@@ -325,6 +326,7 @@
 	}
 	.up:hover,
 	.action-icon:hover {
+		transition-duration: 0s;
 		transform: translateY(-2px);
 	}
 
@@ -451,6 +453,7 @@
 	}
 	.menu button:hover,
 	.menu button:focus-visible {
+		transition-duration: 0s;
 		background: rgba(0, 242, 195, 0.1);
 		color: #fff;
 		outline: none;

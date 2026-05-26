@@ -179,6 +179,7 @@
 			opacity 200ms ease;
 	}
 	.poster-btn:hover img {
+		transition-duration: 0s;
 		transform: scale(1.03);
 		opacity: 1;
 	}
@@ -195,6 +196,7 @@
 		filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.6));
 	}
 	.poster-btn:hover .play {
+		transition-duration: 0s;
 		transform: translate(-50%, -50%) scale(1.08);
 		filter: drop-shadow(0 14px 32px rgba(0, 0, 0, 0.7));
 	}
@@ -258,9 +260,11 @@
 		border-radius: 8px;
 	}
 	.video-mount :global(.video-js.vjs-bs .vjs-button:hover) {
+		transition-duration: 0s;
 		background: rgba(255, 255, 255, 0.08);
 	}
 	.video-mount :global(.video-js.vjs-bs .vjs-button:hover .vjs-icon-placeholder::before) {
+		transition-duration: 0s;
 		color: #fff;
 	}
 	.video-mount :global(.video-js.vjs-bs .vjs-button > .vjs-icon-placeholder::before) {
@@ -288,6 +292,7 @@
 	}
 	.video-mount
 		:global(.video-js.vjs-bs .vjs-progress-control:hover .vjs-progress-holder) {
+			transition-duration: 0s;
 		height: 8px;
 	}
 	.video-mount :global(.video-js.vjs-bs .vjs-play-progress) {
@@ -365,6 +370,7 @@
 		line-height: 88px;
 	}
 	.video-mount :global(.video-js.vjs-bs:hover .vjs-big-play-button) {
+		transition-duration: 0s;
 		background: rgba(0, 242, 195, 0.18);
 		border-color: #00f2c3;
 		transform: scale(1.05);

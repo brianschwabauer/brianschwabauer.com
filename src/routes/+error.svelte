@@ -338,6 +338,7 @@
 
 	.search-input:hover,
 	.search-input:focus-within {
+		transition-duration: 0s;
 		border-color: var(--color-accent);
 		box-shadow: 0 0 0 4px var(--color-accent-light);
 	}
@@ -419,6 +420,7 @@
 	}
 
 	.suggestion:hover {
+		transition-duration: 0s;
 		border-color: var(--color-accent);
 		transform: translateY(-2px);
 		box-shadow: var(--shadow-lg);
