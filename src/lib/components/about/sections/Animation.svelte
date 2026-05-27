@@ -7,6 +7,7 @@
 	import Expandable from '../primitives/Expandable.svelte';
 	import MediaGrid from '../primitives/MediaGrid.svelte';
 	import PinScrub from '../primitives/PinScrub.svelte';
+	import ScrubVideo from '../primitives/ScrubVideo.svelte';
 	import { media } from '../media';
 
 	const calamityShots = [
@@ -138,36 +139,22 @@
 				</Reveal>
 			</div>
 
-			<Reveal variant="up" delay={100}>
-				<div class="transformer-stage">
-					<PinScrub height="180vh">
-						{#snippet children({ progress })}
-							<div class="transformer-inner">
-								<img
-									src={media(
-										'2011-03-01_exposure-animated_on_transparent_background_camera_robot_transforms_from_camera_to_robot.avif',
-									)}
-									alt="Camera robot transforming, scroll-scrubbed"
-									loading="lazy"
-									decoding="async"
-									style:opacity="1"
-									class="transformer-img" />
-								<div class="transformer-text">
-									<div class="t-eyebrow">SCROLL TO TRANSFORM</div>
-									<div class="t-progress">
-										<span class="t-bar" style:width="{progress * 100}%"></span>
-									</div>
-									<div class="t-stages">
-										<span class:active={progress < 0.33}>CAMERA</span>
-										<span class:active={progress >= 0.33 && progress < 0.66}>MORPH</span>
-										<span class:active={progress >= 0.66}>ROBOT</span>
-									</div>
-								</div>
-							</div>
-						{/snippet}
-					</PinScrub>
-				</div>
-			</Reveal>
+			<div class="transformer-stage">
+				<PinScrub height="280vh">
+					{#snippet children({ progress })}
+						<ScrubVideo
+							src={media(
+								'2011-03-01_exposure-animated_on_transparent_background_camera_robot_transforms_from_camera_to_robot.webm',
+							)}
+							reverseSrc={media(
+								'2011-03-01_exposure-animated_on_transparent_background_camera_robot_transforms_from_camera_to_robot-reverse.webm',
+							)}
+							{progress}
+							ariaLabel="Camera transforming into a robot, scrubbed by scroll"
+							class="transformer-video" />
+					{/snippet}
+				</PinScrub>
+			</div>
 
 			<Reveal variant="up" delay={100}>
 				<div class="exposure-grid">
@@ -282,6 +269,7 @@
 			radial-gradient(circle at 80% 100%, rgba(0, 200, 255, 0.1), transparent 50%),
 			linear-gradient(180deg, #050514, #0a0a26 50%, #050514);
 		color: #e8ecff;
+		overflow-x: clip;
 	}
 	.container {
 		max-width: 80rem;
@@ -404,63 +392,42 @@
 	}
 
 	.transformer-stage {
-		margin: 3rem 0;
+		position: relative;
+		width: 100vw;
+		margin-left: calc(50% - 50vw);
+		margin-right: calc(50% - 50vw);
+		pointer-events: none;
+		margin-bottom: -100px;
+		margin-top: -500px;
+		@media (min-width: 1024px) {
+			margin-bottom: -50px;
+		}
 	}
-	.transformer-inner {
-		width: 100%;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: 1.5rem;
-		padding: 2rem;
-		background:
-			radial-gradient(ellipse at center, rgba(108, 99, 255, 0.18), transparent 70%),
-			linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.5));
-	}
-	.transformer-img {
-		max-width: 60%;
-		max-height: 70%;
+	.transformer-stage :global(.transformer-video) {
+		width: 100vw;
+		height: 100vh;
 		object-fit: contain;
-		filter: drop-shadow(0 30px 60px rgba(108, 99, 255, 0.45));
+		filter: drop-shadow(0 30px 60px rgba(108, 99, 255, 0.35));
 	}
-	.transformer-text {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.6rem;
-		width: min(28rem, 90%);
-	}
-	.t-eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		letter-spacing: 0.4em;
-		color: rgba(255, 255, 255, 0.65);
-	}
-	.t-progress {
-		width: 100%;
-		height: 3px;
-		background: rgba(255, 255, 255, 0.12);
-		border-radius: 4px;
-		overflow: hidden;
-	}
-	.t-bar {
-		display: block;
-		height: 100%;
-		background: linear-gradient(90deg, #6c63ff, #00f2c3);
-		transition: width 60ms linear;
-	}
-	.t-stages {
-		display: flex;
-		gap: 1.5rem;
-		font-family: var(--font-mono);
-		font-size: 0.75rem;
-		letter-spacing: 0.2em;
-		color: rgba(255, 255, 255, 0.35);
-	}
-	.t-stages .active {
-		color: #00f2c3;
+	.transformer-stage :global(.transformer-video video) {
+		width: 1500px;
+		height: 1000px;
+		left: calc(43vw - 400px);
+		@media (min-width: 769px) {
+			width: 2000px;
+			height: 1000px;
+			left: calc(43vw - 600px);
+		}
+		@media (min-width: 1024px) {
+			left: 0px;
+			top: -100px;
+			width: 2500px;
+			height: 1200px;
+			left: calc(43vw - 700px);
+		}
+		@media (min-width: 1400px) {
+			left: calc(43vw - 600px);
+		}
 	}
 
 	.exposure-grid {
