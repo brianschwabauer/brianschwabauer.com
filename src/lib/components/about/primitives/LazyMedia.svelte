@@ -12,6 +12,9 @@
 		eager = false,
 		class: klass = '',
 		style = '',
+		onclick = undefined as
+			| undefined
+			| ((event: MouseEvent & { currentTarget: HTMLButtonElement }) => void),
 	}: {
 		src: string;
 		alt?: string;
@@ -23,30 +26,56 @@
 		eager?: boolean;
 		class?: string;
 		style?: string;
+		onclick?: (event: MouseEvent & { currentTarget: HTMLButtonElement }) => void;
 	} = $props();
 
 	const resolved = $derived(src.startsWith('http') ? src : media(src));
 	let loaded = $state(false);
+	const interactive = $derived(typeof onclick === 'function');
 </script>
 
-<figure
-	class="lazy-media {klass}"
-	class:rounded
-	class:shadow
-	style:aspect-ratio={ratio || undefined}
-	{style}>
-	<img
-		src={resolved}
-		{alt}
-		loading={eager ? 'eager' : 'lazy'}
-		decoding="async"
-		class:loaded
-		style:object-fit={fit}
-		onload={() => (loaded = true)} />
-	{#if caption}
-		<figcaption>{caption}</figcaption>
-	{/if}
-</figure>
+{#if interactive}
+	<button
+		type="button"
+		class="lazy-media lazy-media-button {klass}"
+		class:rounded
+		class:shadow
+		style:aspect-ratio={ratio || undefined}
+		{style}
+		aria-label={alt || 'Open image'}
+		onclick={(e) => onclick?.(e)}>
+		<img
+			src={resolved}
+			{alt}
+			loading={eager ? 'eager' : 'lazy'}
+			decoding="async"
+			class:loaded
+			style:object-fit={fit}
+			onload={() => (loaded = true)} />
+		{#if caption}
+			<span class="caption">{caption}</span>
+		{/if}
+	</button>
+{:else}
+	<figure
+		class="lazy-media {klass}"
+		class:rounded
+		class:shadow
+		style:aspect-ratio={ratio || undefined}
+		{style}>
+		<img
+			src={resolved}
+			{alt}
+			loading={eager ? 'eager' : 'lazy'}
+			decoding="async"
+			class:loaded
+			style:object-fit={fit}
+			onload={() => (loaded = true)} />
+		{#if caption}
+			<figcaption>{caption}</figcaption>
+		{/if}
+	</figure>
+{/if}
 
 <style>
 	.lazy-media {
@@ -57,6 +86,27 @@
 		margin: 0;
 		content-visibility: auto;
 		contain-intrinsic-size: 600px 400px;
+	}
+	.lazy-media-button {
+		appearance: none;
+		border: 0;
+		padding: 0;
+		width: 100%;
+		color: inherit;
+		font: inherit;
+		cursor: pointer;
+		transition: transform 200ms ease;
+	}
+	.lazy-media-button:hover img {
+		transition-duration: 0s;
+		transform: scale(1.02);
+	}
+	.lazy-media-button img {
+		transition: transform 250ms ease;
+	}
+	.lazy-media-button:focus-visible {
+		outline: 2px solid #00e0ff;
+		outline-offset: 2px;
 	}
 	.lazy-media.rounded {
 		border-radius: 12px;
@@ -76,7 +126,8 @@
 	img.loaded {
 		opacity: 1;
 	}
-	figcaption {
+	figcaption,
+	.lazy-media .caption {
 		position: absolute;
 		left: 0;
 		right: 0;

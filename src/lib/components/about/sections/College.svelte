@@ -4,9 +4,10 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import VideoPlayer from '../primitives/VideoPlayer.svelte';
-	import MediaGrid from '../primitives/MediaGrid.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem, imageItems, videoItem } from '../media';
 
 	const variousShots = [
 		'2012-02-02_med_365-silent_film-character_looks_up_dramatically.avif',
@@ -31,6 +32,73 @@
 		const ext = i === 2 ? 'avif' : 'jpg';
 		return { src: `2014-09-15_med_465-one_up-behind_the_scenes_set_photo_${n}.${ext}` };
 	});
+
+	const variousImages: GalleryItem[] = imageItems(variousShots);
+	const nodeBTSImages: GalleryItem[] = imageItems(nodeBTS);
+	const oneUpBTSImages: GalleryItem[] = imageItems(oneUpBTS);
+
+	const sectionExtras: GalleryItem[] = [
+		imageItem(
+			'2012-04-27_facebook_short_film-zolly_shot_of_main_character_falling_in_love.avif',
+			'Facebook IRL — the zolly shot',
+			'Facebook IRL — the zolly shot',
+		),
+		videoItem('2012-04-27_facebook', 'Facebook in Real Life (2012)'),
+		imageItem(
+			'2014-03-18_art_300_project-node-360_short_film_panorama_equirectangular.avif',
+			'NODE — equirectangular panorama still',
+			'NODE — equirectangular panorama still',
+		),
+		imageItem(
+			'2014-05-12_pickvid_promo_video-demo_on_phone.avif',
+			'PickVid demo on a phone',
+			'PickVid demo on a phone',
+		),
+		imageItem(
+			'2014-05-12_pickvid_promo_video-logo_animation.avif',
+			'PickVid logo animation',
+			'PickVid logo animation',
+		),
+		videoItem('2014-05-12_pickvid_promo_video', 'PickVid (2014) — promo video / demo'),
+		imageItem(
+			'2013-12-02_bear_bus_bash_flash_game_screen_recording-main_menu.avif',
+			'Bear Bus Bash — main menu',
+			'Bear Bus Bash — main menu',
+		),
+		imageItem(
+			'2013-12-02_bear_bus_bash_flash_game_screen_recording-gameplay_clip.avif',
+			'Bear Bus Bash — gameplay',
+			'Bear Bus Bash — gameplay',
+		),
+		imageItem(
+			'2013-12-02_bear_bus_bash_flash_game_screen_recording-victory_results_page.avif',
+			'Bear Bus Bash — victory',
+			'Bear Bus Bash — victory',
+		),
+		videoItem(
+			'2013-12-02_bear_bus_bash_flash_game_screen_recording',
+			'Bear Bus Bash (2013) — full gameplay recording',
+		),
+		imageItem(
+			'2015-04-12_split_life-sato_48-film_snapshot_1.avif',
+			'Split Life — perspective A',
+			'Split Life — perspective A',
+		),
+		imageItem(
+			'2015-04-12_split_life-sato_48-film_snapshot_2.avif',
+			'Split Life — perspective B',
+			'Split Life — perspective B',
+		),
+		videoItem(
+			'2015-04-12_split_life-sato_48',
+			'Split Life (2015) — 48-hour dual-perspective oner',
+		),
+		videoItem('2014-05-15_katie_bauers_breakup', "Katie Bauer's Breakup (2014)"),
+		videoItem('2014-09-24_med_465-one_up', 'One Up (2014)'),
+		videoItem('2014-09-02_nice_to_meet_you', 'Nice to Meet You (2014)'),
+		videoItem('2015-04-22_legacy', 'Legacy (2015)'),
+	];
+	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="college" year="2012" label="College" theme="college">
@@ -59,7 +127,7 @@
 		<Reveal variant="up">
 			<div class="strip">
 				<div class="strip-eyebrow">A WHIRLWIND OF CLASS PROJECTS</div>
-				<MediaGrid items={variousShots} min={220} gap={6} ratio="16 / 9" />
+				<Gallery items={variousImages} display="masonry-row" />
 				<div class="strip-note">
 					MED 365 silent film · chase scene · complexity edit · ART 230 stop-motion · ART
 					300 disturbance · MED 465 One Up
@@ -87,7 +155,8 @@
 						<LazyMedia
 							src="2012-04-27_facebook_short_film-zolly_shot_of_main_character_falling_in_love.avif"
 							alt="Facebook IRL — the zolly shot"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(0, e.currentTarget)} />
 						<div class="fb-overlay">
 							<div class="fb-bubble">
 								<div class="fb-name">Brian Schwabauer · just now</div>
@@ -106,7 +175,8 @@
 					<VideoPlayer
 						slug="2012-04-27_facebook"
 						title="Facebook in Real Life (2012)"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -159,13 +229,14 @@
 					<LazyMedia
 						src="2014-03-18_art_300_project-node-360_short_film_panorama_equirectangular.avif"
 						alt="NODE — equirectangular panorama still"
-						ratio="2 / 1" />
+						ratio="2 / 1"
+						onclick={(e) => gallery?.open(2, e.currentTarget)} />
 				</div>
 			</Reveal>
 
 			<Reveal variant="up" delay={100}>
 				<div class="node-bts">
-					<MediaGrid items={nodeBTS} min={220} gap={6} ratio="4 / 3" />
+					<Gallery items={nodeBTSImages} display="masonry-row" />
 				</div>
 			</Reveal>
 
@@ -211,11 +282,13 @@
 					<LazyMedia
 						src="2014-05-12_pickvid_promo_video-demo_on_phone.avif"
 						alt="PickVid demo on a phone"
-						ratio="9 / 16" />
+						ratio="9 / 16"
+						onclick={(e) => gallery?.open(3, e.currentTarget)} />
 					<LazyMedia
 						src="2014-05-12_pickvid_promo_video-logo_animation.avif"
 						alt="PickVid logo animation"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(4, e.currentTarget)} />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={130}>
@@ -223,7 +296,8 @@
 					<VideoPlayer
 						slug="2014-05-12_pickvid_promo_video"
 						title="PickVid (2014) — promo video / demo"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(5, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -249,15 +323,18 @@
 					<LazyMedia
 						src="2013-12-02_bear_bus_bash_flash_game_screen_recording-main_menu.avif"
 						alt="Bear Bus Bash — main menu"
-						ratio="4 / 3" />
+						ratio="4 / 3"
+						onclick={(e) => gallery?.open(6, e.currentTarget)} />
 					<LazyMedia
 						src="2013-12-02_bear_bus_bash_flash_game_screen_recording-gameplay_clip.avif"
 						alt="Bear Bus Bash — gameplay"
-						ratio="4 / 3" />
+						ratio="4 / 3"
+						onclick={(e) => gallery?.open(7, e.currentTarget)} />
 					<LazyMedia
 						src="2013-12-02_bear_bus_bash_flash_game_screen_recording-victory_results_page.avif"
 						alt="Bear Bus Bash — victory"
-						ratio="4 / 3" />
+						ratio="4 / 3"
+						onclick={(e) => gallery?.open(8, e.currentTarget)} />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={140}>
@@ -265,7 +342,8 @@
 					<VideoPlayer
 						slug="2013-12-02_bear_bus_bash_flash_game_screen_recording"
 						title="Bear Bus Bash (2013) — full gameplay recording"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(9, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -290,14 +368,16 @@
 						<LazyMedia
 							src="2015-04-12_split_life-sato_48-film_snapshot_1.avif"
 							alt="Split Life — perspective A"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(10, e.currentTarget)} />
 						<div class="split-tag a">PERSPECTIVE A · LEFT</div>
 					</div>
 					<div class="split-stage">
 						<LazyMedia
 							src="2015-04-12_split_life-sato_48-film_snapshot_2.avif"
 							alt="Split Life — perspective B"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(11, e.currentTarget)} />
 						<div class="split-tag b">PERSPECTIVE B · RIGHT</div>
 					</div>
 				</div>
@@ -307,7 +387,8 @@
 					<VideoPlayer
 						slug="2015-04-12_split_life-sato_48"
 						title="Split Life (2015) — 48-hour dual-perspective oner"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(12, e.currentTarget)} />
 				</div>
 			</Reveal>
 
@@ -355,7 +436,8 @@
 						<VideoPlayer
 							slug="2014-05-15_katie_bauers_breakup"
 							title="Katie Bauer's Breakup (2014)"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(13, e.currentTarget)} />
 					</article>
 					<article class="film-quad-card">
 						<h4>
@@ -368,7 +450,8 @@
 						<VideoPlayer
 							slug="2014-09-24_med_465-one_up"
 							title="One Up (2014)"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(14, e.currentTarget)} />
 					</article>
 					<article class="film-quad-card">
 						<h4>
@@ -381,7 +464,8 @@
 						<VideoPlayer
 							slug="2014-09-02_nice_to_meet_you"
 							title="Nice to Meet You (2014)"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(15, e.currentTarget)} />
 					</article>
 					<article class="film-quad-card">
 						<h4>
@@ -391,7 +475,11 @@
 							A quiet 2-character short for my directing class. A husband obsessed with
 							his career, a wife who wants him home. Conversation as conflict.
 						</p>
-						<VideoPlayer slug="2015-04-22_legacy" title="Legacy (2015)" ratio="16 / 9" />
+						<VideoPlayer
+							slug="2015-04-22_legacy"
+							title="Legacy (2015)"
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(16, e.currentTarget)} />
 					</article>
 				</div>
 			</Reveal>
@@ -399,7 +487,7 @@
 			<Reveal variant="up" delay={120}>
 				<div class="oneup-bts">
 					<div class="bts-eyebrow">ONE UP — BTS</div>
-					<MediaGrid items={oneUpBTS} min={170} gap={6} ratio="4 / 3" />
+					<Gallery items={oneUpBTSImages} display="masonry-row" />
 				</div>
 			</Reveal>
 		</div>
@@ -422,9 +510,22 @@
 			</Reveal>
 		</div>
 	</div>
+
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox">
+		{#snippet custom({ item })}
+			<div class="lb-video">
+				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
+			</div>
+		{/snippet}
+	</Gallery>
 </SectionShell>
 
 <style>
+	.lb-video {
+		width: min(1400px, 92vw);
+		aspect-ratio: 16 / 9;
+		max-height: calc(95svh - 8rem);
+	}
 	:global([data-theme='college']) {
 		background:
 			radial-gradient(ellipse at top, rgba(122, 77, 255, 0.1), transparent 50%),

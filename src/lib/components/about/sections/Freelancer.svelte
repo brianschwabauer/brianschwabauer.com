@@ -3,10 +3,9 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import VideoPlayer from '../primitives/VideoPlayer.svelte';
-	import MediaGrid from '../primitives/MediaGrid.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
-	import Expandable from '../primitives/Expandable.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem, imageItems } from '../media';
 
 	const reel = [
 		{
@@ -52,6 +51,20 @@
 		'2015-08-24_brian_demo_reel_2015-wedding_footage_of_bride_in_dress_smiling.avif',
 		'2015-08-24_brian_demo_reel_2015-wedding_footage_bride_walks_towards_smiling_groom.avif',
 	].map((src) => ({ src }));
+
+	const weddingImages: GalleryItem[] = imageItems(weddingShots);
+
+	// Standalone clickable LazyMedias in document order:
+	// 0: business card image, 1..N: reel cards
+	const sectionExtras: GalleryItem[] = [
+		imageItem(
+			'2013-03-12_brian_schwabauer_business_card.avif',
+			'The actual business card',
+			'The actual business card',
+		),
+		...reel.map((item) => imageItem(item.src, item.label, item.label)),
+	];
+	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="freelancer" year="2016" label="Freelancer" theme="hustle">
@@ -99,7 +112,8 @@
 				<LazyMedia
 					src="2013-03-12_brian_schwabauer_business_card.avif"
 					alt="The actual business card"
-					ratio="16 / 9" />
+					ratio="16 / 9"
+					onclick={(e) => gallery?.open(0, e.currentTarget)} />
 			</Reveal>
 		</div>
 
@@ -113,7 +127,11 @@
 				<div class="reel-grid">
 					{#each reel as item, i}
 						<figure class="reel-card" style:--i={i}>
-							<LazyMedia src={item.src} alt={item.label} ratio="16 / 9" />
+							<LazyMedia
+								src={item.src}
+								alt={item.label}
+								ratio="16 / 9"
+								onclick={(e) => gallery?.open(1 + i, e.currentTarget)} />
 							<figcaption>{item.label}</figcaption>
 						</figure>
 					{/each}
@@ -182,7 +200,7 @@
 				<h3 class="sub">Wedding films</h3>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<MediaGrid items={weddingShots} min={300} gap={10} ratio="16 / 9" />
+				<Gallery items={weddingImages} display="masonry-row" />
 			</Reveal>
 		</div>
 
@@ -212,6 +230,8 @@
 			</Reveal>
 		</div>
 	</div>
+
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" />
 </SectionShell>
 
 <style>

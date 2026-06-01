@@ -10,6 +10,9 @@
 		loop = false,
 		preload = 'metadata',
 		class: klass = '',
+		onclick = undefined as
+			| undefined
+			| ((event: MouseEvent & { currentTarget: HTMLButtonElement }) => void),
 	}: {
 		slug: string;
 		title?: string;
@@ -18,6 +21,10 @@
 		loop?: boolean;
 		preload?: 'none' | 'metadata' | 'auto';
 		class?: string;
+		/** When provided, clicking the poster fires this instead of starting inline playback —
+		 *  used to defer playback to a Gallery lightbox. The event's `currentTarget` is the
+		 *  poster button, useful for spotlight/shared-element transitions. */
+		onclick?: (event: MouseEvent & { currentTarget: HTMLButtonElement }) => void;
 	} = $props();
 
 	const src = $derived(hlsUrl(slug));
@@ -99,7 +106,11 @@
 		};
 	});
 
-	function start() {
+	function start(event: MouseEvent & { currentTarget: HTMLButtonElement }) {
+		if (onclick) {
+			onclick(event);
+			return;
+		}
 		started = true;
 		queueMicrotask(init);
 	}
@@ -292,7 +303,7 @@
 	}
 	.video-mount
 		:global(.video-js.vjs-bs .vjs-progress-control:hover .vjs-progress-holder) {
-			transition-duration: 0s;
+		transition-duration: 0s;
 		height: 8px;
 	}
 	.video-mount :global(.video-js.vjs-bs .vjs-play-progress) {

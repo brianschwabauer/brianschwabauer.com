@@ -2,8 +2,19 @@
 	import SectionShell from '../primitives/SectionShell.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem } from '../media';
 
 	const currentYear = new Date().getFullYear();
+
+	const heroShot: GalleryItem[] = [
+		imageItem(
+			'2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif',
+			'Show&Tour project detail page',
+			'Show&Tour · project detail page',
+		),
+	];
+	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell
@@ -89,12 +100,15 @@
 						src="2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif"
 						alt="Show&Tour project detail page"
 						ratio="16 / 10"
-						rounded={false} />
+						rounded={false}
+						onclick={(e) => gallery?.open(0, e.currentTarget)} />
 					<div class="shot-glow" aria-hidden="true"></div>
 				</div>
 			</Reveal>
 		</div>
 	</div>
+
+	<Gallery bind:this={gallery} items={heroShot} display="lightbox" />
 </SectionShell>
 
 <style>

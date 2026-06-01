@@ -4,6 +4,32 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem } from '../media';
+
+	const sectionExtras: GalleryItem[] = [
+		imageItem(
+			'2008-01-01_hunky_spunky_productions-website_design-home_page.jpg',
+			'HSP 2008 site',
+			'Hunky Spunky Productions · 2008',
+		),
+		imageItem(
+			'2009-01-01_hunky_spunky_productions-website_design-home_page.jpg',
+			'HSP 2009 site',
+			'Hunky Spunky Productions · 2009',
+		),
+		imageItem(
+			'2010-01-01_hunky_spunky_productions-website_design-home_page.avif',
+			'HSP 2010 site',
+			'Hunky Spunky Productions · 2010',
+		),
+		imageItem(
+			'2009-12-25_calamity-flash_website_screen_recording-main_menu.avif',
+			'Calamity Flash website screen recording',
+			'Calamity · Flash website · 2009',
+		),
+	];
+	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="taking-it-seriously" year="2009" label="First Websites" theme="flash">
@@ -58,7 +84,8 @@
 						<LazyMedia
 							src="2009-01-01_hunky_spunky_productions-website_design-home_page.jpg"
 							alt="HSP 2009 site"
-							ratio="4 / 3" />
+							ratio="4 / 3"
+							onclick={(e) => gallery?.open(1, e.currentTarget)} />
 					</div>
 					<div class="browser b2">
 						<div class="chrome">
@@ -72,7 +99,8 @@
 						<LazyMedia
 							src="2010-01-01_hunky_spunky_productions-website_design-home_page.avif"
 							alt="HSP 2010 site"
-							ratio="4 / 3" />
+							ratio="4 / 3"
+							onclick={(e) => gallery?.open(2, e.currentTarget)} />
 					</div>
 					<div class="browser b1">
 						<div class="chrome">
@@ -86,7 +114,8 @@
 						<LazyMedia
 							src="2008-01-01_hunky_spunky_productions-website_design-home_page.jpg"
 							alt="HSP 2008 site"
-							ratio="4 / 3" />
+							ratio="4 / 3"
+							onclick={(e) => gallery?.open(0, e.currentTarget)} />
 					</div>
 				</div>
 			</Reveal>
@@ -116,12 +145,15 @@
 						<LazyMedia
 							src="2009-12-25_calamity-flash_website_screen_recording-main_menu.avif"
 							alt="Calamity Flash website screen recording"
-							ratio="4 / 3" />
+							ratio="4 / 3"
+							onclick={(e) => gallery?.open(3, e.currentTarget)} />
 					</div>
 					<div class="flash-tag">FLASH · 2009</div>
 				</div>
 			</Reveal>
 		</div>
+
+		<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" />
 
 		<Reveal>
 			<Expandable label="The Flash-era stack, for the people who remember">

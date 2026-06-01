@@ -5,7 +5,8 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import VideoPlayer from '../primitives/VideoPlayer.svelte';
-	import MediaGrid from '../primitives/MediaGrid.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem, imageItems, videoItem } from '../media';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
@@ -106,6 +107,48 @@
 			caption: 'Shoe, gone',
 		},
 	];
+
+	const xyzImages = imageItems(xyzShots);
+	const vfxImages = imageItems(vfxTests);
+	const nuisanceImages = imageItems(nuisanceShots);
+
+	// All standalone images + inline videos in document order. The headless Gallery
+	// at the bottom of the section drives the lightbox for these.
+	const sectionExtras: GalleryItem[] = [
+		imageItem(
+			'2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen_2.avif',
+			'Brian floating in front of XYZ News greenscreen',
+			'XYZ News — the floating anchor bug',
+		),
+		imageItem(
+			'2008-01-06_pac-attack-pacman_eats_kevin_visual_effect.avif',
+			'Pacman eats Kevin',
+			'Pac-Attack — Pacman eats Kevin',
+		),
+		imageItem(
+			'2008-01-06_pac-attack-pacman_on_green_background_using_powerpoint_for_visual_effect.avif',
+			'Pacman on greenscreen — PowerPoint export',
+			'Step 1 — animated in PowerPoint on a green slide',
+		),
+		imageItem(
+			'2008-01-06_pac-attack-pacman_coming_out_of_tv.avif',
+			'Pacman keyed onto real footage',
+			'Step 2 — keyed onto real footage',
+		),
+		imageItem(
+			'2008-01-06_pac-attack-flash_game_screen_recording-pacman_eats_brians_floating_faces.avif',
+			'The companion Flash game',
+			'Step 3 — the companion Flash game',
+		),
+		videoItem('2008-01-06_pac-attack', 'Pac-Attack (2008) — full short'),
+		videoItem('2008-08-21_nuisance-b-gone', 'Nuisance-B-Gone — the fake infomercial'),
+		videoItem(
+			'2009-02-13_sideline_huddler',
+			"Sideline Huddler — Amanda's invention commercial",
+		),
+	];
+
+	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="green-screen" year="2007" label="Green Screen" theme="green">
@@ -148,7 +191,8 @@
 						src="2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen_2.avif"
 						alt="Brian floating in front of XYZ News greenscreen"
 						ratio="16 / 9"
-						class="key-img" />
+						class="key-img"
+						onclick={(e) => gallery?.open(0, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -159,7 +203,7 @@
 				<p>The funniest thing we'd ever made, by a country mile.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<MediaGrid items={xyzShots} min={200} gap={10} ratio="16 / 9" captions={true} />
+				<Gallery items={xyzImages} display="masonry-row" />
 			</Reveal>
 		</div>
 
@@ -221,7 +265,8 @@
 							<LazyMedia
 								src="2008-01-06_pac-attack-pacman_eats_kevin_visual_effect.avif"
 								alt="Pacman eats Kevin"
-								ratio="4 / 3" />
+								ratio="4 / 3"
+								onclick={(e) => gallery?.open(1, e.currentTarget)} />
 						</div>
 						<div class="arcade-base">
 							<span class="coin">INSERT COIN</span>
@@ -241,7 +286,8 @@
 						<LazyMedia
 							src="2008-01-06_pac-attack-pacman_on_green_background_using_powerpoint_for_visual_effect.avif"
 							alt="Pacman on greenscreen — PowerPoint export"
-							ratio="4 / 3" />
+							ratio="4 / 3"
+							onclick={(e) => gallery?.open(2, e.currentTarget)} />
 						<p>Animated in PowerPoint, exported to video, on a bright green slide.</p>
 					</div>
 					<div class="arrow" aria-hidden="true">→</div>
@@ -250,7 +296,8 @@
 						<LazyMedia
 							src="2008-01-06_pac-attack-pacman_coming_out_of_tv.avif"
 							alt="Pacman keyed onto real footage"
-							ratio="4 / 3" />
+							ratio="4 / 3"
+							onclick={(e) => gallery?.open(3, e.currentTarget)} />
 						<p>Key out the green in our editor. Pacman now lives in real footage.</p>
 					</div>
 					<div class="arrow" aria-hidden="true">→</div>
@@ -259,7 +306,8 @@
 						<LazyMedia
 							src="2008-01-06_pac-attack-flash_game_screen_recording-pacman_eats_brians_floating_faces.avif"
 							alt="The companion Flash game"
-							ratio="4 / 3" />
+							ratio="4 / 3"
+							onclick={(e) => gallery?.open(4, e.currentTarget)} />
 						<p>Bonus: a Flash game launched alongside the film. Eat the Brian-faces.</p>
 					</div>
 				</div>
@@ -270,7 +318,8 @@
 					<VideoPlayer
 						slug="2008-01-06_pac-attack"
 						title="Pac-Attack (2008) — full short"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={() => gallery?.open(5)} />
 				</div>
 			</Reveal>
 		</div>
@@ -286,7 +335,7 @@
 			</Reveal>
 
 			<Reveal variant="up" delay={100}>
-				<MediaGrid items={vfxTests} min={220} gap={10} ratio="16 / 9" captions={true} />
+				<Gallery items={vfxImages} display="masonry-row" />
 			</Reveal>
 		</div>
 
@@ -300,19 +349,15 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<MediaGrid
-					items={nuisanceShots}
-					min={240}
-					gap={10}
-					ratio="4 / 3"
-					captions={true} />
+				<Gallery items={nuisanceImages} display="masonry-row" />
 			</Reveal>
 			<Reveal variant="up" delay={150}>
 				<div class="inline-video">
 					<VideoPlayer
 						slug="2008-08-21_nuisance-b-gone"
 						title="Nuisance-B-Gone — the fake infomercial"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={() => gallery?.open(6)} />
 				</div>
 			</Reveal>
 		</div>
@@ -332,7 +377,8 @@
 					<VideoPlayer
 						slug="2009-02-13_sideline_huddler"
 						title="Sideline Huddler — Amanda's invention commercial"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={() => gallery?.open(7)} />
 				</div>
 			</Reveal>
 		</div>
@@ -355,9 +401,29 @@
 			</Expandable>
 		</Reveal>
 	</div>
+
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox">
+		{#snippet custom({ item })}
+			<div class="lb-video">
+				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
+			</div>
+		{/snippet}
+	</Gallery>
 </SectionShell>
 
 <style>
+	.lb-video {
+		width: min(1400px, 92vw);
+		aspect-ratio: 16 / 9;
+		max-height: calc(95svh - 8rem);
+	}
+	.lb-img {
+		display: block;
+		max-width: min(1400px, 92vw);
+		max-height: calc(95svh - 8rem);
+		object-fit: contain;
+		border-radius: 6px;
+	}
 	:global([data-theme='green']) {
 		background:
 			radial-gradient(ellipse at top, rgba(34, 255, 144, 0.06), transparent 50%),

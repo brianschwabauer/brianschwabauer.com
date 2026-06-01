@@ -5,7 +5,8 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import VideoPlayer from '../primitives/VideoPlayer.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
-	import MediaGrid from '../primitives/MediaGrid.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem, imageItems, videoItem } from '../media';
 
 	const flavaShots = [
 		'2010-03-25_do_da_flava_g-music_video_intro.avif',
@@ -31,6 +32,23 @@
 		'2010-08-10_you_derive_me_crazy-kevin_dancing_in_front_of_green_screen.avif',
 		'2010-08-10_you_derive_me_crazy-lavergne_dancing_in_front_of_green_screen.avif',
 	].map((src) => ({ src }));
+
+	// Standalone LazyMedias + inline VideoPlayers combined into one lightbox-only Gallery.
+	// Order matches document order: 2 Flashlight pair images, then 3 inline videos.
+	const sectionExtras: GalleryItem[] = [
+		imageItem('2007-08-26_flashlight-brian_plays_guitar.avif', 'Brian plays guitar'),
+		imageItem(
+			'2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif',
+			'Summoning a guitar via reversed footage',
+		),
+		videoItem('2007-08-26_flashlight', 'Flashlight (2007) — music video'),
+		videoItem('2010-03-25_do_da_flava_g', 'Do Da Flava G (2010) — music video'),
+		videoItem(
+			'2010-08-10_you_derive_me_crazy',
+			'You Derive Me Crazy (2010) — calculus parody music video',
+		),
+	];
+	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="music-videos" year="2009" label="Music Videos" theme="audio">
@@ -100,11 +118,13 @@
 						<LazyMedia
 							src="2007-08-26_flashlight-brian_plays_guitar.avif"
 							alt="Brian plays guitar"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(0, e.currentTarget)} />
 						<LazyMedia
 							src="2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif"
 							alt="Summoning a guitar via reversed footage"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(1, e.currentTarget)} />
 					</div>
 				</Reveal>
 				<Reveal variant="up" delay={160}>
@@ -112,7 +132,8 @@
 						<VideoPlayer
 							slug="2007-08-26_flashlight"
 							title="Flashlight (2007) — music video"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(2, e.currentTarget)} />
 					</div>
 				</Reveal>
 			</div>
@@ -139,14 +160,15 @@
 					</p>
 				</Reveal>
 				<Reveal variant="up" delay={120}>
-					<MediaGrid items={flavaShots} min={200} gap={6} ratio="4 / 3" />
+					<Gallery items={imageItems(flavaShots)} display="masonry-row" />
 				</Reveal>
 				<Reveal variant="up" delay={160}>
 					<div class="track-video">
 						<VideoPlayer
 							slug="2010-03-25_do_da_flava_g"
 							title="Do Da Flava G (2010) — music video"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(3, e.currentTarget)} />
 					</div>
 				</Reveal>
 			</div>
@@ -169,14 +191,15 @@
 					</p>
 				</Reveal>
 				<Reveal variant="up" delay={120}>
-					<MediaGrid items={calcShots} min={220} gap={6} ratio="16 / 9" />
+					<Gallery items={imageItems(calcShots)} display="masonry-row" />
 				</Reveal>
 				<Reveal variant="up" delay={160}>
 					<div class="track-video">
 						<VideoPlayer
 							slug="2010-08-10_you_derive_me_crazy"
 							title="You Derive Me Crazy (2010) — calculus parody music video"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(4, e.currentTarget)} />
 					</div>
 				</Reveal>
 			</div>
@@ -197,9 +220,22 @@
 			</Expandable>
 		</Reveal>
 	</div>
+
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox">
+		{#snippet custom({ item })}
+			<div class="lb-video">
+				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
+			</div>
+		{/snippet}
+	</Gallery>
 </SectionShell>
 
 <style>
+	.lb-video {
+		width: min(1400px, 92vw);
+		aspect-ratio: 16 / 9;
+		max-height: calc(95svh - 8rem);
+	}
 	:global([data-theme='audio']) {
 		background:
 			radial-gradient(ellipse at 80% 0%, rgba(255, 122, 208, 0.12), transparent 50%),

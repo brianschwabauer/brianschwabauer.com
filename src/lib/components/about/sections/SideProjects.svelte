@@ -3,6 +3,27 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem } from '../media';
+
+	const sectionExtras: GalleryItem[] = [
+		imageItem(
+			'2026-01-01_ghtui_screen_recording.avif',
+			'ghtui in action',
+			'ghtui · terminal UI for GitHub',
+		),
+		imageItem(
+			'2026-01-01_video_curator_screenshot-dashboard.avif',
+			'Video Curator dashboard',
+			'Video Curator · dashboard',
+		),
+		imageItem(
+			'2026-01-01_video_curator_screenshot-clips_page.avif',
+			'Video Curator clips page',
+			'Video Curator · clips page',
+		),
+	];
+	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="side-projects" year="Now" label="Side projects" theme="side">
@@ -59,7 +80,8 @@
 						<LazyMedia
 							src="2026-01-01_ghtui_screen_recording.avif"
 							alt="ghtui in action"
-							ratio="16 / 10" />
+							ratio="16 / 10"
+							onclick={(e) => gallery?.open(0, e.currentTarget)} />
 					</div>
 				</article>
 			</Reveal>
@@ -98,11 +120,13 @@
 							<LazyMedia
 								src="2026-01-01_video_curator_screenshot-dashboard.avif"
 								alt="Video Curator dashboard"
-								ratio="16 / 10" />
+								ratio="16 / 10"
+								onclick={(e) => gallery?.open(1, e.currentTarget)} />
 							<LazyMedia
 								src="2026-01-01_video_curator_screenshot-clips_page.avif"
 								alt="Video Curator clips page"
-								ratio="16 / 10" />
+								ratio="16 / 10"
+								onclick={(e) => gallery?.open(2, e.currentTarget)} />
 						</div>
 					</div>
 				</article>
@@ -160,6 +184,8 @@
 			</Reveal>
 		</div>
 	</div>
+
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" />
 </SectionShell>
 
 <style>
