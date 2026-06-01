@@ -3,7 +3,9 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import MediaGrid from '../primitives/MediaGrid.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem, imageItems } from '../media';
+
 	import Expandable from '../primitives/Expandable.svelte';
 
 	const dashboardMockups = [
@@ -109,6 +111,15 @@
 			text: 'Unlimited property sites, deliveries, and clients. No per-seat math.',
 		},
 	];
+
+	const heroShot: GalleryItem[] = [
+		imageItem(
+			'2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif',
+			'Show&Tour — project detail page',
+			'Show&Tour · project detail page',
+		),
+	];
+	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="showandtour" year="2019" label="Show&Tour" theme="snt">
@@ -169,7 +180,8 @@
 					alt="Show&Tour — project detail page"
 					ratio="16 / 9"
 					rounded={false}
-					class="hero-img" />
+					class="hero-img"
+					onclick={(e) => gallery?.open(0, e.currentTarget)} />
 				<div class="hero-glow"></div>
 			</div>
 		</Reveal>
@@ -199,12 +211,7 @@
 				<p>Where photographers run their business day to day.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<MediaGrid
-					items={dashboardMockups}
-					min={260}
-					gap={8}
-					ratio="16 / 9"
-					captions={true} />
+				<Gallery items={imageItems(dashboardMockups)} display="masonry-row" />
 			</Reveal>
 		</div>
 
@@ -214,12 +221,7 @@
 				<p>What the photographer's clients actually see.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<MediaGrid
-					items={deliveryPages}
-					min={300}
-					gap={8}
-					ratio="16 / 9"
-					captions={true} />
+				<Gallery items={imageItems(deliveryPages)} display="masonry-row" />
 			</Reveal>
 		</div>
 
@@ -228,10 +230,12 @@
 				<h3 class="sub">Brand · the rest</h3>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<MediaGrid items={brand} min={220} gap={8} ratio="4 / 3" captions={true} />
+				<Gallery items={imageItems(brand)} display="masonry-row" />
 			</Reveal>
 		</div>
 	</div>
+
+	<Gallery bind:this={gallery} items={heroShot} display="lightbox" />
 </SectionShell>
 
 <style>

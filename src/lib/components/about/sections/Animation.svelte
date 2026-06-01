@@ -5,10 +5,10 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import VideoPlayer from '../primitives/VideoPlayer.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
-	import MediaGrid from '../primitives/MediaGrid.svelte';
 	import PinScrub from '../primitives/PinScrub.svelte';
 	import ScrubVideo from '../primitives/ScrubVideo.svelte';
-	import { media } from '../media';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { media, imageItem, imageItems, videoItem } from '../media';
 
 	const calamityShots = [
 		'2009-12-25_calamity-airplane_fly_through_clouds.avif',
@@ -32,6 +32,64 @@
 		'2011-03-01_exposure-behind_the_scenes-brian_runs_backwards_with_camera_filming.avif',
 		'2011-03-01_exposure-behind_the_scenes-wes_dumps_water_on_himself_for_rainy_scene.avif',
 	].map((src) => ({ src }));
+
+	const calamityImages: GalleryItem[] = imageItems(calamityShots);
+	const exposureImages: GalleryItem[] = imageItems(exposureShots);
+
+	// Standalone clickable LazyMedias + inline VideoPlayers in document order:
+	// 0: Calamity BTS - filming lego city (ladder)
+	// 1: Calamity BTS - timelapse building city
+	// 2: Calamity BTS - greenscreen lego
+	// 3: Calamity VideoPlayer
+	// 4: Exposure VideoPlayer
+	// 5: iPrez set jib shot LazyMedia
+	// 6: iPrez row - Brian on greenscreen
+	// 7: iPrez row - Kevin on greenscreen
+	// 8: iPrez row - Kevin in final cut
+	// 9: iPrez VideoPlayer
+	// 10: XYZ News Special Report (inside <details>)
+	const sectionExtras: GalleryItem[] = [
+		imageItem(
+			'2009-12-25_calamity-behind_the_scenes-filming_lego_city_with_ladder_and_light.jpg',
+			'Filming the lego city from a ladder',
+			'Filming the lego city from a ladder',
+		),
+		imageItem(
+			'2009-12-25_calamity-behind_the_scenes_timelapse_of_building_lego_buildings.avif',
+			'Timelapse of building the lego city',
+			'Building the city — timelapse',
+		),
+		imageItem(
+			'2009-12-25_calamity-lego_plan_with_green_screen_background.avif',
+			'A lego scene in front of a greenscreen',
+			'Some shots used greenscreen instead of roto',
+		),
+		videoItem('2009-12-25_calamity', 'Calamity (2009) — full stop-motion short'),
+		videoItem('2011-03-01_exposure', 'Exposure (2011) — the camera-robot short'),
+		imageItem(
+			'2011-08-28_xyz_news-iprez-camera_jib_shot_of_studio.avif',
+			'iPrez 3D set jib shot',
+			'iPrez 3D set jib shot',
+		),
+		imageItem(
+			'2011-08-28_xyz_news-iprez-brian_as_new_anchor_in_front_of_green_screen_behind_the_scenes.avif',
+			'Brian on greenscreen',
+			'Brian on greenscreen',
+		),
+		imageItem(
+			'2011-08-28_xyz_news-iprez-kevin_as_weather_man_on_green_screen_raw_shot.avif',
+			'Kevin on greenscreen',
+			'Kevin on greenscreen',
+		),
+		imageItem(
+			'2011-08-28_xyz_news-iprez-film_snapshot_of_kevin_as_news_anchor.avif',
+			'Kevin in the final cut',
+			'Kevin in the final cut',
+		),
+		videoItem('2011-08-28_xyz_news-iprez', 'XYZ News — iPrez (2011)'),
+		videoItem('2011-03-18_xyz_news_special_report', 'XYZ News Special Report (2011)'),
+	];
+	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="animation" year="2010" label="Animation & VFX" theme="vfx">
@@ -81,14 +139,15 @@
 					<LazyMedia
 						src="2009-12-25_calamity-behind_the_scenes-filming_lego_city_with_ladder_and_light.jpg"
 						alt="Filming the lego city from a ladder"
-						ratio="4 / 3" />
+						ratio="4 / 3"
+						onclick={(e) => gallery?.open(0, e.currentTarget)} />
 				</Reveal>
 			</div>
 
 			<Reveal variant="up" delay={100}>
 				<div class="storyboard">
 					<div class="story-eyebrow">FROM THE SHOT LIST</div>
-					<MediaGrid items={calamityShots} min={220} gap={6} ratio="16 / 9" />
+					<Gallery items={calamityImages} display="masonry-row" />
 				</div>
 			</Reveal>
 
@@ -98,12 +157,14 @@
 						src="2009-12-25_calamity-behind_the_scenes_timelapse_of_building_lego_buildings.avif"
 						alt="Timelapse of building the lego city"
 						ratio="16 / 9"
-						caption="Building the city — timelapse" />
+						caption="Building the city — timelapse"
+						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 					<LazyMedia
 						src="2009-12-25_calamity-lego_plan_with_green_screen_background.avif"
 						alt="A lego scene in front of a greenscreen"
 						ratio="16 / 9"
-						caption="Some shots used greenscreen instead of roto" />
+						caption="Some shots used greenscreen instead of roto"
+						onclick={(e) => gallery?.open(2, e.currentTarget)} />
 				</div>
 			</Reveal>
 
@@ -112,7 +173,8 @@
 					<VideoPlayer
 						slug="2009-12-25_calamity"
 						title="Calamity (2009) — full stop-motion short"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={() => gallery?.open(3)} />
 				</div>
 			</Reveal>
 		</div>
@@ -158,7 +220,7 @@
 
 			<Reveal variant="up" delay={100}>
 				<div class="exposure-grid">
-					<MediaGrid items={exposureShots} min={220} gap={6} ratio="16 / 9" />
+					<Gallery items={exposureImages} display="masonry-row" />
 				</div>
 			</Reveal>
 
@@ -167,7 +229,8 @@
 					<VideoPlayer
 						slug="2011-03-01_exposure"
 						title="Exposure (2011) — the camera-robot short"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={() => gallery?.open(4)} />
 				</div>
 			</Reveal>
 
@@ -217,7 +280,8 @@
 					<LazyMedia
 						src="2011-08-28_xyz_news-iprez-camera_jib_shot_of_studio.avif"
 						alt="iPrez 3D set jib shot"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(5, e.currentTarget)} />
 				</Reveal>
 			</div>
 
@@ -226,15 +290,18 @@
 					<LazyMedia
 						src="2011-08-28_xyz_news-iprez-brian_as_new_anchor_in_front_of_green_screen_behind_the_scenes.avif"
 						alt="Brian on greenscreen"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(6, e.currentTarget)} />
 					<LazyMedia
 						src="2011-08-28_xyz_news-iprez-kevin_as_weather_man_on_green_screen_raw_shot.avif"
 						alt="Kevin on greenscreen"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(7, e.currentTarget)} />
 					<LazyMedia
 						src="2011-08-28_xyz_news-iprez-film_snapshot_of_kevin_as_news_anchor.avif"
 						alt="Kevin in the final cut"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(8, e.currentTarget)} />
 				</div>
 			</Reveal>
 
@@ -243,7 +310,8 @@
 					<VideoPlayer
 						slug="2011-08-28_xyz_news-iprez"
 						title="XYZ News — iPrez (2011)"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={() => gallery?.open(9)} />
 				</div>
 			</Reveal>
 
@@ -254,15 +322,36 @@
 						<VideoPlayer
 							slug="2011-03-18_xyz_news_special_report"
 							title="XYZ News Special Report (2011)"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={() => gallery?.open(10)} />
 					</div>
 				</details>
 			</Reveal>
 		</div>
 	</div>
+
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox">
+		{#snippet custom({ item })}
+			<div class="lb-video">
+				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
+			</div>
+		{/snippet}
+	</Gallery>
 </SectionShell>
 
 <style>
+	.lb-video {
+		width: min(1400px, 92vw);
+		aspect-ratio: 16 / 9;
+		max-height: calc(95svh - 8rem);
+	}
+	.lb-img {
+		display: block;
+		max-width: min(1400px, 92vw);
+		max-height: calc(95svh - 8rem);
+		object-fit: contain;
+		border-radius: 6px;
+	}
 	:global([data-theme='vfx']) {
 		background:
 			radial-gradient(circle at 20% 0%, rgba(108, 99, 255, 0.15), transparent 50%),

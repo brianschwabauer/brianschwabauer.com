@@ -3,10 +3,9 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import VideoPlayer from '../primitives/VideoPlayer.svelte';
-	import MediaGrid from '../primitives/MediaGrid.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
-	import Expandable from '../primitives/Expandable.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem, imageItems } from '../media';
 
 	const towerShots = [
 		'2016-01-01_tower_of_the_americas_panorama-equirectangular.avif',
@@ -44,6 +43,28 @@
 	].map((src) => ({ src }));
 
 	const scrambledLetters = ['S', 'C', 'R', 'M', 'B', 'L', 'D'];
+
+	const towerImages: GalleryItem[] = imageItems(towerShots);
+	const engagementImages: GalleryItem[] = imageItems(engagementShots);
+	const markableImages: GalleryItem[] = imageItems(markableShots);
+
+	// Standalone clickable LazyMedias in document order:
+	// 0: Tower BTS camera shot, 1: Tower demo on tablet shot,
+	// 2..7: 6 tapnotion phone mockups
+	const sectionExtras: GalleryItem[] = [
+		imageItem(
+			'2016-06-08_tower_of_the_americas_virtual_tour_app-panorama_shoot_behind_the_scenes-brian_with_camera.avif',
+			'Brian shooting the panorama',
+			'Shooting the panorama on the observation deck',
+		),
+		imageItem(
+			'2016-06-30_tower_of_the_americas_virtual_tour_app-demo_video_on_tablet-rotate_tablet_360.avif',
+			'Demo on the tablet',
+			'Demoed on the tablet',
+		),
+		...tapnotionShots.map((s) => imageItem(s.src, 'TapNotion screenshot')),
+	];
+	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="entrepreneurship" year="2017" label="Entrepreneurship" theme="entr">
@@ -95,7 +116,7 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<MediaGrid items={towerShots} min={200} gap={6} ratio="16 / 9" />
+				<Gallery items={towerImages} display="masonry-row" />
 			</Reveal>
 			<Reveal variant="up" delay={150}>
 				<div class="bts-row">
@@ -103,12 +124,14 @@
 						src="2016-06-08_tower_of_the_americas_virtual_tour_app-panorama_shoot_behind_the_scenes-brian_with_camera.avif"
 						alt="Brian shooting the panorama"
 						ratio="16 / 9"
-						caption="Shooting the panorama on the observation deck" />
+						caption="Shooting the panorama on the observation deck"
+						onclick={(e) => gallery?.open(0, e.currentTarget)} />
 					<LazyMedia
 						src="2016-06-30_tower_of_the_americas_virtual_tour_app-demo_video_on_tablet-rotate_tablet_360.avif"
 						alt="Demo on the tablet"
 						ratio="16 / 9"
-						caption="Demoed on the tablet" />
+						caption="Demoed on the tablet"
+						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -131,7 +154,11 @@
 				<div class="phone-grid">
 					{#each tapnotionShots as item, i}
 						<div class="phone-mini" style:--i={i}>
-							<LazyMedia src={item.src} alt="" ratio="9 / 16" />
+							<LazyMedia
+								src={item.src}
+								alt=""
+								ratio="9 / 16"
+								onclick={(e) => gallery?.open(2 + i, e.currentTarget)} />
 						</div>
 					{/each}
 				</div>
@@ -152,7 +179,7 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<MediaGrid items={engagementShots} min={220} gap={6} ratio="16 / 9" />
+				<Gallery items={engagementImages} display="masonry-row" />
 			</Reveal>
 			<Reveal variant="up" delay={150}>
 				<ArchiveFrame
@@ -210,7 +237,7 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<MediaGrid items={markableShots} min={220} gap={6} ratio="4 / 3" />
+				<Gallery items={markableImages} display="masonry-row" />
 			</Reveal>
 		</div>
 
@@ -246,6 +273,8 @@
 			</Reveal>
 		</div>
 	</div>
+
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" />
 </SectionShell>
 
 <style>

@@ -6,17 +6,22 @@
 		height = 200,
 		speed = 60,
 		direction = 'left',
+		onframeclick = undefined as
+			| ((detail: { index: number; element: HTMLButtonElement }) => void)
+			| undefined,
 	}: {
 		images: Array<string | { src: string; caption?: string }>;
 		height?: number;
 		speed?: number;
 		direction?: 'left' | 'right';
+		onframeclick?: (detail: { index: number; element: HTMLButtonElement }) => void;
 	} = $props();
 
 	const normalized = $derived(
 		images.map((i) => (typeof i === 'string' ? { src: i } : i)),
 	);
 	const doubled = $derived([...normalized, ...normalized]);
+	const clickable = $derived(typeof onframeclick === 'function');
 </script>
 
 <div
@@ -29,14 +34,30 @@
 	</div>
 	<div class="track">
 		{#each doubled as item, i (i)}
-			<figure class="frame">
-				<img
-					src={item.src.startsWith('http') ? item.src : media(item.src)}
-					alt={item.caption ?? ''}
-					loading="lazy"
-					decoding="async" />
-				{#if item.caption}<figcaption>{item.caption}</figcaption>{/if}
-			</figure>
+			{@const realIndex = i % normalized.length}
+			{#if clickable}
+				<button
+					class="frame frame-button"
+					type="button"
+					aria-label={item.caption ?? 'Open image'}
+					onclick={(e) => onframeclick?.({ index: realIndex, element: e.currentTarget })}>
+					<img
+						src={item.src.startsWith('http') ? item.src : media(item.src)}
+						alt={item.caption ?? ''}
+						loading="lazy"
+						decoding="async" />
+					{#if item.caption}<span class="caption">{item.caption}</span>{/if}
+				</button>
+			{:else}
+				<figure class="frame">
+					<img
+						src={item.src.startsWith('http') ? item.src : media(item.src)}
+						alt={item.caption ?? ''}
+						loading="lazy"
+						decoding="async" />
+					{#if item.caption}<figcaption>{item.caption}</figcaption>{/if}
+				</figure>
+			{/if}
 		{/each}
 	</div>
 	<div class="perforations bottom" aria-hidden="true">
@@ -104,7 +125,25 @@
 		display: block;
 		object-fit: cover;
 	}
-	figcaption {
+	.frame-button {
+		appearance: none;
+		padding: 0;
+		font: inherit;
+		color: inherit;
+		cursor: pointer;
+		transition: transform 200ms ease;
+	}
+	.frame-button:hover {
+		transition-duration: 0s;
+		transform: scale(1.04);
+		z-index: 2;
+	}
+	.frame-button:focus-visible {
+		outline: 2px solid #00e0ff;
+		outline-offset: 2px;
+	}
+	figcaption,
+	.frame .caption {
 		position: absolute;
 		bottom: 0;
 		left: 0;
@@ -117,7 +156,8 @@
 		opacity: 0;
 		transition: opacity 200ms ease;
 	}
-	.frame:hover figcaption {
+	.frame:hover figcaption,
+	.frame:hover .caption {
 		transition-duration: 0s;
 		opacity: 1;
 	}

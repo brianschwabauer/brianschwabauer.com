@@ -4,8 +4,9 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import VideoPlayer from '../primitives/VideoPlayer.svelte';
-	import MediaGrid from '../primitives/MediaGrid.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem, imageItems, videoItem } from '../media';
 
 	const spunkstersPhotos = [
 		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_01.avif',
@@ -26,6 +27,44 @@
 		{ from: '+1 (816) ••• 5621', text: 'Brian and Kevin forever ❤️' },
 		{ from: '+1 (913) ••• 9088', text: 'Oscars who?' },
 	];
+
+	// Standalone LazyMedias + inline VideoPlayers combined into one lightbox-only Gallery.
+	// Order matches document order:
+	//   0: Spunksters logo image
+	//   1: The Spunksters awards show video
+	//   2: Kevin (Bubbly Bros) image
+	//   3: Bubbly Bros video
+	//   4: Power Rangers III logo image
+	//   5: Kevin visits Zordon's grave image
+	//   6: Power Rangers III trailer video
+	const sectionExtras: GalleryItem[] = [
+		imageItem(
+			'2013-06-22_the_spunksters-logo_animation.avif',
+			'The Spunksters logo animation',
+		),
+		videoItem(
+			'2013-06-22_the_spunksters',
+			'The Spunksters (2013) — the live awards show',
+		),
+		imageItem(
+			'2013-06-22_bubbly_bros-kevin_jumps_up_and_down.avif',
+			'Kevin from Bubbly Bros',
+		),
+		videoItem('2013-06-22_bubbly_bros', 'Bubbly Bros (2013) — photo music video'),
+		imageItem(
+			'2013-06-22_power_rangers_iii_trailer-logo_animation.avif',
+			'Power Rangers III logo animation',
+		),
+		imageItem(
+			'2013-06-22_power_rangers_iii_trailer-kevin_visits_zordons_grave.avif',
+			"Kevin visits Zordon's grave",
+		),
+		videoItem(
+			'2013-06-22_power_rangers_iii_trailer',
+			'Power Rangers 360 III — fake trailer (2013)',
+		),
+	];
+	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="spunksters" year="2013" label="The Spunksters" theme="spunksters">
@@ -62,14 +101,16 @@
 				<LazyMedia
 					src="2013-06-22_the_spunksters-logo_animation.avif"
 					alt="The Spunksters logo animation"
-					ratio="16 / 9" />
+					ratio="16 / 9"
+					onclick={(e) => gallery?.open(0, e.currentTarget)} />
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="inline-video">
 					<VideoPlayer
 						slug="2013-06-22_the_spunksters"
 						title="The Spunksters (2013) — the live awards show"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -115,7 +156,7 @@
 		<Reveal variant="up">
 			<div class="bts">
 				<div class="bts-eyebrow">BEHIND THE SCENES</div>
-				<MediaGrid items={spunkstersPhotos} min={200} gap={6} ratio="4 / 3" />
+				<Gallery items={imageItems(spunkstersPhotos)} display="masonry-row" />
 			</div>
 		</Reveal>
 
@@ -124,7 +165,8 @@
 				<LazyMedia
 					src="2013-06-22_bubbly_bros-kevin_jumps_up_and_down.avif"
 					alt="Kevin from Bubbly Bros"
-					ratio="4 / 3" />
+					ratio="4 / 3"
+					onclick={(e) => gallery?.open(2, e.currentTarget)} />
 			</Reveal>
 			<Reveal>
 				<h3 class="sub">Bubbly Bros — the unofficial encore</h3>
@@ -142,7 +184,8 @@
 					<VideoPlayer
 						slug="2013-06-22_bubbly_bros"
 						title="Bubbly Bros (2013) — photo music video"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(3, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -163,11 +206,13 @@
 					<LazyMedia
 						src="2013-06-22_power_rangers_iii_trailer-logo_animation.avif"
 						alt="Power Rangers III logo animation"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(4, e.currentTarget)} />
 					<LazyMedia
 						src="2013-06-22_power_rangers_iii_trailer-kevin_visits_zordons_grave.avif"
 						alt="Kevin visits Zordon's grave"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(5, e.currentTarget)} />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={140}>
@@ -175,7 +220,8 @@
 					<VideoPlayer
 						slug="2013-06-22_power_rangers_iii_trailer"
 						title="Power Rangers 360 III — fake trailer (2013)"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(6, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -191,9 +237,22 @@
 			</div>
 		</Reveal>
 	</div>
+
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox">
+		{#snippet custom({ item })}
+			<div class="lb-video">
+				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
+			</div>
+		{/snippet}
+	</Gallery>
 </SectionShell>
 
 <style>
+	.lb-video {
+		width: min(1400px, 92vw);
+		aspect-ratio: 16 / 9;
+		max-height: calc(95svh - 8rem);
+	}
 	:global([data-theme='spunksters']) {
 		background:
 			radial-gradient(ellipse at top, rgba(255, 217, 52, 0.06), transparent 50%),

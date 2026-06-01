@@ -4,8 +4,9 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
-	import MediaGrid from '../primitives/MediaGrid.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem, imageItems } from '../media';
 
 	const pr1Shots = [
 		{
@@ -111,6 +112,31 @@
 			caption: 'Landing',
 		},
 	];
+
+	const pr1ReelImages: GalleryItem[] = imageItems(pr1Shots);
+	const pr2BTSImages: GalleryItem[] = imageItems(pr2BTS);
+	const pr2StillImages: GalleryItem[] = imageItems(pr2Stills);
+
+	const sectionExtras: GalleryItem[] = [
+		imageItem(
+			'2007-06-16_power_rangers_360-premiere-power_rangers_group_photo_1.jpg',
+			'The Power Rangers cast',
+			'Premiere · summer 2007 · backyard cinema · ~40 friends and family',
+		),
+		imageItem(
+			'2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif',
+			'The PR360 II premiere projector setup',
+			'PR360 II premiere · backyard projector setup',
+		),
+		imageItem(
+			'2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg',
+			'Brian and Kevin at the PR360 II premiere',
+			'Brian and Kevin at the PR360 II premiere',
+		),
+	];
+
+	let reelGallery = $state<ReturnType<typeof Gallery>>();
+	let extrasGallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="power-rangers" year="2008" label="Power Rangers 360" theme="ranger">
@@ -177,7 +203,8 @@
 					<LazyMedia
 						src="2007-06-16_power_rangers_360-premiere-power_rangers_group_photo_1.jpg"
 						alt="The Power Rangers cast"
-						ratio="4 / 3" />
+						ratio="4 / 3"
+						onclick={(e) => extrasGallery?.open(0, e.currentTarget)} />
 					<div class="premiere-cap">
 						Premiere · summer 2007 · backyard cinema · ~40 friends and family
 					</div>
@@ -187,7 +214,11 @@
 
 		<Reveal variant="up" delay={120}>
 			<div class="pr1-reel-wrap">
-				<FilmReel images={pr1Shots} height={160} speed={70} />
+				<FilmReel
+					images={pr1Shots}
+					height={160}
+					speed={70}
+					onframeclick={({ index, element }) => reelGallery?.open(index, element)} />
 				<div class="film-meta">FROM POWER RANGERS 360 · 2007</div>
 			</div>
 		</Reveal>
@@ -220,14 +251,14 @@
 			<Reveal variant="up" delay={100}>
 				<div class="bts-strip">
 					<div class="bts-eyebrow">BEHIND THE SCENES</div>
-					<MediaGrid items={pr2BTS} min={220} gap={8} ratio="16 / 9" captions={true} />
+					<Gallery items={pr2BTSImages} display="masonry-row" />
 				</div>
 			</Reveal>
 
 			<Reveal variant="up" delay={150}>
 				<div class="bts-strip">
 					<div class="bts-eyebrow">FROM THE FILM</div>
-					<MediaGrid items={pr2Stills} min={240} gap={8} ratio="16 / 9" captions={true} />
+					<Gallery items={pr2StillImages} display="masonry-row" />
 				</div>
 			</Reveal>
 
@@ -236,13 +267,15 @@
 					<LazyMedia
 						src="2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif"
 						alt="The PR360 II premiere projector setup"
-						ratio="4 / 3" />
+						ratio="4 / 3"
+						onclick={(e) => extrasGallery?.open(1, e.currentTarget)} />
 				</Reveal>
 				<Reveal variant="right" delay={100}>
 					<LazyMedia
 						src="2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg"
 						alt="Brian and Kevin at the PR360 II premiere"
-						ratio="4 / 3" />
+						ratio="4 / 3"
+						onclick={(e) => extrasGallery?.open(2, e.currentTarget)} />
 				</Reveal>
 			</div>
 		</div>
@@ -266,6 +299,10 @@
 			</Expandable>
 		</Reveal>
 	</div>
+
+	<Gallery bind:this={reelGallery} items={pr1ReelImages} display="lightbox" />
+
+	<Gallery bind:this={extrasGallery} items={sectionExtras} display="lightbox" />
 </SectionShell>
 
 <style>

@@ -4,8 +4,9 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import VideoPlayer from '../primitives/VideoPlayer.svelte';
-	import MediaGrid from '../primitives/MediaGrid.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem, imageItems, videoItem } from '../media';
 
 	const filmShots = [
 		'2014-06-04_what_makes_us_human-dramatic_dolly_shot_in_library.avif',
@@ -66,6 +67,15 @@
 		'2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-brian_schwabauer_close_up.jpg',
 		'2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-what_makes_us_human_crew_group_photo.avif',
 	].map((src) => ({ src }));
+
+	// Only the full thesis film is rendered inline — defer playback to a Gallery lightbox.
+	const sectionExtras: GalleryItem[] = [
+		videoItem(
+			'2014-06-04_what_makes_us_human',
+			'What Makes Us Human (2014) — full senior thesis short',
+		),
+	];
+	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="what-makes-us-human" year="2015" label="Senior Thesis" theme="thesis">
@@ -132,7 +142,7 @@
 		<div class="film-grid">
 			<Reveal variant="up">
 				<div class="eyebrow">FROM THE FILM</div>
-				<MediaGrid items={filmShots} min={240} gap={6} ratio="16 / 9" />
+				<Gallery items={imageItems(filmShots)} display="masonry-row" />
 			</Reveal>
 			<Reveal variant="up" delay={120}>
 				<div class="full-film">
@@ -145,7 +155,8 @@
 					<VideoPlayer
 						slug="2014-06-04_what_makes_us_human"
 						title="What Makes Us Human (2014) — full senior thesis short"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(0, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -153,7 +164,7 @@
 		<div class="concept-grid">
 			<Reveal variant="up">
 				<div class="eyebrow">CONCEPT ART · PRE-PRODUCTION</div>
-				<MediaGrid items={conceptArt} min={220} gap={8} ratio="16 / 9" captions={true} />
+				<Gallery items={imageItems(conceptArt)} display="masonry-row" />
 			</Reveal>
 		</div>
 
@@ -190,7 +201,7 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<MediaGrid items={btsPhotos} min={180} gap={4} ratio="16 / 9" />
+				<Gallery items={imageItems(btsPhotos)} display="masonry-row" />
 			</Reveal>
 		</div>
 
@@ -204,13 +215,33 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<MediaGrid items={premierePhotos} min={240} gap={6} ratio="16 / 9" />
+				<Gallery items={imageItems(premierePhotos)} display="masonry-row" />
 			</Reveal>
 		</div>
 	</div>
+
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox">
+		{#snippet custom({ item })}
+			<div class="lb-video">
+				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
+			</div>
+		{/snippet}
+	</Gallery>
 </SectionShell>
 
 <style>
+	.lb-video {
+		width: min(1400px, 92vw);
+		aspect-ratio: 16 / 9;
+		max-height: calc(95svh - 8rem);
+	}
+	.lb-img {
+		display: block;
+		max-width: min(1400px, 92vw);
+		max-height: calc(95svh - 8rem);
+		object-fit: contain;
+		border-radius: 6px;
+	}
 	:global([data-theme='thesis']) {
 		background:
 			radial-gradient(ellipse at top, rgba(0, 242, 195, 0.06), transparent 50%),

@@ -4,9 +4,9 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import VideoPlayer from '../primitives/VideoPlayer.svelte';
-	import MediaGrid from '../primitives/MediaGrid.svelte';
-	import Expandable from '../primitives/Expandable.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { imageItem, imageItems, videoItem } from '../media';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
@@ -78,6 +78,64 @@
 		src: `2011-04-14_ksms_block_party_live_show_${String(i + 1).padStart(3, '0')}.jpg`,
 		caption: `Block Party · live show #${i + 1}`,
 	}));
+
+	const reelImages: GalleryItem[] = imageItems(festPhotos);
+	const yardSaleImages: GalleryItem[] = imageItems(yardSale);
+	const liveBroadcastImages: GalleryItem[] = imageItems(liveBroadcastShots);
+	const blockPartyImages: GalleryItem[] = imageItems(blockPartyPhotos);
+
+	let reelGallery = $state<ReturnType<typeof Gallery>>();
+
+	// Standalone clickable LazyMedias + inline VideoPlayers in document order.
+	// 0: Yard Sale inline video
+	// 1: Austin Fender (inside <details>)
+	// 2: KSMS site cr-card LazyMedia
+	// 3: Scott Hirons game cr-card LazyMedia
+	// 4: Hall View cr-card LazyMedia
+	// 5: live broadcast inline video
+	// 6: trick-shot LazyMedia
+	// 7: Block Party FULL SHOW VideoPlayer
+	// 8: Block Party TRAILER VideoPlayer
+	// 9: Block Party PROMO VideoPlayer
+	// 10: A MidWestSide Story VideoPlayer
+	// 11: Long Time No See VideoPlayer
+	const sectionExtras: GalleryItem[] = [
+		videoItem('2009-03-22_yard_sale', 'Yard Sale (2009) — the stuffed-animal short'),
+		videoItem('2008-03-19_austin_fender', 'Austin Fender (2008)'),
+		imageItem(
+			'2010-07-30_ksms_flash_website_large_version_screen_recording-main_menu.avif',
+			'KSMS Flash site (later version)',
+			'The KSMS website (Flash version)',
+		),
+		imageItem(
+			'2010-01-01_scott_hirons_experience_flash_game_screen_recording-gameplay.avif',
+			'Scott Hirons Experience gameplay',
+			'Scott Hirons Experience — Flash game',
+		),
+		imageItem(
+			'2010-08-18_ksms_hallview_full_page_screen_recording.avif',
+			'KSMS Hall View screen recording',
+			'KSMS Hall View — school panorama viewer',
+		),
+		videoItem(
+			'2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip',
+			'KSMS live broadcast · basketball vs SM-NW (2011) — broadcast opener',
+		),
+		imageItem(
+			'2011-04-14_this_is_ksms-basketball_trick_shot_with_vfx.avif',
+			'The KSMS trick shot',
+			'The KSMS trick shot',
+		),
+		videoItem('2011-04-14_ksms_block_party', 'KSMS Block Party (2011) — full live show'),
+		videoItem('2011-04-15_block_party_trailer', 'Block Party trailer (2011)'),
+		videoItem(
+			'2011-04-14_this_is_ksms_basketball_shot',
+			'This is KSMS — trick-shot promo (2011)',
+		),
+		videoItem('2010-03-20_a_midwestside_story', 'A MidWestSide Story (2010)'),
+		videoItem('2011-08-28_long_time_no_see', 'Long Time No See (2011)'),
+	];
+	let extrasGallery = $state<ReturnType<typeof Gallery>>();
 </script>
 
 <SectionShell id="festivals-ksms" year="2011" label="Festivals & KSMS" theme="broadcast">
@@ -102,7 +160,11 @@
 		</div>
 
 		<Reveal variant="up" delay={100}>
-			<FilmReel images={festPhotos} height={170} speed={50} />
+			<FilmReel
+				images={festPhotos}
+				height={170}
+				speed={50}
+				onframeclick={({ index, element }) => reelGallery?.open(index, element)} />
 		</Reveal>
 
 		<div class="yard-sale">
@@ -122,14 +184,15 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<MediaGrid items={yardSale} min={200} gap={6} ratio="16 / 9" captions={true} />
+				<Gallery items={yardSaleImages} display="masonry-row" />
 			</Reveal>
 			<Reveal variant="up" delay={160}>
 				<div class="inline-video">
 					<VideoPlayer
 						slug="2009-03-22_yard_sale"
 						title="Yard Sale (2009) — the stuffed-animal short"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => extrasGallery?.open(0, e.currentTarget)} />
 				</div>
 			</Reveal>
 
@@ -142,7 +205,8 @@
 						<VideoPlayer
 							slug="2008-03-19_austin_fender"
 							title="Austin Fender (2008)"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => extrasGallery?.open(1, e.currentTarget)} />
 					</div>
 				</details>
 			</Reveal>
@@ -178,7 +242,8 @@
 							<LazyMedia
 								src="2010-07-30_ksms_flash_website_large_version_screen_recording-main_menu.avif"
 								alt="KSMS Flash site (later version)"
-								ratio="4 / 3" />
+								ratio="4 / 3"
+								onclick={(e) => extrasGallery?.open(2, e.currentTarget)} />
 						</div>
 					</div>
 				</Reveal>
@@ -196,7 +261,8 @@
 							<LazyMedia
 								src="2010-01-01_scott_hirons_experience_flash_game_screen_recording-gameplay.avif"
 								alt="Scott Hirons Experience gameplay"
-								ratio="4 / 3" />
+								ratio="4 / 3"
+								onclick={(e) => extrasGallery?.open(3, e.currentTarget)} />
 						</div>
 					</div>
 				</Reveal>
@@ -215,7 +281,8 @@
 							<LazyMedia
 								src="2010-08-18_ksms_hallview_full_page_screen_recording.avif"
 								alt="KSMS Hall View screen recording"
-								ratio="4 / 3" />
+								ratio="4 / 3"
+								onclick={(e) => extrasGallery?.open(4, e.currentTarget)} />
 						</div>
 					</div>
 				</Reveal>
@@ -264,12 +331,7 @@
 				</Reveal>
 
 				<Reveal variant="up" delay={150}>
-					<MediaGrid
-						items={liveBroadcastShots}
-						min={220}
-						gap={6}
-						ratio="16 / 9"
-						captions={true} />
+					<Gallery items={liveBroadcastImages} display="masonry-row" />
 				</Reveal>
 
 				<Reveal variant="up" delay={180}>
@@ -277,7 +339,8 @@
 						<VideoPlayer
 							slug="2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip"
 							title="KSMS live broadcast · basketball vs SM-NW (2011) — broadcast opener"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => extrasGallery?.open(5, e.currentTarget)} />
 					</div>
 				</Reveal>
 
@@ -301,12 +364,7 @@
 				</Reveal>
 
 				<Reveal variant="up" delay={120}>
-					<MediaGrid
-						items={blockPartyPhotos}
-						min={200}
-						gap={6}
-						ratio="4 / 3"
-						captions={true} />
+					<Gallery items={blockPartyImages} display="masonry-row" />
 				</Reveal>
 
 				<Reveal variant="up" delay={150}>
@@ -322,7 +380,8 @@
 						<LazyMedia
 							src="2011-04-14_this_is_ksms-basketball_trick_shot_with_vfx.avif"
 							alt="The KSMS trick shot"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => extrasGallery?.open(6, e.currentTarget)} />
 					</div>
 				</Reveal>
 
@@ -333,21 +392,24 @@
 							<VideoPlayer
 								slug="2011-04-14_ksms_block_party"
 								title="KSMS Block Party (2011) — full live show"
-								ratio="16 / 9" />
+								ratio="16 / 9"
+								onclick={(e) => extrasGallery?.open(7, e.currentTarget)} />
 						</div>
 						<div class="bp-video-card">
 							<div class="bp-video-eyebrow">TRAILER</div>
 							<VideoPlayer
 								slug="2011-04-15_block_party_trailer"
 								title="Block Party trailer (2011)"
-								ratio="16 / 9" />
+								ratio="16 / 9"
+								onclick={(e) => extrasGallery?.open(8, e.currentTarget)} />
 						</div>
 						<div class="bp-video-card">
 							<div class="bp-video-eyebrow">PROMO</div>
 							<VideoPlayer
 								slug="2011-04-14_this_is_ksms_basketball_shot"
 								title="This is KSMS — trick-shot promo (2011)"
-								ratio="16 / 9" />
+								ratio="16 / 9"
+								onclick={(e) => extrasGallery?.open(9, e.currentTarget)} />
 						</div>
 					</div>
 				</Reveal>
@@ -366,7 +428,8 @@
 						<VideoPlayer
 							slug="2010-03-20_a_midwestside_story"
 							title="A MidWestSide Story (2010)"
-							ratio="16 / 9" />
+							ratio="16 / 9"
+							onclick={(e) => extrasGallery?.open(10, e.currentTarget)} />
 					</div>
 				</Reveal>
 			</div>
@@ -387,14 +450,30 @@
 					<VideoPlayer
 						slug="2011-08-28_long_time_no_see"
 						title="Long Time No See (2011)"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => extrasGallery?.open(11, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
 	</div>
+
+	<Gallery bind:this={reelGallery} items={reelImages} display="lightbox" />
+
+	<Gallery bind:this={extrasGallery} items={sectionExtras} display="lightbox">
+		{#snippet custom({ item })}
+			<div class="lb-video">
+				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
+			</div>
+		{/snippet}
+	</Gallery>
 </SectionShell>
 
 <style>
+	.lb-video {
+		width: min(1400px, 92vw);
+		aspect-ratio: 16 / 9;
+		max-height: calc(95svh - 8rem);
+	}
 	:global([data-theme='broadcast']) {
 		background: linear-gradient(180deg, #0c0808 0%, #160c0c 50%, #0a0606 100%);
 		color: #fdebe5;

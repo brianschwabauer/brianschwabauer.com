@@ -4,13 +4,21 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
 	import VideoPlayer from '../primitives/VideoPlayer.svelte';
-	import FilmReel from '../primitives/FilmReel.svelte';
-	import { media } from '../media';
+	import { imageItem, videoItem } from '../media';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
-	const earlyFilms = [
+	let gallery = $state<ReturnType<typeof Gallery>>();
+
+	const earlyFilms: Array<{
+		slug: string;
+		title: string;
+		date: string;
+		private: boolean;
+		blurb: string;
+	}> = [
 		{
 			slug: '2006-08-10_quanesha',
 			title: 'Quanesha',
@@ -81,6 +89,44 @@
 				'Newspaper contest: a 29-second short for leap day. Got 2nd place — and taught us quick cuts.',
 		},
 	];
+
+	// Every clickable piece of media in this section, in document order. The lightbox cycles through them all.
+	const baseImages: GalleryItem[] = [
+		imageItem(
+			'1998-05-01_brian_and_kevin_at_preschool_graduation.jpg',
+			'Brian and Kevin at preschool graduation',
+			'Brian and Kevin at preschool graduation',
+		),
+		imageItem(
+			'2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo.avif',
+			'Brian and Kevin fight in slow motion',
+			'The "slowmo" fight scene — take one',
+		),
+		imageItem(
+			'2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo_2.avif',
+			'Round two, still in slowmo',
+			'The "slowmo" fight scene — round two',
+		),
+		imageItem(
+			'2007-09-09_ninja_men-grant_splits_apple_with_karate_chop_special_effect.avif',
+			'The karate-chop apple split',
+			'Ninja Men — the karate-chop apple split',
+		),
+		imageItem(
+			'2008-02-25_02.29.08-editing_with_quick_shots.avif',
+			'Editing with quick cuts on 02.29.08',
+			'02.29.08 — editing with quick cuts',
+		),
+	];
+	const FILM_BASE_INDEX = baseImages.length;
+	const sectionMedia = $derived<GalleryItem[]>([
+		...baseImages,
+		...(signedIn
+			? earlyFilms.map((film) =>
+					videoItem(film.slug, film.title, `${film.title} (${film.date})`),
+				)
+			: []),
+	]);
 </script>
 
 <SectionShell id="humble-beginnings" year="2006" label="Humble Beginnings" theme="tape">
@@ -125,7 +171,8 @@
 					<LazyMedia
 						src="1998-05-01_brian_and_kevin_at_preschool_graduation.jpg"
 						alt="Brian and Kevin at preschool graduation"
-						ratio="4 / 3" />
+						ratio="4 / 3"
+						onclick={(e) => gallery?.open(0, e.currentTarget)} />
 					<svg class="arrows" viewBox="0 0 400 300" aria-hidden="true">
 						<defs>
 							<marker
@@ -203,13 +250,15 @@
 					<LazyMedia
 						src="2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo.avif"
 						alt="Brian and Kevin fight in slow motion"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 				</Reveal>
 				<Reveal variant="right" delay={200}>
 					<LazyMedia
 						src="2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo_2.avif"
 						alt="Round two, still in slowmo"
-						ratio="16 / 9" />
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(2, e.currentTarget)} />
 				</Reveal>
 			</div>
 		</div>
@@ -232,7 +281,8 @@
 					src="2007-09-09_ninja_men-grant_splits_apple_with_karate_chop_special_effect.avif"
 					alt="The karate-chop apple split"
 					ratio="16 / 9"
-					class="karate-media" />
+					class="karate-media"
+					onclick={(e) => gallery?.open(3, e.currentTarget)} />
 			</div>
 		</Reveal>
 
@@ -250,7 +300,8 @@
 				<LazyMedia
 					src="2008-02-25_02.29.08-editing_with_quick_shots.avif"
 					alt="Editing with quick cuts on 02.29.08"
-					ratio="16 / 9" />
+					ratio="16 / 9"
+					onclick={(e) => gallery?.open(4, e.currentTarget)} />
 			</div>
 		</Reveal>
 
@@ -277,10 +328,17 @@
 						</div>
 						<h4 class="film-title">{film.title}</h4>
 						<p class="film-blurb">{film.blurb}</p>
-						{#if signedIn}
-							<div class="film-video">
-								<VideoPlayer slug={film.slug} title={film.title} />
-							</div>
+						{#if signedIn && FILM_BASE_INDEX >= 0}
+							<button
+								type="button"
+								class="film-play"
+								onclick={(e) => gallery?.open(FILM_BASE_INDEX + i, e.currentTarget)}
+								aria-label="Play {film.title}">
+								<svg viewBox="0 0 24 24" aria-hidden="true">
+									<polygon points="8,5 19,12 8,19" fill="currentColor" />
+								</svg>
+								<span>Play film</span>
+							</button>
 						{/if}
 					</li>
 				</Reveal>
@@ -319,9 +377,29 @@
 			</Expandable>
 		</Reveal>
 	</div>
+
+	<Gallery bind:this={gallery} items={sectionMedia} display="lightbox">
+		{#snippet custom({ item })}
+			<div class="lb-video">
+				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
+			</div>
+		{/snippet}
+	</Gallery>
 </SectionShell>
 
 <style>
+	.lb-video {
+		width: min(1400px, 92vw);
+		aspect-ratio: 16 / 9;
+		max-height: calc(95svh - 8rem);
+	}
+	.lb-img {
+		display: block;
+		max-width: min(1400px, 92vw);
+		max-height: calc(95svh - 8rem);
+		object-fit: contain;
+		border-radius: 6px;
+	}
 	:global([data-theme='tape']) {
 		--tape-bg: #1a120a;
 		--tape-ink: #f5e6cf;
@@ -629,8 +707,36 @@
 		opacity: 0.82;
 		margin: 0;
 	}
-	.film-video {
+	.film-play {
 		margin-top: 1rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		appearance: none;
+		background: rgba(255, 156, 74, 0.1);
+		color: var(--tape-accent);
+		border: 1px solid rgba(255, 156, 74, 0.4);
+		padding: 0.4rem 0.9rem;
+		border-radius: 999px;
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		cursor: pointer;
+		transition:
+			background 200ms ease,
+			color 200ms ease,
+			border-color 200ms ease;
+	}
+	.film-play:hover {
+		transition-duration: 0s;
+		background: var(--tape-accent);
+		color: #1a120a;
+		border-color: var(--tape-accent);
+	}
+	.film-play svg {
+		width: 12px;
+		height: 12px;
 	}
 
 	.prose p {
