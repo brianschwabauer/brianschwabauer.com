@@ -300,7 +300,7 @@
 
 		<Reveal variant="up">
 			<div class="strip">
-				<div class="strip-eyebrow">A WHIRLWIND OF CLASS PROJECTS</div>
+				<div class="strip-eyebrow bleed-head">A WHIRLWIND OF CLASS PROJECTS</div>
 				<div class="gallery-bleed">
 					<Gallery items={variousImages} display="masonry" size="2" />
 				</div>
@@ -670,7 +670,7 @@
 
 			<Reveal variant="up" delay={120}>
 				<div class="oneup-bts">
-					<div class="bts-eyebrow">ONE UP — BTS</div>
+					<div class="bts-eyebrow bleed-head">ONE UP — BTS</div>
 					<div class="gallery-bleed">
 						<Gallery items={oneUpBTSImages} display="masonry" size="2" />
 					</div>

@@ -350,7 +350,7 @@
 
 			<Reveal variant="up" delay={100}>
 				<div class="bts-strip">
-					<div class="bts-eyebrow">BEHIND THE SCENES</div>
+					<div class="bts-eyebrow bleed-head">BEHIND THE SCENES</div>
 					<div class="gallery-bleed">
 						<Gallery items={pr2BTSImages} display="masonry" size="2" />
 					</div>
@@ -359,7 +359,7 @@
 
 			<Reveal variant="up" delay={150}>
 				<div class="bts-strip">
-					<div class="bts-eyebrow">FROM THE FILM</div>
+					<div class="bts-eyebrow bleed-head">FROM THE FILM</div>
 					<div class="gallery-bleed">
 						<Gallery items={pr2StillImages} display="masonry" size="2" />
 					</div>

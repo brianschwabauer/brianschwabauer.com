@@ -276,7 +276,7 @@
 		</div>
 
 		<div class="dash-block">
-			<Reveal>
+			<Reveal class="bleed-head">
 				<h3 class="sub">The dashboard</h3>
 				<p>Where photographers run their business day to day.</p>
 			</Reveal>
@@ -298,7 +298,7 @@
 		</div>
 
 		<div class="brand-block">
-			<Reveal>
+			<Reveal class="bleed-head">
 				<h3 class="sub">Brand · the rest</h3>
 			</Reveal>
 			<Reveal variant="up" delay={100}>

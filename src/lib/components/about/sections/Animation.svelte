@@ -281,7 +281,7 @@
 
 			<Reveal variant="up" delay={100}>
 				<div class="storyboard">
-					<div class="story-eyebrow">FROM THE SHOT LIST</div>
+					<div class="story-eyebrow bleed-head">FROM THE SHOT LIST</div>
 					<div class="gallery-bleed">
 						<Gallery items={calamityImages} display="masonry" size="2" />
 					</div>

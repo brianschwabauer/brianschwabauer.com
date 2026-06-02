@@ -226,7 +226,7 @@
 
 		<Reveal variant="up">
 			<div class="bts">
-				<div class="bts-eyebrow">BEHIND THE SCENES</div>
+				<div class="bts-eyebrow bleed-head">BEHIND THE SCENES</div>
 				<div class="gallery-bleed">
 					<Gallery items={spunkstersImages} display="masonry" size="2" />
 				</div>

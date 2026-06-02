@@ -305,7 +305,7 @@
 
 		<div class="film-grid">
 			<Reveal variant="up">
-				<div class="eyebrow">FROM THE FILM</div>
+				<div class="eyebrow bleed-head">FROM THE FILM</div>
 				<div class="gallery-bleed">
 					<Gallery items={filmImages} display="masonry" size="2" />
 				</div>
@@ -358,8 +358,8 @@
 
 		<div class="bts-block">
 			<Reveal>
-				<h3 class="big-sub">We approached it like a Hollywood film.</h3>
-				<p>
+				<h3 class="big-sub bleed-head">We approached it like a Hollywood film.</h3>
+				<p class="bleed-head">
 					A 15-minute short, but with craft services, extras, multiple locations, a
 					casting call, an Indiegogo fundraising campaign, real camera rigs, multiple
 					revisions on the script over months of preproduction. Not because we needed all

@@ -108,6 +108,14 @@
 		},
 		{
 			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-06-20_amanda_hit_by_car_test.avif',
+			width: 352,
+			height: 240,
+			caption: 'Hit-by-car test',
+			alt: 'Hit-by-car test',
+		},
+		{
+			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale-hit_by_car.avif',
 			width: 480,
 			height: 320,
