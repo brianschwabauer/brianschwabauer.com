@@ -116,7 +116,9 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={towerImages} display="masonry-row" />
+				<div class="gallery-bleed">
+					<Gallery items={towerImages} display="masonry" size="2" />
+				</div>
 			</Reveal>
 			<Reveal variant="up" delay={150}>
 				<div class="bts-row">
@@ -179,7 +181,7 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={engagementImages} display="masonry-row" />
+				<Gallery items={engagementImages} display="masonry-row" size="2" />
 			</Reveal>
 			<Reveal variant="up" delay={150}>
 				<ArchiveFrame
@@ -237,7 +239,7 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={markableImages} display="masonry-row" />
+				<Gallery items={markableImages} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 

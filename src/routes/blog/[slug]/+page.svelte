@@ -1,16 +1,18 @@
 <script lang="ts">
 	import { onMount, mount, unmount } from 'svelte';
 	import { Button } from '@delightstack/components/actions';
+	import { Video } from '@delightstack/components/media';
 	import { page } from '$app/state';
 	import { bgStyle } from '$lib/client/images';
 	import { formatPostDate, isoPostDate } from '$lib/utils/date';
-	import VideoPlayer from '$lib/components/about/primitives/VideoPlayer.svelte';
+	import { hls, poster } from '$lib/components/about/media';
 
 	let { data } = $props();
 
 	// The post body is server-rendered HTML ({@html} below). renderDoc emits
 	// `<figure class="blog-video">` placeholders for embedded HLS videos; here
-	// we find them after mount and hydrate each into a video.js player.
+	// we find them after mount and hydrate each into a delightstack Video player
+	// (which lazy-loads hls.js for the HLS stream).
 	let contentEl = $state<HTMLElement | undefined>();
 
 	onMount(() => {
@@ -23,9 +25,9 @@
 			if (!slug || !target) continue;
 			target.replaceChildren();
 			players.push(
-				mount(VideoPlayer, {
+				mount(Video, {
 					target,
-					props: { slug, title: fig.dataset.videoTitle || '', ratio: '16 / 9' },
+					props: { src: hls(slug), poster: poster(slug), aspectRatio: '16/9' },
 				}),
 			);
 		}
@@ -447,7 +449,7 @@
 
 	/* ── BlogVideo (HLS embed) ────────────────────────────────────────────
 	   Three width modes mirror BlogImage. `.blog-video-mount` is the poster
-	   placeholder shown until blog/[slug] hydrates a video.js player into it. */
+	   placeholder shown until blog/[slug] hydrates a delightstack Video into it. */
 	.post-content :global(figure.blog-video) {
 		margin: var(--space-10) auto;
 		display: block;

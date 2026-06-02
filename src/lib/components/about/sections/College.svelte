@@ -3,11 +3,10 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import VideoPlayer from '../primitives/VideoPlayer.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems, videoItem } from '../media';
+	import { imageItem, imageItems, videoItem, poster } from '../media';
 
 	const variousShots = [
 		'2012-02-02_med_365-silent_film-character_looks_up_dramatically.avif',
@@ -127,7 +126,9 @@
 		<Reveal variant="up">
 			<div class="strip">
 				<div class="strip-eyebrow">A WHIRLWIND OF CLASS PROJECTS</div>
-				<Gallery items={variousImages} display="masonry-row" />
+				<div class="gallery-bleed">
+					<Gallery items={variousImages} display="masonry" size="2" />
+				</div>
 				<div class="strip-note">
 					MED 365 silent film · chase scene · complexity edit · ART 230 stop-motion · ART
 					300 disturbance · MED 465 One Up
@@ -172,10 +173,11 @@
 			</Reveal>
 			<Reveal variant="up" delay={120}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2012-04-27_facebook"
-						title="Facebook in Real Life (2012)"
+					<LazyMedia
+						src={poster('2012-04-27_facebook')}
+						alt="Facebook in Real Life (2012)"
 						ratio="16 / 9"
+						video
 						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 				</div>
 			</Reveal>
@@ -236,7 +238,7 @@
 
 			<Reveal variant="up" delay={100}>
 				<div class="node-bts">
-					<Gallery items={nodeBTSImages} display="masonry-row" />
+					<Gallery items={nodeBTSImages} display="masonry-row" size="2" />
 				</div>
 			</Reveal>
 
@@ -293,10 +295,11 @@
 			</Reveal>
 			<Reveal variant="up" delay={130}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2014-05-12_pickvid_promo_video"
-						title="PickVid (2014) — promo video / demo"
+					<LazyMedia
+						src={poster('2014-05-12_pickvid_promo_video')}
+						alt="PickVid (2014) — promo video / demo"
 						ratio="16 / 9"
+						video
 						onclick={(e) => gallery?.open(5, e.currentTarget)} />
 				</div>
 			</Reveal>
@@ -339,10 +342,11 @@
 			</Reveal>
 			<Reveal variant="up" delay={140}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2013-12-02_bear_bus_bash_flash_game_screen_recording"
-						title="Bear Bus Bash (2013) — full gameplay recording"
+					<LazyMedia
+						src={poster('2013-12-02_bear_bus_bash_flash_game_screen_recording')}
+						alt="Bear Bus Bash (2013) — full gameplay recording"
 						ratio="16 / 9"
+						video
 						onclick={(e) => gallery?.open(9, e.currentTarget)} />
 				</div>
 			</Reveal>
@@ -384,10 +388,11 @@
 			</Reveal>
 			<Reveal variant="up" delay={130}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2015-04-12_split_life-sato_48"
-						title="Split Life (2015) — 48-hour dual-perspective oner"
+					<LazyMedia
+						src={poster('2015-04-12_split_life-sato_48')}
+						alt="Split Life (2015) — 48-hour dual-perspective oner"
 						ratio="16 / 9"
+						video
 						onclick={(e) => gallery?.open(12, e.currentTarget)} />
 				</div>
 			</Reveal>
@@ -433,10 +438,11 @@
 							The character realizes she's inside a film and tries to escape it; boom mic
 							crashes the frame on purpose.
 						</p>
-						<VideoPlayer
-							slug="2014-05-15_katie_bauers_breakup"
-							title="Katie Bauer's Breakup (2014)"
+						<LazyMedia
+							src={poster('2014-05-15_katie_bauers_breakup')}
+							alt="Katie Bauer's Breakup (2014)"
 							ratio="16 / 9"
+							video
 							onclick={(e) => gallery?.open(13, e.currentTarget)} />
 					</article>
 					<article class="film-quad-card">
@@ -447,10 +453,11 @@
 							Cinematography-class short. Two guys try to one-up each other to land the
 							same job. Real lighting setups, real coverage.
 						</p>
-						<VideoPlayer
-							slug="2014-09-24_med_465-one_up"
-							title="One Up (2014)"
+						<LazyMedia
+							src={poster('2014-09-24_med_465-one_up')}
+							alt="One Up (2014)"
 							ratio="16 / 9"
+							video
 							onclick={(e) => gallery?.open(14, e.currentTarget)} />
 					</article>
 					<article class="film-quad-card">
@@ -461,10 +468,11 @@
 							Senior-thesis warmup, shot in Canon RAW on a 5D mkIV with Magic Lantern
 							firmware. The girl on the bench was on the phone the whole time.
 						</p>
-						<VideoPlayer
-							slug="2014-09-02_nice_to_meet_you"
-							title="Nice to Meet You (2014)"
+						<LazyMedia
+							src={poster('2014-09-02_nice_to_meet_you')}
+							alt="Nice to Meet You (2014)"
 							ratio="16 / 9"
+							video
 							onclick={(e) => gallery?.open(15, e.currentTarget)} />
 					</article>
 					<article class="film-quad-card">
@@ -475,10 +483,11 @@
 							A quiet 2-character short for my directing class. A husband obsessed with
 							his career, a wife who wants him home. Conversation as conflict.
 						</p>
-						<VideoPlayer
-							slug="2015-04-22_legacy"
-							title="Legacy (2015)"
+						<LazyMedia
+							src={poster('2015-04-22_legacy')}
+							alt="Legacy (2015)"
 							ratio="16 / 9"
+							video
 							onclick={(e) => gallery?.open(16, e.currentTarget)} />
 					</article>
 				</div>
@@ -487,7 +496,9 @@
 			<Reveal variant="up" delay={120}>
 				<div class="oneup-bts">
 					<div class="bts-eyebrow">ONE UP — BTS</div>
-					<Gallery items={oneUpBTSImages} display="masonry-row" />
+					<div class="gallery-bleed">
+						<Gallery items={oneUpBTSImages} display="masonry" size="2" />
+					</div>
 				</div>
 			</Reveal>
 		</div>
@@ -511,21 +522,10 @@
 		</div>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox">
-		{#snippet custom({ item })}
-			<div class="lb-video">
-				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
-			</div>
-		{/snippet}
-	</Gallery>
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" autoplay_video />
 </SectionShell>
 
 <style>
-	.lb-video {
-		width: min(1400px, 92vw);
-		aspect-ratio: 16 / 9;
-		max-height: calc(95svh - 8rem);
-	}
 	:global([data-theme='college']) {
 		background:
 			radial-gradient(ellipse at top, rgba(122, 77, 255, 0.1), transparent 50%),

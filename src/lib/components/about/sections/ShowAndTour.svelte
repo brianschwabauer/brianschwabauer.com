@@ -211,7 +211,9 @@
 				<p>Where photographers run their business day to day.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={imageItems(dashboardMockups)} display="masonry-row" />
+				<div class="gallery-bleed">
+					<Gallery items={imageItems(dashboardMockups)} display="masonry" size="2" />
+				</div>
 			</Reveal>
 		</div>
 
@@ -221,7 +223,7 @@
 				<p>What the photographer's clients actually see.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={imageItems(deliveryPages)} display="masonry-row" />
+				<Gallery items={imageItems(deliveryPages)} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 
@@ -230,7 +232,9 @@
 				<h3 class="sub">Brand · the rest</h3>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={imageItems(brand)} display="masonry-row" />
+				<div class="gallery-bleed">
+					<Gallery items={imageItems(brand)} display="masonry" size="2" />
+				</div>
 			</Reveal>
 		</div>
 	</div>

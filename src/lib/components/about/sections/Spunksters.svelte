@@ -3,10 +3,9 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import VideoPlayer from '../primitives/VideoPlayer.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems, videoItem } from '../media';
+	import { imageItem, imageItems, videoItem, poster } from '../media';
 
 	const spunkstersPhotos = [
 		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_01.avif',
@@ -28,7 +27,7 @@
 		{ from: '+1 (913) ••• 9088', text: 'Oscars who?' },
 	];
 
-	// Standalone LazyMedias + inline VideoPlayers combined into one lightbox-only Gallery.
+	// Standalone images + inline video posters combined into one lightbox-only Gallery.
 	// Order matches document order:
 	//   0: Spunksters logo image
 	//   1: The Spunksters awards show video
@@ -106,10 +105,11 @@
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2013-06-22_the_spunksters"
-						title="The Spunksters (2013) — the live awards show"
+					<LazyMedia
+						src={poster('2013-06-22_the_spunksters')}
+						alt="The Spunksters (2013) — the live awards show"
 						ratio="16 / 9"
+						video
 						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 				</div>
 			</Reveal>
@@ -156,7 +156,9 @@
 		<Reveal variant="up">
 			<div class="bts">
 				<div class="bts-eyebrow">BEHIND THE SCENES</div>
-				<Gallery items={imageItems(spunkstersPhotos)} display="masonry-row" />
+				<div class="gallery-bleed">
+					<Gallery items={imageItems(spunkstersPhotos)} display="masonry" size="2" />
+				</div>
 			</div>
 		</Reveal>
 
@@ -181,10 +183,11 @@
 					there.
 				</p>
 				<div class="bubbly-video">
-					<VideoPlayer
-						slug="2013-06-22_bubbly_bros"
-						title="Bubbly Bros (2013) — photo music video"
+					<LazyMedia
+						src={poster('2013-06-22_bubbly_bros')}
+						alt="Bubbly Bros (2013) — photo music video"
 						ratio="16 / 9"
+						video
 						onclick={(e) => gallery?.open(3, e.currentTarget)} />
 				</div>
 			</Reveal>
@@ -217,10 +220,11 @@
 			</Reveal>
 			<Reveal variant="up" delay={140}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2013-06-22_power_rangers_iii_trailer"
-						title="Power Rangers 360 III — fake trailer (2013)"
+					<LazyMedia
+						src={poster('2013-06-22_power_rangers_iii_trailer')}
+						alt="Power Rangers 360 III — fake trailer (2013)"
 						ratio="16 / 9"
+						video
 						onclick={(e) => gallery?.open(6, e.currentTarget)} />
 				</div>
 			</Reveal>
@@ -238,21 +242,10 @@
 		</Reveal>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox">
-		{#snippet custom({ item })}
-			<div class="lb-video">
-				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
-			</div>
-		{/snippet}
-	</Gallery>
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" autoplay_video />
 </SectionShell>
 
 <style>
-	.lb-video {
-		width: min(1400px, 92vw);
-		aspect-ratio: 16 / 9;
-		max-height: calc(95svh - 8rem);
-	}
 	:global([data-theme='spunksters']) {
 		background:
 			radial-gradient(ellipse at top, rgba(255, 217, 52, 0.06), transparent 50%),

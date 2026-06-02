@@ -200,7 +200,7 @@
 				<h3 class="sub">Wedding films</h3>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={weddingImages} display="masonry-row" />
+				<Gallery items={weddingImages} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 
