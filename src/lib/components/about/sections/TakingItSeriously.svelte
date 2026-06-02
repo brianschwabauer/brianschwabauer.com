@@ -5,29 +5,40 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem } from '../media';
 
 	const sectionExtras: GalleryItem[] = [
-		imageItem(
-			'2008-01-01_hunky_spunky_productions-website_design-home_page.jpg',
-			'HSP 2008 site',
-			'Hunky Spunky Productions · 2008',
-		),
-		imageItem(
-			'2009-01-01_hunky_spunky_productions-website_design-home_page.jpg',
-			'HSP 2009 site',
-			'Hunky Spunky Productions · 2009',
-		),
-		imageItem(
-			'2010-01-01_hunky_spunky_productions-website_design-home_page.avif',
-			'HSP 2010 site',
-			'Hunky Spunky Productions · 2010',
-		),
-		imageItem(
-			'2009-12-25_calamity-flash_website_screen_recording-main_menu.avif',
-			'Calamity Flash website screen recording',
-			'Calamity · Flash website · 2009',
-		),
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-01-01_hunky_spunky_productions-website_design-home_page.jpg',
+			width: 1878,
+			height: 916,
+			caption: 'Hunky Spunky Productions · 2008',
+			alt: 'HSP 2008 site',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-01-01_hunky_spunky_productions-website_design-home_page.jpg',
+			width: 1878,
+			height: 919,
+			caption: 'Hunky Spunky Productions · 2009',
+			alt: 'HSP 2009 site',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-01-01_hunky_spunky_productions-website_design-home_page.avif',
+			width: 1878,
+			height: 920,
+			caption: 'Hunky Spunky Productions · 2010',
+			alt: 'HSP 2010 site',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity-flash_website_screen_recording-main_menu.avif',
+			width: 1080,
+			height: 604,
+			caption: 'Calamity · Flash website · 2009',
+			alt: 'Calamity Flash website screen recording',
+		},
 	];
 	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
@@ -82,7 +93,7 @@
 							<div class="url">www.hunkyspunky.com / 2009</div>
 						</div>
 						<LazyMedia
-							src="2009-01-01_hunky_spunky_productions-website_design-home_page.jpg"
+							src="https://cdn.brianschwabauer.com/media/2009-01-01_hunky_spunky_productions-website_design-home_page.jpg"
 							alt="HSP 2009 site"
 							ratio="4 / 3"
 							onclick={(e) => gallery?.open(1, e.currentTarget)} />
@@ -97,7 +108,7 @@
 							<div class="url">www.hunkyspunky.com / 2010</div>
 						</div>
 						<LazyMedia
-							src="2010-01-01_hunky_spunky_productions-website_design-home_page.avif"
+							src="https://cdn.brianschwabauer.com/media/2010-01-01_hunky_spunky_productions-website_design-home_page.avif"
 							alt="HSP 2010 site"
 							ratio="4 / 3"
 							onclick={(e) => gallery?.open(2, e.currentTarget)} />
@@ -112,7 +123,7 @@
 							<div class="url">www.hunkyspunky.com / 2008</div>
 						</div>
 						<LazyMedia
-							src="2008-01-01_hunky_spunky_productions-website_design-home_page.jpg"
+							src="https://cdn.brianschwabauer.com/media/2008-01-01_hunky_spunky_productions-website_design-home_page.jpg"
 							alt="HSP 2008 site"
 							ratio="4 / 3"
 							onclick={(e) => gallery?.open(0, e.currentTarget)} />
@@ -143,7 +154,7 @@
 				<div class="flash-mock">
 					<div class="flash-frame">
 						<LazyMedia
-							src="2009-12-25_calamity-flash_website_screen_recording-main_menu.avif"
+							src="https://cdn.brianschwabauer.com/media/2009-12-25_calamity-flash_website_screen_recording-main_menu.avif"
 							alt="Calamity Flash website screen recording"
 							ratio="4 / 3"
 							onclick={(e) => gallery?.open(3, e.currentTarget)} />

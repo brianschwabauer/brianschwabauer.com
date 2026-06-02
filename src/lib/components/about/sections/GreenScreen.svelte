@@ -5,7 +5,6 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems, videoItem, poster } from '../media';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
@@ -47,109 +46,200 @@
 		};
 	});
 
-	const xyzShots = [
+	const xyzImages: GalleryItem[] = [
 		{
-			src: '2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen.avif',
+			width: 352,
+			height: 240,
 			caption: 'Floating anchor — turns out you need a tripod',
+			alt: 'Floating anchor — turns out you need a tripod',
 		},
 		{
-			src: '2007-08-09_xyz_news_episode_i-brian_talks_while_floating_with_green_screen.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-brian_talks_while_floating_with_green_screen.avif',
+			width: 352,
+			height: 240,
 			caption: 'Same thumbs-up bug, different shot',
+			alt: 'Same thumbs-up bug, different shot',
 		},
 		{
-			src: '2007-08-09_xyz_news_episode_i-kevin_dances_in_front_of_green_screen_weather_report.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_dances_in_front_of_green_screen_weather_report.avif',
+			width: 352,
+			height: 240,
 			caption: 'Kevin as weatherman #1',
+			alt: 'Kevin as weatherman #1',
 		},
 		{
-			src: '2007-08-09_xyz_news_episode_i-kevin_appears_using_green_screen_blanket_visual_effect.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_appears_using_green_screen_blanket_visual_effect.avif',
+			width: 352,
+			height: 240,
 			caption: 'Greenscreen blanket → vanishing trick',
+			alt: 'Greenscreen blanket → vanishing trick',
 		},
 		{
-			src: '2007-08-09_xyz_news_episode_i-kevin_makes_funny_expression_while_wearing_a_frisbee.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_makes_funny_expression_while_wearing_a_frisbee.avif',
+			width: 352,
+			height: 240,
 			caption: 'Kevin, also wearing a frisbee',
+			alt: 'Kevin, also wearing a frisbee',
 		},
 	];
 
-	const vfxTests = [
-		{ src: '2008-03-09_clone_brian_test.avif', caption: 'Clone effect — twin Brians' },
+	const vfxImages: GalleryItem[] = [
 		{
-			src: '2008-03-20_star_wars_test.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-03-09_clone_brian_test.avif',
+			width: 352,
+			height: 240,
+			caption: 'Clone effect — twin Brians',
+			alt: 'Clone effect — twin Brians',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-03-20_star_wars_test.avif',
+			width: 480,
+			height: 384,
 			caption: 'Lightsaber, the obligatory VFX rite',
+			alt: 'Lightsaber, the obligatory VFX rite',
 		},
-		{ src: '2008-06-20_amanda_hit_by_car_test.avif', caption: 'Hit-by-car test' },
 		{
-			src: '2009-03-22_yard_sale-hit_by_car.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale-hit_by_car.avif',
+			width: 480,
+			height: 320,
 			caption: 'Same effect, in a real film a year later',
+			alt: 'Same effect, in a real film a year later',
+			favorite: true,
 		},
-		{ src: '2008-06-22_awc_logo_animation.avif', caption: 'AWC studio logo test' },
 		{
-			src: '2008-06-22_take_one_films_logo_animation.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-06-22_awc_logo_animation.avif',
+			width: 480,
+			height: 384,
+			caption: 'AWC studio logo test',
+			alt: 'AWC studio logo test',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-06-22_take_one_films_logo_animation.avif',
+			width: 480,
+			height: 384,
 			caption: 'Take One Films logo',
+			alt: 'Take One Films logo',
 		},
 		{
-			src: '2008-07-13_hunky_spunky_productions_logo_animation_2.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-07-13_hunky_spunky_productions_logo_animation_2.avif',
+			width: 480,
+			height: 320,
 			caption: 'Hunky Spunky Productions logo',
+			alt: 'Hunky Spunky Productions logo',
 		},
 	];
 
-	const nuisanceShots = [
+	const nuisanceImages: GalleryItem[] = [
 		{
-			src: '2008-08-21_nuisance-b-gone-brian_explains_the_product.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone-brian_explains_the_product.avif',
+			width: 480,
+			height: 320,
 			caption: 'The pitch',
+			alt: 'The pitch',
 		},
 		{
-			src: '2008-08-21_nuisance-b-gone-product_makes_chair_disappear_visual_effect.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone-product_makes_chair_disappear_visual_effect.avif',
+			width: 480,
+			height: 320,
 			caption: 'Chair, gone',
+			alt: 'Chair, gone',
 		},
 		{
-			src: '2008-08-21_nuisance-b-gone-product_makes_shoe_disappear_visual_effect.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone-product_makes_shoe_disappear_visual_effect.avif',
+			width: 480,
+			height: 320,
 			caption: 'Shoe, gone',
+			alt: 'Shoe, gone',
 		},
 	];
-
-	const xyzImages = imageItems(xyzShots);
-	// const vfxImages = imageItems(vfxTests);
-	const vfxImages = [
-		...imageItems(vfxTests).slice(0, 2),
-		{ ...imageItems(vfxTests)[3], favorite: true },
-		...imageItems(vfxTests).slice(4),
-	];
-	const nuisanceImages = imageItems(nuisanceShots);
 
 	// All standalone images + inline videos in document order. The headless Gallery
 	// at the bottom of the section drives the lightbox for these.
 	const sectionExtras: GalleryItem[] = [
-		imageItem(
-			'2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen_2.avif',
-			'Brian floating in front of XYZ News greenscreen',
-			'XYZ News — the floating anchor bug',
-		),
-		imageItem(
-			'2008-01-06_pac-attack-pacman_eats_kevin_visual_effect.avif',
-			'Pacman eats Kevin',
-			'Pac-Attack — Pacman eats Kevin',
-		),
-		imageItem(
-			'2008-01-06_pac-attack-pacman_on_green_background_using_powerpoint_for_visual_effect.avif',
-			'Pacman on greenscreen — PowerPoint export',
-			'Step 1 — animated in PowerPoint on a green slide',
-		),
-		imageItem(
-			'2008-01-06_pac-attack-pacman_coming_out_of_tv.avif',
-			'Pacman keyed onto real footage',
-			'Step 2 — keyed onto real footage',
-		),
-		imageItem(
-			'2008-01-06_pac-attack-flash_game_screen_recording-pacman_eats_brians_floating_faces.avif',
-			'The companion Flash game',
-			'Step 3 — the companion Flash game',
-		),
-		videoItem('2008-01-06_pac-attack', 'Pac-Attack (2008) — full short'),
-		videoItem('2008-08-21_nuisance-b-gone', 'Nuisance-B-Gone — the fake infomercial'),
-		videoItem(
-			'2009-02-13_sideline_huddler',
-			"Sideline Huddler — Amanda's invention commercial",
-		),
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen_2.avif',
+			width: 352,
+			height: 240,
+			caption: 'XYZ News — the floating anchor bug',
+			alt: 'Brian floating in front of XYZ News greenscreen',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack-pacman_eats_kevin_visual_effect.avif',
+			width: 480,
+			height: 320,
+			caption: 'Pac-Attack — Pacman eats Kevin',
+			alt: 'Pacman eats Kevin',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack-pacman_on_green_background_using_powerpoint_for_visual_effect.avif',
+			width: 352,
+			height: 240,
+			caption: 'Step 1 — animated in PowerPoint on a green slide',
+			alt: 'Pacman on greenscreen — PowerPoint export',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack-pacman_coming_out_of_tv.avif',
+			width: 480,
+			height: 320,
+			caption: 'Step 2 — keyed onto real footage',
+			alt: 'Pacman keyed onto real footage',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack-flash_game_screen_recording-pacman_eats_brians_floating_faces.avif',
+			width: 824,
+			height: 600,
+			caption: 'Step 3 — the companion Flash game',
+			alt: 'The companion Flash game',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack/master.m3u8',
+			poster: 'https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: 'Pac-Attack (2008) — full short',
+			alt: 'Pac-Attack (2008) — full short',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: 'Nuisance-B-Gone — the fake infomercial',
+			alt: 'Nuisance-B-Gone — the fake infomercial',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2009-02-13_sideline_huddler/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2009-02-13_sideline_huddler/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: "Sideline Huddler — Amanda's invention commercial",
+			alt: "Sideline Huddler — Amanda's invention commercial",
+		},
 	];
 
 	let gallery = $state<ReturnType<typeof Gallery>>();
@@ -192,7 +282,7 @@
 						<div class="key-label">CHROMA · 0x22FF90</div>
 					</div>
 					<LazyMedia
-						src="2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen_2.avif"
+						src="https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen_2.avif"
 						alt="Brian floating in front of XYZ News greenscreen"
 						ratio="16 / 9"
 						class="key-img"
@@ -267,7 +357,7 @@
 					<div class="arcade">
 						<div class="arcade-screen">
 							<LazyMedia
-								src="2008-01-06_pac-attack-pacman_eats_kevin_visual_effect.avif"
+								src="https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack-pacman_eats_kevin_visual_effect.avif"
 								alt="Pacman eats Kevin"
 								ratio="4 / 3"
 								onclick={(e) => gallery?.open(1, e.currentTarget)} />
@@ -288,7 +378,7 @@
 					<div class="pac-step">
 						<span class="num">1</span>
 						<LazyMedia
-							src="2008-01-06_pac-attack-pacman_on_green_background_using_powerpoint_for_visual_effect.avif"
+							src="https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack-pacman_on_green_background_using_powerpoint_for_visual_effect.avif"
 							alt="Pacman on greenscreen — PowerPoint export"
 							ratio="4 / 3"
 							onclick={(e) => gallery?.open(2, e.currentTarget)} />
@@ -298,7 +388,7 @@
 					<div class="pac-step">
 						<span class="num">2</span>
 						<LazyMedia
-							src="2008-01-06_pac-attack-pacman_coming_out_of_tv.avif"
+							src="https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack-pacman_coming_out_of_tv.avif"
 							alt="Pacman keyed onto real footage"
 							ratio="4 / 3"
 							onclick={(e) => gallery?.open(3, e.currentTarget)} />
@@ -308,7 +398,7 @@
 					<div class="pac-step">
 						<span class="num">3</span>
 						<LazyMedia
-							src="2008-01-06_pac-attack-flash_game_screen_recording-pacman_eats_brians_floating_faces.avif"
+							src="https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack-flash_game_screen_recording-pacman_eats_brians_floating_faces.avif"
 							alt="The companion Flash game"
 							ratio="4 / 3"
 							onclick={(e) => gallery?.open(4, e.currentTarget)} />
@@ -320,7 +410,7 @@
 			<Reveal variant="up" delay={200}>
 				<div class="pac-video">
 					<LazyMedia
-						src={poster('2008-01-06_pac-attack')}
+						src="https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack/poster.jpg"
 						alt="Pac-Attack (2008) — full short"
 						ratio="16 / 9"
 						video
@@ -359,7 +449,7 @@
 			<Reveal variant="up" delay={150}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2008-08-21_nuisance-b-gone')}
+						src="https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone/poster.jpg"
 						alt="Nuisance-B-Gone — the fake infomercial"
 						ratio="16 / 9"
 						video
@@ -381,7 +471,7 @@
 			<Reveal variant="up" delay={100}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2009-02-13_sideline_huddler')}
+						src="https://cdn.brianschwabauer.com/media/2009-02-13_sideline_huddler/poster.jpg"
 						alt="Sideline Huddler — Amanda's invention commercial"
 						ratio="16 / 9"
 						video

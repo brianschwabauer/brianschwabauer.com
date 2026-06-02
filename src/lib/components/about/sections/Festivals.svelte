@@ -5,83 +5,200 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems, videoItem, poster } from '../media';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
-	const festPhotos = [
-		'2009-04-19_lawrence_high_school_film_festival-brian_and_kevin_in_front_of_theater.avif',
-		'2009-04-19_lawrence_high_school_film_festival-brian_close_shot_in_front_of_theater.avif',
-		'2009-04-23_johnson_county_community_college_film_festival-brian_and_kevin_1.avif',
-		'2009-04-23_johnson_county_community_college_film_festival-brian_and_kevin_2.avif',
-		'2009-04-23_johnson_county_community_college_film_festival-brian_and_kevin_3.avif',
-		'2009-04-23_johnson_county_community_college_film_festival-brian_and_kevin_6.avif',
-		'2009-04-29_shawnee_mission_east_film_festival-kevin_and_brian_1.avif',
-	].map((src) => ({ src }));
-
-	const yardSale = [
+	const reelImages = [
 		{
-			src: '2009-03-22_yard_sale-brian_leaves_shot_and_reveals_yard_sale_sign.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-04-19_lawrence_high_school_film_festival-brian_and_kevin_in_front_of_theater.avif',
+			width: 1365,
+			height: 2048,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-04-19_lawrence_high_school_film_festival-brian_close_shot_in_front_of_theater.avif',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-04-23_johnson_county_community_college_film_festival-brian_and_kevin_1.avif',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-04-23_johnson_county_community_college_film_festival-brian_and_kevin_2.avif',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-04-23_johnson_county_community_college_film_festival-brian_and_kevin_3.avif',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-04-23_johnson_county_community_college_film_festival-brian_and_kevin_6.avif',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-04-29_shawnee_mission_east_film_festival-kevin_and_brian_1.avif',
+			width: 2048,
+			height: 1365,
+		},
+	] satisfies GalleryItem[];
+
+	const yardSaleImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale-brian_leaves_shot_and_reveals_yard_sale_sign.avif',
+			width: 480,
+			height: 320,
 			caption: 'The setup',
+			alt: 'The setup',
 		},
 		{
-			src: '2009-03-22_yard_sale-matthew_hides_in_stuff_animal_pile.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale-matthew_hides_in_stuff_animal_pile.avif',
+			width: 480,
+			height: 320,
 			caption: 'The pile',
+			alt: 'The pile',
 		},
 		{
-			src: '2009-03-22_yard_sale-stop_action_animation_with_stuffed_animal.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale-stop_action_animation_with_stuffed_animal.avif',
+			width: 480,
+			height: 320,
 			caption: 'Stop-motion stuffed animals',
+			alt: 'Stop-motion stuffed animals',
 		},
 		{
-			src: '2009-03-22_yard_sale-stop_action_all_animals_moving.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale-stop_action_all_animals_moving.avif',
+			width: 480,
+			height: 320,
 			caption: 'All 20+ at once',
+			alt: 'All 20+ at once',
 		},
 		{
-			src: '2009-03-22_yard_sale-animals_attack_from_behind.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale-animals_attack_from_behind.avif',
+			width: 480,
+			height: 320,
 			caption: 'Attack scene',
+			alt: 'Attack scene',
 		},
 		{
-			src: '2009-03-22_yard_sale-brian_runs_to_start_car.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale-brian_runs_to_start_car.avif',
+			width: 480,
+			height: 320,
 			caption: 'Run to the car',
+			alt: 'Run to the car',
 		},
 		{
-			src: '2009-03-22_yard_sale-hit_by_car.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale-hit_by_car.avif',
+			width: 480,
+			height: 320,
 			caption: 'Hit-by-car effect, lifted from earlier',
+			alt: 'Hit-by-car effect, lifted from earlier',
 		},
 		{
-			src: '2009-03-22_yard_sale-close_up_on_brian_as_animals_attack.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale-close_up_on_brian_as_animals_attack.avif',
+			width: 480,
+			height: 320,
 			caption: 'The penguin gets the last peck',
+			alt: 'The penguin gets the last peck',
 		},
 	];
 
-	const liveBroadcastShots = [
+	const liveBroadcastImages: GalleryItem[] = [
 		{
-			src: '2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-intro_animation.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-intro_animation.avif',
+			width: 720,
+			height: 480,
 			caption: 'Custom intro animation',
+			alt: 'Custom intro animation',
 		},
 		{
-			src: '2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-commentators.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-commentators.avif',
+			width: 720,
+			height: 480,
 			caption: 'The booth',
+			alt: 'The booth',
 		},
 		{
-			src: '2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-replay_animation.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-replay_animation.avif',
+			width: 720,
+			height: 480,
 			caption: 'Instant replay',
+			alt: 'Instant replay',
 		},
 		{
-			src: '2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-sideline-reporter.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-sideline-reporter.avif',
+			width: 720,
+			height: 480,
 			caption: 'Sideline reporter',
+			alt: 'Sideline reporter',
 		},
 	];
 
-	const blockPartyPhotos = Array.from({ length: 7 }, (_, i) => ({
-		src: `2011-04-14_ksms_block_party_live_show_${String(i + 1).padStart(3, '0')}.jpg`,
-		caption: `Block Party · live show #${i + 1}`,
-	}));
-
-	const reelImages: GalleryItem[] = imageItems(festPhotos);
-	const yardSaleImages: GalleryItem[] = imageItems(yardSale);
-	const liveBroadcastImages: GalleryItem[] = imageItems(liveBroadcastShots);
-	const blockPartyImages: GalleryItem[] = imageItems(blockPartyPhotos);
+	const blockPartyImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party_live_show_001.jpg',
+			caption: 'Block Party · live show #1',
+			alt: 'Block Party · live show #1',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party_live_show_002.jpg',
+			caption: 'Block Party · live show #2',
+			alt: 'Block Party · live show #2',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party_live_show_003.jpg',
+			caption: 'Block Party · live show #3',
+			alt: 'Block Party · live show #3',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party_live_show_004.jpg',
+			caption: 'Block Party · live show #4',
+			alt: 'Block Party · live show #4',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party_live_show_005.jpg',
+			caption: 'Block Party · live show #5',
+			alt: 'Block Party · live show #5',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party_live_show_006.jpg',
+			caption: 'Block Party · live show #6',
+			alt: 'Block Party · live show #6',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party_live_show_007.jpg',
+			caption: 'Block Party · live show #7',
+			alt: 'Block Party · live show #7',
+		},
+	];
 
 	let reelGallery = $state<ReturnType<typeof Gallery>>();
 
@@ -99,40 +216,116 @@
 	// 10: A MidWestSide Story video
 	// 11: Long Time No See video
 	const sectionExtras: GalleryItem[] = [
-		videoItem('2009-03-22_yard_sale', 'Yard Sale (2009) — the stuffed-animal short'),
-		videoItem('2008-03-19_austin_fender', 'Austin Fender (2008)'),
-		imageItem(
-			'2010-07-30_ksms_flash_website_large_version_screen_recording-main_menu.avif',
-			'KSMS Flash site (later version)',
-			'The KSMS website (Flash version)',
-		),
-		imageItem(
-			'2010-01-01_scott_hirons_experience_flash_game_screen_recording-gameplay.avif',
-			'Scott Hirons Experience gameplay',
-			'Scott Hirons Experience — Flash game',
-		),
-		imageItem(
-			'2010-08-18_ksms_hallview_full_page_screen_recording.avif',
-			'KSMS Hall View screen recording',
-			'KSMS Hall View — school panorama viewer',
-		),
-		videoItem(
-			'2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip',
-			'KSMS live broadcast · basketball vs SM-NW (2011) — broadcast opener',
-		),
-		imageItem(
-			'2011-04-14_this_is_ksms-basketball_trick_shot_with_vfx.avif',
-			'The KSMS trick shot',
-			'The KSMS trick shot',
-		),
-		videoItem('2011-04-14_ksms_block_party', 'KSMS Block Party (2011) — full live show'),
-		videoItem('2011-04-15_block_party_trailer', 'Block Party trailer (2011)'),
-		videoItem(
-			'2011-04-14_this_is_ksms_basketball_shot',
-			'This is KSMS — trick-shot promo (2011)',
-		),
-		videoItem('2010-03-20_a_midwestside_story', 'A MidWestSide Story (2010)'),
-		videoItem('2011-08-28_long_time_no_see', 'Long Time No See (2011)'),
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale/master.m3u8',
+			poster: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: 'Yard Sale (2009) — the stuffed-animal short',
+			alt: 'Yard Sale (2009) — the stuffed-animal short',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2008-03-19_austin_fender/master.m3u8',
+			poster: 'https://cdn.brianschwabauer.com/media/2008-03-19_austin_fender/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: 'Austin Fender (2008)',
+			alt: 'Austin Fender (2008)',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-07-30_ksms_flash_website_large_version_screen_recording-main_menu.avif',
+			width: 1080,
+			height: 808,
+			caption: 'The KSMS website (Flash version)',
+			alt: 'KSMS Flash site (later version)',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-01-01_scott_hirons_experience_flash_game_screen_recording-gameplay.avif',
+			width: 1078,
+			height: 720,
+			caption: 'Scott Hirons Experience — Flash game',
+			alt: 'Scott Hirons Experience gameplay',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-08-18_ksms_hallview_full_page_screen_recording.avif',
+			width: 1000,
+			height: 748,
+			caption: 'KSMS Hall View — school panorama viewer',
+			alt: 'KSMS Hall View screen recording',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: 'KSMS live broadcast · basketball vs SM-NW (2011) — broadcast opener',
+			alt: 'KSMS live broadcast · basketball vs SM-NW (2011) — broadcast opener',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_this_is_ksms-basketball_trick_shot_with_vfx.avif',
+			width: 480,
+			height: 320,
+			caption: 'The KSMS trick shot',
+			alt: 'The KSMS trick shot',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: 'KSMS Block Party (2011) — full live show',
+			alt: 'KSMS Block Party (2011) — full live show',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2011-04-15_block_party_trailer/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2011-04-15_block_party_trailer/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: 'Block Party trailer (2011)',
+			alt: 'Block Party trailer (2011)',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_this_is_ksms_basketball_shot/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2011-04-14_this_is_ksms_basketball_shot/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: 'This is KSMS — trick-shot promo (2011)',
+			alt: 'This is KSMS — trick-shot promo (2011)',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-20_a_midwestside_story/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2010-03-20_a_midwestside_story/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: 'A MidWestSide Story (2010)',
+			alt: 'A MidWestSide Story (2010)',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2011-08-28_long_time_no_see/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2011-08-28_long_time_no_see/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: 'Long Time No See (2011)',
+			alt: 'Long Time No See (2011)',
+		},
 	];
 	let extrasGallery = $state<ReturnType<typeof Gallery>>();
 </script>
@@ -160,7 +353,7 @@
 
 		<Reveal variant="up" delay={100}>
 			<FilmReel
-				images={festPhotos}
+				images={reelImages}
 				height={170}
 				speed={50}
 				onframeclick={({ index, element }) => reelGallery?.open(index, element)} />
@@ -190,7 +383,7 @@
 			<Reveal variant="up" delay={160}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2009-03-22_yard_sale')}
+						src="https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale/poster.jpg"
 						alt="Yard Sale (2009) — the stuffed-animal short"
 						ratio="16 / 9"
 						video
@@ -205,7 +398,7 @@
 					</summary>
 					<div class="inline-video">
 						<LazyMedia
-							src={poster('2008-03-19_austin_fender')}
+							src="https://cdn.brianschwabauer.com/media/2008-03-19_austin_fender/poster.jpg"
 							alt="Austin Fender (2008)"
 							ratio="16 / 9"
 							video
@@ -243,7 +436,7 @@
 						</p>
 						<div class="cr-media">
 							<LazyMedia
-								src="2010-07-30_ksms_flash_website_large_version_screen_recording-main_menu.avif"
+								src="https://cdn.brianschwabauer.com/media/2010-07-30_ksms_flash_website_large_version_screen_recording-main_menu.avif"
 								alt="KSMS Flash site (later version)"
 								ratio="4 / 3"
 								onclick={(e) => extrasGallery?.open(2, e.currentTarget)} />
@@ -262,7 +455,7 @@
 						</p>
 						<div class="cr-media">
 							<LazyMedia
-								src="2010-01-01_scott_hirons_experience_flash_game_screen_recording-gameplay.avif"
+								src="https://cdn.brianschwabauer.com/media/2010-01-01_scott_hirons_experience_flash_game_screen_recording-gameplay.avif"
 								alt="Scott Hirons Experience gameplay"
 								ratio="4 / 3"
 								onclick={(e) => extrasGallery?.open(3, e.currentTarget)} />
@@ -282,7 +475,7 @@
 						</p>
 						<div class="cr-media">
 							<LazyMedia
-								src="2010-08-18_ksms_hallview_full_page_screen_recording.avif"
+								src="https://cdn.brianschwabauer.com/media/2010-08-18_ksms_hallview_full_page_screen_recording.avif"
 								alt="KSMS Hall View screen recording"
 								ratio="4 / 3"
 								onclick={(e) => extrasGallery?.open(4, e.currentTarget)} />
@@ -340,9 +533,7 @@
 				<Reveal variant="up" delay={180}>
 					<div class="inline-video">
 						<LazyMedia
-							src={poster(
-								'2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip',
-							)}
+							src="https://cdn.brianschwabauer.com/media/2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip/poster.jpg"
 							alt="KSMS live broadcast · basketball vs SM-NW (2011) — broadcast opener"
 							ratio="16 / 9"
 							video
@@ -386,7 +577,7 @@
 							</p>
 						</div>
 						<LazyMedia
-							src="2011-04-14_this_is_ksms-basketball_trick_shot_with_vfx.avif"
+							src="https://cdn.brianschwabauer.com/media/2011-04-14_this_is_ksms-basketball_trick_shot_with_vfx.avif"
 							alt="The KSMS trick shot"
 							ratio="16 / 9"
 							onclick={(e) => extrasGallery?.open(6, e.currentTarget)} />
@@ -398,7 +589,7 @@
 						<div class="bp-video-card">
 							<div class="bp-video-eyebrow">FULL SHOW</div>
 							<LazyMedia
-								src={poster('2011-04-14_ksms_block_party')}
+								src="https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party/poster.jpg"
 								alt="KSMS Block Party (2011) — full live show"
 								ratio="16 / 9"
 								video
@@ -407,7 +598,7 @@
 						<div class="bp-video-card">
 							<div class="bp-video-eyebrow">TRAILER</div>
 							<LazyMedia
-								src={poster('2011-04-15_block_party_trailer')}
+								src="https://cdn.brianschwabauer.com/media/2011-04-15_block_party_trailer/poster.jpg"
 								alt="Block Party trailer (2011)"
 								ratio="16 / 9"
 								video
@@ -416,7 +607,7 @@
 						<div class="bp-video-card">
 							<div class="bp-video-eyebrow">PROMO</div>
 							<LazyMedia
-								src={poster('2011-04-14_this_is_ksms_basketball_shot')}
+								src="https://cdn.brianschwabauer.com/media/2011-04-14_this_is_ksms_basketball_shot/poster.jpg"
 								alt="This is KSMS — trick-shot promo (2011)"
 								ratio="16 / 9"
 								video
@@ -437,7 +628,7 @@
 				<Reveal variant="up" delay={120}>
 					<div class="inline-video">
 						<LazyMedia
-							src={poster('2010-03-20_a_midwestside_story')}
+							src="https://cdn.brianschwabauer.com/media/2010-03-20_a_midwestside_story/poster.jpg"
 							alt="A MidWestSide Story (2010)"
 							ratio="16 / 9"
 							video
@@ -460,7 +651,7 @@
 			<Reveal variant="up" delay={120}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2011-08-28_long_time_no_see')}
+						src="https://cdn.brianschwabauer.com/media/2011-08-28_long_time_no_see/poster.jpg"
 						alt="Long Time No See (2011)"
 						ratio="16 / 9"
 						video

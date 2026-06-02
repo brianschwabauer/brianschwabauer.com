@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { media } from '../media';
-
 	let {
 		images,
 		height = 200,
@@ -41,20 +39,12 @@
 					type="button"
 					aria-label={item.caption ?? 'Open image'}
 					onclick={(e) => onframeclick?.({ index: realIndex, element: e.currentTarget })}>
-					<img
-						src={item.src.startsWith('http') ? item.src : media(item.src)}
-						alt={item.caption ?? ''}
-						loading="lazy"
-						decoding="async" />
+					<img src={item.src} alt={item.caption ?? ''} loading="lazy" decoding="async" />
 					{#if item.caption}<span class="caption">{item.caption}</span>{/if}
 				</button>
 			{:else}
 				<figure class="frame">
-					<img
-						src={item.src.startsWith('http') ? item.src : media(item.src)}
-						alt={item.caption ?? ''}
-						loading="lazy"
-						decoding="async" />
+					<img src={item.src} alt={item.caption ?? ''} loading="lazy" decoding="async" />
 					{#if item.caption}<figcaption>{item.caption}</figcaption>{/if}
 				</figure>
 			{/if}

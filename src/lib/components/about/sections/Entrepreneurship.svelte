@@ -5,18 +5,6 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems } from '../media';
-
-	const towerShots = [
-		'2016-01-01_tower_of_the_americas_panorama-equirectangular.avif',
-		'2016-01-01_tower_of_the_americas_panorama-little_planet.avif',
-		'2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_a1-home_page.avif',
-		'2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_e1-panorama_page.avif',
-		'2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_e1-panorama_page_zoomed_in.avif',
-		'2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_g1-location_info_page.avif',
-		'2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_d3-view_story_page.avif',
-		'2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_b1-location_selection.avif',
-	].map((src) => ({ src }));
 
 	const tapnotionShots = [
 		'2017-01-01_tapnotion_app_screenshot_home_page-scores.avif',
@@ -25,44 +13,179 @@
 		'2017-01-01_tapnotion_app_screenshot_game_over-win.avif',
 		'2017-01-01_tapnotion_app_screenshot_milestone-start.avif',
 		'2017-01-01_tapnotion_app_screenshot_question-multiple_choice-answer_revealed.avif',
-	].map((src) => ({ src }));
-
-	const engagementShots = [
-		'2016-01-01_engagement_grower_settings_page_mockup.avif',
-		'2016-01-01_engagement_grower_settings_page_addons_mockup.avif',
-		'2016-01-01_engagement_grower_infinite_scroll_settings_page_mockup.avif',
-		'2016-01-01_engagement_grower-fresh_content_addon_animation_for_website.gif',
-	].map((src) => ({ src }));
-
-	const markableShots = [
-		'2024-01-01_remarkably_organized_app-home_page_screenshot.avif',
-		'2024-01-01_remarkably_organized_app-settings_popup_screenshot.avif',
-		'2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-close_up_on_navigation.avif',
-		'2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-shallow_depth_of_field_year_view.avif',
-		'2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-title_page_close_up.avif',
-	].map((src) => ({ src }));
+	].map((src) => ({ src: `https://cdn.brianschwabauer.com/media/${src}` }));
 
 	const scrambledLetters = ['S', 'C', 'R', 'M', 'B', 'L', 'D'];
 
-	const towerImages: GalleryItem[] = imageItems(towerShots);
-	const engagementImages: GalleryItem[] = imageItems(engagementShots);
-	const markableImages: GalleryItem[] = imageItems(markableShots);
+	const towerImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_tower_of_the_americas_panorama-equirectangular.avif',
+			width: 2048,
+			height: 1024,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_tower_of_the_americas_panorama-little_planet.avif',
+			width: 2048,
+			height: 2048,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_a1-home_page.avif',
+			width: 1920,
+			height: 1080,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_e1-panorama_page.avif',
+			width: 1920,
+			height: 1080,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_e1-panorama_page_zoomed_in.avif',
+			width: 1920,
+			height: 1080,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_g1-location_info_page.avif',
+			width: 1920,
+			height: 1080,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_d3-view_story_page.avif',
+			width: 1920,
+			height: 1080,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_b1-location_selection.avif',
+			width: 1920,
+			height: 1080,
+		},
+	];
+	const engagementImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_engagement_grower_settings_page_mockup.avif',
+			width: 1787,
+			height: 2048,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_engagement_grower_settings_page_addons_mockup.avif',
+			width: 1787,
+			height: 2048,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_engagement_grower_infinite_scroll_settings_page_mockup.avif',
+			width: 1787,
+			height: 2048,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_engagement_grower-fresh_content_addon_animation_for_website.gif',
+		},
+	];
+	const markableImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_app-home_page_screenshot.avif',
+			width: 1907,
+			height: 979,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_app-settings_popup_screenshot.avif',
+			width: 1532,
+			height: 1222,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-close_up_on_navigation.avif',
+			width: 2048,
+			height: 1536,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-shallow_depth_of_field_year_view.avif',
+			width: 2048,
+			height: 1536,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-title_page_close_up.avif',
+			width: 2048,
+			height: 1536,
+		},
+	];
 
 	// Standalone clickable LazyMedias in document order:
 	// 0: Tower BTS camera shot, 1: Tower demo on tablet shot,
 	// 2..7: 6 tapnotion phone mockups
 	const sectionExtras: GalleryItem[] = [
-		imageItem(
-			'2016-06-08_tower_of_the_americas_virtual_tour_app-panorama_shoot_behind_the_scenes-brian_with_camera.avif',
-			'Brian shooting the panorama',
-			'Shooting the panorama on the observation deck',
-		),
-		imageItem(
-			'2016-06-30_tower_of_the_americas_virtual_tour_app-demo_video_on_tablet-rotate_tablet_360.avif',
-			'Demo on the tablet',
-			'Demoed on the tablet',
-		),
-		...tapnotionShots.map((s) => imageItem(s.src, 'TapNotion screenshot')),
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-06-08_tower_of_the_americas_virtual_tour_app-panorama_shoot_behind_the_scenes-brian_with_camera.avif',
+			width: 1080,
+			height: 608,
+			caption: 'Shooting the panorama on the observation deck',
+			alt: 'Brian shooting the panorama',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-06-30_tower_of_the_americas_virtual_tour_app-demo_video_on_tablet-rotate_tablet_360.avif',
+			width: 1080,
+			height: 608,
+			caption: 'Demoed on the tablet',
+			alt: 'Demo on the tablet',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2017-01-01_tapnotion_app_screenshot_home_page-scores.avif',
+			width: 375,
+			height: 812,
+			alt: 'TapNotion screenshot',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2017-01-01_tapnotion_app_screenshot_game-item-multiple_choice.avif',
+			width: 375,
+			height: 812,
+			alt: 'TapNotion screenshot',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2017-01-01_tapnotion_app_screenshot_challenge_page-completed_level.avif',
+			width: 375,
+			height: 812,
+			alt: 'TapNotion screenshot',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2017-01-01_tapnotion_app_screenshot_game_over-win.avif',
+			width: 375,
+			height: 812,
+			alt: 'TapNotion screenshot',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2017-01-01_tapnotion_app_screenshot_milestone-start.avif',
+			width: 375,
+			height: 812,
+			alt: 'TapNotion screenshot',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2017-01-01_tapnotion_app_screenshot_question-multiple_choice-answer_revealed.avif',
+			width: 375,
+			height: 812,
+			alt: 'TapNotion screenshot',
+		},
 	];
 	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
@@ -123,13 +246,13 @@
 			<Reveal variant="up" delay={150}>
 				<div class="bts-row">
 					<LazyMedia
-						src="2016-06-08_tower_of_the_americas_virtual_tour_app-panorama_shoot_behind_the_scenes-brian_with_camera.avif"
+						src="https://cdn.brianschwabauer.com/media/2016-06-08_tower_of_the_americas_virtual_tour_app-panorama_shoot_behind_the_scenes-brian_with_camera.avif"
 						alt="Brian shooting the panorama"
 						ratio="16 / 9"
 						caption="Shooting the panorama on the observation deck"
 						onclick={(e) => gallery?.open(0, e.currentTarget)} />
 					<LazyMedia
-						src="2016-06-30_tower_of_the_americas_virtual_tour_app-demo_video_on_tablet-rotate_tablet_360.avif"
+						src="https://cdn.brianschwabauer.com/media/2016-06-30_tower_of_the_americas_virtual_tour_app-demo_video_on_tablet-rotate_tablet_360.avif"
 						alt="Demo on the tablet"
 						ratio="16 / 9"
 						caption="Demoed on the tablet"

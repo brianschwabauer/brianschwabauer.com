@@ -5,74 +5,239 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems, videoItem, poster } from '../media';
 
-	const filmShots = [
-		'2014-06-04_what_makes_us_human-dramatic_dolly_shot_in_library.avif',
-		'2014-06-04_what_makes_us_human-drone_show_of_telescan_building_visual_effect.avif',
-		'2014-06-04_what_makes_us_human-eye_recording_light_visual_effect.avif',
-		'2014-06-04_what_makes_us_human-main_character_stuck_in_high_tech_jail_cell_visual_effect.avif',
-		'2014-06-04_what_makes_us_human-main_character_uses_futuristic_computer_hologram_ui_visual_effect.avif',
-		'2014-06-04_what_makes_us_human-transparent_tablet_ui_animation_visual_effect.avif',
-		'2014-06-04_what_makes_us_human-transparent_tablet_ui_animation_visual_effect_2.avif',
-		'2014-06-04_what_makes_us_human-villian_lectures_protagonist_in_high_tech_jail_cell.avif',
-	].map((src) => ({ src }));
-
-	const conceptArt = [
+	const filmImages: GalleryItem[] = [
 		{
-			src: '2014-06-04_what_makes_us_human-concept_art-telescan_building.avif',
-			caption: 'Telescan headquarters · concept art',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-dramatic_dolly_shot_in_library.avif',
+			width: 480,
+			height: 204,
 		},
 		{
-			src: '2014-06-04_what_makes_us_human-concept_art-disposal_room.jpg',
-			caption: 'Disposal room',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-drone_show_of_telescan_building_visual_effect.avif',
+			width: 480,
+			height: 204,
 		},
 		{
-			src: '2014-06-04_what_makes_us_human-concept_art-teleporter.jpg',
-			caption: 'The teleporter',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-eye_recording_light_visual_effect.avif',
+			width: 480,
+			height: 204,
 		},
 		{
-			src: '2014-06-04_what_makes_us_human-concept_art-handcuffs.jpg',
-			caption: 'Hi-tech restraints',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-main_character_stuck_in_high_tech_jail_cell_visual_effect.avif',
+			width: 480,
+			height: 204,
 		},
 		{
-			src: '2014-06-04_what_makes_us_human-concept_art-main_characters_eye_recorder_close_up.jpg',
-			caption: 'Eye-recorder UI',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-main_character_uses_futuristic_computer_hologram_ui_visual_effect.avif',
+			width: 480,
+			height: 204,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-transparent_tablet_ui_animation_visual_effect.avif',
+			width: 480,
+			height: 204,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-transparent_tablet_ui_animation_visual_effect_2.avif',
+			width: 480,
+			height: 204,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-villian_lectures_protagonist_in_high_tech_jail_cell.avif',
+			width: 480,
+			height: 204,
 		},
 	];
 
-	const btsPhotos = [
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-001.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-002.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-057.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-059.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-060.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-062.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-072.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-084.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-088.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-094.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-096.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-101.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-127.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-155.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-163.avif',
-		'2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-194.avif',
-	].map((src) => ({ src }));
+	const conceptImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-concept_art-telescan_building.avif',
+			width: 2048,
+			height: 1536,
+			caption: 'Telescan headquarters · concept art',
+			alt: 'Telescan headquarters · concept art',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-concept_art-disposal_room.jpg',
+			width: 843,
+			height: 474,
+			caption: 'Disposal room',
+			alt: 'Disposal room',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-concept_art-teleporter.jpg',
+			width: 738,
+			height: 960,
+			caption: 'The teleporter',
+			alt: 'The teleporter',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-concept_art-handcuffs.jpg',
+			width: 843,
+			height: 474,
+			caption: 'Hi-tech restraints',
+			alt: 'Hi-tech restraints',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-concept_art-main_characters_eye_recorder_close_up.jpg',
+			width: 1920,
+			height: 818,
+			caption: 'Eye-recorder UI',
+			alt: 'Eye-recorder UI',
+		},
+	];
 
-	const premierePhotos = [
-		'2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-empty_theater.avif',
-		'2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-crowd.avif',
-		'2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-brian_schwabauer_close_up.jpg',
-		'2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-what_makes_us_human_crew_group_photo.avif',
-	].map((src) => ({ src }));
+	const btsImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-001.avif',
+			width: 2048,
+			height: 1152,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-002.avif',
+			width: 2048,
+			height: 1152,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-057.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-059.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-060.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-062.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-072.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-084.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-088.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-094.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-096.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-101.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-127.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-155.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-163.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-194.avif',
+			width: 2048,
+			height: 1367,
+		},
+	];
+
+	const premiereImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-empty_theater.avif',
+			width: 2048,
+			height: 1537,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-crowd.avif',
+			width: 2048,
+			height: 1536,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-brian_schwabauer_close_up.jpg',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-what_makes_us_human_crew_group_photo.avif',
+			width: 2048,
+			height: 1365,
+		},
+	];
 
 	// Only the full thesis film is rendered inline — defer playback to a Gallery lightbox.
 	const sectionExtras: GalleryItem[] = [
-		videoItem(
-			'2014-06-04_what_makes_us_human',
-			'What Makes Us Human (2014) — full senior thesis short',
-		),
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human/poster.jpg',
+			width: 1920,
+			height: 818,
+			caption: 'What Makes Us Human (2014) — full senior thesis short',
+			alt: 'What Makes Us Human (2014) — full senior thesis short',
+		},
 	];
 	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
@@ -142,7 +307,7 @@
 			<Reveal variant="up">
 				<div class="eyebrow">FROM THE FILM</div>
 				<div class="gallery-bleed">
-					<Gallery items={imageItems(filmShots)} display="masonry" size="2" />
+					<Gallery items={filmImages} display="masonry" size="2" />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
@@ -154,7 +319,7 @@
 						<span>WATCH THE FULL FILM · 15 MIN</span>
 					</div>
 					<LazyMedia
-						src={poster('2014-06-04_what_makes_us_human')}
+						src="https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human/poster.jpg"
 						alt="What Makes Us Human (2014) — full senior thesis short"
 						ratio="16 / 9"
 						video
@@ -166,7 +331,7 @@
 		<div class="concept-grid">
 			<Reveal variant="up">
 				<div class="eyebrow">CONCEPT ART · PRE-PRODUCTION</div>
-				<Gallery items={imageItems(conceptArt)} display="masonry-row" size="2" />
+				<Gallery items={conceptImages} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 
@@ -204,7 +369,7 @@
 			</Reveal>
 			<Reveal variant="up" delay={120}>
 				<div class="gallery-bleed">
-					<Gallery items={imageItems(btsPhotos)} display="masonry" size="2" />
+					<Gallery items={btsImages} display="masonry" size="2" />
 				</div>
 			</Reveal>
 		</div>
@@ -219,7 +384,7 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<Gallery items={imageItems(premierePhotos)} display="masonry-row" size="2" />
+				<Gallery items={premiereImages} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 	</div>

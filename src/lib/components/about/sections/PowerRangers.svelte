@@ -6,133 +6,233 @@
 	import Expandable from '../primitives/Expandable.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems } from '../media';
 
-	const pr1Shots = [
+	const pr1ReelImages = [
 		{
-			src: '2007-07-26_power_rangers_360-power_rangers_start_the_morphin_time.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-07-26_power_rangers_360-power_rangers_start_the_morphin_time.avif',
+			width: 352,
+			height: 240,
 			caption: 'Morphin time',
+			alt: 'Morphin time',
 		},
 		{
-			src: '2007-07-26_power_rangers_360-amanda_morphs_on_green_screen_graphic.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-07-26_power_rangers_360-amanda_morphs_on_green_screen_graphic.avif',
+			width: 352,
+			height: 240,
 			caption: 'Amanda morphs (greenscreen graphic)',
+			alt: 'Amanda morphs (greenscreen graphic)',
 		},
 		{
-			src: '2007-07-26_power_rangers_360-brian_morphs_on_green_screen_graphic.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-07-26_power_rangers_360-brian_morphs_on_green_screen_graphic.avif',
+			width: 352,
+			height: 240,
 			caption: 'Brian morphs',
+			alt: 'Brian morphs',
 		},
 		{
-			src: '2007-07-26_power_rangers_360-emma_morphs_on_green_screen_graphic.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-07-26_power_rangers_360-emma_morphs_on_green_screen_graphic.avif',
+			width: 352,
+			height: 240,
 			caption: 'Emma morphs',
+			alt: 'Emma morphs',
 		},
 		{
-			src: '2007-07-26_power_rangers_360-kevin_morphs_on_green_screen_graphic.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-07-26_power_rangers_360-kevin_morphs_on_green_screen_graphic.avif',
+			width: 352,
+			height: 240,
 			caption: 'Kevin morphs',
+			alt: 'Kevin morphs',
 		},
 		{
-			src: '2007-07-26_power_rangers_360-brian_and_kevin_sword_fight.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-07-26_power_rangers_360-brian_and_kevin_sword_fight.avif',
+			width: 352,
+			height: 240,
 			caption: 'Red vs Blue, the duel',
+			alt: 'Red vs Blue, the duel',
 		},
 		{
-			src: '2007-07-26_power_rangers_360-vino_kicks_brian_in_360_move.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-07-26_power_rangers_360-vino_kicks_brian_in_360_move.avif',
+			width: 352,
+			height: 240,
 			caption: 'Vino lands the "360"',
+			alt: 'Vino lands the "360"',
 		},
 		{
-			src: '2007-07-26_power_rangers_360-vino_summons_fallen_broom_stick_reversed_footage_visual_effect.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-07-26_power_rangers_360-vino_summons_fallen_broom_stick_reversed_footage_visual_effect.avif',
+			width: 352,
+			height: 240,
 			caption: 'Reversed-footage summoning',
+			alt: 'Reversed-footage summoning',
 		},
 		{
-			src: '2007-07-26_power_rangers_360-vino_disappears_visual_effect.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-07-26_power_rangers_360-vino_disappears_visual_effect.avif',
+			width: 352,
+			height: 240,
 			caption: 'Vino vanishes',
+			alt: 'Vino vanishes',
 		},
 		{
-			src: '2007-07-26_power_rangers_360-brian_pulls_out_knife.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-07-26_power_rangers_360-brian_pulls_out_knife.avif',
+			width: 352,
+			height: 240,
 			caption: 'The final duel begins',
+			alt: 'The final duel begins',
 		},
-	];
+	] satisfies GalleryItem[];
 
-	const pr2BTS = [
+	const pr2BTSImages: GalleryItem[] = [
 		{
-			src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_03-clapper.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_03-clapper.avif',
+			width: 480,
+			height: 320,
 			caption: 'A real clapper this time',
+			alt: 'A real clapper this time',
 		},
 		{
-			src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_01.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_01.avif',
+			width: 480,
+			height: 320,
 			caption: 'On set, take whatever',
+			alt: 'On set, take whatever',
 		},
 		{
-			src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_02.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_02.avif',
+			width: 480,
+			height: 320,
 			caption: 'Stunt prep',
+			alt: 'Stunt prep',
 		},
 		{
-			src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_filming_a_dog.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_filming_a_dog.avif',
+			width: 480,
+			height: 320,
 			caption: 'Yes, Zordon was played by a dog',
+			alt: 'Yes, Zordon was played by a dog',
 		},
 		{
-			src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_green_screen_super_hero.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_green_screen_super_hero.avif',
+			width: 480,
+			height: 320,
 			caption: 'Flight comp, greenscreen',
+			alt: 'Flight comp, greenscreen',
 		},
 		{
-			src: '2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_04.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-behind_the_scenes_set_clip_04.avif',
+			width: 480,
+			height: 320,
 			caption: 'More set life',
+			alt: 'More set life',
 		},
 	];
 
-	const pr2Stills = [
+	const pr2StillImages: GalleryItem[] = [
 		{
-			src: '2008-08-15_power_rangers_360_ii-all_power_rangers_charge_towards_bad_guys.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-all_power_rangers_charge_towards_bad_guys.avif',
+			width: 480,
+			height: 320,
 			caption: 'The charge',
+			alt: 'The charge',
 		},
 		{
-			src: '2008-08-15_power_rangers_360_ii-all_power_rangers_pull_out_their_knifes.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-all_power_rangers_pull_out_their_knifes.avif',
+			width: 480,
+			height: 320,
 			caption: 'Blades out',
+			alt: 'Blades out',
 		},
 		{
-			src: '2008-08-15_power_rangers_360_ii-brian_and_grant_fight_with_swords.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-brian_and_grant_fight_with_swords.avif',
+			width: 480,
+			height: 320,
 			caption: 'Red vs henchman',
+			alt: 'Red vs henchman',
 		},
 		{
-			src: '2008-08-15_power_rangers_360_ii-brian_flies_towards_camera_using_green_screen_visual_effect.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-brian_flies_towards_camera_using_green_screen_visual_effect.avif',
+			width: 480,
+			height: 320,
 			caption: 'Flight, greenscreen',
+			alt: 'Flight, greenscreen',
 		},
 		{
-			src: '2008-08-15_power_rangers_360_ii-brian_flies_through_clouds_visual_effect.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-brian_flies_through_clouds_visual_effect.avif',
+			width: 480,
+			height: 320,
 			caption: 'Through the clouds',
+			alt: 'Through the clouds',
 		},
 		{
-			src: '2008-08-15_power_rangers_360_ii-vino_appears_by_tree_visual_effect.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-vino_appears_by_tree_visual_effect.avif',
+			width: 480,
+			height: 320,
 			caption: 'Vino, back from "the dead"',
+			alt: 'Vino, back from "the dead"',
 		},
 		{
-			src: '2008-08-15_power_rangers_360_ii-all_power_rangers_charge_towards_bad_guys_profile_shot.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-all_power_rangers_charge_towards_bad_guys_profile_shot.avif',
+			width: 480,
+			height: 320,
 			caption: 'Profile shot',
+			alt: 'Profile shot',
 		},
 		{
-			src: '2008-08-15_power_rangers_360_ii-brian_flies_and_lands_on_ground_visual_effect.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-15_power_rangers_360_ii-brian_flies_and_lands_on_ground_visual_effect.avif',
+			width: 480,
+			height: 320,
 			caption: 'Landing',
+			alt: 'Landing',
 		},
 	];
-
-	const pr1ReelImages: GalleryItem[] = imageItems(pr1Shots);
-	const pr2BTSImages: GalleryItem[] = imageItems(pr2BTS);
-	const pr2StillImages: GalleryItem[] = imageItems(pr2Stills);
 
 	const sectionExtras: GalleryItem[] = [
-		imageItem(
-			'2007-06-16_power_rangers_360-premiere-power_rangers_group_photo_1.jpg',
-			'The Power Rangers cast',
-			'Premiere · summer 2007 · backyard cinema · ~40 friends and family',
-		),
-		imageItem(
-			'2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif',
-			'The PR360 II premiere projector setup',
-			'PR360 II premiere · backyard projector setup',
-		),
-		imageItem(
-			'2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg',
-			'Brian and Kevin at the PR360 II premiere',
-			'Brian and Kevin at the PR360 II premiere',
-		),
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-06-16_power_rangers_360-premiere-power_rangers_group_photo_1.jpg',
+			width: 1536,
+			height: 1024,
+			caption: 'Premiere · summer 2007 · backyard cinema · ~40 friends and family',
+			alt: 'The Power Rangers cast',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif',
+			width: 1536,
+			height: 2048,
+			caption: 'PR360 II premiere · backyard projector setup',
+			alt: 'The PR360 II premiere projector setup',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg',
+			width: 1024,
+			height: 1536,
+			caption: 'Brian and Kevin at the PR360 II premiere',
+			alt: 'Brian and Kevin at the PR360 II premiere',
+		},
 	];
 
 	let reelGallery = $state<ReturnType<typeof Gallery>>();
@@ -201,7 +301,7 @@
 			<Reveal variant="right" delay={100}>
 				<div class="premiere">
 					<LazyMedia
-						src="2007-06-16_power_rangers_360-premiere-power_rangers_group_photo_1.jpg"
+						src="https://cdn.brianschwabauer.com/media/2007-06-16_power_rangers_360-premiere-power_rangers_group_photo_1.jpg"
 						alt="The Power Rangers cast"
 						ratio="4 / 3"
 						onclick={(e) => extrasGallery?.open(0, e.currentTarget)} />
@@ -215,7 +315,7 @@
 		<Reveal variant="up" delay={120}>
 			<div class="pr1-reel-wrap">
 				<FilmReel
-					images={pr1Shots}
+					images={pr1ReelImages}
 					height={160}
 					speed={70}
 					onframeclick={({ index, element }) => reelGallery?.open(index, element)} />
@@ -269,14 +369,14 @@
 			<div class="premiere-2">
 				<Reveal variant="left">
 					<LazyMedia
-						src="2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif"
+						src="https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif"
 						alt="The PR360 II premiere projector setup"
 						ratio="4 / 3"
 						onclick={(e) => extrasGallery?.open(1, e.currentTarget)} />
 				</Reveal>
 				<Reveal variant="right" delay={100}>
 					<LazyMedia
-						src="2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg"
+						src="https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg"
 						alt="Brian and Kevin at the PR360 II premiere"
 						ratio="4 / 3"
 						onclick={(e) => extrasGallery?.open(2, e.currentTarget)} />

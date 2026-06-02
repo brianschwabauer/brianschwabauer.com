@@ -5,9 +5,10 @@
 	import { page } from '$app/state';
 	import { bgStyle } from '$lib/client/images';
 	import { formatPostDate, isoPostDate } from '$lib/utils/date';
-	import { hls, poster } from '$lib/components/about/media';
 
 	let { data } = $props();
+
+	const MEDIA_BASE = 'https://cdn.brianschwabauer.com/media';
 
 	// The post body is server-rendered HTML ({@html} below). renderDoc emits
 	// `<figure class="blog-video">` placeholders for embedded HLS videos; here
@@ -27,7 +28,11 @@
 			players.push(
 				mount(Video, {
 					target,
-					props: { src: hls(slug), poster: poster(slug), aspectRatio: '16/9' },
+					props: {
+						src: `${MEDIA_BASE}/${slug}/master.m3u8`,
+						poster: `${MEDIA_BASE}/${slug}/poster.jpg`,
+						aspectRatio: '16/9',
+					},
 				}),
 			);
 		}

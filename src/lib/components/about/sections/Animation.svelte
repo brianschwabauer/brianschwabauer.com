@@ -7,33 +7,114 @@
 	import PinScrub from '../primitives/PinScrub.svelte';
 	import ScrubVideo from '../primitives/ScrubVideo.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { media, imageItem, imageItems, videoItem, poster } from '../media';
 
-	const calamityShots = [
-		'2009-12-25_calamity-airplane_fly_through_clouds.avif',
-		'2009-12-25_calamity-airplane_fly_through_city_first_person.avif',
-		'2009-12-25_calamity-airplane_fly_through_city_third_person.avif',
-		'2009-12-25_calamity-animated_radar_screen_visual_effect.avif',
-		'2009-12-25_calamity-dialog_scene_with_animated_mouths.avif',
-		'2009-12-25_calamity-explosions.avif',
-		'2009-12-25_calamity-monster_blown_up.avif',
-	].map((src) => ({ src }));
+	const calamityImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity-airplane_fly_through_clouds.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity-airplane_fly_through_city_first_person.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity-airplane_fly_through_city_third_person.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity-animated_radar_screen_visual_effect.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity-dialog_scene_with_animated_mouths.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity-explosions.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity-monster_blown_up.avif',
+			width: 480,
+			height: 320,
+		},
+	];
 
-	const exposureShots = [
-		'2011-03-01_exposure-camera_robot_chases_kevin.avif',
-		'2011-03-01_exposure-camera_robot_overheats_and_transforms_back_to_a_camera.avif',
-		'2011-03-01_exposure-camera_robot_scans_house_in_3d.avif',
-		'2011-03-01_exposure-camera_robot_shoots_tape_with_3d_effect.avif',
-		'2011-03-01_exposure-first_person_camera_robot_chase.avif',
-		'2011-03-01_exposure-3d_camera_model_wireframe.avif',
-		'2011-03-01_exposure-behind_the_scenes-brian_controls_rc_car_with_camera_mounted_for_robot_pov_shot.avif',
-		'2011-03-01_exposure-behind_the_scenes-brian_films_scene_of_actors.avif',
-		'2011-03-01_exposure-behind_the_scenes-brian_runs_backwards_with_camera_filming.avif',
-		'2011-03-01_exposure-behind_the_scenes-wes_dumps_water_on_himself_for_rainy_scene.avif',
-	].map((src) => ({ src }));
-
-	const calamityImages: GalleryItem[] = imageItems(calamityShots);
-	const exposureImages: GalleryItem[] = imageItems(exposureShots);
+	const exposureImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-camera_robot_chases_kevin.avif',
+			width: 480,
+			height: 270,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-camera_robot_overheats_and_transforms_back_to_a_camera.avif',
+			width: 480,
+			height: 270,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-camera_robot_scans_house_in_3d.avif',
+			width: 480,
+			height: 270,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-camera_robot_shoots_tape_with_3d_effect.avif',
+			width: 480,
+			height: 270,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-first_person_camera_robot_chase.avif',
+			width: 480,
+			height: 270,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-3d_camera_model_wireframe.avif',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-behind_the_scenes-brian_controls_rc_car_with_camera_mounted_for_robot_pov_shot.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-behind_the_scenes-brian_films_scene_of_actors.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-behind_the_scenes-brian_runs_backwards_with_camera_filming.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-behind_the_scenes-wes_dumps_water_on_himself_for_rainy_scene.avif',
+			width: 480,
+			height: 320,
+		},
+	];
 
 	// Standalone clickable LazyMedias + inline video posters in document order:
 	// 0: Calamity BTS - filming lego city (ladder)
@@ -48,45 +129,100 @@
 	// 9: iPrez video
 	// 10: XYZ News Special Report (inside <details>)
 	const sectionExtras: GalleryItem[] = [
-		imageItem(
-			'2009-12-25_calamity-behind_the_scenes-filming_lego_city_with_ladder_and_light.jpg',
-			'Filming the lego city from a ladder',
-			'Filming the lego city from a ladder',
-		),
-		imageItem(
-			'2009-12-25_calamity-behind_the_scenes_timelapse_of_building_lego_buildings.avif',
-			'Timelapse of building the lego city',
-			'Building the city — timelapse',
-		),
-		imageItem(
-			'2009-12-25_calamity-lego_plan_with_green_screen_background.avif',
-			'A lego scene in front of a greenscreen',
-			'Some shots used greenscreen instead of roto',
-		),
-		videoItem('2009-12-25_calamity', 'Calamity (2009) — full stop-motion short'),
-		videoItem('2011-03-01_exposure', 'Exposure (2011) — the camera-robot short'),
-		imageItem(
-			'2011-08-28_xyz_news-iprez-camera_jib_shot_of_studio.avif',
-			'iPrez 3D set jib shot',
-			'iPrez 3D set jib shot',
-		),
-		imageItem(
-			'2011-08-28_xyz_news-iprez-brian_as_new_anchor_in_front_of_green_screen_behind_the_scenes.avif',
-			'Brian on greenscreen',
-			'Brian on greenscreen',
-		),
-		imageItem(
-			'2011-08-28_xyz_news-iprez-kevin_as_weather_man_on_green_screen_raw_shot.avif',
-			'Kevin on greenscreen',
-			'Kevin on greenscreen',
-		),
-		imageItem(
-			'2011-08-28_xyz_news-iprez-film_snapshot_of_kevin_as_news_anchor.avif',
-			'Kevin in the final cut',
-			'Kevin in the final cut',
-		),
-		videoItem('2011-08-28_xyz_news-iprez', 'XYZ News — iPrez (2011)'),
-		videoItem('2011-03-18_xyz_news_special_report', 'XYZ News Special Report (2011)'),
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity-behind_the_scenes-filming_lego_city_with_ladder_and_light.jpg',
+			width: 720,
+			height: 480,
+			caption: 'Filming the lego city from a ladder',
+			alt: 'Filming the lego city from a ladder',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity-behind_the_scenes_timelapse_of_building_lego_buildings.avif',
+			width: 480,
+			height: 320,
+			caption: 'Building the city — timelapse',
+			alt: 'Timelapse of building the lego city',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity-lego_plan_with_green_screen_background.avif',
+			width: 720,
+			height: 480,
+			caption: 'Some shots used greenscreen instead of roto',
+			alt: 'A lego scene in front of a greenscreen',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity/master.m3u8',
+			poster: 'https://cdn.brianschwabauer.com/media/2009-12-25_calamity/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: 'Calamity (2009) — full stop-motion short',
+			alt: 'Calamity (2009) — full stop-motion short',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure/master.m3u8',
+			poster: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: 'Exposure (2011) — the camera-robot short',
+			alt: 'Exposure (2011) — the camera-robot short',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez-camera_jib_shot_of_studio.avif',
+			width: 480,
+			height: 270,
+			caption: 'iPrez 3D set jib shot',
+			alt: 'iPrez 3D set jib shot',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez-brian_as_new_anchor_in_front_of_green_screen_behind_the_scenes.avif',
+			width: 1080,
+			height: 608,
+			caption: 'Brian on greenscreen',
+			alt: 'Brian on greenscreen',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez-kevin_as_weather_man_on_green_screen_raw_shot.avif',
+			width: 1080,
+			height: 1920,
+			caption: 'Kevin on greenscreen',
+			alt: 'Kevin on greenscreen',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez-film_snapshot_of_kevin_as_news_anchor.avif',
+			width: 1920,
+			height: 1080,
+			caption: 'Kevin in the final cut',
+			alt: 'Kevin in the final cut',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: 'XYZ News — iPrez (2011)',
+			alt: 'XYZ News — iPrez (2011)',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2011-03-18_xyz_news_special_report/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2011-03-18_xyz_news_special_report/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: 'XYZ News Special Report (2011)',
+			alt: 'XYZ News Special Report (2011)',
+		},
 	];
 	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
@@ -136,7 +272,7 @@
 				</Reveal>
 				<Reveal variant="right" delay={120}>
 					<LazyMedia
-						src="2009-12-25_calamity-behind_the_scenes-filming_lego_city_with_ladder_and_light.jpg"
+						src="https://cdn.brianschwabauer.com/media/2009-12-25_calamity-behind_the_scenes-filming_lego_city_with_ladder_and_light.jpg"
 						alt="Filming the lego city from a ladder"
 						ratio="4 / 3"
 						onclick={(e) => gallery?.open(0, e.currentTarget)} />
@@ -155,13 +291,13 @@
 			<Reveal variant="up" delay={150}>
 				<div class="bts-pair">
 					<LazyMedia
-						src="2009-12-25_calamity-behind_the_scenes_timelapse_of_building_lego_buildings.avif"
+						src="https://cdn.brianschwabauer.com/media/2009-12-25_calamity-behind_the_scenes_timelapse_of_building_lego_buildings.avif"
 						alt="Timelapse of building the lego city"
 						ratio="16 / 9"
 						caption="Building the city — timelapse"
 						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 					<LazyMedia
-						src="2009-12-25_calamity-lego_plan_with_green_screen_background.avif"
+						src="https://cdn.brianschwabauer.com/media/2009-12-25_calamity-lego_plan_with_green_screen_background.avif"
 						alt="A lego scene in front of a greenscreen"
 						ratio="16 / 9"
 						caption="Some shots used greenscreen instead of roto"
@@ -172,7 +308,7 @@
 			<Reveal variant="up" delay={200}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2009-12-25_calamity')}
+						src="https://cdn.brianschwabauer.com/media/2009-12-25_calamity/poster.jpg"
 						alt="Calamity (2009) — full stop-motion short"
 						ratio="16 / 9"
 						video
@@ -207,12 +343,8 @@
 				<PinScrub height="280vh">
 					{#snippet children({ progress })}
 						<ScrubVideo
-							src={media(
-								'2011-03-01_exposure-animated_on_transparent_background_camera_robot_transforms_from_camera_to_robot.webm',
-							)}
-							reverseSrc={media(
-								'2011-03-01_exposure-animated_on_transparent_background_camera_robot_transforms_from_camera_to_robot-reverse.webm',
-							)}
+							src="https://cdn.brianschwabauer.com/media/2011-03-01_exposure-animated_on_transparent_background_camera_robot_transforms_from_camera_to_robot.webm"
+							reverseSrc="https://cdn.brianschwabauer.com/media/2011-03-01_exposure-animated_on_transparent_background_camera_robot_transforms_from_camera_to_robot-reverse.webm"
 							{progress}
 							ariaLabel="Camera transforming into a robot, scrubbed by scroll"
 							class="transformer-video" />
@@ -231,7 +363,7 @@
 			<Reveal variant="up" delay={130}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2011-03-01_exposure')}
+						src="https://cdn.brianschwabauer.com/media/2011-03-01_exposure/poster.jpg"
 						alt="Exposure (2011) — the camera-robot short"
 						ratio="16 / 9"
 						video
@@ -283,7 +415,7 @@
 				</Reveal>
 				<Reveal variant="right" delay={100}>
 					<LazyMedia
-						src="2011-08-28_xyz_news-iprez-camera_jib_shot_of_studio.avif"
+						src="https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez-camera_jib_shot_of_studio.avif"
 						alt="iPrez 3D set jib shot"
 						ratio="16 / 9"
 						onclick={(e) => gallery?.open(5, e.currentTarget)} />
@@ -293,17 +425,17 @@
 			<Reveal variant="up" delay={100}>
 				<div class="iprez-row">
 					<LazyMedia
-						src="2011-08-28_xyz_news-iprez-brian_as_new_anchor_in_front_of_green_screen_behind_the_scenes.avif"
+						src="https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez-brian_as_new_anchor_in_front_of_green_screen_behind_the_scenes.avif"
 						alt="Brian on greenscreen"
 						ratio="16 / 9"
 						onclick={(e) => gallery?.open(6, e.currentTarget)} />
 					<LazyMedia
-						src="2011-08-28_xyz_news-iprez-kevin_as_weather_man_on_green_screen_raw_shot.avif"
+						src="https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez-kevin_as_weather_man_on_green_screen_raw_shot.avif"
 						alt="Kevin on greenscreen"
 						ratio="16 / 9"
 						onclick={(e) => gallery?.open(7, e.currentTarget)} />
 					<LazyMedia
-						src="2011-08-28_xyz_news-iprez-film_snapshot_of_kevin_as_news_anchor.avif"
+						src="https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez-film_snapshot_of_kevin_as_news_anchor.avif"
 						alt="Kevin in the final cut"
 						ratio="16 / 9"
 						onclick={(e) => gallery?.open(8, e.currentTarget)} />
@@ -313,7 +445,7 @@
 			<Reveal variant="up" delay={140}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2011-08-28_xyz_news-iprez')}
+						src="https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez/poster.jpg"
 						alt="XYZ News — iPrez (2011)"
 						ratio="16 / 9"
 						video
@@ -326,7 +458,7 @@
 					<summary>Also watch — XYZ News Special Report (2011)</summary>
 					<div class="inline-video">
 						<LazyMedia
-							src={poster('2011-03-18_xyz_news_special_report')}
+							src="https://cdn.brianschwabauer.com/media/2011-03-18_xyz_news_special_report/poster.jpg"
 							alt="XYZ News Special Report (2011)"
 							ratio="16 / 9"
 							video

@@ -5,7 +5,6 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, videoItem } from '../media';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
@@ -91,39 +90,58 @@
 
 	// Every clickable piece of media in this section, in document order. The lightbox cycles through them all.
 	const baseImages: GalleryItem[] = [
-		imageItem(
-			'1998-05-01_brian_and_kevin_at_preschool_graduation.jpg',
-			'Brian and Kevin at preschool graduation',
-			'Brian and Kevin at preschool graduation',
-		),
-		imageItem(
-			'2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo.avif',
-			'Brian and Kevin fight in slow motion',
-			'The "slowmo" fight scene — take one',
-		),
-		imageItem(
-			'2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo_2.avif',
-			'Round two, still in slowmo',
-			'The "slowmo" fight scene — round two',
-		),
-		imageItem(
-			'2007-09-09_ninja_men-grant_splits_apple_with_karate_chop_special_effect.avif',
-			'The karate-chop apple split',
-			'Ninja Men — the karate-chop apple split',
-		),
-		imageItem(
-			'2008-02-25_02.29.08-editing_with_quick_shots.avif',
-			'Editing with quick cuts on 02.29.08',
-			'02.29.08 — editing with quick cuts',
-		),
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/1998-05-01_brian_and_kevin_at_preschool_graduation.jpg',
+			width: 677,
+			height: 958,
+			caption: 'Brian and Kevin at preschool graduation',
+			alt: 'Brian and Kevin at preschool graduation',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo.avif',
+			width: 352,
+			height: 240,
+			caption: 'The "slowmo" fight scene — take one',
+			alt: 'Brian and Kevin fight in slow motion',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo_2.avif',
+			width: 352,
+			height: 240,
+			caption: 'The "slowmo" fight scene — round two',
+			alt: 'Round two, still in slowmo',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-09-09_ninja_men-grant_splits_apple_with_karate_chop_special_effect.avif',
+			width: 352,
+			height: 240,
+			caption: 'Ninja Men — the karate-chop apple split',
+			alt: 'The karate-chop apple split',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-02-25_02.29.08-editing_with_quick_shots.avif',
+			width: 352,
+			height: 240,
+			caption: '02.29.08 — editing with quick cuts',
+			alt: 'Editing with quick cuts on 02.29.08',
+		},
 	];
 	const FILM_BASE_INDEX = baseImages.length;
 	const sectionMedia = $derived<GalleryItem[]>([
 		...baseImages,
 		...(signedIn
-			? earlyFilms.map((film) =>
-					videoItem(film.slug, film.title, `${film.title} (${film.date})`),
-				)
+			? earlyFilms.map((film) => ({
+					type: 'video' as const,
+					src: `https://cdn.brianschwabauer.com/media/${film.slug}/master.m3u8`,
+					poster: `https://cdn.brianschwabauer.com/media/${film.slug}/poster.jpg`,
+					caption: `${film.title} (${film.date})`,
+					alt: film.title,
+				}))
 			: []),
 	]);
 </script>
@@ -168,7 +186,7 @@
 			<Reveal variant="right" delay={200}>
 				<figure class="annotated">
 					<LazyMedia
-						src="1998-05-01_brian_and_kevin_at_preschool_graduation.jpg"
+						src="https://cdn.brianschwabauer.com/media/1998-05-01_brian_and_kevin_at_preschool_graduation.jpg"
 						alt="Brian and Kevin at preschool graduation"
 						ratio="4 / 3"
 						onclick={(e) => gallery?.open(0, e.currentTarget)} />
@@ -247,14 +265,14 @@
 			<div class="fight-pair">
 				<Reveal variant="left" delay={100}>
 					<LazyMedia
-						src="2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo.avif"
+						src="https://cdn.brianschwabauer.com/media/2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo.avif"
 						alt="Brian and Kevin fight in slow motion"
 						ratio="16 / 9"
 						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 				</Reveal>
 				<Reveal variant="right" delay={200}>
 					<LazyMedia
-						src="2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo_2.avif"
+						src="https://cdn.brianschwabauer.com/media/2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo_2.avif"
 						alt="Round two, still in slowmo"
 						ratio="16 / 9"
 						onclick={(e) => gallery?.open(2, e.currentTarget)} />
@@ -277,7 +295,7 @@
 					</p>
 				</div>
 				<LazyMedia
-					src="2007-09-09_ninja_men-grant_splits_apple_with_karate_chop_special_effect.avif"
+					src="https://cdn.brianschwabauer.com/media/2007-09-09_ninja_men-grant_splits_apple_with_karate_chop_special_effect.avif"
 					alt="The karate-chop apple split"
 					ratio="16 / 9"
 					class="karate-media"
@@ -297,7 +315,7 @@
 					</p>
 				</div>
 				<LazyMedia
-					src="2008-02-25_02.29.08-editing_with_quick_shots.avif"
+					src="https://cdn.brianschwabauer.com/media/2008-02-25_02.29.08-editing_with_quick_shots.avif"
 					alt="Editing with quick cuts on 02.29.08"
 					ratio="16 / 9"
 					onclick={(e) => gallery?.open(4, e.currentTarget)} />
