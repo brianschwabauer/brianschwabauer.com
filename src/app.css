@@ -703,3 +703,29 @@ select:focus {
 	   single giant column. Establish the container here. */
 	container-type: inline-size;
 }
+
+/* Masonry gallery that should stay at its parent's width (e.g. nested inside a
+   bordered card or narrow column) rather than bleeding to the viewport. Still
+   establishes the @container context the masonry layout needs. */
+.gallery-contained {
+	container-type: inline-size;
+}
+
+/* Pull a gallery's heading/intro out to the same full-bleed width + side padding
+   as the .gallery-bleed below it, so their left edges line up. Apply to the
+   heading / eyebrow / intro elements sitting above a full-width gallery. It only
+   sets the bleed (width + horizontal margin + padding), so an element's own
+   max-width still constrains the text — just its left edge shifts out to align
+   with the gallery. */
+.bleed-head {
+	width: 100vw;
+	/* !important so a heading's own `margin` shorthand (which sets margin-inline
+	   to 0 and, being component-scoped, outranks this rule) can't cancel the
+	   horizontal breakout. These elements never need their own side margins. */
+	margin-inline: calc(50% - 50vw) !important;
+	padding-inline: clamp(0.5rem, 2.5vw, 2rem);
+	box-sizing: border-box;
+	/* Only the left edge needs to reach the gallery; keep the text itself at a
+	   readable measure (a tighter per-section max-width on the prose still wins). */
+	max-width: 64rem;
+}

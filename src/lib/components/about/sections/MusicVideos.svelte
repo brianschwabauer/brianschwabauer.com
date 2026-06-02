@@ -269,7 +269,7 @@
 		<div class="track">
 			<div class="track-num">02</div>
 			<div class="track-body">
-				<Reveal>
+				<Reveal class="bleed-head">
 					<h3 class="sub">
 						Do Da Flava G <span class="dot">·</span>
 						2010
@@ -307,7 +307,7 @@
 		<div class="track">
 			<div class="track-num">03</div>
 			<div class="track-body">
-				<Reveal>
+				<Reveal class="bleed-head">
 					<h3 class="sub">
 						You Derive Me Crazy <span class="dot">·</span>
 						2010

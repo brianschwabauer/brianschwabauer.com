@@ -360,7 +360,7 @@
 		</Reveal>
 
 		<div class="yard-sale">
-			<Reveal>
+			<Reveal class="bleed-head">
 				<h3 class="sub">Yard Sale (2009) — the one I was most proud of</h3>
 				<p>
 					Almost no dialogue. A guy holds a yard sale and tries to get rid of his stuffed
@@ -550,7 +550,7 @@
 			</div>
 
 			<div class="block-party">
-				<Reveal>
+				<Reveal class="bleed-head">
 					<h4 class="lb-title">KSMS Block Party — the senior-year finale</h4>
 					<p>
 						A live, SNL-style variety show in our school auditorium. Months of

@@ -239,7 +239,7 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<div class="gallery-bleed">
+				<div class="gallery-contained">
 					<Gallery items={towerImages} display="masonry" size="2" />
 				</div>
 			</Reveal>
