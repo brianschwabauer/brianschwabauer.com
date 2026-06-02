@@ -5,7 +5,6 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import VideoPlayer from '../primitives/VideoPlayer.svelte';
 	import { imageItem, videoItem } from '../media';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
@@ -378,21 +377,10 @@
 		</Reveal>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionMedia} display="lightbox">
-		{#snippet custom({ item })}
-			<div class="lb-video">
-				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
-			</div>
-		{/snippet}
-	</Gallery>
+	<Gallery bind:this={gallery} items={sectionMedia} display="lightbox" autoplay_video />
 </SectionShell>
 
 <style>
-	.lb-video {
-		width: min(1400px, 92vw);
-		aspect-ratio: 16 / 9;
-		max-height: calc(95svh - 8rem);
-	}
 	.lb-img {
 		display: block;
 		max-width: min(1400px, 92vw);

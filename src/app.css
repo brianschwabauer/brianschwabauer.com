@@ -101,6 +101,11 @@
 	--z-modal: 400;
 	--z-menu: 500;
 	--z-tooltip: 600;
+
+	/* delightstack's top overlay layer (used by its Modal/Gallery lightbox, Popover,
+	   etc.) defaults to 5 — below our sticky header (200). Raise it above the whole
+	   site z-index scale so the Gallery lightbox modal covers the navbar. */
+	--layer-5: 1000;
 }
 
 /* Dark Theme */
@@ -682,4 +687,19 @@ select:focus {
 	animation-duration: 300ms;
 	animation-delay: 300ms;
 	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Full-bleed wrapper for home-page galleries that should span the viewport,
+   even when nested inside a max-width content container. Used for image-heavy
+   Gallery sections; smaller galleries stay at container width. */
+.gallery-bleed {
+	width: 100vw;
+	margin-left: calc(50% - 50vw);
+	margin-right: calc(50% - 50vw);
+	padding-inline: clamp(0.5rem, 2.5vw, 2rem);
+	box-sizing: border-box;
+	/* The delightstack masonry layout sizes its columns with @container queries,
+	   so it needs a query container ancestor — without one it collapses to a
+	   single giant column. Establish the container here. */
+	container-type: inline-size;
 }

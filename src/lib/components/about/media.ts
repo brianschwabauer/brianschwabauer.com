@@ -1,4 +1,5 @@
 import type { GalleryItem } from '@delightstack/components/media';
+import { MEDIA_DIMENSIONS } from './media-dimensions';
 
 export const MEDIA_BASE = 'https://cdn.brianschwabauer.com/media';
 
@@ -14,35 +15,40 @@ export function poster(slug: string): string {
 	return `${MEDIA_BASE}/${slug}/poster.jpg`;
 }
 
-export function vttThumbs(slug: string): string {
-	return `${MEDIA_BASE}/${slug}/thumbs/thumbs.vtt`;
+/** Look up the real intrinsic dimensions for a CDN filename or video slug.
+ *  Falls back to the bare filename when a full CDN URL is passed. */
+function dimsFor(key: string): { width?: number; height?: number } {
+	const stripped = key.startsWith(`${MEDIA_BASE}/`)
+		? key.slice(MEDIA_BASE.length + 1)
+		: key;
+	const dims = MEDIA_DIMENSIONS[key] ?? MEDIA_DIMENSIONS[stripped];
+	return dims ? { width: dims[0], height: dims[1] } : {};
 }
 
 export function imageItem(src: string, alt = '', caption?: string): GalleryItem {
 	return {
 		type: 'image',
 		src: media(src),
+		...dimsFor(src),
 		alt,
 		name: caption,
 		caption,
 	};
 }
 
-/** Build a custom-type GalleryItem for an HLS video — Gallery renders it via the `custom`
- *  snippet, which the consuming page wires up to the project's video.js-based VideoPlayer.
- *  The slug is stored on `id` (and as `src` so Carousel has a stable key) and re-read inside
- *  the snippet to construct the player. */
+/** Build a video GalleryItem. Gallery's built-in Video renderer plays the HLS stream
+ *  natively (lazy-loading hls.js where the browser lacks native HLS); the poster doubles
+ *  as the thumbnail in the grid. width/height come from the poster so masonry can pack it. */
 export function videoItem(slug: string, title = '', caption?: string): GalleryItem {
 	return {
 		id: slug,
-		type: 'custom',
-		src: slug,
+		type: 'video',
+		src: hls(slug),
 		poster: poster(slug),
+		...dimsFor(slug),
 		alt: title,
 		name: title,
 		caption: caption ?? title,
-		disable_zoom: true,
-		disable_swipe: true,
 	};
 }
 

@@ -3,12 +3,11 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import VideoPlayer from '../primitives/VideoPlayer.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import PinScrub from '../primitives/PinScrub.svelte';
 	import ScrubVideo from '../primitives/ScrubVideo.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { media, imageItem, imageItems, videoItem } from '../media';
+	import { media, imageItem, imageItems, videoItem, poster } from '../media';
 
 	const calamityShots = [
 		'2009-12-25_calamity-airplane_fly_through_clouds.avif',
@@ -36,17 +35,17 @@
 	const calamityImages: GalleryItem[] = imageItems(calamityShots);
 	const exposureImages: GalleryItem[] = imageItems(exposureShots);
 
-	// Standalone clickable LazyMedias + inline VideoPlayers in document order:
+	// Standalone clickable LazyMedias + inline video posters in document order:
 	// 0: Calamity BTS - filming lego city (ladder)
 	// 1: Calamity BTS - timelapse building city
 	// 2: Calamity BTS - greenscreen lego
-	// 3: Calamity VideoPlayer
-	// 4: Exposure VideoPlayer
+	// 3: Calamity video
+	// 4: Exposure video
 	// 5: iPrez set jib shot LazyMedia
 	// 6: iPrez row - Brian on greenscreen
 	// 7: iPrez row - Kevin on greenscreen
 	// 8: iPrez row - Kevin in final cut
-	// 9: iPrez VideoPlayer
+	// 9: iPrez video
 	// 10: XYZ News Special Report (inside <details>)
 	const sectionExtras: GalleryItem[] = [
 		imageItem(
@@ -147,7 +146,9 @@
 			<Reveal variant="up" delay={100}>
 				<div class="storyboard">
 					<div class="story-eyebrow">FROM THE SHOT LIST</div>
-					<Gallery items={calamityImages} display="masonry-row" />
+					<div class="gallery-bleed">
+						<Gallery items={calamityImages} display="masonry" size="2" />
+					</div>
 				</div>
 			</Reveal>
 
@@ -170,11 +171,12 @@
 
 			<Reveal variant="up" delay={200}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2009-12-25_calamity"
-						title="Calamity (2009) — full stop-motion short"
+					<LazyMedia
+						src={poster('2009-12-25_calamity')}
+						alt="Calamity (2009) — full stop-motion short"
 						ratio="16 / 9"
-						onclick={() => gallery?.open(3)} />
+						video
+						onclick={(e) => gallery?.open(3, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -220,17 +222,20 @@
 
 			<Reveal variant="up" delay={100}>
 				<div class="exposure-grid">
-					<Gallery items={exposureImages} display="masonry-row" />
+					<div class="gallery-bleed">
+						<Gallery items={exposureImages} display="masonry" size="2" />
+					</div>
 				</div>
 			</Reveal>
 
 			<Reveal variant="up" delay={130}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2011-03-01_exposure"
-						title="Exposure (2011) — the camera-robot short"
+					<LazyMedia
+						src={poster('2011-03-01_exposure')}
+						alt="Exposure (2011) — the camera-robot short"
 						ratio="16 / 9"
-						onclick={() => gallery?.open(4)} />
+						video
+						onclick={(e) => gallery?.open(4, e.currentTarget)} />
 				</div>
 			</Reveal>
 
@@ -307,11 +312,12 @@
 
 			<Reveal variant="up" delay={140}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2011-08-28_xyz_news-iprez"
-						title="XYZ News — iPrez (2011)"
+					<LazyMedia
+						src={poster('2011-08-28_xyz_news-iprez')}
+						alt="XYZ News — iPrez (2011)"
 						ratio="16 / 9"
-						onclick={() => gallery?.open(9)} />
+						video
+						onclick={(e) => gallery?.open(9, e.currentTarget)} />
 				</div>
 			</Reveal>
 
@@ -319,32 +325,22 @@
 				<details class="extra-video">
 					<summary>Also watch — XYZ News Special Report (2011)</summary>
 					<div class="inline-video">
-						<VideoPlayer
-							slug="2011-03-18_xyz_news_special_report"
-							title="XYZ News Special Report (2011)"
+						<LazyMedia
+							src={poster('2011-03-18_xyz_news_special_report')}
+							alt="XYZ News Special Report (2011)"
 							ratio="16 / 9"
-							onclick={() => gallery?.open(10)} />
+							video
+							onclick={(e) => gallery?.open(10, e.currentTarget)} />
 					</div>
 				</details>
 			</Reveal>
 		</div>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox">
-		{#snippet custom({ item })}
-			<div class="lb-video">
-				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
-			</div>
-		{/snippet}
-	</Gallery>
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" autoplay_video />
 </SectionShell>
 
 <style>
-	.lb-video {
-		width: min(1400px, 92vw);
-		aspect-ratio: 16 / 9;
-		max-height: calc(95svh - 8rem);
-	}
 	.lb-img {
 		display: block;
 		max-width: min(1400px, 92vw);

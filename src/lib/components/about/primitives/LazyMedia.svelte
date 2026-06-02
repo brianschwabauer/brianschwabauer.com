@@ -10,6 +10,7 @@
 		rounded = true,
 		shadow = true,
 		eager = false,
+		video = false,
 		class: klass = '',
 		style = '',
 		onclick = undefined as
@@ -24,6 +25,9 @@
 		rounded?: boolean;
 		shadow?: boolean;
 		eager?: boolean;
+		/** Render a play-button overlay over the poster (use for clickable video thumbnails
+		 *  that open a Gallery lightbox). */
+		video?: boolean;
 		class?: string;
 		style?: string;
 		onclick?: (event: MouseEvent & { currentTarget: HTMLButtonElement }) => void;
@@ -52,6 +56,11 @@
 			class:loaded
 			style:object-fit={fit}
 			onload={() => (loaded = true)} />
+		{#if video}
+			<span class="play" aria-hidden="true">
+				<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+			</span>
+		{/if}
 		{#if caption}
 			<span class="caption">{caption}</span>
 		{/if}
@@ -107,6 +116,35 @@
 	.lazy-media-button:focus-visible {
 		outline: 2px solid #00e0ff;
 		outline-offset: 2px;
+	}
+	.play {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		display: grid;
+		place-items: center;
+		width: clamp(44px, 9%, 72px);
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background: rgba(0, 0, 0, 0.55);
+		color: #fff;
+		backdrop-filter: blur(4px);
+		box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+		transition:
+			transform 200ms ease,
+			background 200ms ease;
+		pointer-events: none;
+	}
+	.play svg {
+		width: 45%;
+		height: 45%;
+		margin-left: 6%;
+	}
+	.lazy-media-button:hover .play {
+		transition-duration: 0s;
+		transform: translate(-50%, -50%) scale(1.08);
+		background: rgba(0, 0, 0, 0.7);
 	}
 	.lazy-media.rounded {
 		border-radius: 12px;

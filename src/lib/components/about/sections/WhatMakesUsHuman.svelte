@@ -3,10 +3,9 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import VideoPlayer from '../primitives/VideoPlayer.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems, videoItem } from '../media';
+	import { imageItem, imageItems, videoItem, poster } from '../media';
 
 	const filmShots = [
 		'2014-06-04_what_makes_us_human-dramatic_dolly_shot_in_library.avif',
@@ -142,7 +141,9 @@
 		<div class="film-grid">
 			<Reveal variant="up">
 				<div class="eyebrow">FROM THE FILM</div>
-				<Gallery items={imageItems(filmShots)} display="masonry-row" />
+				<div class="gallery-bleed">
+					<Gallery items={imageItems(filmShots)} display="masonry" size="2" />
+				</div>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
 				<div class="full-film">
@@ -152,10 +153,11 @@
 						</svg>
 						<span>WATCH THE FULL FILM · 15 MIN</span>
 					</div>
-					<VideoPlayer
-						slug="2014-06-04_what_makes_us_human"
-						title="What Makes Us Human (2014) — full senior thesis short"
+					<LazyMedia
+						src={poster('2014-06-04_what_makes_us_human')}
+						alt="What Makes Us Human (2014) — full senior thesis short"
 						ratio="16 / 9"
+						video
 						onclick={(e) => gallery?.open(0, e.currentTarget)} />
 				</div>
 			</Reveal>
@@ -164,7 +166,7 @@
 		<div class="concept-grid">
 			<Reveal variant="up">
 				<div class="eyebrow">CONCEPT ART · PRE-PRODUCTION</div>
-				<Gallery items={imageItems(conceptArt)} display="masonry-row" />
+				<Gallery items={imageItems(conceptArt)} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 
@@ -201,7 +203,9 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<Gallery items={imageItems(btsPhotos)} display="masonry-row" />
+				<div class="gallery-bleed">
+					<Gallery items={imageItems(btsPhotos)} display="masonry" size="2" />
+				</div>
 			</Reveal>
 		</div>
 
@@ -215,26 +219,15 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<Gallery items={imageItems(premierePhotos)} display="masonry-row" />
+				<Gallery items={imageItems(premierePhotos)} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox">
-		{#snippet custom({ item })}
-			<div class="lb-video">
-				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
-			</div>
-		{/snippet}
-	</Gallery>
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" autoplay_video />
 </SectionShell>
 
 <style>
-	.lb-video {
-		width: min(1400px, 92vw);
-		aspect-ratio: 16 / 9;
-		max-height: calc(95svh - 8rem);
-	}
 	.lb-img {
 		display: block;
 		max-width: min(1400px, 92vw);

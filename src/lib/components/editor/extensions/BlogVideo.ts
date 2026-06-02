@@ -10,7 +10,7 @@
  *
  * The TipTap JSON is the source of truth. The public post page (renderDoc)
  * emits a `<figure class="blog-video">` placeholder that blog/[slug]/+page.svelte
- * hydrates into a video.js player; the editor shows the static poster preview
+ * hydrates into a delightstack Video player; the editor shows the static poster preview
  * straight from renderHTML below (no node view needed — the node is an atom).
  */
 import { Node, mergeAttributes } from '@tiptap/core';

@@ -3,10 +3,9 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import VideoPlayer from '../primitives/VideoPlayer.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems, videoItem } from '../media';
+	import { imageItem, imageItems, videoItem, poster } from '../media';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
@@ -86,7 +85,7 @@
 
 	let reelGallery = $state<ReturnType<typeof Gallery>>();
 
-	// Standalone clickable LazyMedias + inline VideoPlayers in document order.
+	// Standalone clickable LazyMedias + inline video posters in document order.
 	// 0: Yard Sale inline video
 	// 1: Austin Fender (inside <details>)
 	// 2: KSMS site cr-card LazyMedia
@@ -94,11 +93,11 @@
 	// 4: Hall View cr-card LazyMedia
 	// 5: live broadcast inline video
 	// 6: trick-shot LazyMedia
-	// 7: Block Party FULL SHOW VideoPlayer
-	// 8: Block Party TRAILER VideoPlayer
-	// 9: Block Party PROMO VideoPlayer
-	// 10: A MidWestSide Story VideoPlayer
-	// 11: Long Time No See VideoPlayer
+	// 7: Block Party FULL SHOW video
+	// 8: Block Party TRAILER video
+	// 9: Block Party PROMO video
+	// 10: A MidWestSide Story video
+	// 11: Long Time No See video
 	const sectionExtras: GalleryItem[] = [
 		videoItem('2009-03-22_yard_sale', 'Yard Sale (2009) — the stuffed-animal short'),
 		videoItem('2008-03-19_austin_fender', 'Austin Fender (2008)'),
@@ -184,14 +183,17 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<Gallery items={yardSaleImages} display="masonry-row" />
+				<div class="gallery-bleed">
+					<Gallery items={yardSaleImages} display="masonry" size="2" />
+				</div>
 			</Reveal>
 			<Reveal variant="up" delay={160}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2009-03-22_yard_sale"
-						title="Yard Sale (2009) — the stuffed-animal short"
+					<LazyMedia
+						src={poster('2009-03-22_yard_sale')}
+						alt="Yard Sale (2009) — the stuffed-animal short"
 						ratio="16 / 9"
+						video
 						onclick={(e) => extrasGallery?.open(0, e.currentTarget)} />
 				</div>
 			</Reveal>
@@ -202,10 +204,11 @@
 						Also watch — Austin Fender (2008) · our first festival submission
 					</summary>
 					<div class="inline-video">
-						<VideoPlayer
-							slug="2008-03-19_austin_fender"
-							title="Austin Fender (2008)"
+						<LazyMedia
+							src={poster('2008-03-19_austin_fender')}
+							alt="Austin Fender (2008)"
 							ratio="16 / 9"
+							video
 							onclick={(e) => extrasGallery?.open(1, e.currentTarget)} />
 					</div>
 				</details>
@@ -331,15 +334,18 @@
 				</Reveal>
 
 				<Reveal variant="up" delay={150}>
-					<Gallery items={liveBroadcastImages} display="masonry-row" />
+					<Gallery items={liveBroadcastImages} display="masonry-row" size="2" />
 				</Reveal>
 
 				<Reveal variant="up" delay={180}>
 					<div class="inline-video">
-						<VideoPlayer
-							slug="2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip"
-							title="KSMS live broadcast · basketball vs SM-NW (2011) — broadcast opener"
+						<LazyMedia
+							src={poster(
+								'2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip',
+							)}
+							alt="KSMS live broadcast · basketball vs SM-NW (2011) — broadcast opener"
 							ratio="16 / 9"
+							video
 							onclick={(e) => extrasGallery?.open(5, e.currentTarget)} />
 					</div>
 				</Reveal>
@@ -364,7 +370,9 @@
 				</Reveal>
 
 				<Reveal variant="up" delay={120}>
-					<Gallery items={blockPartyImages} display="masonry-row" />
+					<div class="gallery-bleed">
+						<Gallery items={blockPartyImages} display="masonry" size="2" />
+					</div>
 				</Reveal>
 
 				<Reveal variant="up" delay={150}>
@@ -389,26 +397,29 @@
 					<div class="block-party-videos">
 						<div class="bp-video-card">
 							<div class="bp-video-eyebrow">FULL SHOW</div>
-							<VideoPlayer
-								slug="2011-04-14_ksms_block_party"
-								title="KSMS Block Party (2011) — full live show"
+							<LazyMedia
+								src={poster('2011-04-14_ksms_block_party')}
+								alt="KSMS Block Party (2011) — full live show"
 								ratio="16 / 9"
+								video
 								onclick={(e) => extrasGallery?.open(7, e.currentTarget)} />
 						</div>
 						<div class="bp-video-card">
 							<div class="bp-video-eyebrow">TRAILER</div>
-							<VideoPlayer
-								slug="2011-04-15_block_party_trailer"
-								title="Block Party trailer (2011)"
+							<LazyMedia
+								src={poster('2011-04-15_block_party_trailer')}
+								alt="Block Party trailer (2011)"
 								ratio="16 / 9"
+								video
 								onclick={(e) => extrasGallery?.open(8, e.currentTarget)} />
 						</div>
 						<div class="bp-video-card">
 							<div class="bp-video-eyebrow">PROMO</div>
-							<VideoPlayer
-								slug="2011-04-14_this_is_ksms_basketball_shot"
-								title="This is KSMS — trick-shot promo (2011)"
+							<LazyMedia
+								src={poster('2011-04-14_this_is_ksms_basketball_shot')}
+								alt="This is KSMS — trick-shot promo (2011)"
 								ratio="16 / 9"
+								video
 								onclick={(e) => extrasGallery?.open(9, e.currentTarget)} />
 						</div>
 					</div>
@@ -425,10 +436,11 @@
 				</Reveal>
 				<Reveal variant="up" delay={120}>
 					<div class="inline-video">
-						<VideoPlayer
-							slug="2010-03-20_a_midwestside_story"
-							title="A MidWestSide Story (2010)"
+						<LazyMedia
+							src={poster('2010-03-20_a_midwestside_story')}
+							alt="A MidWestSide Story (2010)"
 							ratio="16 / 9"
+							video
 							onclick={(e) => extrasGallery?.open(10, e.currentTarget)} />
 					</div>
 				</Reveal>
@@ -447,33 +459,27 @@
 			</Reveal>
 			<Reveal variant="up" delay={120}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2011-08-28_long_time_no_see"
-						title="Long Time No See (2011)"
+					<LazyMedia
+						src={poster('2011-08-28_long_time_no_see')}
+						alt="Long Time No See (2011)"
 						ratio="16 / 9"
+						video
 						onclick={(e) => extrasGallery?.open(11, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
 	</div>
 
-	<Gallery bind:this={reelGallery} items={reelImages} display="lightbox" />
+	<Gallery bind:this={reelGallery} items={reelImages} display="lightbox" autoplay_video />
 
-	<Gallery bind:this={extrasGallery} items={sectionExtras} display="lightbox">
-		{#snippet custom({ item })}
-			<div class="lb-video">
-				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
-			</div>
-		{/snippet}
-	</Gallery>
+	<Gallery
+		bind:this={extrasGallery}
+		items={sectionExtras}
+		display="lightbox"
+		autoplay_video />
 </SectionShell>
 
 <style>
-	.lb-video {
-		width: min(1400px, 92vw);
-		aspect-ratio: 16 / 9;
-		max-height: calc(95svh - 8rem);
-	}
 	:global([data-theme='broadcast']) {
 		background: linear-gradient(180deg, #0c0808 0%, #160c0c 50%, #0a0606 100%);
 		color: #fdebe5;

@@ -269,8 +269,8 @@ const MEDIA_BASE = 'https://cdn.brianschwabauer.com/media';
 
 /**
  * Emit a `.blog-video` placeholder. The post page (blog/[slug]/+page.svelte)
- * finds these on mount and hydrates `.blog-video-mount` into a video.js HLS
- * player; before JS runs, the poster image stands in.
+ * finds these on mount and hydrates `.blog-video-mount` into a delightstack
+ * Video (HLS) player; before JS runs, the poster image stands in.
  */
 function renderBlogVideo(node: TipTapNode): string {
 	const attrs = node.attrs ?? {};

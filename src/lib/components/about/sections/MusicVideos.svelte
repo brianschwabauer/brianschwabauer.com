@@ -3,10 +3,9 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import VideoPlayer from '../primitives/VideoPlayer.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems, videoItem } from '../media';
+	import { imageItem, imageItems, videoItem, poster } from '../media';
 
 	const flavaShots = [
 		'2010-03-25_do_da_flava_g-music_video_intro.avif',
@@ -33,8 +32,8 @@
 		'2010-08-10_you_derive_me_crazy-lavergne_dancing_in_front_of_green_screen.avif',
 	].map((src) => ({ src }));
 
-	// Standalone LazyMedias + inline VideoPlayers combined into one lightbox-only Gallery.
-	// Order matches document order: 2 Flashlight pair images, then 3 inline videos.
+	// Standalone image thumbnails + inline video poster thumbnails, combined into one
+	// lightbox-only Gallery. Order matches document order: 2 Flashlight images, then 3 videos.
 	const sectionExtras: GalleryItem[] = [
 		imageItem('2007-08-26_flashlight-brian_plays_guitar.avif', 'Brian plays guitar'),
 		imageItem(
@@ -129,10 +128,11 @@
 				</Reveal>
 				<Reveal variant="up" delay={160}>
 					<div class="track-video">
-						<VideoPlayer
-							slug="2007-08-26_flashlight"
-							title="Flashlight (2007) — music video"
+						<LazyMedia
+							src={poster('2007-08-26_flashlight')}
+							alt="Flashlight (2007) — music video"
 							ratio="16 / 9"
+							video
 							onclick={(e) => gallery?.open(2, e.currentTarget)} />
 					</div>
 				</Reveal>
@@ -160,14 +160,17 @@
 					</p>
 				</Reveal>
 				<Reveal variant="up" delay={120}>
-					<Gallery items={imageItems(flavaShots)} display="masonry-row" />
+					<div class="gallery-bleed">
+						<Gallery items={imageItems(flavaShots)} display="masonry" size="2" />
+					</div>
 				</Reveal>
 				<Reveal variant="up" delay={160}>
 					<div class="track-video">
-						<VideoPlayer
-							slug="2010-03-25_do_da_flava_g"
-							title="Do Da Flava G (2010) — music video"
+						<LazyMedia
+							src={poster('2010-03-25_do_da_flava_g')}
+							alt="Do Da Flava G (2010) — music video"
 							ratio="16 / 9"
+							video
 							onclick={(e) => gallery?.open(3, e.currentTarget)} />
 					</div>
 				</Reveal>
@@ -191,14 +194,17 @@
 					</p>
 				</Reveal>
 				<Reveal variant="up" delay={120}>
-					<Gallery items={imageItems(calcShots)} display="masonry-row" />
+					<div class="gallery-bleed">
+						<Gallery items={imageItems(calcShots)} display="masonry" size="2" />
+					</div>
 				</Reveal>
 				<Reveal variant="up" delay={160}>
 					<div class="track-video">
-						<VideoPlayer
-							slug="2010-08-10_you_derive_me_crazy"
-							title="You Derive Me Crazy (2010) — calculus parody music video"
+						<LazyMedia
+							src={poster('2010-08-10_you_derive_me_crazy')}
+							alt="You Derive Me Crazy (2010) — calculus parody music video"
 							ratio="16 / 9"
+							video
 							onclick={(e) => gallery?.open(4, e.currentTarget)} />
 					</div>
 				</Reveal>
@@ -221,21 +227,10 @@
 		</Reveal>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox">
-		{#snippet custom({ item })}
-			<div class="lb-video">
-				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
-			</div>
-		{/snippet}
-	</Gallery>
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" autoplay_video />
 </SectionShell>
 
 <style>
-	.lb-video {
-		width: min(1400px, 92vw);
-		aspect-ratio: 16 / 9;
-		max-height: calc(95svh - 8rem);
-	}
 	:global([data-theme='audio']) {
 		background:
 			radial-gradient(ellipse at 80% 0%, rgba(255, 122, 208, 0.12), transparent 50%),

@@ -251,14 +251,18 @@
 			<Reveal variant="up" delay={100}>
 				<div class="bts-strip">
 					<div class="bts-eyebrow">BEHIND THE SCENES</div>
-					<Gallery items={pr2BTSImages} display="masonry-row" />
+					<div class="gallery-bleed">
+						<Gallery items={pr2BTSImages} display="masonry" size="2" />
+					</div>
 				</div>
 			</Reveal>
 
 			<Reveal variant="up" delay={150}>
 				<div class="bts-strip">
 					<div class="bts-eyebrow">FROM THE FILM</div>
-					<Gallery items={pr2StillImages} display="masonry-row" />
+					<div class="gallery-bleed">
+						<Gallery items={pr2StillImages} display="masonry" size="2" />
+					</div>
 				</div>
 			</Reveal>
 

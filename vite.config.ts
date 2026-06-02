@@ -10,6 +10,20 @@ const IMAGE_WORKER_URL = process.env.IMAGE_WORKER_URL || 'http://localhost:8788'
 
 export default defineConfig({
 	plugins: [sveltekit()],
+	// @delightstack/components ships raw .svelte files (consumed via the submodule's
+	// dist). They're compiled by vite-plugin-svelte on demand, so keep them out of
+	// Vite's esbuild dependency pre-bundling — its scanner can't parse Svelte sources.
+	optimizeDeps: {
+		exclude: [
+			'@delightstack/components',
+			'@delightstack/components/actions',
+			'@delightstack/components/display',
+			'@delightstack/components/feedback',
+			'@delightstack/components/form',
+			'@delightstack/components/media',
+			'@delightstack/components/navigation',
+		],
+	},
 	build: {
 		rollupOptions: {
 			external: [/^cloudflare:/],

@@ -4,9 +4,8 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
-	import VideoPlayer from '../primitives/VideoPlayer.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems, videoItem } from '../media';
+	import { imageItem, imageItems, videoItem, poster } from '../media';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
@@ -109,7 +108,12 @@
 	];
 
 	const xyzImages = imageItems(xyzShots);
-	const vfxImages = imageItems(vfxTests);
+	// const vfxImages = imageItems(vfxTests);
+	const vfxImages = [
+		...imageItems(vfxTests).slice(0, 2),
+		{ ...imageItems(vfxTests)[3], favorite: true },
+		...imageItems(vfxTests).slice(4),
+	];
 	const nuisanceImages = imageItems(nuisanceShots);
 
 	// All standalone images + inline videos in document order. The headless Gallery
@@ -203,7 +207,7 @@
 				<p>The funniest thing we'd ever made, by a country mile.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={xyzImages} display="masonry-row" />
+				<Gallery items={xyzImages} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 
@@ -315,11 +319,12 @@
 
 			<Reveal variant="up" delay={200}>
 				<div class="pac-video">
-					<VideoPlayer
-						slug="2008-01-06_pac-attack"
-						title="Pac-Attack (2008) — full short"
+					<LazyMedia
+						src={poster('2008-01-06_pac-attack')}
+						alt="Pac-Attack (2008) — full short"
 						ratio="16 / 9"
-						onclick={() => gallery?.open(5)} />
+						video
+						onclick={(e) => gallery?.open(5, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -335,7 +340,7 @@
 			</Reveal>
 
 			<Reveal variant="up" delay={100}>
-				<Gallery items={vfxImages} display="masonry-row" />
+				<Gallery items={vfxImages} display="masonry" size="0" />
 			</Reveal>
 		</div>
 
@@ -349,15 +354,16 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={nuisanceImages} display="masonry-row" />
+				<Gallery items={nuisanceImages} display="masonry-row" size="2" />
 			</Reveal>
 			<Reveal variant="up" delay={150}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2008-08-21_nuisance-b-gone"
-						title="Nuisance-B-Gone — the fake infomercial"
+					<LazyMedia
+						src={poster('2008-08-21_nuisance-b-gone')}
+						alt="Nuisance-B-Gone — the fake infomercial"
 						ratio="16 / 9"
-						onclick={() => gallery?.open(6)} />
+						video
+						onclick={(e) => gallery?.open(6, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -374,11 +380,12 @@
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="inline-video">
-					<VideoPlayer
-						slug="2009-02-13_sideline_huddler"
-						title="Sideline Huddler — Amanda's invention commercial"
+					<LazyMedia
+						src={poster('2009-02-13_sideline_huddler')}
+						alt="Sideline Huddler — Amanda's invention commercial"
 						ratio="16 / 9"
-						onclick={() => gallery?.open(7)} />
+						video
+						onclick={(e) => gallery?.open(7, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -402,21 +409,10 @@
 		</Reveal>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox">
-		{#snippet custom({ item })}
-			<div class="lb-video">
-				<VideoPlayer slug={item.src} title={item.alt} ratio="16 / 9" />
-			</div>
-		{/snippet}
-	</Gallery>
+	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" autoplay_video />
 </SectionShell>
 
 <style>
-	.lb-video {
-		width: min(1400px, 92vw);
-		aspect-ratio: 16 / 9;
-		max-height: calc(95svh - 8rem);
-	}
 	.lb-img {
 		display: block;
 		max-width: min(1400px, 92vw);
