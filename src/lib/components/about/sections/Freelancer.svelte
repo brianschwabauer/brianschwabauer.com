@@ -5,64 +5,117 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems } from '../media';
 
 	const reel = [
 		{
-			src: '2015-08-24_brian_demo_reel_2015-logo_animation_over_sunset_timelapse.avif',
-			label: '2015 demo reel · open',
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2015-08-24_brian_demo_reel_2015-logo_animation_over_sunset_timelapse.avif',
+			width: 480,
+			height: 204,
+			caption: '2015 demo reel · open',
+			alt: '2015 demo reel · open',
 		},
 		{
-			src: '2014-07-25_missouri_reverse_transfer-animated_character_and_graphics.avif',
-			label: 'MO Reverse Transfer · motion graphics',
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2014-07-25_missouri_reverse_transfer-animated_character_and_graphics.avif',
+			width: 480,
+			height: 270,
+			caption: 'MO Reverse Transfer · motion graphics',
+			alt: 'MO Reverse Transfer · motion graphics',
 		},
 		{
-			src: '2014-07-25_missouri_reverse_transfer-logo_animation.avif',
-			label: 'MO Reverse Transfer · logo',
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2014-07-25_missouri_reverse_transfer-logo_animation.avif',
+			width: 480,
+			height: 270,
+			caption: 'MO Reverse Transfer · logo',
+			alt: 'MO Reverse Transfer · logo',
 		},
 		{
-			src: '2014-10-05_decisionfx_logo_animation.avif',
-			label: 'DecisionFX · logo animation',
-		},
-		{ src: '2014-11-24_ursa_promo-logo_animation.avif', label: 'URSA · promo' },
-		{
-			src: '2015-02-08_engage_mobile_5_logo_animation.avif',
-			label: 'Engage Mobile · 5yr anniversary',
-		},
-		{
-			src: '2015-04-25_humane_society-logo_animation.avif',
-			label: 'Humane Society · logo',
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2014-10-05_decisionfx_logo_animation.avif',
+			width: 480,
+			height: 270,
+			caption: 'DecisionFX · logo animation',
+			alt: 'DecisionFX · logo animation',
 		},
 		{
-			src: '2015-08-04_adpi_recruitment_video_2015-women_jumping_off_fountain_ledge_in_slowmo.avif',
-			label: 'ADPi · recruitment',
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2014-11-24_ursa_promo-logo_animation.avif',
+			width: 480,
+			height: 270,
+			caption: 'URSA · promo',
+			alt: 'URSA · promo',
 		},
 		{
-			src: '2015-08-04_adpi_recruitment_video_2015-women_dancing_and_laughing_with_fireworks.avif',
-			label: 'ADPi · recruitment 2',
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2015-02-08_engage_mobile_5_logo_animation.avif',
+			width: 480,
+			height: 270,
+			caption: 'Engage Mobile · 5yr anniversary',
+			alt: 'Engage Mobile · 5yr anniversary',
 		},
 		{
-			src: '2012-03-22_holy_cross_lutheran_church_tshirt_commericial-angel_appears.avif',
-			label: 'Holy Cross · t-shirt commercial',
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2015-04-25_humane_society-logo_animation.avif',
+			width: 480,
+			height: 204,
+			caption: 'Humane Society · logo',
+			alt: 'Humane Society · logo',
+		},
+		{
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2015-08-04_adpi_recruitment_video_2015-women_jumping_off_fountain_ledge_in_slowmo.avif',
+			width: 480,
+			height: 204,
+			caption: 'ADPi · recruitment',
+			alt: 'ADPi · recruitment',
+		},
+		{
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2015-08-04_adpi_recruitment_video_2015-women_dancing_and_laughing_with_fireworks.avif',
+			width: 480,
+			height: 204,
+			caption: 'ADPi · recruitment 2',
+			alt: 'ADPi · recruitment 2',
+		},
+		{
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2012-03-22_holy_cross_lutheran_church_tshirt_commericial-angel_appears.avif',
+			width: 480,
+			height: 270,
+			caption: 'Holy Cross · t-shirt commercial',
+			alt: 'Holy Cross · t-shirt commercial',
 		},
 	];
 
-	const weddingShots = [
-		'2015-08-24_brian_demo_reel_2015-wedding_footage_of_bride_in_dress_smiling.avif',
-		'2015-08-24_brian_demo_reel_2015-wedding_footage_bride_walks_towards_smiling_groom.avif',
-	].map((src) => ({ src }));
-
-	const weddingImages: GalleryItem[] = imageItems(weddingShots);
+	const weddingImages: GalleryItem[] = [
+		{
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2015-08-24_brian_demo_reel_2015-wedding_footage_of_bride_in_dress_smiling.avif',
+			width: 480,
+			height: 204,
+		},
+		{
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2015-08-24_brian_demo_reel_2015-wedding_footage_bride_walks_towards_smiling_groom.avif',
+			width: 480,
+			height: 204,
+		},
+	];
 
 	// Standalone clickable LazyMedias in document order:
 	// 0: business card image, 1..N: reel cards
 	const sectionExtras: GalleryItem[] = [
-		imageItem(
-			'2013-03-12_brian_schwabauer_business_card.avif',
-			'The actual business card',
-			'The actual business card',
-		),
-		...reel.map((item) => imageItem(item.src, item.label, item.label)),
+		{
+			type: 'image' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2013-03-12_brian_schwabauer_business_card.avif',
+			width: 1062,
+			height: 615,
+			caption: 'The actual business card',
+			alt: 'The actual business card',
+		},
+		...reel,
 	];
 	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
@@ -110,7 +163,7 @@
 					<div class="biz-meta">brian@brianschwabauer.com</div>
 				</div>
 				<LazyMedia
-					src="2013-03-12_brian_schwabauer_business_card.avif"
+					src="https://cdn.brianschwabauer.com/media/2013-03-12_brian_schwabauer_business_card.avif"
 					alt="The actual business card"
 					ratio="16 / 9"
 					onclick={(e) => gallery?.open(0, e.currentTarget)} />
@@ -129,10 +182,10 @@
 						<figure class="reel-card" style:--i={i}>
 							<LazyMedia
 								src={item.src}
-								alt={item.label}
+								alt={item.caption}
 								ratio="16 / 9"
 								onclick={(e) => gallery?.open(1 + i, e.currentTarget)} />
-							<figcaption>{item.label}</figcaption>
+							<figcaption>{item.caption}</figcaption>
 						</figure>
 					{/each}
 				</div>

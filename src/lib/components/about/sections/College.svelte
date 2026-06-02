@@ -6,96 +6,271 @@
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems, videoItem, poster } from '../media';
 
-	const variousShots = [
-		'2012-02-02_med_365-silent_film-character_looks_up_dramatically.avif',
-		'2012-02-02_med_365-silent_film-character_throws_ball_against_wall.avif',
-		'2012-04-12_med_365-chase_scene-character_hit_by_car.avif',
-		'2012-05-10_med_365-complexity-character_drunkily_stumbles_out_of_bar.avif',
-		'2012-12-06_art_230_final-stop_action_animation_of_two_people_on_steps.avif',
-		'2014-04-10_art_300-project_3-disturbance-stillframe_of_character_walking_in_hand_drawn_scene.avif',
-		'2014-09-24_med_465-one_up-close_up_shots_on_two_guys_staring_eachother_down.avif',
-		'2014-09-24_med_465-one_up-quick_cuts_between_two_character_close_ups.avif',
-	].map((src) => ({ src }));
+	const variousImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2012-02-02_med_365-silent_film-character_looks_up_dramatically.avif',
+			width: 1080,
+			height: 608,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2012-02-02_med_365-silent_film-character_throws_ball_against_wall.avif',
+			width: 1080,
+			height: 608,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2012-04-12_med_365-chase_scene-character_hit_by_car.avif',
+			width: 1080,
+			height: 608,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2012-05-10_med_365-complexity-character_drunkily_stumbles_out_of_bar.avif',
+			width: 1080,
+			height: 608,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2012-12-06_art_230_final-stop_action_animation_of_two_people_on_steps.avif',
+			width: 480,
+			height: 204,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-04-10_art_300-project_3-disturbance-stillframe_of_character_walking_in_hand_drawn_scene.avif',
+			width: 1920,
+			height: 1080,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up-close_up_shots_on_two_guys_staring_eachother_down.avif',
+			width: 480,
+			height: 270,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up-quick_cuts_between_two_character_close_ups.avif',
+			width: 480,
+			height: 204,
+		},
+	];
 
-	const nodeBTS = [
-		'2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_01-four_go_pro_mount.avif',
-		'2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_03_four_gopro_mount_in_car.avif',
-		'2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_04.avif',
-		'2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_05-all_actors.avif',
-	].map((src) => ({ src }));
+	const nodeBTSImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_01-four_go_pro_mount.avif',
+			width: 2048,
+			height: 1536,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_03_four_gopro_mount_in_car.avif',
+			width: 2048,
+			height: 1536,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_04.avif',
+			width: 2048,
+			height: 1536,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_05-all_actors.avif',
+			width: 2048,
+			height: 1536,
+		},
+	];
 
-	const oneUpBTS = Array.from({ length: 8 }, (_, i) => {
-		const n = String(i + 1).padStart(2, '0');
-		const ext = i === 2 ? 'avif' : 'jpg';
-		return { src: `2014-09-15_med_465-one_up-behind_the_scenes_set_photo_${n}.${ext}` };
-	});
-
-	const variousImages: GalleryItem[] = imageItems(variousShots);
-	const nodeBTSImages: GalleryItem[] = imageItems(nodeBTS);
-	const oneUpBTSImages: GalleryItem[] = imageItems(oneUpBTS);
+	const oneUpBTSImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_01.jpg',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_02.jpg',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_03.avif',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_04.jpg',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_05.jpg',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_06.jpg',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_07.jpg',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_08.jpg',
+		},
+	];
 
 	const sectionExtras: GalleryItem[] = [
-		imageItem(
-			'2012-04-27_facebook_short_film-zolly_shot_of_main_character_falling_in_love.avif',
-			'Facebook IRL — the zolly shot',
-			'Facebook IRL — the zolly shot',
-		),
-		videoItem('2012-04-27_facebook', 'Facebook in Real Life (2012)'),
-		imageItem(
-			'2014-03-18_art_300_project-node-360_short_film_panorama_equirectangular.avif',
-			'NODE — equirectangular panorama still',
-			'NODE — equirectangular panorama still',
-		),
-		imageItem(
-			'2014-05-12_pickvid_promo_video-demo_on_phone.avif',
-			'PickVid demo on a phone',
-			'PickVid demo on a phone',
-		),
-		imageItem(
-			'2014-05-12_pickvid_promo_video-logo_animation.avif',
-			'PickVid logo animation',
-			'PickVid logo animation',
-		),
-		videoItem('2014-05-12_pickvid_promo_video', 'PickVid (2014) — promo video / demo'),
-		imageItem(
-			'2013-12-02_bear_bus_bash_flash_game_screen_recording-main_menu.avif',
-			'Bear Bus Bash — main menu',
-			'Bear Bus Bash — main menu',
-		),
-		imageItem(
-			'2013-12-02_bear_bus_bash_flash_game_screen_recording-gameplay_clip.avif',
-			'Bear Bus Bash — gameplay',
-			'Bear Bus Bash — gameplay',
-		),
-		imageItem(
-			'2013-12-02_bear_bus_bash_flash_game_screen_recording-victory_results_page.avif',
-			'Bear Bus Bash — victory',
-			'Bear Bus Bash — victory',
-		),
-		videoItem(
-			'2013-12-02_bear_bus_bash_flash_game_screen_recording',
-			'Bear Bus Bash (2013) — full gameplay recording',
-		),
-		imageItem(
-			'2015-04-12_split_life-sato_48-film_snapshot_1.avif',
-			'Split Life — perspective A',
-			'Split Life — perspective A',
-		),
-		imageItem(
-			'2015-04-12_split_life-sato_48-film_snapshot_2.avif',
-			'Split Life — perspective B',
-			'Split Life — perspective B',
-		),
-		videoItem(
-			'2015-04-12_split_life-sato_48',
-			'Split Life (2015) — 48-hour dual-perspective oner',
-		),
-		videoItem('2014-05-15_katie_bauers_breakup', "Katie Bauer's Breakup (2014)"),
-		videoItem('2014-09-24_med_465-one_up', 'One Up (2014)'),
-		videoItem('2014-09-02_nice_to_meet_you', 'Nice to Meet You (2014)'),
-		videoItem('2015-04-22_legacy', 'Legacy (2015)'),
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2012-04-27_facebook_short_film-zolly_shot_of_main_character_falling_in_love.avif',
+			width: 480,
+			height: 270,
+			caption: 'Facebook IRL — the zolly shot',
+			alt: 'Facebook IRL — the zolly shot',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2012-04-27_facebook/master.m3u8',
+			poster: 'https://cdn.brianschwabauer.com/media/2012-04-27_facebook/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: 'Facebook in Real Life (2012)',
+			alt: 'Facebook in Real Life (2012)',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-03-18_art_300_project-node-360_short_film_panorama_equirectangular.avif',
+			width: 2048,
+			height: 1024,
+			caption: 'NODE — equirectangular panorama still',
+			alt: 'NODE — equirectangular panorama still',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-demo_on_phone.avif',
+			width: 480,
+			height: 270,
+			caption: 'PickVid demo on a phone',
+			alt: 'PickVid demo on a phone',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-logo_animation.avif',
+			width: 480,
+			height: 270,
+			caption: 'PickVid logo animation',
+			alt: 'PickVid logo animation',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: 'PickVid (2014) — promo video / demo',
+			alt: 'PickVid (2014) — promo video / demo',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording-main_menu.avif',
+			width: 1080,
+			height: 608,
+			caption: 'Bear Bus Bash — main menu',
+			alt: 'Bear Bus Bash — main menu',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording-gameplay_clip.avif',
+			width: 1080,
+			height: 608,
+			caption: 'Bear Bus Bash — gameplay',
+			alt: 'Bear Bus Bash — gameplay',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording-victory_results_page.avif',
+			width: 1080,
+			height: 608,
+			caption: 'Bear Bus Bash — victory',
+			alt: 'Bear Bus Bash — victory',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: 'Bear Bus Bash (2013) — full gameplay recording',
+			alt: 'Bear Bus Bash (2013) — full gameplay recording',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48-film_snapshot_1.avif',
+			width: 2048,
+			height: 873,
+			caption: 'Split Life — perspective A',
+			alt: 'Split Life — perspective A',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48-film_snapshot_2.avif',
+			width: 2048,
+			height: 873,
+			caption: 'Split Life — perspective B',
+			alt: 'Split Life — perspective B',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48/poster.jpg',
+			width: 2534,
+			height: 1080,
+			caption: 'Split Life (2015) — 48-hour dual-perspective oner',
+			alt: 'Split Life (2015) — 48-hour dual-perspective oner',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2014-05-15_katie_bauers_breakup/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2014-05-15_katie_bauers_breakup/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: "Katie Bauer's Breakup (2014)",
+			alt: "Katie Bauer's Breakup (2014)",
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: 'One Up (2014)',
+			alt: 'One Up (2014)',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2014-09-02_nice_to_meet_you/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2014-09-02_nice_to_meet_you/poster.jpg',
+			width: 1920,
+			height: 818,
+			caption: 'Nice to Meet You (2014)',
+			alt: 'Nice to Meet You (2014)',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2015-04-22_legacy/master.m3u8',
+			poster: 'https://cdn.brianschwabauer.com/media/2015-04-22_legacy/poster.jpg',
+			width: 1920,
+			height: 818,
+			caption: 'Legacy (2015)',
+			alt: 'Legacy (2015)',
+		},
 	];
 	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
@@ -154,7 +329,7 @@
 					</div>
 					<div class="fb-card">
 						<LazyMedia
-							src="2012-04-27_facebook_short_film-zolly_shot_of_main_character_falling_in_love.avif"
+							src="https://cdn.brianschwabauer.com/media/2012-04-27_facebook_short_film-zolly_shot_of_main_character_falling_in_love.avif"
 							alt="Facebook IRL — the zolly shot"
 							ratio="16 / 9"
 							onclick={(e) => gallery?.open(0, e.currentTarget)} />
@@ -174,7 +349,7 @@
 			<Reveal variant="up" delay={120}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2012-04-27_facebook')}
+						src="https://cdn.brianschwabauer.com/media/2012-04-27_facebook/poster.jpg"
 						alt="Facebook in Real Life (2012)"
 						ratio="16 / 9"
 						video
@@ -229,7 +404,7 @@
 						</ol>
 					</div>
 					<LazyMedia
-						src="2014-03-18_art_300_project-node-360_short_film_panorama_equirectangular.avif"
+						src="https://cdn.brianschwabauer.com/media/2014-03-18_art_300_project-node-360_short_film_panorama_equirectangular.avif"
 						alt="NODE — equirectangular panorama still"
 						ratio="2 / 1"
 						onclick={(e) => gallery?.open(2, e.currentTarget)} />
@@ -282,12 +457,12 @@
 			<Reveal variant="up" delay={100}>
 				<div class="pickvid-grid">
 					<LazyMedia
-						src="2014-05-12_pickvid_promo_video-demo_on_phone.avif"
+						src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-demo_on_phone.avif"
 						alt="PickVid demo on a phone"
 						ratio="9 / 16"
 						onclick={(e) => gallery?.open(3, e.currentTarget)} />
 					<LazyMedia
-						src="2014-05-12_pickvid_promo_video-logo_animation.avif"
+						src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-logo_animation.avif"
 						alt="PickVid logo animation"
 						ratio="16 / 9"
 						onclick={(e) => gallery?.open(4, e.currentTarget)} />
@@ -296,7 +471,7 @@
 			<Reveal variant="up" delay={130}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2014-05-12_pickvid_promo_video')}
+						src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video/poster.jpg"
 						alt="PickVid (2014) — promo video / demo"
 						ratio="16 / 9"
 						video
@@ -324,17 +499,17 @@
 			<Reveal variant="up" delay={100}>
 				<div class="bb-grid">
 					<LazyMedia
-						src="2013-12-02_bear_bus_bash_flash_game_screen_recording-main_menu.avif"
+						src="https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording-main_menu.avif"
 						alt="Bear Bus Bash — main menu"
 						ratio="4 / 3"
 						onclick={(e) => gallery?.open(6, e.currentTarget)} />
 					<LazyMedia
-						src="2013-12-02_bear_bus_bash_flash_game_screen_recording-gameplay_clip.avif"
+						src="https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording-gameplay_clip.avif"
 						alt="Bear Bus Bash — gameplay"
 						ratio="4 / 3"
 						onclick={(e) => gallery?.open(7, e.currentTarget)} />
 					<LazyMedia
-						src="2013-12-02_bear_bus_bash_flash_game_screen_recording-victory_results_page.avif"
+						src="https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording-victory_results_page.avif"
 						alt="Bear Bus Bash — victory"
 						ratio="4 / 3"
 						onclick={(e) => gallery?.open(8, e.currentTarget)} />
@@ -343,7 +518,7 @@
 			<Reveal variant="up" delay={140}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2013-12-02_bear_bus_bash_flash_game_screen_recording')}
+						src="https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording/poster.jpg"
 						alt="Bear Bus Bash (2013) — full gameplay recording"
 						ratio="16 / 9"
 						video
@@ -370,7 +545,7 @@
 				<div class="split-row">
 					<div class="split-stage">
 						<LazyMedia
-							src="2015-04-12_split_life-sato_48-film_snapshot_1.avif"
+							src="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48-film_snapshot_1.avif"
 							alt="Split Life — perspective A"
 							ratio="16 / 9"
 							onclick={(e) => gallery?.open(10, e.currentTarget)} />
@@ -378,7 +553,7 @@
 					</div>
 					<div class="split-stage">
 						<LazyMedia
-							src="2015-04-12_split_life-sato_48-film_snapshot_2.avif"
+							src="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48-film_snapshot_2.avif"
 							alt="Split Life — perspective B"
 							ratio="16 / 9"
 							onclick={(e) => gallery?.open(11, e.currentTarget)} />
@@ -389,7 +564,7 @@
 			<Reveal variant="up" delay={130}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2015-04-12_split_life-sato_48')}
+						src="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48/poster.jpg"
 						alt="Split Life (2015) — 48-hour dual-perspective oner"
 						ratio="16 / 9"
 						video
@@ -439,7 +614,7 @@
 							crashes the frame on purpose.
 						</p>
 						<LazyMedia
-							src={poster('2014-05-15_katie_bauers_breakup')}
+							src="https://cdn.brianschwabauer.com/media/2014-05-15_katie_bauers_breakup/poster.jpg"
 							alt="Katie Bauer's Breakup (2014)"
 							ratio="16 / 9"
 							video
@@ -454,7 +629,7 @@
 							same job. Real lighting setups, real coverage.
 						</p>
 						<LazyMedia
-							src={poster('2014-09-24_med_465-one_up')}
+							src="https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up/poster.jpg"
 							alt="One Up (2014)"
 							ratio="16 / 9"
 							video
@@ -469,7 +644,7 @@
 							firmware. The girl on the bench was on the phone the whole time.
 						</p>
 						<LazyMedia
-							src={poster('2014-09-02_nice_to_meet_you')}
+							src="https://cdn.brianschwabauer.com/media/2014-09-02_nice_to_meet_you/poster.jpg"
 							alt="Nice to Meet You (2014)"
 							ratio="16 / 9"
 							video
@@ -484,7 +659,7 @@
 							his career, a wife who wants him home. Conversation as conflict.
 						</p>
 						<LazyMedia
-							src={poster('2015-04-22_legacy')}
+							src="https://cdn.brianschwabauer.com/media/2015-04-22_legacy/poster.jpg"
 							alt="Legacy (2015)"
 							ratio="16 / 9"
 							video

@@ -4,84 +4,151 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems } from '../media';
 
 	import Expandable from '../primitives/Expandable.svelte';
 
-	const dashboardMockups = [
+	const dashboardMockupsImages: GalleryItem[] = [
 		{
-			src: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_list.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_list.avif',
+			width: 1904,
+			height: 978,
 			caption: 'Project list · dark mode',
+			alt: 'Project list · dark mode',
 		},
 		{
-			src: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif',
+			width: 1890,
+			height: 975,
 			caption: 'Project detail',
+			alt: 'Project detail',
 		},
 		{
-			src: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_client_page.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_client_page.avif',
+			width: 1907,
+			height: 980,
 			caption: 'Project · client view',
+			alt: 'Project · client view',
 		},
 		{
-			src: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_settings_page.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_settings_page.avif',
+			width: 1907,
+			height: 1632,
 			caption: 'Settings',
+			alt: 'Settings',
 		},
 		{
-			src: '2026-01-01_show_and_tour-dashboard_mockup-clients_page_empty.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_mockup-clients_page_empty.avif',
+			width: 2048,
+			height: 1152,
 			caption: 'Clients (empty state)',
+			alt: 'Clients (empty state)',
 		},
 		{
-			src: '2026-01-01_show_and_tour-dashboard_mockup-projects_page_empty.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_mockup-projects_page_empty.avif',
+			width: 2048,
+			height: 1152,
 			caption: 'Projects (empty state)',
+			alt: 'Projects (empty state)',
 		},
 		{
-			src: '2026-01-01_show_and_tour-dashboard_mockup-delivery_page_dark.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_mockup-delivery_page_dark.avif',
+			width: 733,
+			height: 2048,
 			caption: 'Delivery page · dark',
+			alt: 'Delivery page · dark',
 		},
 		{
-			src: '2026-01-01_show_and_tour-dashboard_mockup-media_player.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_mockup-media_player.avif',
+			width: 1440,
+			height: 960,
 			caption: 'Built-in media player',
+			alt: 'Built-in media player',
 		},
 	];
 
-	const deliveryPages = [
+	const deliveryPagesImages: GalleryItem[] = [
 		{
-			src: '2026-01-01_show_and_tour-legacy_delivery_page_screenshot-963_n1950_rd.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-legacy_delivery_page_screenshot-963_n1950_rd.avif',
+			width: 702,
+			height: 2048,
 			caption: '963 N 1950 RD · client delivery',
+			alt: '963 N 1950 RD · client delivery',
 		},
 		{
-			src: '2026-01-01_show_and_tour-property_website_screenshot-8700leeboulevard.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-property_website_screenshot-8700leeboulevard.avif',
+			width: 854,
+			height: 2048,
 			caption: '8700 Lee Boulevard · property site',
+			alt: '8700 Lee Boulevard · property site',
 		},
 		{
-			src: '2026-01-01_show_and_tour-property_website_screenshot-prairievillageestate.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-property_website_screenshot-prairievillageestate.avif',
+			width: 1375,
+			height: 2048,
 			caption: 'Prairie Village Estate · property site',
+			alt: 'Prairie Village Estate · property site',
 		},
 	];
 
-	const brand = [
+	const brandImages: GalleryItem[] = [
 		{
-			src: '2026-01-01_show_and_tour-brand_style_guide-laptop_mockup.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-brand_style_guide-laptop_mockup.avif',
+			width: 2048,
+			height: 1152,
 			caption: 'On a laptop',
+			alt: 'On a laptop',
 		},
 		{
-			src: '2026-01-01_show_and_tour-brand_style_guide-app_icon_mockup.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-brand_style_guide-app_icon_mockup.avif',
+			width: 2048,
+			height: 1152,
 			caption: 'App icon',
+			alt: 'App icon',
 		},
 		{
-			src: '2026-01-01_show_and_tour-brand_style_guide-website_mockup.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-brand_style_guide-website_mockup.avif',
+			width: 2048,
+			height: 1152,
 			caption: 'Marketing site',
+			alt: 'Marketing site',
 		},
 		{
-			src: '2026-01-01_show_and_tour-brand_style_guide-business_card_mockup.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-brand_style_guide-business_card_mockup.avif',
+			width: 2048,
+			height: 1152,
 			caption: 'Business cards',
+			alt: 'Business cards',
 		},
 		{
-			src: '2026-01-01_show_and_tour-brand_style_guide-instagram_ad_mockup.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-brand_style_guide-instagram_ad_mockup.avif',
+			width: 2048,
+			height: 1152,
 			caption: 'Instagram ad',
+			alt: 'Instagram ad',
 		},
 		{
-			src: '2026-01-01_show_and_tour-brand_style_guide-first_page.avif',
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-brand_style_guide-first_page.avif',
+			width: 2048,
+			height: 1152,
 			caption: 'Brand guide cover',
+			alt: 'Brand guide cover',
 		},
 	];
 
@@ -113,11 +180,14 @@
 	];
 
 	const heroShot: GalleryItem[] = [
-		imageItem(
-			'2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif',
-			'Show&Tour — project detail page',
-			'Show&Tour · project detail page',
-		),
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif',
+			width: 1890,
+			height: 975,
+			caption: 'Show&Tour · project detail page',
+			alt: 'Show&Tour — project detail page',
+		},
 	];
 	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
@@ -176,7 +246,7 @@
 		<Reveal variant="up">
 			<div class="hero-shot">
 				<LazyMedia
-					src="2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif"
+					src="https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif"
 					alt="Show&Tour — project detail page"
 					ratio="16 / 9"
 					rounded={false}
@@ -212,7 +282,7 @@
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="gallery-bleed">
-					<Gallery items={imageItems(dashboardMockups)} display="masonry" size="2" />
+					<Gallery items={dashboardMockupsImages} display="masonry" size="2" />
 				</div>
 			</Reveal>
 		</div>
@@ -223,7 +293,7 @@
 				<p>What the photographer's clients actually see.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={imageItems(deliveryPages)} display="masonry-row" size="2" />
+				<Gallery items={deliveryPagesImages} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 
@@ -233,7 +303,7 @@
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="gallery-bleed">
-					<Gallery items={imageItems(brand)} display="masonry" size="2" />
+					<Gallery items={brandImages} display="masonry" size="2" />
 				</div>
 			</Reveal>
 		</div>

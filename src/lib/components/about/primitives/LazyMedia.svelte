@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { media } from '../media';
-
 	let {
 		src,
 		alt = '',
@@ -33,7 +31,6 @@
 		onclick?: (event: MouseEvent & { currentTarget: HTMLButtonElement }) => void;
 	} = $props();
 
-	const resolved = $derived(src.startsWith('http') ? src : media(src));
 	let loaded = $state(false);
 	const interactive = $derived(typeof onclick === 'function');
 </script>
@@ -49,7 +46,7 @@
 		aria-label={alt || 'Open image'}
 		onclick={(e) => onclick?.(e)}>
 		<img
-			src={resolved}
+			{src}
 			{alt}
 			loading={eager ? 'eager' : 'lazy'}
 			decoding="async"
@@ -73,7 +70,7 @@
 		style:aspect-ratio={ratio || undefined}
 		{style}>
 		<img
-			src={resolved}
+			{src}
 			{alt}
 			loading={eager ? 'eager' : 'lazy'}
 			decoding="async"

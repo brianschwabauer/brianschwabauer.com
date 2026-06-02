@@ -5,47 +5,174 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems, videoItem, poster } from '../media';
 
-	const flavaShots = [
-		'2010-03-25_do_da_flava_g-music_video_intro.avif',
-		'2010-03-25_do_da_flava_g-caleb_dancing_in_front_of_animated_stage.avif',
-		'2010-03-25_do_da_flava_g-caleb_dances_with_his_bling.avif',
-		'2010-03-25_do_da_flava_g-caleb_dancing_with_3d_moving_platform_animation.avif',
-		'2010-03-25_do_da_flava_g-caleb_clones_dancing_in_street.avif',
-		'2010-03-25_do_da_flava_g-grandpa_spins_and_dances.avif',
-		'2010-03-25_do_da_flava_g-family_dancing_together_in_yard.avif',
-		'2010-03-25_do_da_flava_g-matthew_dancing.avif',
-		'2010-03-25_do_da_flava_g-flash_video_game_screen_recording.avif',
-		'2010-03-25_do_da_flava_g-family_family_dancing_together_in_house.avif',
-		'2010-03-25_do_da_flava_g-caleb_hits_baseball_visual_effect.avif',
-	].map((src) => ({ src }));
+	const flavaImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g-music_video_intro.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g-caleb_dancing_in_front_of_animated_stage.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g-caleb_dances_with_his_bling.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g-caleb_dancing_with_3d_moving_platform_animation.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g-caleb_clones_dancing_in_street.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g-grandpa_spins_and_dances.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g-family_dancing_together_in_yard.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g-matthew_dancing.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g-flash_video_game_screen_recording.avif',
+			width: 1080,
+			height: 720,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g-family_family_dancing_together_in_house.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g-caleb_hits_baseball_visual_effect.avif',
+			width: 480,
+			height: 320,
+		},
+	];
 
-	const calcShots = [
-		'2010-08-10_you_derive_me_crazy-whole_class_looks_at_camera.avif',
-		'2010-08-10_you_derive_me_crazy-class_dances_on_green_screen_virtual_set.avif',
-		'2010-08-10_you_derive_me_crazy-class_dances_with_dance_routine.avif',
-		'2010-08-10_you_derive_me_crazy-sarah_sings_to_camera.avif',
-		'2010-08-10_you_derive_me_crazy-teacher_looks_at_camera_with_funny_face.avif',
-		'2010-08-10_you_derive_me_crazy-class_walks_towards_camera_dramatically.avif',
-		'2010-08-10_you_derive_me_crazy-kevin_dancing_in_front_of_green_screen.avif',
-		'2010-08-10_you_derive_me_crazy-lavergne_dancing_in_front_of_green_screen.avif',
-	].map((src) => ({ src }));
+	const calcImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy-whole_class_looks_at_camera.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy-class_dances_on_green_screen_virtual_set.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy-class_dances_with_dance_routine.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy-sarah_sings_to_camera.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy-teacher_looks_at_camera_with_funny_face.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy-class_walks_towards_camera_dramatically.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy-kevin_dancing_in_front_of_green_screen.avif',
+			width: 480,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy-lavergne_dancing_in_front_of_green_screen.avif',
+			width: 480,
+			height: 320,
+		},
+	];
 
 	// Standalone image thumbnails + inline video poster thumbnails, combined into one
 	// lightbox-only Gallery. Order matches document order: 2 Flashlight images, then 3 videos.
 	const sectionExtras: GalleryItem[] = [
-		imageItem('2007-08-26_flashlight-brian_plays_guitar.avif', 'Brian plays guitar'),
-		imageItem(
-			'2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif',
-			'Summoning a guitar via reversed footage',
-		),
-		videoItem('2007-08-26_flashlight', 'Flashlight (2007) — music video'),
-		videoItem('2010-03-25_do_da_flava_g', 'Do Da Flava G (2010) — music video'),
-		videoItem(
-			'2010-08-10_you_derive_me_crazy',
-			'You Derive Me Crazy (2010) — calculus parody music video',
-		),
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_plays_guitar.avif',
+			width: 352,
+			height: 240,
+			caption: 'Brian plays guitar',
+			alt: 'Brian plays guitar',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif',
+			width: 352,
+			height: 240,
+			caption: 'Summoning a guitar via reversed footage',
+			alt: 'Summoning a guitar via reversed footage',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/master.m3u8',
+			poster: 'https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/poster.jpg',
+			width: 352,
+			height: 240,
+			caption: 'Flashlight (2007) — music video',
+			alt: 'Flashlight (2007) — music video',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/master.m3u8',
+			poster: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: 'Do Da Flava G (2010) — music video',
+			alt: 'Do Da Flava G (2010) — music video',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/poster.jpg',
+			width: 720,
+			height: 480,
+			caption: 'You Derive Me Crazy (2010) — calculus parody music video',
+			alt: 'You Derive Me Crazy (2010) — calculus parody music video',
+		},
 	];
 	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
@@ -115,12 +242,12 @@
 				<Reveal variant="up" delay={120}>
 					<div class="paired">
 						<LazyMedia
-							src="2007-08-26_flashlight-brian_plays_guitar.avif"
+							src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_plays_guitar.avif"
 							alt="Brian plays guitar"
 							ratio="16 / 9"
 							onclick={(e) => gallery?.open(0, e.currentTarget)} />
 						<LazyMedia
-							src="2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif"
+							src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif"
 							alt="Summoning a guitar via reversed footage"
 							ratio="16 / 9"
 							onclick={(e) => gallery?.open(1, e.currentTarget)} />
@@ -129,7 +256,7 @@
 				<Reveal variant="up" delay={160}>
 					<div class="track-video">
 						<LazyMedia
-							src={poster('2007-08-26_flashlight')}
+							src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/poster.jpg"
 							alt="Flashlight (2007) — music video"
 							ratio="16 / 9"
 							video
@@ -161,13 +288,13 @@
 				</Reveal>
 				<Reveal variant="up" delay={120}>
 					<div class="gallery-bleed">
-						<Gallery items={imageItems(flavaShots)} display="masonry" size="2" />
+						<Gallery items={flavaImages} display="masonry" size="2" />
 					</div>
 				</Reveal>
 				<Reveal variant="up" delay={160}>
 					<div class="track-video">
 						<LazyMedia
-							src={poster('2010-03-25_do_da_flava_g')}
+							src="https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/poster.jpg"
 							alt="Do Da Flava G (2010) — music video"
 							ratio="16 / 9"
 							video
@@ -195,13 +322,13 @@
 				</Reveal>
 				<Reveal variant="up" delay={120}>
 					<div class="gallery-bleed">
-						<Gallery items={imageItems(calcShots)} display="masonry" size="2" />
+						<Gallery items={calcImages} display="masonry" size="2" />
 					</div>
 				</Reveal>
 				<Reveal variant="up" delay={160}>
 					<div class="track-video">
 						<LazyMedia
-							src={poster('2010-08-10_you_derive_me_crazy')}
+							src="https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/poster.jpg"
 							alt="You Derive Me Crazy (2010) — calculus parody music video"
 							ratio="16 / 9"
 							video

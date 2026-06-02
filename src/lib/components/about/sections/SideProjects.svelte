@@ -4,24 +4,32 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem } from '../media';
 
 	const sectionExtras: GalleryItem[] = [
-		imageItem(
-			'2026-01-01_ghtui_screen_recording.avif',
-			'ghtui in action',
-			'ghtui · terminal UI for GitHub',
-		),
-		imageItem(
-			'2026-01-01_video_curator_screenshot-dashboard.avif',
-			'Video Curator dashboard',
-			'Video Curator · dashboard',
-		),
-		imageItem(
-			'2026-01-01_video_curator_screenshot-clips_page.avif',
-			'Video Curator clips page',
-			'Video Curator · clips page',
-		),
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_ghtui_screen_recording.avif',
+			width: 1080,
+			height: 608,
+			caption: 'ghtui · terminal UI for GitHub',
+			alt: 'ghtui in action',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_video_curator_screenshot-dashboard.avif',
+			width: 1920,
+			height: 993,
+			caption: 'Video Curator · dashboard',
+			alt: 'Video Curator dashboard',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_video_curator_screenshot-clips_page.avif',
+			width: 1920,
+			height: 993,
+			caption: 'Video Curator · clips page',
+			alt: 'Video Curator clips page',
+		},
 	];
 	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
@@ -78,7 +86,7 @@
 							</svg>
 						</a>
 						<LazyMedia
-							src="2026-01-01_ghtui_screen_recording.avif"
+							src="https://cdn.brianschwabauer.com/media/2026-01-01_ghtui_screen_recording.avif"
 							alt="ghtui in action"
 							ratio="16 / 10"
 							onclick={(e) => gallery?.open(0, e.currentTarget)} />
@@ -118,12 +126,12 @@
 						</a>
 						<div class="screens">
 							<LazyMedia
-								src="2026-01-01_video_curator_screenshot-dashboard.avif"
+								src="https://cdn.brianschwabauer.com/media/2026-01-01_video_curator_screenshot-dashboard.avif"
 								alt="Video Curator dashboard"
 								ratio="16 / 10"
 								onclick={(e) => gallery?.open(1, e.currentTarget)} />
 							<LazyMedia
-								src="2026-01-01_video_curator_screenshot-clips_page.avif"
+								src="https://cdn.brianschwabauer.com/media/2026-01-01_video_curator_screenshot-clips_page.avif"
 								alt="Video Curator clips page"
 								ratio="16 / 10"
 								onclick={(e) => gallery?.open(2, e.currentTarget)} />

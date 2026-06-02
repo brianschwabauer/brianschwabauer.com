@@ -5,18 +5,57 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem, imageItems, videoItem, poster } from '../media';
 
-	const spunkstersPhotos = [
-		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_01.avif',
-		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_02.avif',
-		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_03.avif',
-		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_04.avif',
-		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_05.avif',
-		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_06.avif',
-		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_07.avif',
-		'2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_08.jpg',
-	].map((src) => ({ src }));
+	const spunkstersImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_01.avif',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_02.avif',
+			width: 1365,
+			height: 2048,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_03.avif',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_04.avif',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_05.avif',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_06.avif',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_07.avif',
+			width: 1536,
+			height: 2048,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters-live_show_behind_the_scenes_photos_08.jpg',
+			width: 720,
+			height: 960,
+		},
+	];
 
 	const messages = [
 		{ from: '+1 (913) ••• 4451', text: 'this is HILARIOUS' },
@@ -37,31 +76,63 @@
 	//   5: Kevin visits Zordon's grave image
 	//   6: Power Rangers III trailer video
 	const sectionExtras: GalleryItem[] = [
-		imageItem(
-			'2013-06-22_the_spunksters-logo_animation.avif',
-			'The Spunksters logo animation',
-		),
-		videoItem(
-			'2013-06-22_the_spunksters',
-			'The Spunksters (2013) — the live awards show',
-		),
-		imageItem(
-			'2013-06-22_bubbly_bros-kevin_jumps_up_and_down.avif',
-			'Kevin from Bubbly Bros',
-		),
-		videoItem('2013-06-22_bubbly_bros', 'Bubbly Bros (2013) — photo music video'),
-		imageItem(
-			'2013-06-22_power_rangers_iii_trailer-logo_animation.avif',
-			'Power Rangers III logo animation',
-		),
-		imageItem(
-			'2013-06-22_power_rangers_iii_trailer-kevin_visits_zordons_grave.avif',
-			"Kevin visits Zordon's grave",
-		),
-		videoItem(
-			'2013-06-22_power_rangers_iii_trailer',
-			'Power Rangers 360 III — fake trailer (2013)',
-		),
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters-logo_animation.avif',
+			width: 480,
+			height: 270,
+			alt: 'The Spunksters logo animation',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: 'The Spunksters (2013) — the live awards show',
+			alt: 'The Spunksters (2013) — the live awards show',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_bubbly_bros-kevin_jumps_up_and_down.avif',
+			width: 480,
+			height: 270,
+			alt: 'Kevin from Bubbly Bros',
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_bubbly_bros/master.m3u8',
+			poster: 'https://cdn.brianschwabauer.com/media/2013-06-22_bubbly_bros/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: 'Bubbly Bros (2013) — photo music video',
+			alt: 'Bubbly Bros (2013) — photo music video',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_power_rangers_iii_trailer-logo_animation.avif',
+			width: 480,
+			height: 270,
+			alt: 'Power Rangers III logo animation',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_power_rangers_iii_trailer-kevin_visits_zordons_grave.avif',
+			width: 480,
+			height: 270,
+			alt: "Kevin visits Zordon's grave",
+		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2013-06-22_power_rangers_iii_trailer/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2013-06-22_power_rangers_iii_trailer/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: 'Power Rangers 360 III — fake trailer (2013)',
+			alt: 'Power Rangers 360 III — fake trailer (2013)',
+		},
 	];
 	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
@@ -98,7 +169,7 @@
 		<div class="logo-stage">
 			<Reveal variant="up">
 				<LazyMedia
-					src="2013-06-22_the_spunksters-logo_animation.avif"
+					src="https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters-logo_animation.avif"
 					alt="The Spunksters logo animation"
 					ratio="16 / 9"
 					onclick={(e) => gallery?.open(0, e.currentTarget)} />
@@ -106,7 +177,7 @@
 			<Reveal variant="up" delay={100}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2013-06-22_the_spunksters')}
+						src="https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters/poster.jpg"
 						alt="The Spunksters (2013) — the live awards show"
 						ratio="16 / 9"
 						video
@@ -157,7 +228,7 @@
 			<div class="bts">
 				<div class="bts-eyebrow">BEHIND THE SCENES</div>
 				<div class="gallery-bleed">
-					<Gallery items={imageItems(spunkstersPhotos)} display="masonry" size="2" />
+					<Gallery items={spunkstersImages} display="masonry" size="2" />
 				</div>
 			</div>
 		</Reveal>
@@ -165,7 +236,7 @@
 		<div class="bubbly-bros">
 			<Reveal variant="left">
 				<LazyMedia
-					src="2013-06-22_bubbly_bros-kevin_jumps_up_and_down.avif"
+					src="https://cdn.brianschwabauer.com/media/2013-06-22_bubbly_bros-kevin_jumps_up_and_down.avif"
 					alt="Kevin from Bubbly Bros"
 					ratio="4 / 3"
 					onclick={(e) => gallery?.open(2, e.currentTarget)} />
@@ -184,7 +255,7 @@
 				</p>
 				<div class="bubbly-video">
 					<LazyMedia
-						src={poster('2013-06-22_bubbly_bros')}
+						src="https://cdn.brianschwabauer.com/media/2013-06-22_bubbly_bros/poster.jpg"
 						alt="Bubbly Bros (2013) — photo music video"
 						ratio="16 / 9"
 						video
@@ -207,12 +278,12 @@
 			<Reveal variant="up" delay={100}>
 				<div class="trailer-pair">
 					<LazyMedia
-						src="2013-06-22_power_rangers_iii_trailer-logo_animation.avif"
+						src="https://cdn.brianschwabauer.com/media/2013-06-22_power_rangers_iii_trailer-logo_animation.avif"
 						alt="Power Rangers III logo animation"
 						ratio="16 / 9"
 						onclick={(e) => gallery?.open(4, e.currentTarget)} />
 					<LazyMedia
-						src="2013-06-22_power_rangers_iii_trailer-kevin_visits_zordons_grave.avif"
+						src="https://cdn.brianschwabauer.com/media/2013-06-22_power_rangers_iii_trailer-kevin_visits_zordons_grave.avif"
 						alt="Kevin visits Zordon's grave"
 						ratio="16 / 9"
 						onclick={(e) => gallery?.open(5, e.currentTarget)} />
@@ -221,7 +292,7 @@
 			<Reveal variant="up" delay={140}>
 				<div class="inline-video">
 					<LazyMedia
-						src={poster('2013-06-22_power_rangers_iii_trailer')}
+						src="https://cdn.brianschwabauer.com/media/2013-06-22_power_rangers_iii_trailer/poster.jpg"
 						alt="Power Rangers 360 III — fake trailer (2013)"
 						ratio="16 / 9"
 						video

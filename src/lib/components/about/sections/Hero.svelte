@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { media } from '../media';
 	import { STARFIELD_IMAGES } from '../starfield-images';
 	import HeroMascot from './HeroMascot.svelte';
 	import HeroExplosion from './HeroExplosion.svelte';
@@ -576,7 +575,7 @@
 				{#each stars as star, i (star.id)}
 					<img
 						class="star"
-						src={media(star.src)}
+						src="https://cdn.brianschwabauer.com/media/{star.src}"
 						alt=""
 						loading={i < 8 ? 'eager' : 'lazy'}
 						decoding="async"

@@ -3,16 +3,18 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
-	import { imageItem } from '../media';
 
 	const currentYear = new Date().getFullYear();
 
 	const heroShot: GalleryItem[] = [
-		imageItem(
-			'2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif',
-			'Show&Tour project detail page',
-			'Show&Tour · project detail page',
-		),
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif',
+			width: 1890,
+			height: 975,
+			caption: 'Show&Tour · project detail page',
+			alt: 'Show&Tour project detail page',
+		},
 	];
 	let gallery = $state<ReturnType<typeof Gallery>>();
 </script>
@@ -97,7 +99,7 @@
 			<Reveal variant="left" delay={200}>
 				<div class="shot">
 					<LazyMedia
-						src="2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif"
+						src="https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif"
 						alt="Show&Tour project detail page"
 						ratio="16 / 10"
 						rounded={false}
