@@ -4,9 +4,10 @@
 	interface Props {
 		editor: Editor | null;
 		onPickImage?: () => void;
+		onInsertGallery?: () => void;
 	}
 
-	let { editor, onPickImage }: Props = $props();
+	let { editor, onPickImage, onInsertGallery }: Props = $props();
 
 	function toggleBold() {
 		editor?.chain().focus().toggleBold().run();
@@ -138,6 +139,20 @@
 				<rect x="3" y="3" width="18" height="18" rx="2" />
 				<circle cx="8.5" cy="8.5" r="1.5" />
 				<polyline points="21 15 16 10 5 21" />
+			</svg>
+		</button>
+		<button type="button" onclick={() => onInsertGallery?.()} title="Insert gallery">
+			<svg
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				width="16"
+				height="16">
+				<rect x="3" y="3" width="7" height="7" rx="1" />
+				<rect x="14" y="3" width="7" height="7" rx="1" />
+				<rect x="3" y="14" width="7" height="7" rx="1" />
+				<rect x="14" y="14" width="7" height="7" rx="1" />
 			</svg>
 		</button>
 		<span class="bar-sep"></span>

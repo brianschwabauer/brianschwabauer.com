@@ -17,10 +17,23 @@
 	interface Props {
 		open: boolean;
 		onSelect?: (image: ImageRecord) => void;
+		/** When set, the library runs in multi-select mode. */
+		multiple?: boolean;
+		/** Called with all chosen images when the user confirms a multi-select. */
+		onSelectMany?: (images: ImageRecord[]) => void;
+		/** Label for the multi-select confirm button (default "Add"). */
+		confirmLabel?: string;
 		title?: string;
 	}
 
-	let { open = $bindable(false), onSelect, title = 'Media Library' }: Props = $props();
+	let {
+		open = $bindable(false),
+		onSelect,
+		multiple = false,
+		onSelectMany,
+		confirmLabel = 'Add',
+		title = 'Media Library',
+	}: Props = $props();
 
 	const thisYear = String(new Date().getUTCFullYear());
 	let year = $state(thisYear);
@@ -34,6 +47,25 @@
 	let editingImage = $state<ImageRecord | null>(null);
 	let savingMeta = $state(false);
 	let fileInput = $state<HTMLInputElement | undefined>(undefined);
+	// Multi-select state (order preserved). Records are kept (not just paths) so
+	// the selection survives switching the year filter mid-pick.
+	let selected = $state<ImageRecord[]>([]);
+
+	function isSelected(path: string): boolean {
+		return selected.some((i) => i.path === path);
+	}
+
+	function toggleSelect(image: ImageRecord) {
+		selected = isSelected(image.path)
+			? selected.filter((i) => i.path !== image.path)
+			: [...selected, image];
+	}
+
+	function confirmMany() {
+		onSelectMany?.(selected);
+		selected = [];
+		open = false;
+	}
 
 	const years = $derived.by(() => {
 		const set = new Set<string>([thisYear, year]);
@@ -58,6 +90,7 @@
 
 	$effect(() => {
 		if (open) void refresh();
+		else selected = [];
 	});
 
 	$effect(() => {
@@ -248,19 +281,36 @@
 					{#each filtered as image (image.path)}
 						<div
 							class="tile"
+							class:selected={multiple && isSelected(image.path)}
 							style={bgStyle(image)}
 							style:aspect-ratio={image.aspect_ratio || 1}
 							role="button"
 							tabindex="0"
-							onclick={() => pick(image)}
-							ondblclick={() => pick(image)}
+							onclick={() => (multiple ? toggleSelect(image) : pick(image))}
+							ondblclick={() => {
+								if (!multiple) pick(image);
+							}}
 							onkeydown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
 									e.preventDefault();
-									pick(image);
+									if (multiple) toggleSelect(image);
+									else pick(image);
 								}
 							}}>
 							<img src={thumbnailURL(image)} alt={image.alt_text ?? ''} loading="lazy" />
+							{#if multiple}
+								<div class="tile-check" aria-hidden="true">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="3"
+										width="14"
+										height="14">
+										<polyline points="20 6 9 17 4 12" />
+									</svg>
+								</div>
+							{/if}
 							<div class="tile-overlay">
 								<div class="tile-name">{image.file_name ?? image.slug}</div>
 								<div class="tile-actions">
@@ -315,6 +365,20 @@
 				{/if}
 			{/if}
 			</div>
+
+			{#if multiple}
+				<div class="library-footer">
+					<span class="sel-count">{selected.length} selected</span>
+					<div class="footer-actions">
+						{#if selected.length}
+							<Button outline onclick={() => (selected = [])}>Clear</Button>
+						{/if}
+						<Button onclick={confirmMany} disabled={selected.length === 0}>
+							{confirmLabel}{selected.length ? ` ${selected.length}` : ''}
+						</Button>
+					</div>
+				</div>
+			{/if}
 		</div>
 
 		{#if editingImage}
@@ -506,6 +570,50 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+	}
+
+	/* ── Multi-select ─────────────────────────────────────────────────── */
+	.tile.selected {
+		outline: 3px solid var(--color-accent);
+		outline-offset: -3px;
+	}
+
+	.tile-check {
+		position: absolute;
+		top: var(--space-2);
+		left: var(--space-2);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 22px;
+		height: 22px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface);
+		border: 1.5px solid var(--color-border);
+		color: transparent;
+		box-shadow: var(--shadow-sm);
+	}
+	.tile.selected .tile-check {
+		background: var(--color-accent);
+		border-color: var(--color-accent);
+		color: white;
+	}
+
+	.library-footer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-3);
+		padding-top: var(--space-3);
+		border-top: 1px solid var(--color-border);
+	}
+	.sel-count {
+		font-size: var(--text-sm);
+		color: var(--color-text-secondary);
+	}
+	.footer-actions {
+		display: flex;
+		gap: var(--space-2);
 	}
 
 	.tile-overlay {

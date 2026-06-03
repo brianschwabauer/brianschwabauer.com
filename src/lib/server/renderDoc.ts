@@ -11,6 +11,9 @@
  * width-mode classes for breakout, etc. — so the public blog post can just
  * {@html} the result with no further processing.
  */
+import { render } from 'svelte/server';
+import type { ComponentProps } from 'svelte';
+import { Gallery } from '@delightstack/components/media';
 
 export interface TipTapDoc {
 	type: string;
@@ -117,6 +120,9 @@ function renderNode(node: TipTapNode): string {
 
 		case 'blogAudio':
 			return renderBlogAudio(node);
+
+		case 'blogGallery':
+			return renderBlogGallery(node);
 
 		default:
 			// Unknown node — render children if any, otherwise drop
@@ -263,6 +269,96 @@ function renderBlogImage(node: TipTapNode): string {
 	return `<figure ${figureAttrs}><img ${imgAttrs}>${captionHTML}</figure>`;
 }
 
+// ── blogGallery renderer ────────────────────────────────────────────────────
+
+interface GalleryEntry {
+	path: string;
+	alt: string | null;
+	caption: string | null;
+	width: number;
+	height: number;
+	thumbhash: string | null;
+	bgColor: string | null;
+	variants: VariantInfo[];
+}
+
+function parseGalleryEntries(raw: unknown): GalleryEntry[] {
+	try {
+		if (typeof raw === 'string') return JSON.parse(raw) as GalleryEntry[];
+		if (Array.isArray(raw)) return raw as GalleryEntry[];
+	} catch {
+		/* ignore */
+	}
+	return [];
+}
+
+/** The Gallery items the renderer/hydration both use (src is a responsive srcset). */
+function galleryItemsFor(entries: GalleryEntry[]) {
+	return entries.map((e) => {
+		const cdnBase = `/cdn/image/${e.path}`;
+		const variants = (Array.isArray(e.variants) ? e.variants : [])
+			.slice()
+			.sort((a, b) => a.width - b.width);
+		const srcset = variants.map((v) => `${cdnBase}/${v.name} ${v.width}w`).join(', ');
+		return {
+			type: 'image' as const,
+			src: srcset || `${cdnBase}/default`,
+			alt: typeof e.alt === 'string' ? e.alt : undefined,
+			caption: typeof e.caption === 'string' ? e.caption : undefined,
+			width: Number(e.width) || undefined,
+			height: Number(e.height) || undefined,
+			thumbhash: typeof e.thumbhash === 'string' ? e.thumbhash : undefined,
+		};
+	});
+}
+
+/**
+ * Server-render the actual delightstack Gallery so the SSR markup is exactly
+ * what the client hydrates — no layout flash, no bespoke fallback grid. The
+ * post page (blog/[slug]/+page.svelte) hydrates this island on mount to wire up
+ * the built-in click→Carousel lightbox; `data-*` carry the props it needs.
+ */
+function renderBlogGallery(node: TipTapNode): string {
+	const attrs = node.attrs ?? {};
+	const entries = parseGalleryEntries(attrs.items);
+	if (entries.length === 0) return '';
+
+	const display = String(attrs.display ?? 'masonry');
+	const size = String(attrs.size ?? '2');
+	const spacing = String(attrs.spacing ?? '1');
+	const radius = String(attrs.radius ?? '1');
+	const fit = String(attrs.fit ?? 'contain');
+	const widthMode = String(attrs.widthMode ?? 'wide');
+
+	const items = galleryItemsFor(entries);
+	const props = {
+		items,
+		display,
+		size,
+		spacing,
+		radius,
+		fit,
+		autoplay: display === 'slideshow',
+	};
+
+	let inner = '';
+	try {
+		inner = render(Gallery, { props: props as ComponentProps<typeof Gallery> }).body;
+	} catch {
+		inner = '';
+	}
+
+	const dataItems = escapeAttr(JSON.stringify(items));
+	return (
+		`<div class="blog-gallery" data-display="${escapeAttr(display)}"` +
+		` data-size="${escapeAttr(size)}" data-spacing="${escapeAttr(spacing)}"` +
+		` data-radius="${escapeAttr(radius)}" data-fit="${escapeAttr(fit)}"` +
+		` data-width-mode="${escapeAttr(widthMode)}" data-items="${dataItems}">` +
+		inner +
+		`</div>`
+	);
+}
+
 // ── blogVideo / blogAudio renderers ─────────────────────────────────────────
 
 const MEDIA_BASE = 'https://cdn.brianschwabauer.com/media';
@@ -343,6 +439,14 @@ function walkText(node: TipTapDoc | TipTapNode, out: string[]): void {
 		const caption = attrs?.caption;
 		if (typeof title === 'string' && title) out.push(` ${title} `);
 		if (typeof caption === 'string' && caption) out.push(` ${caption} `);
+		return;
+	}
+	if (node.type === 'blogGallery') {
+		const entries = parseGalleryEntries((node as TipTapNode).attrs?.items);
+		for (const e of entries) {
+			if (e?.caption) out.push(` ${e.caption} `);
+			else if (e?.alt) out.push(` ${e.alt} `);
+		}
 		return;
 	}
 	const content = (node as TipTapNode).content;
