@@ -8,6 +8,7 @@
 		aliases: string[];
 		iconKind:
 			| 'image'
+			| 'gallery'
 			| 'video'
 			| 'audio'
 			| 'h1'
@@ -31,9 +32,11 @@
 		slashRef: { onKeyDown: (event: KeyboardEvent) => boolean };
 		/** Called when the user picks "/image" — opens the media library. */
 		onPickImage?: () => void;
+		/** Called when the user picks "/gallery" — opens the multi-select picker. */
+		onInsertGallery?: () => void;
 	}
 
-	let { editor, slashRef, onPickImage }: Props = $props();
+	let { editor, slashRef, onPickImage, onInsertGallery }: Props = $props();
 
 	let visible = $state(false);
 	let top = $state(0);
@@ -59,6 +62,14 @@
 			aliases: ['img', 'picture', 'photo', 'media'],
 			iconKind: 'image',
 			run: () => onPickImage?.(),
+		},
+		{
+			id: 'gallery',
+			label: 'Gallery',
+			description: 'A grid of images with a lightbox',
+			aliases: ['gallery', 'grid', 'album', 'photos', 'lightbox', 'carousel'],
+			iconKind: 'gallery',
+			run: () => onInsertGallery?.(),
 		},
 		{
 			id: 'video',
@@ -400,6 +411,19 @@
 							<rect x="3" y="3" width="18" height="18" rx="2" />
 							<circle cx="8.5" cy="8.5" r="1.5" />
 							<polyline points="21 15 16 10 5 21" />
+						</svg>
+					{:else if cmd.iconKind === 'gallery'}
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							width="16"
+							height="16">
+							<rect x="3" y="3" width="7" height="7" rx="1" />
+							<rect x="14" y="3" width="7" height="7" rx="1" />
+							<rect x="3" y="14" width="7" height="7" rx="1" />
+							<rect x="14" y="14" width="7" height="7" rx="1" />
 						</svg>
 					{:else if cmd.iconKind === 'video'}
 						<svg

@@ -5,9 +5,11 @@
 		editor: Editor | null;
 		/** Trigger to open the media library so the user can pick an image. */
 		onPickImage?: () => void;
+		/** Trigger to open the multi-select picker and insert a gallery. */
+		onInsertGallery?: () => void;
 	}
 
-	let { editor, onPickImage }: Props = $props();
+	let { editor, onPickImage, onInsertGallery }: Props = $props();
 
 	let visible = $state(false);
 	let top = $state(0);
@@ -97,6 +99,11 @@
 		onPickImage?.();
 	}
 
+	function insertGallery() {
+		close();
+		onInsertGallery?.();
+	}
+
 	function insertHeading(level: 2 | 3 | 4) {
 		editor?.chain().focus().setHeading({ level }).run();
 		close();
@@ -172,6 +179,22 @@
 				</svg>
 				<span class="pm-label">Image</span>
 				<span class="pm-desc">Upload or pick from library</span>
+			</button>
+			<button type="button" class="pm-item" onclick={insertGallery}>
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					width="16"
+					height="16">
+					<rect x="3" y="3" width="7" height="7" rx="1" />
+					<rect x="14" y="3" width="7" height="7" rx="1" />
+					<rect x="3" y="14" width="7" height="7" rx="1" />
+					<rect x="14" y="14" width="7" height="7" rx="1" />
+				</svg>
+				<span class="pm-label">Gallery</span>
+				<span class="pm-desc">A grid of images with a lightbox</span>
 			</button>
 			<button type="button" class="pm-item" onclick={() => insertHeading(2)}>
 				<span class="pm-icon">H1</span>

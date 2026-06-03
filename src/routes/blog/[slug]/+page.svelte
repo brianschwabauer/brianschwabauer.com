@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { onMount, mount, unmount } from 'svelte';
+	import { onMount, mount, unmount, hydrate, tick } from 'svelte';
 	import { Button } from '@delightstack/components/actions';
-	import { Video } from '@delightstack/components/media';
+	import { Video, Gallery, type GalleryItem } from '@delightstack/components/media';
 	import { page } from '$app/state';
 	import { bgStyle } from '$lib/client/images';
 	import { formatPostDate, isoPostDate } from '$lib/utils/date';
@@ -11,15 +11,42 @@
 	const MEDIA_BASE = 'https://cdn.brianschwabauer.com/media';
 
 	// The post body is server-rendered HTML ({@html} below). renderDoc emits
-	// `<figure class="blog-video">` placeholders for embedded HLS videos; here
-	// we find them after mount and hydrate each into a delightstack Video player
-	// (which lazy-loads hls.js for the HLS stream).
+	// `<figure class="blog-video">` placeholders for embedded HLS videos and
+	// `<div class="blog-gallery">` placeholders for galleries; here we hydrate
+	// both after mount. We also wire every image (body + cover) to open in a
+	// shared headless Carousel lightbox.
 	let contentEl = $state<HTMLElement | undefined>();
+	let lightbox = $state<ReturnType<typeof Gallery>>();
+	let lightboxItems = $state<GalleryItem[]>([]);
+
+	/** Build a GalleryItem from a rendered <img> inside a <figure>. */
+	function itemFromImg(img: HTMLImageElement, figure: HTMLElement | null): GalleryItem {
+		const caption = figure?.querySelector('figcaption')?.textContent?.trim();
+		return {
+			type: 'image',
+			src: img.getAttribute('srcset') || img.currentSrc || img.src,
+			alt: img.alt || undefined,
+			caption: caption || undefined,
+			width: img.naturalWidth || Number(img.getAttribute('width')) || undefined,
+			height: img.naturalHeight || Number(img.getAttribute('height')) || undefined,
+			thumbhash: figure?.dataset.thumbhash || undefined,
+		};
+	}
+
+	async function openLightbox(img: HTMLImageElement, figure: HTMLElement | null) {
+		lightboxItems = [itemFromImg(img, figure)];
+		await tick();
+		lightbox?.open(0, img);
+	}
 
 	onMount(() => {
 		const root = contentEl;
 		if (!root) return;
 		const players: Array<Record<string, unknown>> = [];
+		const galleries: Array<Record<string, unknown>> = [];
+		const cleanups: Array<() => void> = [];
+
+		// 1. Hydrate HLS videos.
 		for (const fig of root.querySelectorAll<HTMLElement>('figure.blog-video')) {
 			const slug = fig.dataset.videoSlug;
 			const target = fig.querySelector<HTMLElement>('.blog-video-mount');
@@ -36,8 +63,71 @@
 				}),
 			);
 		}
+
+		// 2. Hydrate galleries. renderDoc SSR-renders the real delightstack Gallery,
+		//    so we hydrate (not mount) the existing markup in place — no layout
+		//    flash. The Gallery provides its own click→Carousel lightbox. Props
+		//    must match the server render exactly for hydration to line up.
+		for (const el of root.querySelectorAll<HTMLElement>('div.blog-gallery')) {
+			let items: GalleryItem[] = [];
+			try {
+				items = JSON.parse(el.dataset.items || '[]') as GalleryItem[];
+			} catch {
+				items = [];
+			}
+			if (!items.length) continue;
+			galleries.push(
+				hydrate(Gallery, {
+					target: el,
+					props: {
+						items,
+						display: (el.dataset.display || 'masonry') as never,
+						size: (el.dataset.size || '2') as never,
+						spacing: (el.dataset.spacing || '1') as never,
+						radius: (el.dataset.radius || '1') as never,
+						fit: (el.dataset.fit || 'contain') as never,
+						autoplay: el.dataset.display === 'slideshow',
+						autoplay_video: true,
+					},
+				}),
+			);
+		}
+
+		// 3. Make every standalone image (body + cover) open the lightbox.
+		const figures = Array.from(root.querySelectorAll<HTMLElement>('figure.blog-img'));
+		const coverImg = document.querySelector<HTMLImageElement>('figure.post-featured img');
+		if (coverImg) {
+			const coverFig = coverImg.closest<HTMLElement>('figure');
+			figures.push(coverFig ?? coverImg.parentElement!);
+		}
+		for (const figure of figures) {
+			const img = figure.querySelector<HTMLImageElement>('img');
+			if (!img) continue;
+			img.style.cursor = 'zoom-in';
+			img.setAttribute('role', 'button');
+			img.setAttribute('tabindex', '0');
+			const onClick = (e: Event) => {
+				e.preventDefault();
+				void openLightbox(img, figure);
+			};
+			const onKey = (e: KeyboardEvent) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					void openLightbox(img, figure);
+				}
+			};
+			img.addEventListener('click', onClick);
+			img.addEventListener('keydown', onKey);
+			cleanups.push(() => {
+				img.removeEventListener('click', onClick);
+				img.removeEventListener('keydown', onKey);
+			});
+		}
+
 		return () => {
 			for (const player of players) unmount(player);
+			for (const g of galleries) unmount(g);
+			for (const fn of cleanups) fn();
 		};
 	});
 
@@ -168,6 +258,10 @@
 		</div>
 	{/if}
 </article>
+
+<!-- Shared headless lightbox: every standalone image opens here in a Carousel
+     (swipe-to-dismiss, ✕ close, keyboard nav). Renders nothing until opened. -->
+<Gallery bind:this={lightbox} items={lightboxItems} display="lightbox" autoplay_video />
 
 <style>
 	/* ── Page shell — Medium-style two-tier width ────────────────────────
@@ -450,6 +544,35 @@
 
 	.post-content :global(figure.blog-img[data-width-mode='full'] figcaption) {
 		border-radius: 0;
+	}
+
+	/* ── BlogGallery ──────────────────────────────────────────────────────
+	   Width modes mirror BlogImage. Before hydration a `.blog-gallery-fallback`
+	   grid stands in; on mount it's replaced by a delightstack Gallery (which
+	   provides the click→Carousel lightbox). */
+	.post-content :global(.blog-gallery) {
+		margin: var(--space-10) auto;
+		display: block;
+		/* The delightstack Gallery's grid/masonry layouts use @container queries
+		   and cqw units, so its wrapper must establish an inline-size container. */
+		container-type: inline-size;
+	}
+	.post-content :global(.blog-gallery[data-width-mode='normal']) {
+		max-width: var(--measure);
+		margin-left: auto;
+		margin-right: auto;
+	}
+	.post-content :global(.blog-gallery[data-width-mode='wide']) {
+		width: var(--prose-wide);
+		max-width: calc(100vw - 2rem);
+		margin-left: 50%;
+		transform: translateX(-50%);
+	}
+	.post-content :global(.blog-gallery[data-width-mode='full']) {
+		width: 100vw;
+		max-width: 100vw;
+		margin-left: 50%;
+		transform: translateX(-50%);
 	}
 
 	/* ── BlogVideo (HLS embed) ────────────────────────────────────────────

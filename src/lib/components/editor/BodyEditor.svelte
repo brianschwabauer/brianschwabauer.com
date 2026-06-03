@@ -7,6 +7,7 @@
 	import { BlogImage } from './extensions/BlogImage';
 	import { BlogVideo } from './extensions/BlogVideo';
 	import { BlogAudio } from './extensions/BlogAudio';
+	import { BlogGallery, recordToGalleryEntry } from './extensions/BlogGallery';
 	import {
 		imageDropHandler,
 		recordToBlogImageAttrs,
@@ -70,6 +71,11 @@
 	// stacking both previews and shifting the page height.
 	let mounted = $state(false);
 	let libraryOpen = $state(false);
+	// Multi-select picker for galleries. `pendingGalleryPick` receives the chosen
+	// records — either inserting a new gallery (from a menu) or appending to an
+	// existing one (from the gallery node view's "Add" button).
+	let galleryPickerOpen = $state(false);
+	let pendingGalleryPick: ((records: ImageRecord[]) => void) | null = null;
 	// Seed from the initial content so the SSR'd output isn't covered by the
 	// placeholder before TipTap mounts.
 	let isDocEmpty = $state(untrack(() => isJsonDocEmpty(content)));
@@ -114,6 +120,7 @@
 				BlogImage,
 				BlogVideo,
 				BlogAudio,
+				BlogGallery.configure({ openImagePicker: openGalleryPicker }),
 				TrailingParagraph,
 				imageDropHandler.configure({
 					onUploadError: (err, file) => {
@@ -180,6 +187,30 @@
 		editor?.chain().focus().setBlogImage(recordToBlogImageAttrs(image)).run();
 	}
 
+	/** Opens the multi-select library; `onPick` is called with the chosen records. */
+	function openGalleryPicker(onPick: (records: ImageRecord[]) => void) {
+		pendingGalleryPick = onPick;
+		galleryPickerOpen = true;
+	}
+
+	function handleGalleryPicked(records: ImageRecord[]) {
+		const cb = pendingGalleryPick;
+		pendingGalleryPick = null;
+		cb?.(records);
+	}
+
+	/** Insert a brand-new gallery block from a menu. */
+	function insertGallery() {
+		openGalleryPicker((records) => {
+			if (!records.length) return;
+			editor
+				?.chain()
+				.focus()
+				.setBlogGallery({ items: JSON.stringify(records.map(recordToGalleryEntry)) })
+				.run();
+		});
+	}
+
 	export function getJSON(): JSONContent {
 		const raw = editor?.getJSON() ?? { type: 'doc', content: [] };
 		return stripUploadingPlaceholders(raw);
@@ -235,11 +266,24 @@
 </div>
 
 <EditorBubbleMenu {editor} {onAiAction} />
-<EditorPlusMenu {editor} onPickImage={openMediaLibrary} />
-<EditorSlashMenu {editor} {slashRef} onPickImage={openMediaLibrary} />
-<EditorMobileBar {editor} onPickImage={openMediaLibrary} />
+<EditorPlusMenu {editor} onPickImage={openMediaLibrary} onInsertGallery={insertGallery} />
+<EditorSlashMenu
+	{editor}
+	{slashRef}
+	onPickImage={openMediaLibrary}
+	onInsertGallery={insertGallery} />
+<EditorMobileBar
+	{editor}
+	onPickImage={openMediaLibrary}
+	onInsertGallery={insertGallery} />
 
 <MediaLibrary bind:open={libraryOpen} onSelect={insertFromLibrary} title="Insert Image" />
+<MediaLibrary
+	bind:open={galleryPickerOpen}
+	multiple
+	onSelectMany={handleGalleryPicked}
+	confirmLabel="Add to gallery"
+	title="Add gallery images" />
 
 <style>
 	.body-editor {
@@ -400,6 +444,16 @@
 	}
 	.body-host :global(.body-ssr figure.blog-img.is-cropped[data-width-mode='full']) {
 		border-radius: 0;
+	}
+
+	/* renderDoc emits an empty paragraph as <p></p>, which collapses to zero
+	   height in the static SSR preview. TipTap renders the same paragraph as
+	   <p><br class="ProseMirror-trailingBreak"></p> — one line tall — so without
+	   this the whole document below an empty line jumps down by one line when the
+	   editor hydrates. Give SSR-only empty paragraphs that same single line of
+	   height so the layout is stable across hydration. */
+	.body-host :global(.body-ssr p:empty) {
+		min-height: 1lh;
 	}
 
 	/* Caption overlay — only visible when the figure carries a caption. The
@@ -704,6 +758,41 @@
 	.body-host :global(figure.blog-img.is-selected) {
 		outline: 2px solid var(--color-accent);
 		outline-offset: 4px;
+		border-radius: 4px;
+	}
+
+	/* ── BlogGallery (in-editor) — width-mode breakout mirrors BlogImage.
+	   The node view's outer `.blog-gallery` div carries data-width-mode; the
+	   interactive UI is rendered by BlogGalleryEditor.svelte inside it. ──── */
+	.body-host :global(.blog-gallery) {
+		position: relative;
+		margin: var(--space-8) auto;
+		display: block;
+		/* The SSR placeholder (renderDoc) and the hydrated node-view preview both
+		   render a real Gallery here; its grid/masonry layout needs an inline-size
+		   container for its @container queries / cqw units. */
+		container-type: inline-size;
+	}
+	.body-host :global(.blog-gallery[data-width-mode='normal']) {
+		max-width: var(--measure);
+		margin-left: auto;
+		margin-right: auto;
+	}
+	.body-host :global(.blog-gallery[data-width-mode='wide']) {
+		width: var(--prose-wide);
+		max-width: calc(100vw - 2rem);
+		margin-left: 50%;
+		transform: translateX(-50%);
+	}
+	.body-host :global(.blog-gallery[data-width-mode='full']) {
+		width: 100vw;
+		max-width: 100vw;
+		margin-left: 50%;
+		transform: translateX(-50%);
+	}
+	.body-host :global(.blog-gallery.is-selected) {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 6px;
 		border-radius: 4px;
 	}
 
