@@ -228,7 +228,7 @@ button {
 	background: none;
 }
 
-input,
+input:not([type='range']),
 textarea,
 select {
 	font-family: inherit;
@@ -243,7 +243,7 @@ select {
 		box-shadow var(--transition-fast);
 }
 
-input:focus,
+input:not([type='range']):focus,
 textarea:focus,
 select:focus {
 	outline: none;
