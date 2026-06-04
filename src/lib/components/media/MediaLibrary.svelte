@@ -707,7 +707,7 @@
 						active={mode === 'select'}
 						accent={mode === 'select'}
 						onclick={() => (mode = 'select')}>
-						Choose images
+							Select
 					</Button>
 					<Button
 						size="0"
@@ -726,9 +726,9 @@
 		{#if multiple}
 			<div class="header-actions">
 				{#if selected.length}
-					<Button size="0" translucent onclick={() => (selected = [])}>Clear</Button>
+					<Button translucent onclick={() => (selected = [])}>Clear</Button>
 				{/if}
-				<Button size="0" accent onclick={confirmMany} disabled={selected.length === 0}>
+				<Button onclick={confirmMany} disabled={selected.length === 0}>
 					{confirmLabel}
 				</Button>
 			</div>
@@ -1339,6 +1339,7 @@
 	.mode-tabs {
 		display: flex;
 		align-items: center;
+		margin-left: 1rem;
 	}
 
 	/* Smaller, lighter modal title so the translucent toggle beside it reads as
