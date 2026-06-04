@@ -129,6 +129,7 @@
 					<Button
 						icon
 						size="0"
+						translucent
 						active={view.attrs.display === l.value}
 						accent={view.attrs.display === l.value}
 						tooltip={l.label}
@@ -146,6 +147,7 @@
 					{#each WIDTHS as w (w.value)}
 						<Button
 							size="0"
+							translucent
 							active={view.attrs.widthMode === w.value}
 							accent={view.attrs.widthMode === w.value}
 							onclick={() => onUpdateAttrs({ widthMode: w.value })}>
@@ -159,6 +161,7 @@
 				<ButtonGroup size="0">
 					<Button
 						size="0"
+						translucent
 						active={view.attrs.fit === 'contain'}
 						accent={view.attrs.fit === 'contain'}
 						tooltip="Show the whole image"
@@ -167,6 +170,7 @@
 					</Button>
 					<Button
 						size="0"
+						translucent
 						active={view.attrs.fit === 'cover'}
 						accent={view.attrs.fit === 'cover'}
 						tooltip="Fill the frame (cropped)"
@@ -180,7 +184,6 @@
 		<div class="bg-field">
 			<span class="bg-label">Thumbnail size</span>
 			<Range
-				size="0"
 				min={0}
 				max={3}
 				step={1}
@@ -193,7 +196,6 @@
 		<div class="bg-field">
 			<span class="bg-label">Spacing</span>
 			<Range
-				size="0"
 				min={0}
 				max={3}
 				step={1}
@@ -206,7 +208,6 @@
 		<div class="bg-field">
 			<span class="bg-label">Corners</span>
 			<Range
-				size="0"
 				min={0}
 				max={3}
 				step={1}
@@ -447,6 +448,7 @@
 		gap: var(--space-3);
 		width: 280px;
 		max-width: 80vw;
+		padding: var(--space-2);
 		/* Bridge delightstack's form-token namespace (--c-*) to the app's accent
 		   so the Range matches the green Buttons instead of falling back to blue. */
 		--c-action: var(--color-accent);
