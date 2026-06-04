@@ -15,6 +15,7 @@ import BlogGalleryEditor from '../BlogGalleryEditor.svelte';
 import {
 	parseGalleryItems,
 	recordToGalleryEntry,
+	galleryEntryToRecord,
 	type BlogGalleryAttrs,
 	type BlogGalleryOptions,
 } from './BlogGallery';
@@ -35,9 +36,8 @@ class BlogGalleryNodeView {
 	#getPos: () => number | undefined;
 	#app: Record<string, unknown>;
 	// Reactive bridge handed to the Svelte component. Mutating `.attrs` /
-	// `.selected` / `.editing` propagates into the component via $state deep
-	// reactivity. `editing` also gates stopEvent's drag ownership.
-	#view = $state<{ attrs: BlogGalleryAttrs; selected: boolean; editing: boolean }>({
+	// `.selected` propagates into the component via $state deep reactivity.
+	#view = $state<{ attrs: BlogGalleryAttrs; selected: boolean }>({
 		attrs: {
 			items: '[]',
 			display: 'masonry',
@@ -48,7 +48,6 @@ class BlogGalleryNodeView {
 			widthMode: 'wide',
 		},
 		selected: false,
-		editing: false,
 	});
 
 	constructor(props: NodeViewProps, options: BlogGalleryOptions) {
@@ -66,7 +65,7 @@ class BlogGalleryNodeView {
 			props: {
 				view: this.#view,
 				onUpdateAttrs: (partial: Partial<BlogGalleryAttrs>) => this.#updateAttrs(partial),
-				onAddImages: () => this.#addImages(options),
+				onEditImages: () => this.#editImages(options),
 				onSelect: () => this.#select(),
 				onDelete: () => this.#delete(),
 			},
@@ -82,12 +81,13 @@ class BlogGalleryNodeView {
 		dispatch(state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, ...partial }));
 	}
 
-	#addImages(options: BlogGalleryOptions) {
-		options.openImagePicker?.((records: ImageRecord[]) => {
-			if (!records.length) return;
-			const existing = parseGalleryItems(this.#view.attrs.items);
-			const next = [...existing, ...records.map(recordToGalleryEntry)];
-			this.#updateAttrs({ items: JSON.stringify(next) });
+	#editImages(options: BlogGalleryOptions) {
+		// Hand the modal the gallery's current items (as records) and replace the
+		// whole list with whatever it returns — add / remove / reorder all happen
+		// in the modal, so the result is the final ordered selection.
+		const current = parseGalleryItems(this.#view.attrs.items).map(galleryEntryToRecord);
+		options.openImagePicker?.(current, (records: ImageRecord[]) => {
+			this.#updateAttrs({ items: JSON.stringify(records.map(recordToGalleryEntry)) });
 		});
 	}
 
@@ -124,21 +124,15 @@ class BlogGalleryNodeView {
 
 	deselectNode() {
 		this.#view.selected = false;
-		this.#view.editing = false;
 		this.dom.classList.remove('is-selected');
 	}
 
 	stopEvent(event: Event) {
 		const isDrag = event.type.startsWith('drag') || event.type === 'drop';
-		if (isDrag) {
-			// In reorder mode the gallery owns drag/drop (thumbnail reordering) so
-			// ProseMirror's drop cursor / node-drag stay out of the way. Outside
-			// reorder mode, let ProseMirror handle the drag so the whole block can
-			// be reordered like any other section.
-			return this.#view.editing;
-		}
+		// Let ProseMirror handle drag/drop so the whole block can be reordered like
+		// any other section (reordering individual images now lives in the modal).
 		// Everything else (clicks, pointer, keys) is handled by our Svelte UI.
-		return true;
+		return isDrag ? false : true;
 	}
 
 	ignoreMutation() {

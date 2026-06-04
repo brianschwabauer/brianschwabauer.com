@@ -22,7 +22,7 @@
  */
 import { Node, mergeAttributes } from '@tiptap/core';
 import type { GalleryItem } from '@delightstack/components/media';
-import type { ImageRecord, ImageVariantInfo } from '$lib/types/images';
+import type { ImageRecord, ImageVariantInfo, OklchColor } from '$lib/types/images';
 import { createBlogGalleryNodeView } from './BlogGalleryNodeView.svelte';
 
 export type GalleryDisplay = 'grid' | 'masonry' | 'masonry-row' | 'slider' | 'slideshow';
@@ -55,11 +55,15 @@ export interface BlogGalleryAttrs {
 
 export interface BlogGalleryOptions {
 	/**
-	 * Opens the multi-select Media Library and resolves with the chosen records.
-	 * Wired up by BodyEditor so the node view can add images without owning a
-	 * MediaLibrary instance itself.
+	 * Opens the gallery image modal, preloaded with the gallery's current items,
+	 * and resolves with the FINAL ordered selection (add / remove / reorder all
+	 * happen inside the modal). Wired up by BodyEditor so the node view doesn't
+	 * own a MediaLibrary instance itself.
 	 */
-	openImagePicker?: (onPick: (records: ImageRecord[]) => void) => void;
+	openImagePicker?: (
+		current: ImageRecord[],
+		onResult: (records: ImageRecord[]) => void,
+	) => void;
 }
 
 declare module '@tiptap/core' {
@@ -105,6 +109,44 @@ export function recordToGalleryEntry(record: ImageRecord): GalleryImageEntry {
 			? `oklch(${record.background_color.l} ${record.background_color.c} ${record.background_color.h})`
 			: null,
 		variants: record.variants ?? [],
+	};
+}
+
+/**
+ * Reconstruct an ImageRecord from a stored gallery entry. The gallery only keeps
+ * a snapshot (not the full library record), so this fills the fields the picker
+ * modal needs to display the item and — crucially — round-trips losslessly back
+ * through recordToGalleryEntry (path / alt / caption / dims / thumbhash / bgColor
+ * / variants are all preserved), so editing an existing gallery never degrades
+ * items the user didn't touch.
+ */
+export function galleryEntryToRecord(entry: GalleryImageEntry): ImageRecord {
+	const segments = entry.path.split('/');
+	const slug = segments[segments.length - 1] || entry.path;
+	const year = segments.find((s) => /^\d{4}$/.test(s)) ?? '';
+	let background_color: OklchColor | null = null;
+	if (entry.bgColor) {
+		const m = entry.bgColor.match(/oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)/i);
+		if (m) background_color = { l: Number(m[1]), c: Number(m[2]), h: Number(m[3]) };
+	}
+	return {
+		key: entry.path,
+		path: entry.path,
+		year,
+		slug,
+		file_name: slug,
+		alt_text: entry.alt,
+		caption: entry.caption,
+		mime_type: '',
+		width: entry.width,
+		height: entry.height,
+		aspect_ratio: entry.height ? entry.width / entry.height : 1,
+		thumbhash: entry.thumbhash,
+		background_color,
+		accent_color: null,
+		variants: entry.variants ?? [],
+		created_at: '',
+		updated_at: '',
 	};
 }
 

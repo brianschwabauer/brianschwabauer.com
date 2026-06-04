@@ -8,8 +8,10 @@
 	 * - Settings live in a delightstack Popover (opened from the gear button).
 	 *   The Popover portals its content to <body>, which keeps the Range sliders
 	 *   out of the ProseMirror DOM so TipTap can't hijack their drag gestures.
-	 * - Categorical options use ButtonGroup segmented controls; ordinal scales
-	 *   use Range sliders — every option visible, one interaction to change.
+	 * - Choosing, removing and reordering images all happen in the media modal
+	 *   ("Edit images"), which lives outside the editor — so there's no conflict
+	 *   between ProseMirror's block drag and a per-thumbnail drag. The inline UI
+	 *   is just the live preview plus this toolbar.
 	 */
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
 	import { Button, ButtonGroup } from '@delightstack/components/actions';
@@ -18,7 +20,6 @@
 		parseGalleryItems,
 		entryToGalleryItem,
 		type BlogGalleryAttrs,
-		type GalleryImageEntry,
 		type GalleryScale,
 		type GalleryDisplay,
 		type GalleryFit,
@@ -26,18 +27,15 @@
 	} from './extensions/BlogGallery';
 
 	interface Props {
-		view: { attrs: BlogGalleryAttrs; selected: boolean; editing: boolean };
+		view: { attrs: BlogGalleryAttrs; selected: boolean };
 		onUpdateAttrs: (partial: Partial<BlogGalleryAttrs>) => void;
-		onAddImages: () => void;
+		/** Opens the media modal to add / remove / reorder the gallery's images. */
+		onEditImages: () => void;
 		onSelect: () => void;
 		onDelete: () => void;
 	}
 
-	let { view, onUpdateAttrs, onAddImages, onSelect, onDelete }: Props = $props();
-
-	// `editing` lives on the shared view bridge so the node view's stopEvent can
-	// give the gallery exclusive drag ownership while reordering.
-	let dragIndex = $state<number | null>(null);
+	let { view, onUpdateAttrs, onEditImages, onSelect, onDelete }: Props = $props();
 
 	const entries = $derived(parseGalleryItems(view.attrs.items));
 	const galleryItems = $derived<GalleryItem[]>(entries.map(entryToGalleryItem));
@@ -56,33 +54,6 @@
 	];
 	const SIZE_LABELS = ['S', 'M', 'L', 'XL'];
 	const STEP_LABELS = ['None', 'S', 'M', 'L'];
-
-	function entryThumb(e: GalleryImageEntry): string {
-		const v = e.variants?.find((x) => x.name === 'thumbnail') ?? e.variants?.[0];
-		return `/cdn/image/${e.path}/${v?.name ?? 'default'}`;
-	}
-
-	function commit(next: GalleryImageEntry[]) {
-		onUpdateAttrs({ items: JSON.stringify(next) });
-	}
-
-	function removeAt(i: number) {
-		commit(entries.filter((_, idx) => idx !== i));
-	}
-
-	function move(from: number, to: number) {
-		if (to < 0 || to >= entries.length || from === to) return;
-		const next = [...entries];
-		const [moved] = next.splice(from, 1);
-		next.splice(to, 0, moved);
-		commit(next);
-	}
-
-	function onDrop(i: number) {
-		if (dragIndex === null) return;
-		move(dragIndex, i);
-		dragIndex = null;
-	}
 
 	function setScale(key: 'size' | 'spacing' | 'radius', value: number) {
 		onUpdateAttrs({ [key]: String(value) as GalleryScale });
@@ -247,27 +218,12 @@
 					d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
 			</svg>
 		</Button>
-		<Button icon size="0" transparent tooltip="Add images" onclick={onAddImages}>
-			<svg
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				width="16"
-				height="16"
-				aria-hidden="true">
-				<line x1="12" y1="5" x2="12" y2="19" />
-				<line x1="5" y1="12" x2="19" y2="12" />
-			</svg>
-		</Button>
 		<Button
 			icon
 			size="0"
 			transparent
-			active={view.editing}
-			disabled={entries.length === 0}
-			tooltip={view.editing ? 'Done reordering' : 'Reorder / remove'}
-			onclick={() => (view.editing = !view.editing)}>
+			tooltip="Add, remove & reorder images"
+			onclick={onEditImages}>
 			<svg
 				viewBox="0 0 24 24"
 				fill="none"
@@ -276,10 +232,9 @@
 				width="16"
 				height="16"
 				aria-hidden="true">
-				<polyline points="17 1 21 5 17 9" />
-				<path d="M3 11V9a4 4 0 0 1 4-4h14" />
-				<polyline points="7 23 3 19 7 15" />
-				<path d="M21 13v2a4 4 0 0 1-4 4H3" />
+				<rect x="3" y="3" width="18" height="18" rx="2" />
+				<circle cx="8.5" cy="8.5" r="1.5" />
+				<polyline points="21 15 16 10 5 21" />
 			</svg>
 		</Button>
 		<Button icon size="0" transparent error tooltip="Delete gallery" onclick={onDelete}>
@@ -306,7 +261,7 @@
 		class="bg-empty"
 		onclick={() => {
 			onSelect();
-			onAddImages();
+			onEditImages();
 		}}>
 		<svg
 			viewBox="0 0 24 24"
@@ -322,88 +277,6 @@
 		<span class="bg-empty-title">Add images to gallery</span>
 		<span class="bg-empty-hint">Pick multiple from your media library</span>
 	</button>
-{:else if view.editing}
-	<!-- Manage grid: remove + drag-to-reorder. In reorder mode the node view's
-		     stopEvent returns true for drag events; we ALSO stopPropagation here so
-		     ProseMirror's drop cursor never sees the gesture and the gallery fully
-		     owns drag/drop within this container. -->
-	<div
-		class="bg-manage"
-		role="list"
-		ondragover={(e) => {
-			e.preventDefault();
-			e.stopPropagation();
-		}}
-		ondrop={(e) => {
-			e.preventDefault();
-			e.stopPropagation();
-		}}>
-		{#each entries as entry, i (entry.path + i)}
-			<div
-				class="bg-thumb"
-				class:dragging={dragIndex === i}
-				draggable="true"
-				role="listitem"
-				style:background-color={entry.bgColor || undefined}
-				ondragstart={(e) => {
-					dragIndex = i;
-					e.stopPropagation();
-					if (e.dataTransfer) {
-						e.dataTransfer.effectAllowed = 'move';
-						e.dataTransfer.setData('text/plain', String(i));
-					}
-				}}
-				ondragend={(e) => {
-					e.stopPropagation();
-					dragIndex = null;
-				}}
-				ondragover={(e) => {
-					e.preventDefault();
-					e.stopPropagation();
-				}}
-				ondrop={(e) => {
-					e.preventDefault();
-					e.stopPropagation();
-					onDrop(i);
-				}}>
-				<img src={entryThumb(entry)} alt={entry.alt ?? ''} draggable="false" />
-				<div class="bg-thumb-actions">
-					<button
-						type="button"
-						title="Move left"
-						disabled={i === 0}
-						onclick={() => move(i, i - 1)}
-						aria-label="Move left">
-						‹
-					</button>
-					<button
-						type="button"
-						title="Move right"
-						disabled={i === entries.length - 1}
-						onclick={() => move(i, i + 1)}
-						aria-label="Move right">
-						›
-					</button>
-					<button
-						type="button"
-						class="danger"
-						title="Remove"
-						onclick={() => removeAt(i)}
-						aria-label="Remove image">
-						✕
-					</button>
-				</div>
-			</div>
-		{/each}
-		<button
-			type="button"
-			class="bg-add-tile"
-			onclick={onAddImages}
-			aria-label="Add images">
-			<span>＋</span>
-			<small>Add</small>
-		</button>
-	</div>
 {:else}
 	<!-- Live preview. Clicking a thumbnail selects the node; the gallery's own
 		     lightbox is suppressed (onclick returns false) so editing stays in the
@@ -519,99 +392,5 @@
 	.bg-empty-hint {
 		font-size: var(--text-xs);
 		color: var(--color-text-muted);
-	}
-
-	/* ── Manage grid ───────────────────────────────────────────────────── */
-	.bg-manage {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-		gap: var(--space-2);
-		padding: var(--space-3);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-md);
-		background: var(--color-bg-secondary);
-	}
-	.bg-thumb {
-		position: relative;
-		aspect-ratio: 1;
-		border-radius: var(--radius-sm);
-		overflow: hidden;
-		cursor: grab;
-		background: var(--color-surface);
-	}
-	.bg-thumb.dragging {
-		opacity: 0.4;
-	}
-	.bg-thumb img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-	}
-	.bg-thumb-actions {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		align-items: flex-start;
-		justify-content: flex-end;
-		gap: 2px;
-		padding: 4px;
-		opacity: 0;
-		background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 45%);
-		transition: opacity var(--transition-fast);
-	}
-	.bg-thumb:hover .bg-thumb-actions,
-	.bg-thumb:focus-within .bg-thumb-actions {
-		transition-duration: 0s;
-		opacity: 1;
-	}
-	.bg-thumb-actions button {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 22px;
-		height: 22px;
-		border: none;
-		border-radius: var(--radius-sm);
-		background: rgba(255, 255, 255, 0.92);
-		color: #111;
-		font-size: 13px;
-		line-height: 1;
-		cursor: pointer;
-	}
-	.bg-thumb-actions button:hover {
-		transition-duration: 0s;
-		background: white;
-	}
-	.bg-thumb-actions button:disabled {
-		opacity: 0.35;
-		cursor: default;
-	}
-	.bg-thumb-actions button.danger:hover {
-		transition-duration: 0s;
-		background: var(--color-error);
-		color: white;
-	}
-	.bg-add-tile {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: 2px;
-		aspect-ratio: 1;
-		border: 2px dashed var(--color-border);
-		border-radius: var(--radius-sm);
-		background: transparent;
-		color: var(--color-text-secondary);
-		font-size: 1.5rem;
-		cursor: pointer;
-	}
-	.bg-add-tile small {
-		font-size: var(--text-xs);
-	}
-	.bg-add-tile:hover {
-		transition-duration: 0s;
-		border-color: var(--color-accent);
-		color: var(--color-accent);
 	}
 </style>
