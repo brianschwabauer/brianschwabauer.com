@@ -645,7 +645,6 @@
 									class:source={!!drag && drag.items.includes(rec)}
 									animate:flip={{ duration: FLIP_MS, easing: cubicOut }}
 									role="listitem"
-									style={bgStyle(rec)}
 									onpointerdown={(e) => onTileDown(e, rec)}>
 									<img src={thumbnailURL(rec)} alt={rec.alt_text ?? ''} draggable="false" />
 									{#if marked.has(rec)}
@@ -671,9 +670,6 @@
 								</div>
 							{/each}
 						</div>
-						<p class="reorder-hint">
-							Drag to reorder · click to select · Shift / Ctrl for multiple
-						</p>
 					{/if}
 				</div>
 			{:else}
@@ -747,8 +743,6 @@
 						<div
 							class="tile"
 							class:selected={multiple && isSelected(image.path)}
-							style={bgStyle(image)}
-							style:aspect-ratio={image.aspect_ratio || 1}
 							role="button"
 							tabindex="0"
 							onclick={() => (multiple ? toggleSelect(image) : pick(image))}
@@ -875,9 +869,9 @@
 						<img class="rfloat-back" src={thumbnailURL(dragRecs[1])} alt="" draggable="false" />
 					{/if}
 					{#if dragRecs[0]}
-						<!-- Same contain + per-image background as the tiles, so the card
+						<!-- Same contain + background + border as the tiles, so the card
 						     reads identically to the slot it lands in (seamless drop). -->
-						<div class="rfloat-card" style={bgStyle(dragRecs[0])}>
+						<div class="rfloat-card">
 							<img class="rfloat-main" src={thumbnailURL(dragRecs[0])} alt="" draggable="false" />
 						</div>
 					{/if}
@@ -1040,12 +1034,15 @@
 		position: relative;
 		display: block;
 		width: 100%;
-		border: none;
+		/* Square, contained image on a consistent neutral with a subtle border —
+		   matches the reorder tiles so both modes look identical. */
+		aspect-ratio: 1;
+		border: 1px solid var(--color-border);
 		padding: 0;
 		border-radius: var(--radius-md);
 		overflow: hidden;
 		cursor: pointer;
-		background: var(--color-surface);
+		background: var(--color-bg-secondary);
 		text-align: left;
 	}
 
@@ -1076,7 +1073,7 @@
 		display: block;
 		width: 100%;
 		height: 100%;
-		object-fit: cover;
+		object-fit: contain;
 	}
 
 	/* ── Multi-select ─────────────────────────────────────────────────── */
@@ -1231,27 +1228,24 @@
 		cursor: grabbing;
 	}
 
-	.reorder-hint {
-		text-align: center;
-		font-size: var(--text-xs);
-		color: var(--color-text-muted);
-	}
-
 	.rtile {
 		position: relative;
 		aspect-ratio: 1;
 		border-radius: var(--radius-md);
 		overflow: hidden;
 		cursor: grab;
-		background: var(--color-surface);
+		background: var(--color-bg-secondary);
+		border: 1px solid var(--color-border);
 		user-select: none;
 		-webkit-user-select: none;
 		touch-action: none;
-		/* Powers the press release, the lifted-placeholder fade, and the selection
-		   ring. FLIP drives position changes via its own animation. */
+		/* Powers the press release and the selection ring; FLIP drives position
+		   changes via its own animation. Opacity (the source-placeholder dim) is
+		   deliberately NOT transitioned — otherwise, when the dropped card retires,
+		   the tile fades from dimmed back to full, which reads as the dropped image
+		   fading in. Snapping is instant and seamless under the landed card. */
 		transition:
 			transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
-			opacity 160ms ease,
 			outline-color 140ms ease;
 		outline: 3px solid transparent;
 		outline-offset: -3px;
@@ -1274,9 +1268,8 @@
 	.rtile img {
 		width: 100%;
 		height: 100%;
-		/* contain so the real aspect ratio shows; the tile's own background
-		   (set per-image via bgStyle, with a surface fallback) fills the
-		   letterbox so every square reads as a filled, consistent container. */
+		/* contain so the real aspect ratio shows; the tile's neutral background
+		   fills the letterbox so every square reads as a consistent container. */
 		object-fit: contain;
 		display: block;
 		pointer-events: none;
@@ -1376,7 +1369,8 @@
 		inset: 0;
 		border-radius: var(--radius-md);
 		overflow: hidden;
-		background: var(--color-surface);
+		background: var(--color-bg-secondary);
+		border: 1px solid var(--color-border);
 		box-shadow:
 			0 22px 44px rgba(0, 0, 0, 0.36),
 			0 6px 14px rgba(0, 0, 0, 0.24);
