@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Modal, Button, ButtonGroup, alert } from '@delightstack/components/actions';
-	import { Input } from '@delightstack/components/form';
+	import { Input, Select } from '@delightstack/components/form';
 	import { flip } from 'svelte/animate';
 	import { cubicOut } from 'svelte/easing';
 	import { onDestroy } from 'svelte';
@@ -564,8 +564,115 @@
 		}
 	}
 
+	// ── Marquee (rubber-band) selection ─────────────────────────────────────
+	// Drag on empty space to sweep a rectangle. In "Choose images" it grows the
+	// gallery selection (`selected`); in "Arrange" it marks tiles for a block
+	// move (`marked`). Plain drag adds; holding Ctrl/⌘/Shift removes. The result
+	// is always (snapshot ± swept), so prior picks are preserved and shrinking
+	// the box restores them. In-house, no Selecto dependency; coords are
+	// viewport-true (clientX/Y) and the rect is portaled to <body>.
+	let marquee = $state<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
+	let marqueePending: { x: number; y: number; id: number } | null = null;
+	let marqueeMode: 'select' | 'reorder' = 'select';
+	let marqueeSnapSelected: ImageRecord[] = [];
+	let marqueeSnapMarked: Set<ImageRecord> = new Set();
+	let marqueeEl: HTMLElement | null = null;
+	const MARQUEE_THRESH = 6;
+
+	function onGridDown(e: PointerEvent) {
+		if (!multiple || e.button !== 0 || drag) return;
+		const t = e.target as HTMLElement;
+		// A press on a tile (or any control) is a click/drag, not a marquee.
+		if (t.closest('.tile') || t.closest('.rtile') || t.closest('button') || t.closest('input'))
+			return;
+		// Stop the mouse press from starting a text selection on the sweep (touch
+		// is left alone so the grid can still be scrolled with a finger).
+		if (e.pointerType === 'mouse') e.preventDefault();
+		marqueeEl = e.currentTarget as HTMLElement;
+		marqueePending = { x: e.clientX, y: e.clientY, id: e.pointerId };
+		marqueeEl.addEventListener('pointermove', onGridMove);
+		marqueeEl.addEventListener('pointerup', onGridUp);
+		marqueeEl.addEventListener('pointercancel', onGridUp);
+		marqueeEl.addEventListener('lostpointercapture', onGridUp);
+	}
+
+	function onGridMove(e: PointerEvent) {
+		if (!marqueePending || e.pointerId !== marqueePending.id) return;
+		if (!marquee) {
+			if (Math.hypot(e.clientX - marqueePending.x, e.clientY - marqueePending.y) < MARQUEE_THRESH)
+				return;
+			try {
+				marqueeEl?.setPointerCapture(e.pointerId);
+			} catch {
+				/* pointer already released */
+			}
+			marqueeMode = mode;
+			marqueeSnapSelected = [...selected];
+			marqueeSnapMarked = new Set(marked);
+			marquee = { x0: marqueePending.x, y0: marqueePending.y, x1: e.clientX, y1: e.clientY };
+		} else {
+			marquee = { ...marquee, x1: e.clientX, y1: e.clientY };
+		}
+		recomputeMarqueeSelection(e.ctrlKey || e.metaKey || e.shiftKey);
+	}
+
+	function onGridUp(e: PointerEvent) {
+		if (marqueePending && e.pointerId !== marqueePending.id) return;
+		const wasMarquee = !!marquee;
+		marquee = null;
+		marqueePending = null;
+		detachMarquee();
+		// A plain tap on empty space (no sweep) clears the reorder marks.
+		if (!wasMarquee && mode === 'reorder') clearMarks();
+	}
+
+	function detachMarquee() {
+		const el = marqueeEl;
+		if (!el) return;
+		el.removeEventListener('pointermove', onGridMove);
+		el.removeEventListener('pointerup', onGridUp);
+		el.removeEventListener('pointercancel', onGridUp);
+		el.removeEventListener('lostpointercapture', onGridUp);
+		marqueeEl = null;
+	}
+
+	function recomputeMarqueeSelection(subtract: boolean) {
+		if (!marquee || !marqueeEl) return;
+		const lx = Math.min(marquee.x0, marquee.x1);
+		const rx = Math.max(marquee.x0, marquee.x1);
+		const ty = Math.min(marquee.y0, marquee.y1);
+		const by = Math.max(marquee.y0, marquee.y1);
+		const sel = marqueeMode === 'reorder' ? '.rtile[data-path]' : '.tile[data-path]';
+		const hit = new Set<string>();
+		marqueeEl.querySelectorAll<HTMLElement>(sel).forEach((tile) => {
+			const r = tile.getBoundingClientRect();
+			if (r.left < rx && r.right > lx && r.top < by && r.bottom > ty) {
+				if (tile.dataset.path) hit.add(tile.dataset.path);
+			}
+		});
+		if (marqueeMode === 'reorder') {
+			// Mark/unmark tiles (records live in `selected`) for a block move.
+			const next = new Set(marqueeSnapMarked);
+			for (const rec of selected) {
+				if (!hit.has(rec.path)) continue;
+				if (subtract) next.delete(rec);
+				else next.add(rec);
+			}
+			marked = next;
+		} else {
+			const snapPaths = new Set(marqueeSnapSelected.map((i) => i.path));
+			if (subtract) {
+				selected = marqueeSnapSelected.filter((i) => !hit.has(i.path));
+			} else {
+				const added = filtered.filter((img) => hit.has(img.path) && !snapPaths.has(img.path));
+				selected = [...marqueeSnapSelected, ...added];
+			}
+		}
+	}
+
 	onDestroy(() => {
 		detachCapture();
+		detachMarquee();
 		if (raf) cancelAnimationFrame(raf);
 	});
 
@@ -615,6 +722,18 @@
 			</div>
 		{/if}
 	{/snippet}
+	{#snippet headerEnd()}
+		{#if multiple}
+			<div class="header-actions">
+				{#if selected.length}
+					<Button size="0" translucent onclick={() => (selected = [])}>Clear</Button>
+				{/if}
+				<Button size="0" accent onclick={confirmMany} disabled={selected.length === 0}>
+					{confirmLabel}
+				</Button>
+			</div>
+		{/if}
+	{/snippet}
 	<div class="library" class:has-side={!!editingImage}>
 		<div class="library-main">
 			{#if multiple && mode === 'reorder'}
@@ -629,14 +748,13 @@
 							class="reorder-grid"
 							class:is-dragging={!!drag}
 							class:suppress-actions={suppressActions}
+							class:marquee-active={!!marquee}
 							bind:this={reorderGridEl}
 							role="list"
 							onpointermove={() => {
 								if (suppressActions) suppressActions = false;
 							}}
-							onpointerdown={(e) => {
-								if (e.target === reorderGridEl) clearMarks();
-							}}>
+							onpointerdown={onGridDown}>
 							{#each selected as rec (rec)}
 								<div
 									class="rtile"
@@ -645,6 +763,7 @@
 									class:source={!!drag && drag.items.includes(rec)}
 									animate:flip={{ duration: FLIP_MS, easing: cubicOut }}
 									role="listitem"
+									data-path={rec.path}
 									onpointerdown={(e) => onTileDown(e, rec)}>
 									<img src={thumbnailURL(rec)} alt={rec.alt_text ?? ''} draggable="false" />
 									{#if marked.has(rec)}
@@ -675,18 +794,35 @@
 			{:else}
 				<div class="toolbar">
 			<div class="toolbar-left">
-				<label class="year-label" for="media-year">Year</label>
-				<select id="media-year" bind:value={year} class="year-select">
-					{#each years as y}
-						<option value={y}>{y}</option>
-					{/each}
-				</select>
+				<div class="year">
+					<Select
+						size="1"
+						placeholder="Year"
+						value={year}
+						options={years.map((y) => ({ value: y, label: y }))}
+						onchange={(d) => (year = String(d.value))} />
+				</div>
 				<div class="search">
 					<Input placeholder="Search by name or alt..." bind:value={search} />
 				</div>
 			</div>
 			<div class="toolbar-right">
-				<Button onclick={onPickFiles}>Upload</Button>
+				<Button transparent onclick={onPickFiles}>
+					<svg
+						class="upload-icon"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						aria-hidden="true">
+						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+						<polyline points="17 8 12 3 7 8" />
+						<line x1="12" y1="3" x2="12" y2="15" />
+					</svg>
+					Upload
+				</Button>
 				<input
 					bind:this={fileInput}
 					type="file"
@@ -704,8 +840,10 @@
 		<div
 			class="dropzone"
 			class:active={dragOver}
+			class:marquee-active={!!marquee}
 			role="region"
 			aria-label="Drop images to upload"
+			onpointerdown={onGridDown}
 			ondragenter={(e) => {
 				e.preventDefault();
 				dragOver = true;
@@ -743,6 +881,7 @@
 						<div
 							class="tile"
 							class:selected={multiple && isSelected(image.path)}
+							data-path={image.path}
 							role="button"
 							tabindex="0"
 							onclick={() => (multiple ? toggleSelect(image) : pick(image))}
@@ -825,21 +964,20 @@
 				{/if}
 				</div>
 			{/if}
-
-			{#if multiple}
-				<div class="library-footer">
-					<span class="sel-count">{selected.length} selected</span>
-					<div class="footer-actions">
-						{#if mode === 'select' && selected.length}
-							<Button outline onclick={() => (selected = [])}>Clear</Button>
-						{/if}
-						<Button onclick={confirmMany} disabled={selected.length === 0}>
-							{confirmLabel}
-						</Button>
-					</div>
-				</div>
-			{/if}
 		</div>
+
+		{#if marquee}
+			<!-- Rubber-band selection rectangle, portaled to <body> so its fixed
+			     coords are viewport-true and it paints above the grid. -->
+			<div
+				class="marquee"
+				use:portal
+				style:left="{Math.min(marquee.x0, marquee.x1)}px"
+				style:top="{Math.min(marquee.y0, marquee.y1)}px"
+				style:width="{Math.abs(marquee.x1 - marquee.x0)}px"
+				style:height="{Math.abs(marquee.y1 - marquee.y0)}px">
+			</div>
+		{/if}
 
 		{#if drag}
 			<!-- Lifted drag card, portaled to <body> so its fixed coords are
@@ -962,21 +1100,15 @@
 		display: flex;
 		gap: var(--space-2);
 	}
-
-	.year-label {
-		display: block;
-		font-size: var(--text-xs);
-		color: var(--color-text-secondary);
-		margin-bottom: var(--space-1);
+	.upload-icon {
+		width: 1.15em;
+		height: 1.15em;
+		flex-shrink: 0;
 	}
 
-	.year-select {
-		padding: var(--space-2) var(--space-3);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-md);
-		background: var(--color-surface);
-		color: var(--color-text);
-		font-size: var(--text-sm);
+	.year {
+		width: 7rem;
+		flex-shrink: 0;
 	}
 
 	.search {
@@ -1002,6 +1134,23 @@
 		border: 2px dashed transparent;
 		border-radius: var(--radius-md);
 		transition: border-color var(--transition-fast), background var(--transition-fast);
+	}
+	/* While sweeping a marquee, don't let the gesture select text/images. */
+	.dropzone.marquee-active,
+	.reorder-grid.marquee-active {
+		user-select: none;
+		-webkit-user-select: none;
+		cursor: crosshair;
+	}
+
+	/* Rubber-band selection rectangle (portaled to <body>). */
+	:global(.marquee) {
+		position: fixed;
+		z-index: 99998;
+		pointer-events: none;
+		border: 1px solid var(--color-accent);
+		background: color-mix(in oklch, var(--color-accent) 14%, transparent);
+		border-radius: 2px;
 	}
 
 	.dropzone.active {
@@ -1042,7 +1191,9 @@
 		border-radius: var(--radius-md);
 		overflow: hidden;
 		cursor: pointer;
-		background: var(--color-bg-secondary);
+		/* A touch darker than --color-bg-secondary so the tile reads clearly
+		   against the modal background and the letterbox is visible. */
+		background: color-mix(in oklch, var(--color-text) 9%, var(--color-bg-secondary));
 		text-align: left;
 	}
 
@@ -1103,20 +1254,10 @@
 		color: white;
 	}
 
-	.library-footer {
+	/* Header Clear / Save buttons (moved out of a footer). */
+	.header-actions {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-3);
-		padding-top: var(--space-3);
-		border-top: 1px solid var(--color-border);
-	}
-	.sel-count {
-		font-size: var(--text-sm);
-		color: var(--color-text-secondary);
-	}
-	.footer-actions {
-		display: flex;
 		gap: var(--space-2);
 	}
 
@@ -1222,7 +1363,11 @@
 	.reorder-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+		align-content: start;
 		gap: var(--space-3);
+		/* Fill the scroll area so there's empty space below the tiles to start a
+		   marquee from (rows stay packed at the top via align-content). */
+		flex: 1;
 	}
 	.reorder-grid.is-dragging {
 		cursor: grabbing;
@@ -1234,7 +1379,7 @@
 		border-radius: var(--radius-md);
 		overflow: hidden;
 		cursor: grab;
-		background: var(--color-bg-secondary);
+		background: color-mix(in oklch, var(--color-text) 9%, var(--color-bg-secondary));
 		border: 1px solid var(--color-border);
 		user-select: none;
 		-webkit-user-select: none;
@@ -1319,7 +1464,8 @@
 	/* Hidden while dragging, and for a beat after a drop (until the pointer next
 	   moves) so the ✕ doesn't flash in on the tile the cursor is resting on. */
 	.reorder-grid.is-dragging .rtile-actions,
-	.reorder-grid.suppress-actions .rtile-actions {
+	.reorder-grid.suppress-actions .rtile-actions,
+	.reorder-grid.marquee-active .rtile-actions {
 		opacity: 0;
 	}
 	/* Re-enable interaction on the delightstack remove button only (the overlay
@@ -1369,7 +1515,7 @@
 		inset: 0;
 		border-radius: var(--radius-md);
 		overflow: hidden;
-		background: var(--color-bg-secondary);
+		background: color-mix(in oklch, var(--color-text) 9%, var(--color-bg-secondary));
 		border: 1px solid var(--color-border);
 		box-shadow:
 			0 22px 44px rgba(0, 0, 0, 0.36),
