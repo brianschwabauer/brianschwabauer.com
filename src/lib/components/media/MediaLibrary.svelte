@@ -262,8 +262,12 @@
 	let reorderGridEl = $state<HTMLDivElement | undefined>(undefined);
 	let raf = 0;
 	let lastFrame = 0;
+	// Right after a drop the pointer is still resting on the just-dropped tile, so
+	// the hover-actions (✕) would snap in the instant the lifted card retires — a
+	// jarring flash. Keep actions suppressed until the user actually moves again.
+	let suppressActions = $state(false);
 
-	const LIFT = 1.06;
+	const LIFT = 1.12;
 	const ROT_GAIN = 6;
 	const ROT_MAX = 14;
 	const THRESH = 5;
@@ -514,9 +518,12 @@
 		drag.py = tr.top;
 		drag.rot = 0;
 		// `selected` already holds the final order (we reorder live), so there's
-		// nothing to commit — just retire the overlay after it flies home.
+		// nothing to commit — just retire the overlay after it flies home. Suppress
+		// the hover-actions in the same tick the card disappears so the ✕ doesn't
+		// flash in on the tile the pointer is resting on; cleared on next move.
 		window.setTimeout(() => {
 			drag = null;
+			suppressActions = true;
 		}, DROP_MS);
 	}
 
@@ -621,8 +628,12 @@
 						<div
 							class="reorder-grid"
 							class:is-dragging={!!drag}
+							class:suppress-actions={suppressActions}
 							bind:this={reorderGridEl}
 							role="list"
+							onpointermove={() => {
+								if (suppressActions) suppressActions = false;
+							}}
 							onpointerdown={(e) => {
 								if (e.target === reorderGridEl) clearMarks();
 							}}>
@@ -641,14 +652,21 @@
 										<span class="rtile-check" aria-hidden="true">✓</span>
 									{/if}
 									<div class="rtile-actions">
-										<button
-											type="button"
-											class="danger"
-											title="Remove from gallery"
-											aria-label="Remove from gallery"
+										<Button
+											icon
+											size="00"
+											translucent
+											tooltip="Remove from gallery"
 											onclick={() => removeRec(rec)}>
-											✕
-										</button>
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2.5"
+												aria-hidden="true">
+												<path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" />
+											</svg>
+										</Button>
 									</div>
 								</div>
 							{/each}
@@ -831,26 +849,42 @@
 
 		{#if drag}
 			<!-- Lifted drag card, portaled to <body> so its fixed coords are
-			     viewport-true and it paints above the modal. -->
+			     viewport-true and it paints above the modal. Two layers: the outer
+			     carries only the translate (cursor follow); the inner carries the
+			     lift/tilt scale + rotation. Keeping scale off the translated node is
+			     what stops the card from lurching toward the origin on pickup — a
+			     `scale` applied over a large translate shrinks the translate too. -->
 			<div
 				class="rfloat"
 				class:multi={drag.items.length > 1}
 				use:portal
 				style:width="{drag.cellW}px"
 				style:height="{drag.cellH}px"
-				style:transform={`translate3d(${drag.px}px, ${drag.py}px, 0) rotate(${drag.rot}deg) scale(${drag.dropping ? 1 : LIFT})`}
+				style:transform={`translate3d(${drag.px}px, ${drag.py}px, 0)`}
 				style:transition={drag.dropping
 					? `transform ${DROP_MS}ms cubic-bezier(.2,.7,.2,1)`
 					: 'none'}>
-				{#if dragRecs[1]}
-					<img class="rfloat-back" src={thumbnailURL(dragRecs[1])} alt="" draggable="false" />
-				{/if}
-				{#if dragRecs[0]}
-					<img class="rfloat-main" src={thumbnailURL(dragRecs[0])} alt="" draggable="false" />
-				{/if}
-				{#if drag.items.length > 1}
-					<span class="rfloat-count">{drag.items.length}</span>
-				{/if}
+				<div
+					class="rfloat-inner"
+					style:transform={`rotate(${drag.rot}deg) scale(${drag.dropping ? 1 : LIFT})`}
+					style:transition={drag.dropping
+						? `transform ${DROP_MS}ms cubic-bezier(.2,.7,.2,1)`
+						: 'none'}>
+					{#if dragRecs[1]}
+						<!-- Stacked card peeking behind, for a multi-image drag. -->
+						<img class="rfloat-back" src={thumbnailURL(dragRecs[1])} alt="" draggable="false" />
+					{/if}
+					{#if dragRecs[0]}
+						<!-- Same contain + per-image background as the tiles, so the card
+						     reads identically to the slot it lands in (seamless drop). -->
+						<div class="rfloat-card" style={bgStyle(dragRecs[0])}>
+							<img class="rfloat-main" src={thumbnailURL(dragRecs[0])} alt="" draggable="false" />
+						</div>
+					{/if}
+					{#if drag.items.length > 1}
+						<span class="rfloat-count">{drag.items.length}</span>
+					{/if}
+				</div>
 			</div>
 		{/if}
 
@@ -1240,7 +1274,10 @@
 	.rtile img {
 		width: 100%;
 		height: 100%;
-		object-fit: cover;
+		/* contain so the real aspect ratio shows; the tile's own background
+		   (set per-image via bgStyle, with a surface fallback) fills the
+		   letterbox so every square reads as a filled, consistent container. */
+		object-fit: contain;
 		display: block;
 		pointer-events: none;
 	}
@@ -1273,7 +1310,6 @@
 		justify-content: flex-end;
 		padding: var(--space-1);
 		opacity: 0;
-		background: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 45%);
 		transition: opacity var(--transition-fast);
 		/* The overlay covers the whole tile (inset:0). Without this it would sit
 		   on top of the tile and swallow every pointerdown — onTileDown bails when
@@ -1287,72 +1323,83 @@
 		transition-duration: 0s;
 		opacity: 1;
 	}
-	.reorder-grid.is-dragging .rtile-actions {
+	/* Hidden while dragging, and for a beat after a drop (until the pointer next
+	   moves) so the ✕ doesn't flash in on the tile the cursor is resting on. */
+	.reorder-grid.is-dragging .rtile-actions,
+	.reorder-grid.suppress-actions .rtile-actions {
 		opacity: 0;
 	}
-	.rtile-actions button {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 24px;
-		height: 24px;
-		border: none;
-		border-radius: var(--radius-sm);
-		background: rgba(255, 255, 255, 0.92);
-		color: #111;
-		font-size: 13px;
-		line-height: 1;
-		cursor: pointer;
-		/* Re-enable interaction on the button only (the overlay itself is
-		   pointer-events:none so it doesn't block dragging the tile). */
+	/* Re-enable interaction on the delightstack remove button only (the overlay
+	   itself is pointer-events:none so it doesn't block dragging the tile). */
+	.rtile-actions :global(.button) {
 		pointer-events: auto;
+		width: 2.25rem;
+		height: 2.25rem;
+		--color-bg-active: rgb(0 0 0 / 0.8);
 	}
-	.rtile-actions button.danger:hover {
-		transition-duration: 0s;
-		background: var(--color-error);
-		color: #fff;
+	.rtile-actions :global(.button button) {
+		background-color: rgb(0 0 0 / 0.5);
 	}
 
-	/* ── Lifted drag overlay (portaled to <body>) ──────────────────────── */
+	/* ── Lifted drag overlay (portaled to <body>) ──────────────────────────
+	   Outer = translate only (cursor follow). Inner = rotate + lift scale, and
+	   the scale-in pop. Because the scale lives on a node with no translate, it
+	   can never shrink the translate and yank the card off the cursor. */
 	.rfloat {
 		position: fixed;
 		left: 0;
 		top: 0;
 		z-index: 99999;
 		pointer-events: none;
-		border-radius: var(--radius-md);
+		will-change: transform;
+	}
+	.rfloat-inner {
+		position: relative;
+		width: 100%;
+		height: 100%;
 		transform-origin: center center;
 		will-change: transform;
-		animation: rfloat-in 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+		animation: rfloat-pop 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 	}
-	@keyframes rfloat-in {
+	@keyframes rfloat-pop {
 		from {
-			scale: 0.9;
-			opacity: 0.6;
+			scale: 0.92;
+			opacity: 0.4;
 		}
 		to {
 			scale: 1;
 			opacity: 1;
 		}
 	}
-	.rfloat img {
+	.rfloat-card {
+		position: absolute;
+		inset: 0;
+		border-radius: var(--radius-md);
+		overflow: hidden;
+		background: var(--color-surface);
+		box-shadow:
+			0 22px 44px rgba(0, 0, 0, 0.36),
+			0 6px 14px rgba(0, 0, 0, 0.24);
+	}
+	.rfloat-main {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		display: block;
+	}
+	.rfloat-back {
 		position: absolute;
 		inset: 0;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		border-radius: var(--radius-md);
-		display: block;
-	}
-	.rfloat-main {
-		box-shadow:
-			0 18px 36px rgba(0, 0, 0, 0.34),
-			0 4px 10px rgba(0, 0, 0, 0.22);
-	}
-	.rfloat-back {
 		transform: rotate(-6deg) translate(-6%, 4%);
 		filter: brightness(0.92);
 		box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+		display: block;
 	}
 	.rfloat-count {
 		position: absolute;
