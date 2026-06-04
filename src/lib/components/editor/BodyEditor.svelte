@@ -71,10 +71,12 @@
 	// stacking both previews and shifting the page height.
 	let mounted = $state(false);
 	let libraryOpen = $state(false);
-	// Multi-select picker for galleries. `pendingGalleryPick` receives the chosen
-	// records — either inserting a new gallery (from a menu) or appending to an
-	// existing one (from the gallery node view's "Add" button).
+	// Gallery image modal. Preloaded with the gallery's current items
+	// (`galleryInitial`); `pendingGalleryPick` receives the FINAL ordered
+	// selection — used both to insert a new gallery (from a menu) and to edit an
+	// existing one (from the gallery node view).
 	let galleryPickerOpen = $state(false);
+	let galleryInitial = $state<ImageRecord[]>([]);
 	let pendingGalleryPick: ((records: ImageRecord[]) => void) | null = null;
 	// Seed from the initial content so the SSR'd output isn't covered by the
 	// placeholder before TipTap mounts.
@@ -187,9 +189,16 @@
 		editor?.chain().focus().setBlogImage(recordToBlogImageAttrs(image)).run();
 	}
 
-	/** Opens the multi-select library; `onPick` is called with the chosen records. */
-	function openGalleryPicker(onPick: (records: ImageRecord[]) => void) {
-		pendingGalleryPick = onPick;
+	/**
+	 * Opens the gallery image modal preloaded with `current`; `onResult` is called
+	 * with the final ordered selection when the user confirms.
+	 */
+	function openGalleryPicker(
+		current: ImageRecord[],
+		onResult: (records: ImageRecord[]) => void,
+	) {
+		galleryInitial = current;
+		pendingGalleryPick = onResult;
 		galleryPickerOpen = true;
 	}
 
@@ -199,9 +208,9 @@
 		cb?.(records);
 	}
 
-	/** Insert a brand-new gallery block from a menu. */
+	/** Insert a brand-new gallery block from a menu (starts with no images). */
 	function insertGallery() {
-		openGalleryPicker((records) => {
+		openGalleryPicker([], (records) => {
 			if (!records.length) return;
 			editor
 				?.chain()
@@ -281,9 +290,10 @@
 <MediaLibrary
 	bind:open={galleryPickerOpen}
 	multiple
+	initialSelection={galleryInitial}
 	onSelectMany={handleGalleryPicked}
-	confirmLabel="Add to gallery"
-	title="Add gallery images" />
+	confirmLabel="Save gallery"
+	title="Gallery images" />
 
 <style>
 	.body-editor {
