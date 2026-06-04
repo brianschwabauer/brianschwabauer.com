@@ -98,7 +98,7 @@
 
 	<div class="actions">
 		<Button translucent disabled={saving} onclick={onCancel}>Cancel</Button>
-		<Button accent loading={saving} onclick={submit}>Save</Button>
+		<Button loading={saving} onclick={submit}>Save</Button>
 	</div>
 </div>
 
