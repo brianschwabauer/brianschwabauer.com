@@ -292,7 +292,7 @@
 	multiple
 	initialSelection={galleryInitial}
 	onSelectMany={handleGalleryPicked}
-	confirmLabel="Save gallery"
+	confirmLabel="Done"
 	title="Gallery images" />
 
 <style>
