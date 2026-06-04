@@ -147,6 +147,19 @@ body {
 	min-height: 100vh;
 }
 
+/* delightstack's tooltip utility portals every tooltip into a shared #tooltips
+   div on <body> and hardcodes the tooltip's own z-index to 100. Because we raise
+   --layer-5 to 1000 (above), a delightstack Popover/Modal (z-index: var(--layer-5))
+   would otherwise paint OVER a tooltip — e.g. tooltips on buttons inside the
+   gallery settings popover were clipped behind it. Give #tooltips its own stacking
+   context just above the top overlay layer so tooltips always sit on top. The
+   fixed-positioned tooltips inside are still viewport-positioned (z-index alone
+   doesn't create a containing block), only their paint order changes. */
+#tooltips {
+	position: relative;
+	z-index: calc(var(--layer-5) + 1);
+}
+
 /* Typography */
 h1,
 h2,
