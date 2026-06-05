@@ -912,49 +912,51 @@
 									</svg>
 								</div>
 							{/if}
+							<!-- Actions sit in the top-right corner so the filename can use
+							     the full width of the bottom strip. -->
+							<div class="tile-actions">
+								<Button
+									icon
+									size="00"
+									overlay
+									tooltip="Edit alt text and caption"
+									onclick={(e) => {
+										e?.stopPropagation();
+										startEditMeta(image);
+									}}>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										aria-hidden="true">
+										<path
+											d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+									</svg>
+								</Button>
+								<Button
+									icon
+									size="00"
+									overlay
+									tooltip="Delete image"
+									onclick={(e) => {
+										e?.stopPropagation();
+										remove(image);
+									}}>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										aria-hidden="true">
+										<polyline points="3 6 5 6 21 6" />
+										<path
+											d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+									</svg>
+								</Button>
+							</div>
 							<div class="tile-overlay">
 								<div class="tile-name">{image.file_name ?? image.slug}</div>
-								<div class="tile-actions">
-									<Button
-										icon
-										size="00"
-										overlay
-										tooltip="Edit alt text and caption"
-										onclick={(e) => {
-											e?.stopPropagation();
-											startEditMeta(image);
-										}}>
-										<svg
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="2"
-											aria-hidden="true">
-											<path
-												d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-										</svg>
-									</Button>
-									<Button
-										icon
-										size="00"
-										overlay
-										tooltip="Delete image"
-										onclick={(e) => {
-											e?.stopPropagation();
-											remove(image);
-										}}>
-										<svg
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="2"
-											aria-hidden="true">
-											<polyline points="3 6 5 6 21 6" />
-											<path
-												d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-										</svg>
-									</Button>
-								</div>
 							</div>
 						</div>
 					{/each}
@@ -1284,14 +1286,39 @@
 		right: 0;
 		bottom: 0;
 		padding: var(--space-2);
-		background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
 		color: white;
+		text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
 		opacity: 0;
 		transition: opacity var(--transition-fast);
-		display: flex;
-		justify-content: space-between;
-		align-items: end;
-		gap: var(--space-2);
+		z-index: 1;
+		&::before {
+			content: "";
+			position: absolute;
+			top: -20px;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			z-index: -1;
+			background:  linear-gradient(
+		    to bottom,
+		    hsla(0, 0%, 0%, 0) 0%,
+		    hsla(0, 0%, 0%, 0.013) 10.2%,
+		    hsla(0, 0%, 0%, 0.049) 20.2%,
+		    hsla(0, 0%, 0%, 0.104) 30%,
+		    hsla(0, 0%, 0%, 0.175) 39.5%,
+		    hsla(0, 0%, 0%, 0.259) 48.6%,
+		    hsla(0, 0%, 0%, 0.352) 57.2%,
+		    hsla(0, 0%, 0%, 0.45) 65.3%,
+		    hsla(0, 0%, 0%, 0.55) 72.8%,
+		    hsla(0, 0%, 0%, 0.648) 79.5%,
+		    hsla(0, 0%, 0%, 0.741) 85.4%,
+		    hsla(0, 0%, 0%, 0.825) 90.4%,
+		    hsla(0, 0%, 0%, 0.896) 94.5%,
+		    hsla(0, 0%, 0%, 0.951) 97.5%,
+		    hsla(0, 0%, 0%, 0.987) 99.4%,
+		    hsl(0, 0%, 0%) 100%
+		  );
+		}
 	}
 
 	.tile:hover .tile-overlay,
@@ -1306,12 +1333,23 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		flex: 1;
 	}
 
+	/* Top-right corner; revealed on hover like the bottom strip. */
 	.tile-actions {
+		position: absolute;
+		top: var(--space-1);
+		right: var(--space-1);
+		z-index: 2;
 		display: flex;
 		gap: var(--space-1);
+		opacity: 0;
+		transition: opacity var(--transition-fast);
+	}
+	.tile:hover .tile-actions,
+	.tile:focus-within .tile-actions {
+		transition-duration: 0s;
+		opacity: 1;
 	}
 
 	.drop-hint {
