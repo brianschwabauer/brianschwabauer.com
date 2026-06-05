@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Modal, Button, ButtonGroup, alert } from '@delightstack/components/actions';
-	import { Input, Select } from '@delightstack/components/form';
+	import { Input, Select, Range } from '@delightstack/components/form';
 	import { flip } from 'svelte/animate';
 	import { cubicOut } from 'svelte/easing';
 	import { onDestroy } from 'svelte';
@@ -60,6 +60,54 @@
 	// and 'reorder' (drag to reorder + remove the chosen images).
 	let selected = $state<ImageRecord[]>([]);
 	let mode = $state<'select' | 'reorder'>('select');
+
+	// ── View settings (persisted to localStorage) ───────────────────────────
+	// The grid renders a fixed number of columns; fewer columns ⇒ bigger
+	// thumbnails. The settings popover exposes this via a *reversed* Range:
+	// dragging the slider up lowers the column count, so "higher" reads as
+	// "bigger" to the user. The chosen density is saved on every change (no
+	// manual save) so it becomes a sticky per-user preference. Stored as an
+	// object so future view settings (e.g. grid vs list) can live alongside it.
+	const MIN_COLS = 2;
+	const MAX_COLS = 8;
+	const DEFAULT_COLS = 5;
+	const SETTINGS_KEY = 'media-library:view-settings';
+	// Left→right the slider reads small→large; an empty middle keeps the track
+	// uncluttered while the endpoints orient the (reversed) direction.
+	const SIZE_TICK_LABELS = ['Small', '', '', '', '', '', 'Large'];
+
+	function loadCols(): number {
+		if (typeof localStorage === 'undefined') return DEFAULT_COLS;
+		try {
+			const raw = localStorage.getItem(SETTINGS_KEY);
+			if (!raw) return DEFAULT_COLS;
+			const c = Number((JSON.parse(raw) as { cols?: unknown })?.cols);
+			if (!Number.isFinite(c)) return DEFAULT_COLS;
+			return Math.max(MIN_COLS, Math.min(MAX_COLS, Math.round(c)));
+		} catch {
+			return DEFAULT_COLS;
+		}
+	}
+
+	let cols = $state(loadCols());
+
+	// Persist whenever the column count changes — runs client-only (effects don't
+	// run during SSR), so the first run just re-writes the value we loaded.
+	$effect(() => {
+		if (typeof localStorage === 'undefined') return;
+		try {
+			localStorage.setItem(SETTINGS_KEY, JSON.stringify({ cols }));
+		} catch {
+			/* storage disabled / full — the preference just won't persist */
+		}
+	});
+
+	// The Range runs over the same [MIN,MAX] domain as the column count but
+	// inverted, so a higher slider position means fewer columns (bigger tiles).
+	const sizeValue = $derived(MIN_COLS + MAX_COLS - cols);
+	function setColsFromSize(v: number) {
+		cols = Math.max(MIN_COLS, Math.min(MAX_COLS, MIN_COLS + MAX_COLS - Math.round(v)));
+	}
 
 	function isSelected(path: string): boolean {
 		return selected.some((i) => i.path === path);
@@ -709,6 +757,24 @@
 	</ButtonGroup>
 {/snippet}
 
+{#snippet viewSettings(_ctx: { close: () => void })}
+	<div class="ml-settings">
+		<div class="ml-field">
+			<span class="ml-label">Thumbnail size</span>
+			<Range
+				min={MIN_COLS}
+				max={MAX_COLS}
+				step={1}
+				value={sizeValue}
+				show_ticks
+				tick_labels={SIZE_TICK_LABELS}
+				aria_label="Thumbnail size"
+				oninput={(d) => setColsFromSize(d.value as number)}
+				onchange={(d) => setColsFromSize(d.value as number)} />
+		</div>
+	</div>
+{/snippet}
+
 <Modal
 	bind:open
 	{title}
@@ -737,7 +803,7 @@
 			</div>
 		{/if}
 	{/snippet}
-	<div class="library" class:has-side={!!editingImage}>
+	<div class="library" class:has-side={!!editingImage} style:--ml-cols={cols}>
 		<div class="library-main">
 			{#if multiple && mode === 'reorder'}
 				<div class="reorder-scroll">
@@ -833,6 +899,26 @@
 					multiple
 					hidden
 					onchange={onFileChange} />
+				<Button
+					icon
+					size="0"
+					transparent
+					tooltip="View settings"
+					popoverPlacement="bottom-end"
+					menu={viewSettings}>
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						aria-hidden="true">
+						<circle cx="12" cy="12" r="3" />
+						<path
+							d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+					</svg>
+				</Button>
 			</div>
 		</div>
 
@@ -1125,6 +1211,34 @@
 		flex-shrink: 0;
 	}
 
+	/* ── View-settings popover (portaled out of the modal by the Popover) ──── */
+	.ml-settings {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+		width: 240px;
+		max-width: 80vw;
+		padding: var(--space-1);
+		/* Bridge delightstack's form-token namespace (--c-*) to the app accent so
+		   the Range matches the accent instead of falling back to its blue. */
+		--c-action: var(--color-accent);
+		--c-action-active: var(--color-accent);
+		--c-action-text: #fff;
+		--c-bg-6: color-mix(in oklch, var(--color-text) 16%, transparent);
+		--c-text-2: var(--color-text-secondary);
+	}
+	.ml-field {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		min-width: 0;
+	}
+	.ml-label {
+		font-size: var(--text-xs);
+		font-weight: 500;
+		color: var(--color-text-secondary);
+	}
+
 	.year {
 		width: 7rem;
 		flex-shrink: 0;
@@ -1194,7 +1308,8 @@
 
 	.grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+		/* Fixed column count driven by the saved view setting (fewer = bigger). */
+		grid-template-columns: repeat(var(--ml-cols, 5), minmax(0, 1fr));
 		gap: var(--space-3);
 	}
 
@@ -1420,7 +1535,8 @@
 
 	.reorder-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+		/* Same fixed column count as the browse grid (shared view setting). */
+		grid-template-columns: repeat(var(--ml-cols, 5), minmax(0, 1fr));
 		align-content: start;
 		gap: var(--space-3);
 		/* Fill the scroll area so there's empty space below the tiles to start a
