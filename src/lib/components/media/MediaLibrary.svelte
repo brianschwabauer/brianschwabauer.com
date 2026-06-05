@@ -687,39 +687,42 @@
 	}
 </script>
 
+{#snippet modeToggle()}
+	<ButtonGroup size="0">
+		<Button
+			size="0"
+			translucent
+			active={mode === 'select'}
+			accent={mode === 'select'}
+			onclick={() => (mode = 'select')}>
+			Select
+		</Button>
+		<Button
+			size="0"
+			translucent
+			active={mode === 'reorder'}
+			accent={mode === 'reorder'}
+			disabled={selected.length === 0}
+			onclick={() => (mode = 'reorder')}>
+			Arrange{selected.length ? ` (${selected.length})` : ''}
+		</Button>
+	</ButtonGroup>
+{/snippet}
+
 <Modal
 	bind:open
 	{title}
 	class="media-modal"
-	width="min(960px, 100vw - 2rem)"
-	height="min(80vh, 760px)"
+	width="min(1200px, 100vw - 2rem)"
+	height="min(86vh, 880px)"
 	maxWidth="100vw"
-	maxHeight="100svh">
+	maxHeight="calc(100svh - 1.5rem)">
 	{#snippet headerStart()}
 		{#if multiple}
-			<!-- Mode toggle lives in the header (just after the title) so the body
-			     is all canvas. Translucent buttons keep it light against the bar. -->
-			<div class="mode-tabs">
-				<ButtonGroup size="0">
-					<Button
-						size="0"
-						translucent
-						active={mode === 'select'}
-						accent={mode === 'select'}
-						onclick={() => (mode = 'select')}>
-							Select
-					</Button>
-					<Button
-						size="0"
-						translucent
-						active={mode === 'reorder'}
-						accent={mode === 'reorder'}
-						disabled={selected.length === 0}
-						onclick={() => (mode = 'reorder')}>
-						Arrange{selected.length ? ` (${selected.length})` : ''}
-					</Button>
-				</ButtonGroup>
-			</div>
+			<!-- Desktop: the toggle sits in the (top) header just after the title.
+			     On mobile this is hidden and the toggle floats above the bottom bar
+			     instead (see .mode-tabs-float below). -->
+			<div class="mode-tabs mode-tabs-header">{@render modeToggle()}</div>
 		{/if}
 	{/snippet}
 	{#snippet headerEnd()}
@@ -912,47 +915,45 @@
 							<div class="tile-overlay">
 								<div class="tile-name">{image.file_name ?? image.slug}</div>
 								<div class="tile-actions">
-									<button
-										type="button"
-										class="overlay-btn"
-										title="Edit alt text and caption"
+									<Button
+										icon
+										size="00"
+										overlay
+										tooltip="Edit alt text and caption"
 										onclick={(e) => {
-											e.stopPropagation();
+											e?.stopPropagation();
 											startEditMeta(image);
-										}}
-										aria-label="Edit alt text and caption">
+										}}>
 										<svg
 											viewBox="0 0 24 24"
 											fill="none"
 											stroke="currentColor"
 											stroke-width="2"
-											width="16"
-											height="16">
+											aria-hidden="true">
 											<path
 												d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
 										</svg>
-									</button>
-									<button
-										type="button"
-										class="overlay-btn danger"
-										title="Delete image"
+									</Button>
+									<Button
+										icon
+										size="00"
+										overlay
+										tooltip="Delete image"
 										onclick={(e) => {
-											e.stopPropagation();
+											e?.stopPropagation();
 											remove(image);
-										}}
-										aria-label="Delete image">
+										}}>
 										<svg
 											viewBox="0 0 24 24"
 											fill="none"
 											stroke="currentColor"
 											stroke-width="2"
-											width="16"
-											height="16">
+											aria-hidden="true">
 											<polyline points="3 6 5 6 21 6" />
 											<path
 												d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
 										</svg>
-									</button>
+									</Button>
 								</div>
 							</div>
 						</div>
@@ -965,6 +966,13 @@
 				</div>
 			{/if}
 		</div>
+
+		{#if multiple}
+			<!-- Mobile only: the toggle floats just above the bottom header bar,
+			     portaled to <body> so it sits above the modal. Hidden on desktop
+			     (the header copy is shown there instead). -->
+			<div class="mode-tabs mode-tabs-float" use:portal>{@render modeToggle()}</div>
+		{/if}
 
 		{#if marquee}
 			<!-- Rubber-band selection rectangle, portaled to <body> so its fixed
@@ -1038,11 +1046,20 @@
 </Modal>
 
 <style>
+	/* Make the modal body a flex column so the library fills the space left by
+	   the sticky header instead of being 100% of the whole body (which overflows
+	   — pushing the image-details Save/Cancel below the fold). */
+	:global(.modal.media-modal .modal-body) {
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+	}
+
 	.library {
 		display: grid;
 		grid-template-columns: 1fr;
 		grid-template-rows: 100%;
-		height: 100%;
+		flex: 1;
 		min-height: 0;
 		gap: var(--space-4);
 	}
@@ -1297,30 +1314,6 @@
 		gap: var(--space-1);
 	}
 
-	.overlay-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 26px;
-		height: 26px;
-		border: none;
-		border-radius: var(--radius-sm);
-		background: rgba(255, 255, 255, 0.16);
-		color: white;
-		cursor: pointer;
-		transition: background var(--transition-fast);
-	}
-
-	.overlay-btn:hover {
-		transition-duration: 0s;
-		background: rgba(255, 255, 255, 0.28);
-	}
-
-	.overlay-btn.danger:hover {
-		transition-duration: 0s;
-		background: var(--color-error);
-	}
-
 	.drop-hint {
 		position: absolute;
 		inset: 0;
@@ -1340,6 +1333,32 @@
 		display: flex;
 		align-items: center;
 		margin-left: 1rem;
+	}
+
+	/* Desktop: toggle lives in the header. Hide the floating copy. */
+	.mode-tabs-float {
+		display: none;
+	}
+	@media (max-width: 767px) {
+		/* Mobile: the header (a bottom bar) shouldn't carry the toggle — hide the
+		   header copy and float the toggle just above the bar instead. */
+		.mode-tabs-header {
+			display: none;
+		}
+		.mode-tabs-float {
+			display: flex;
+			position: fixed;
+			z-index: 99990;
+			left: 50%;
+			bottom: 4rem;
+			transform: translateX(-50%);
+			margin-left: 0;
+			padding: 0.3rem;
+			border-radius: var(--radius-full, 999px);
+			background: var(--color-surface);
+			box-shadow: var(--shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.25));
+			border: 1px solid var(--color-border);
+		}
 	}
 
 	/* Smaller, lighter modal title so the translucent toggle beside it reads as
