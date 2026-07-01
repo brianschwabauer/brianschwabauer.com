@@ -2,7 +2,16 @@
 	import { untrack } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { Button, alert } from '@delightstack/components/actions';
+	import { Input, Select } from '@delightstack/components/form';
+	import type { SelectOption } from '@delightstack/components';
 	import type { RedirectEntry, RedirectMap, RedirectStatus } from '$lib/server/redirects';
+
+	const statusOptions: SelectOption[] = [
+		{ value: 301, label: '301' },
+		{ value: 302, label: '302' },
+		{ value: 307, label: '307' },
+		{ value: 308, label: '308' },
+	];
 
 	let { data } = $props();
 
@@ -198,49 +207,43 @@
 		</div>
 		{#each rows as row (row.id)}
 			<div class="table-row">
-				<input
-					class="col-from"
-					type="text"
-					bind:value={row.from}
-					placeholder="/old/path"
-					autocomplete="off"
-					spellcheck="false" />
-				<input
-					class="col-to"
-					type="text"
-					bind:value={row.to}
-					placeholder="/new/path"
-					autocomplete="off"
-					spellcheck="false" />
-				<select class="col-status" bind:value={row.status}>
-					<option value={301}>301</option>
-					<option value={302}>302</option>
-					<option value={307}>307</option>
-					<option value={308}>308</option>
-				</select>
-				<input
-					class="col-note"
-					type="text"
-					bind:value={row.note}
-					placeholder="Optional note"
-					autocomplete="off" />
-				<button
-					type="button"
-					class="col-actions remove-btn"
-					onclick={() => removeRow(row.id)}
-					aria-label="Remove redirect">
-					<svg
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						aria-hidden="true">
-						<polyline points="3 6 5 6 21 6" />
-						<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-						<path d="M10 11v6" />
-						<path d="M14 11v6" />
-					</svg>
-				</button>
+				<div class="col-from">
+					<Input size="0" dense bind:value={row.from} placeholder="/old/path" />
+				</div>
+				<div class="col-to">
+					<Input size="0" dense bind:value={row.to} placeholder="/new/path" />
+				</div>
+				<div class="col-status">
+					<Select
+						size="0"
+						dense
+						value={row.status}
+						options={statusOptions}
+						onchange={(d) => (row.status = d.value as RedirectStatus)} />
+				</div>
+				<div class="col-note">
+					<Input size="0" dense bind:value={row.note} placeholder="Optional note" />
+				</div>
+				<div class="col-actions">
+					<Button
+						icon
+						transparent
+						size="0"
+						onclick={() => removeRow(row.id)}
+						aria-label="Remove redirect">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							aria-hidden="true">
+							<polyline points="3 6 5 6 21 6" />
+							<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+							<path d="M10 11v6" />
+							<path d="M14 11v6" />
+						</svg>
+					</Button>
+				</div>
 			</div>
 		{/each}
 	</div>
@@ -350,51 +353,15 @@
 		align-items: center;
 	}
 
-	.table-row input,
-	.table-row select {
-		padding: var(--space-2) var(--space-3);
-		font-size: var(--text-sm);
-		font-family: var(--font-mono, ui-monospace, monospace);
-		background: var(--color-bg);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-sm);
-		color: var(--color-text);
+	/* Grid cells wrap the delightstack controls; let them shrink inside the fr
+	   tracks, and centre the icon-only remove button in its narrow cell. */
+	.table-row > div {
 		min-width: 0;
 	}
-
-	.table-row input:focus,
-	.table-row select:focus {
-		outline: none;
-		border-color: var(--color-accent);
-	}
-
-	.remove-btn {
-		display: inline-flex;
+	.col-actions {
+		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 32px;
-		height: 32px;
-		border-radius: var(--radius-sm);
-		background: transparent;
-		border: 1px solid transparent;
-		color: var(--color-text-muted);
-		cursor: pointer;
-		transition:
-			color var(--transition-fast),
-			border-color var(--transition-fast),
-			background-color var(--transition-fast);
-	}
-
-	.remove-btn:hover {
-		transition-duration: 0s;
-		color: #d33;
-		border-color: rgba(220, 60, 60, 0.3);
-		background: rgba(220, 60, 60, 0.08);
-	}
-
-	.remove-btn svg {
-		width: 16px;
-		height: 16px;
 	}
 
 	.add-row {

@@ -2,6 +2,8 @@
 	import { onMount, untrack } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { Button, alert } from '@delightstack/components/actions';
+	import { Input, Select } from '@delightstack/components/form';
+	import type { SelectOption } from '@delightstack/components';
 	import {
 		create,
 		insertMultiple,
@@ -121,6 +123,25 @@
 		return c;
 	});
 
+	const statusOptions: SelectOption[] = $derived([
+		{ value: 'all', label: `All (${counts.all})` },
+		{ value: 'published', label: `Published (${counts.published})` },
+		{ value: 'draft', label: `Drafts (${counts.draft})` },
+		{ value: 'archived', label: `Archived (${counts.archived})` },
+	]);
+
+	const tagOptions: SelectOption[] = $derived([
+		{ value: '', label: 'All tags' },
+		...allTags.map((tag: string) => ({ value: tag, label: tag })),
+	]);
+
+	const sortOptions: SelectOption[] = [
+		{ value: 'updated-desc', label: 'Recently updated' },
+		{ value: 'date-desc', label: 'Newest first' },
+		{ value: 'date-asc', label: 'Oldest first' },
+		{ value: 'title-asc', label: 'Title A–Z' },
+	];
+
 	function formatDate(date: number | null | undefined) {
 		if (!date) return '—';
 		return new Date(date).toLocaleDateString('en-US', {
@@ -187,54 +208,36 @@
 </div>
 
 <div class="controls">
-	<div class="search">
-		<svg
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="2"
-			aria-hidden="true">
-			<circle cx="11" cy="11" r="7" />
-			<path d="m20 20-3.5-3.5" />
-		</svg>
-		<input
+	<div class="c-search">
+		<Input
 			type="search"
+			label="Search"
 			bind:value={query}
-			placeholder="Search title, summary, tags…"
-			autocomplete="off"
-			spellcheck="false"
-			aria-label="Search posts" />
+			clearable
+			placeholder="Search title, summary, tags…" />
 	</div>
-	<div class="filters">
-		<label class="control">
-			<span class="control-label">Status</span>
-			<select bind:value={statusFilter}>
-				<option value="all">All ({counts.all})</option>
-				<option value="published">Published ({counts.published})</option>
-				<option value="draft">Drafts ({counts.draft})</option>
-				<option value="archived">Archived ({counts.archived})</option>
-			</select>
-		</label>
-		{#if allTags.length > 0}
-			<label class="control">
-				<span class="control-label">Tag</span>
-				<select bind:value={tagFilter}>
-					<option value="">All tags</option>
-					{#each allTags as tag (tag)}
-						<option value={tag}>{tag}</option>
-					{/each}
-				</select>
-			</label>
-		{/if}
-		<label class="control">
-			<span class="control-label">Sort</span>
-			<select bind:value={sortKey}>
-				<option value="updated-desc">Recently updated</option>
-				<option value="date-desc">Newest first</option>
-				<option value="date-asc">Oldest first</option>
-				<option value="title-asc">Title A–Z</option>
-			</select>
-		</label>
+	<div class="c-filter">
+		<Select
+			label="Status"
+			value={statusFilter}
+			options={statusOptions}
+			onchange={(d) => (statusFilter = d.value as StatusFilter)} />
+	</div>
+	{#if allTags.length > 0}
+		<div class="c-filter">
+			<Select
+				label="Tag"
+				value={tagFilter}
+				options={tagOptions}
+				onchange={(d) => (tagFilter = String(d.value))} />
+		</div>
+	{/if}
+	<div class="c-filter">
+		<Select
+			label="Sort"
+			value={sortKey}
+			options={sortOptions}
+			onchange={(d) => (sortKey = d.value as SortKey)} />
 	</div>
 </div>
 
@@ -422,80 +425,20 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-3);
-		align-items: center;
+		align-items: end;
 		margin-bottom: var(--space-6);
 	}
 
-	.search {
-		flex: 1 1 280px;
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-		padding: var(--space-2) var(--space-3);
-		background: var(--color-surface);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-md);
-		transition: border-color var(--transition-fast);
-	}
-
-	.search:focus-within {
-		border-color: var(--color-accent);
-	}
-
-	.search svg {
-		width: 16px;
-		height: 16px;
-		color: var(--color-text-muted);
-		flex-shrink: 0;
-	}
-
-	.search input {
-		flex: 1;
-		border: 0;
-		background: transparent;
-		font-size: var(--text-base);
-		color: var(--color-text);
+	/* Search grows; the three filters share the rest of the row and only wrap
+	   to a new line together on narrow widths. Wrappers carry the flex sizing so
+	   the delightstack controls (width:100%) fill each cell. */
+	.c-search {
+		flex: 1.6 1 220px;
 		min-width: 0;
 	}
-
-	.search input:focus {
-		outline: none;
-		box-shadow: none;
-	}
-
-	.search input::-webkit-search-cancel-button {
-		appearance: none;
-	}
-
-	.filters {
-		display: flex;
-		gap: var(--space-3);
-		flex-wrap: wrap;
-	}
-
-	.control {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-1);
-		font-size: var(--text-sm);
-	}
-
-	.control-label {
-		font-family: var(--font-mono, ui-monospace, monospace);
-		font-size: 0.65rem;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: var(--color-text-muted);
-	}
-
-	.control select {
-		padding: var(--space-2) var(--space-3);
-		background: var(--color-surface);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-md);
-		color: var(--color-text);
-		font-size: var(--text-sm);
-		min-width: 150px;
+	.c-filter {
+		flex: 1 1 150px;
+		min-width: 0;
 	}
 
 	.action-error {

@@ -161,7 +161,7 @@
 				Thanks, {firstName}. I'll write back to you in hopefully a timely manner
 				(sometimes I can be slow. Feel free to keep bugging me).
 			</p>
-			<button type="button" class="ghost-btn" onclick={resetForm}>Send another</button>
+			<Button outline pill onclick={resetForm}>Send another</Button>
 		</div>
 	{:else}
 		<form
@@ -590,28 +590,6 @@
 			opacity: 0;
 			transform: translateX(0);
 		}
-	}
-
-	.ghost-btn {
-		font: inherit;
-		font-weight: 700;
-		font-size: 0.9rem;
-		color: var(--color-text);
-		background: transparent;
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-full);
-		padding: 0.6rem 1.2rem;
-		cursor: pointer;
-		transition:
-			background-color var(--transition-fast),
-			border-color var(--transition-fast),
-			color var(--transition-fast);
-	}
-	.ghost-btn:hover {
-		transition-duration: 0s;
-		background: var(--color-accent-light);
-		border-color: var(--color-accent);
-		color: var(--color-accent);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
