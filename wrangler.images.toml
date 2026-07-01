@@ -19,7 +19,7 @@ bucket_name = "brianschwabauer"
 
 [[containers]]
 class_name = "ImageProcessorContainer"
-image = "./delightstack/packages/images/container/Dockerfile"
+image = "./node_modules/@delightstack/images/container/Dockerfile"
 max_instances = 5
 instance_type = "standard-1"
 
