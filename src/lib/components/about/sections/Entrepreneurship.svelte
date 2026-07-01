@@ -4,7 +4,8 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const tapnotionShots = [
 		'2017-01-01_tapnotion_app_screenshot_home_page-scores.avif',
@@ -187,7 +188,7 @@
 			alt: 'TapNotion screenshot',
 		},
 	];
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="entrepreneurship" year="2017" label="Entrepreneurship" theme="entr">
@@ -240,7 +241,7 @@
 			</div>
 			<Reveal variant="up" delay={100}>
 				<div class="gallery-contained">
-					<Gallery items={towerImages} display="masonry" size="2" />
+					<LightboxGallery key="entrepreneurship-tower" items={towerImages} display="masonry" size="2" />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={150}>
@@ -304,7 +305,7 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={engagementImages} display="masonry-row" size="2" />
+				<LightboxGallery key="entrepreneurship-engagement" items={engagementImages} display="masonry-row" size="2" />
 			</Reveal>
 			<Reveal variant="up" delay={150}>
 				<ArchiveFrame
@@ -362,7 +363,7 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={markableImages} display="masonry-row" size="2" />
+				<LightboxGallery key="entrepreneurship-markable" items={markableImages} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 
@@ -399,7 +400,7 @@
 		</div>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" />
+	<LightboxGallery bind:this={gallery} key="entrepreneurship" items={sectionExtras} />
 </SectionShell>
 
 <style>

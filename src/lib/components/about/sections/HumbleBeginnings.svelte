@@ -4,11 +4,12 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 
 	const earlyFilms: Array<{
 		slug: string;
@@ -395,7 +396,11 @@
 		</Reveal>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionMedia} display="lightbox" autoplay_video />
+	<LightboxGallery
+		bind:this={gallery}
+		key="humble-beginnings"
+		items={sectionMedia}
+		autoplay_video />
 </SectionShell>
 
 <style>

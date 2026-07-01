@@ -6,7 +6,8 @@
 	import Expandable from '../primitives/Expandable.svelte';
 	import PinScrub from '../primitives/PinScrub.svelte';
 	import ScrubVideo from '../primitives/ScrubVideo.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const calamityImages: GalleryItem[] = [
 		{
@@ -224,7 +225,7 @@
 			alt: 'XYZ News Special Report (2011)',
 		},
 	];
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="animation" year="2010" label="Animation & VFX" theme="vfx">
@@ -283,7 +284,7 @@
 				<div class="storyboard">
 					<div class="story-eyebrow bleed-head">FROM THE SHOT LIST</div>
 					<div class="gallery-bleed">
-						<Gallery items={calamityImages} display="masonry" size="2" />
+						<LightboxGallery key="animation-calamity" items={calamityImages} display="masonry" size="2" />
 					</div>
 				</div>
 			</Reveal>
@@ -355,7 +356,7 @@
 			<Reveal variant="up" delay={100}>
 				<div class="exposure-grid">
 					<div class="gallery-bleed">
-						<Gallery items={exposureImages} display="masonry" size="2" />
+						<LightboxGallery key="animation-exposure" items={exposureImages} display="masonry" size="2" />
 					</div>
 				</div>
 			</Reveal>
@@ -469,7 +470,7 @@
 		</div>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" autoplay_video />
+	<LightboxGallery bind:this={gallery} key="animation" items={sectionExtras} autoplay_video />
 </SectionShell>
 
 <style>

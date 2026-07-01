@@ -5,7 +5,8 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const pr1ReelImages = [
 		{
@@ -235,8 +236,8 @@
 		},
 	];
 
-	let reelGallery = $state<ReturnType<typeof Gallery>>();
-	let extrasGallery = $state<ReturnType<typeof Gallery>>();
+	let reelGallery = $state<ReturnType<typeof LightboxGallery>>();
+	let extrasGallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="power-rangers" year="2008" label="Power Rangers 360" theme="ranger">
@@ -352,7 +353,7 @@
 				<div class="bts-strip">
 					<div class="bts-eyebrow bleed-head">BEHIND THE SCENES</div>
 					<div class="gallery-bleed">
-						<Gallery items={pr2BTSImages} display="masonry" size="2" />
+						<LightboxGallery key="power-rangers-pr2-bts" items={pr2BTSImages} display="masonry" size="2" />
 					</div>
 				</div>
 			</Reveal>
@@ -361,7 +362,7 @@
 				<div class="bts-strip">
 					<div class="bts-eyebrow bleed-head">FROM THE FILM</div>
 					<div class="gallery-bleed">
-						<Gallery items={pr2StillImages} display="masonry" size="2" />
+						<LightboxGallery key="power-rangers-pr2-stills" items={pr2StillImages} display="masonry" size="2" />
 					</div>
 				</div>
 			</Reveal>
@@ -404,9 +405,9 @@
 		</Reveal>
 	</div>
 
-	<Gallery bind:this={reelGallery} items={pr1ReelImages} display="lightbox" />
+	<LightboxGallery bind:this={reelGallery} key="power-rangers-reel" items={pr1ReelImages} />
 
-	<Gallery bind:this={extrasGallery} items={sectionExtras} display="lightbox" />
+	<LightboxGallery bind:this={extrasGallery} key="power-rangers-extras" items={sectionExtras} />
 </SectionShell>
 
 <style>

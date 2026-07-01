@@ -4,7 +4,8 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
@@ -200,7 +201,7 @@
 		},
 	];
 
-	let reelGallery = $state<ReturnType<typeof Gallery>>();
+	let reelGallery = $state<ReturnType<typeof LightboxGallery>>();
 
 	// Standalone clickable LazyMedias + inline video posters in document order.
 	// 0: Yard Sale inline video
@@ -327,7 +328,7 @@
 			alt: 'Long Time No See (2011)',
 		},
 	];
-	let extrasGallery = $state<ReturnType<typeof Gallery>>();
+	let extrasGallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="festivals-ksms" year="2011" label="Festivals & KSMS" theme="broadcast">
@@ -377,7 +378,7 @@
 			</Reveal>
 			<Reveal variant="up" delay={120}>
 				<div class="gallery-bleed">
-					<Gallery items={yardSaleImages} display="masonry" size="2" />
+					<LightboxGallery key="festivals-yard-sale" items={yardSaleImages} display="masonry" size="2" />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={160}>
@@ -527,7 +528,7 @@
 				</Reveal>
 
 				<Reveal variant="up" delay={150}>
-					<Gallery items={liveBroadcastImages} display="masonry-row" size="2" />
+					<LightboxGallery key="festivals-live-broadcast" items={liveBroadcastImages} display="masonry-row" size="2" />
 				</Reveal>
 
 				<Reveal variant="up" delay={180}>
@@ -562,7 +563,7 @@
 
 				<Reveal variant="up" delay={120}>
 					<div class="gallery-bleed">
-						<Gallery items={blockPartyImages} display="masonry" size="2" />
+						<LightboxGallery key="festivals-block-party" items={blockPartyImages} display="masonry" size="2" />
 					</div>
 				</Reveal>
 
@@ -661,12 +662,16 @@
 		</div>
 	</div>
 
-	<Gallery bind:this={reelGallery} items={reelImages} display="lightbox" autoplay_video />
+	<LightboxGallery
+		bind:this={reelGallery}
+		key="festivals-reel"
+		items={reelImages}
+		autoplay_video />
 
-	<Gallery
+	<LightboxGallery
 		bind:this={extrasGallery}
+		key="festivals-extras"
 		items={sectionExtras}
-		display="lightbox"
 		autoplay_video />
 </SectionShell>
 

@@ -93,6 +93,14 @@
 		content-visibility: auto;
 		contain-intrinsic-size: 600px 400px;
 	}
+	/* Remember the real rendered size after first paint so sections above the
+	   scroll target stop shifting height once they've been seen (see
+	   SectionShell for the cross-browser guard rationale). */
+	@supports (contain-intrinsic-size: auto 1px) {
+		.lazy-media {
+			contain-intrinsic-size: auto 600px auto 400px;
+		}
+	}
 	.lazy-media-button {
 		appearance: none;
 		border: 0;

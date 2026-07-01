@@ -3,7 +3,8 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	import Expandable from '../primitives/Expandable.svelte';
 
@@ -189,7 +190,7 @@
 			alt: 'Show&Tour — project detail page',
 		},
 	];
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="showandtour" year="2019" label="Show&Tour" theme="snt">
@@ -282,7 +283,7 @@
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="gallery-bleed">
-					<Gallery items={dashboardMockupsImages} display="masonry" size="2" />
+					<LightboxGallery key="show-and-tour-dashboards" items={dashboardMockupsImages} display="masonry" size="2" />
 				</div>
 			</Reveal>
 		</div>
@@ -293,7 +294,7 @@
 				<p>What the photographer's clients actually see.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={deliveryPagesImages} display="masonry-row" size="2" />
+				<LightboxGallery key="show-and-tour-delivery" items={deliveryPagesImages} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 
@@ -303,13 +304,13 @@
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="gallery-bleed">
-					<Gallery items={brandImages} display="masonry" size="2" />
+					<LightboxGallery key="show-and-tour-brand" items={brandImages} display="masonry" size="2" />
 				</div>
 			</Reveal>
 		</div>
 	</div>
 
-	<Gallery bind:this={gallery} items={heroShot} display="lightbox" />
+	<LightboxGallery bind:this={gallery} key="show-and-tour" items={heroShot} />
 </SectionShell>
 
 <style>

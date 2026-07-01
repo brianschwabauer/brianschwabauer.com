@@ -2,7 +2,8 @@
 	import SectionShell from '../primitives/SectionShell.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const currentYear = new Date().getFullYear();
 
@@ -16,7 +17,7 @@
 			alt: 'Show&Tour project detail page',
 		},
 	];
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell
@@ -110,7 +111,7 @@
 		</div>
 	</div>
 
-	<Gallery bind:this={gallery} items={heroShot} display="lightbox" />
+	<LightboxGallery bind:this={gallery} key="what-im-up-to" items={heroShot} />
 </SectionShell>
 
 <style>

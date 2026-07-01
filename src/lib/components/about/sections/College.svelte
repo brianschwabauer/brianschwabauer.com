@@ -5,7 +5,8 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const variousImages: GalleryItem[] = [
 		{
@@ -272,7 +273,7 @@
 			alt: 'Legacy (2015)',
 		},
 	];
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="college" year="2012" label="College" theme="college">
@@ -302,7 +303,7 @@
 			<div class="strip">
 				<div class="strip-eyebrow bleed-head">A WHIRLWIND OF CLASS PROJECTS</div>
 				<div class="gallery-bleed">
-					<Gallery items={variousImages} display="masonry" size="2" />
+					<LightboxGallery key="college-various" items={variousImages} display="masonry" size="2" />
 				</div>
 				<div class="strip-note">
 					MED 365 silent film · chase scene · complexity edit · ART 230 stop-motion · ART
@@ -413,7 +414,7 @@
 
 			<Reveal variant="up" delay={100}>
 				<div class="node-bts">
-					<Gallery items={nodeBTSImages} display="masonry-row" size="2" />
+					<LightboxGallery key="college-node-bts" items={nodeBTSImages} display="masonry-row" size="2" />
 				</div>
 			</Reveal>
 
@@ -672,7 +673,7 @@
 				<div class="oneup-bts">
 					<div class="bts-eyebrow bleed-head">ONE UP — BTS</div>
 					<div class="gallery-bleed">
-						<Gallery items={oneUpBTSImages} display="masonry" size="2" />
+						<LightboxGallery key="college-oneup-bts" items={oneUpBTSImages} display="masonry" size="2" />
 					</div>
 				</div>
 			</Reveal>
@@ -697,7 +698,7 @@
 		</div>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" autoplay_video />
+	<LightboxGallery bind:this={gallery} key="college" items={sectionExtras} autoplay_video />
 </SectionShell>
 
 <style>

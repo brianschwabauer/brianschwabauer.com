@@ -3,7 +3,8 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const sectionExtras: GalleryItem[] = [
 		{
@@ -31,7 +32,7 @@
 			alt: 'Video Curator clips page',
 		},
 	];
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="side-projects" year="Now" label="Side projects" theme="side">
@@ -193,7 +194,7 @@
 		</div>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" />
+	<LightboxGallery bind:this={gallery} key="side-projects" items={sectionExtras} />
 </SectionShell>
 
 <style>
