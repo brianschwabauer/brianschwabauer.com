@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
+	import { page } from '$app/state';
+	import { scrollToSection, setSectionHash } from '$lib/sectionNav';
 
 	let {
 		stops,
@@ -9,6 +11,24 @@
 
 	let activeId = $state(stops[0]?.id ?? '');
 	let scrollPercent = $state(0);
+
+	// True while a programmatic jump is animating. We suppress scroll-driven hash
+	// writes during it so the URL reflects the *target* section, not every
+	// section the converging scroll passes through on the way there.
+	let jumping = false;
+
+	/** Hash value for a stop id — null (cleared) for the first/top section. */
+	const hashFor = (id: string) => (id === stops[0]?.id ? null : id);
+
+	async function jump(id: string) {
+		const el = document.getElementById(id);
+		if (!el) return;
+		activeId = id;
+		jumping = true;
+		setSectionHash(hashFor(id));
+		await scrollToSection(el);
+		jumping = false;
+	}
 
 	onMount(() => {
 		const sections: HTMLElement[] = stops
@@ -24,29 +44,28 @@
 				const top = s.getBoundingClientRect().top;
 				if (top - probe <= 0) current = s.id;
 			}
-			activeId = current;
+			if (current !== activeId) {
+				activeId = current;
+				if (!jumping) setSectionHash(hashFor(current));
+			}
 		};
 		update();
 		window.addEventListener('scroll', update, { passive: true });
 		window.addEventListener('resize', update);
+
+		// Restore a deep-linked section on load. The browser/SvelteKit will have
+		// attempted a native hash scroll already, but content-visibility estimates
+		// make that land in the wrong place — re-run the converging jump to fix it.
+		const hashId = page.url.hash.replace(/^#/, '');
+		if (hashId && sections.some((s) => s.id === hashId)) {
+			tick().then(() => requestAnimationFrame(() => jump(hashId)));
+		}
+
 		return () => {
 			window.removeEventListener('scroll', update);
 			window.removeEventListener('resize', update);
 		};
 	});
-
-	function jump(id: string) {
-		const el = document.getElementById(id);
-		if (!el) return;
-		const scrollTo = () => {
-			const top = el.getBoundingClientRect().top + window.scrollY - 80;
-			window.scrollTo({ top });
-		};
-		scrollTo();
-		activeId = id;
-		// Re-snap after layout settles (lazy images, reveal animations above).
-		requestAnimationFrame(() => requestAnimationFrame(scrollTo));
-	}
 </script>
 
 <aside class="year-scrubber" aria-label="Page navigation">

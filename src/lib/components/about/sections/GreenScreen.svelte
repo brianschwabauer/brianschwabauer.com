@@ -4,7 +4,8 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
@@ -250,7 +251,7 @@
 		},
 	];
 
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="green-screen" year="2007" label="Green Screen" theme="green">
@@ -305,7 +306,7 @@
 				<p>The funniest thing we'd ever made, by a country mile.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={xyzImages} display="masonry-row" size="2" />
+				<LightboxGallery key="green-screen-xyz" items={xyzImages} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 
@@ -438,7 +439,7 @@
 			</Reveal>
 
 			<Reveal variant="up" delay={100}>
-				<Gallery items={vfxImages} display="masonry" size="0" />
+				<LightboxGallery key="green-screen-vfx" items={vfxImages} display="masonry" size="0" />
 			</Reveal>
 		</div>
 
@@ -452,7 +453,7 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={nuisanceImages} display="masonry-row" size="2" />
+				<LightboxGallery key="green-screen-nuisance" items={nuisanceImages} display="masonry-row" size="2" />
 			</Reveal>
 			<Reveal variant="up" delay={150}>
 				<div class="inline-video">
@@ -507,7 +508,7 @@
 		</Reveal>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" autoplay_video />
+	<LightboxGallery bind:this={gallery} key="green-screen" items={sectionExtras} autoplay_video />
 </SectionShell>
 
 <style>

@@ -4,7 +4,8 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const sectionExtras: GalleryItem[] = [
 		{
@@ -40,7 +41,7 @@
 			alt: 'Calamity Flash website screen recording',
 		},
 	];
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="taking-it-seriously" year="2009" label="First Websites" theme="flash">
@@ -164,7 +165,7 @@
 			</Reveal>
 		</div>
 
-		<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" />
+		<LightboxGallery bind:this={gallery} key="taking-it-seriously" items={sectionExtras} />
 
 		<Reveal>
 			<Expandable label="The Flash-era stack, for the people who remember">

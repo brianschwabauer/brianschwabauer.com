@@ -4,7 +4,8 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const spunkstersImages: GalleryItem[] = [
 		{
@@ -134,7 +135,7 @@
 			alt: 'Power Rangers 360 III — fake trailer (2013)',
 		},
 	];
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="spunksters" year="2013" label="The Spunksters" theme="spunksters">
@@ -228,7 +229,7 @@
 			<div class="bts">
 				<div class="bts-eyebrow bleed-head">BEHIND THE SCENES</div>
 				<div class="gallery-bleed">
-					<Gallery items={spunkstersImages} display="masonry" size="2" />
+					<LightboxGallery key="spunksters-photos" items={spunkstersImages} display="masonry" size="2" />
 				</div>
 			</div>
 		</Reveal>
@@ -313,7 +314,7 @@
 		</Reveal>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" autoplay_video />
+	<LightboxGallery bind:this={gallery} key="spunksters" items={sectionExtras} autoplay_video />
 </SectionShell>
 
 <style>

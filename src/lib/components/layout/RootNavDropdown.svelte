@@ -2,6 +2,7 @@
 	import { onMount, tick } from 'svelte';
 	import { ripple } from '@delightstack/utilities';
 	import { hideHeaderLogo, searchOpen } from '$lib/stores/navState';
+	import { scrollToSection, setSectionHash } from '$lib/sectionNav';
 
 	// material-style ripple for the bar buttons — gated to the mobile bottom
 	// bar (the desktop top bar is left as it was)
@@ -68,15 +69,18 @@
 
 	const scrollToTop = () => {
 		window.scrollTo({ top: 0 });
+		setSectionHash(null);
 	};
 
 	const jumpTo = (id: string) => {
 		const el = document.getElementById(id);
 		if (!el) return;
-		const top = el.getBoundingClientRect().top + window.scrollY - 72;
-		window.scrollTo({ top });
 		open = false;
 		buttonEl?.focus();
+		setSectionHash(id === 'hero' ? null : id);
+		// Converging scroll (72px mobile header offset) survives the layout shifts
+		// that content-visibility sections cause as they render on the way down.
+		void scrollToSection(el, 72);
 	};
 
 	const openMenu = async () => {

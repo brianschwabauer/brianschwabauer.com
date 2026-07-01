@@ -4,7 +4,8 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const filmImages: GalleryItem[] = [
 		{
@@ -239,7 +240,7 @@
 			alt: 'What Makes Us Human (2014) — full senior thesis short',
 		},
 	];
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="what-makes-us-human" year="2015" label="Senior Thesis" theme="thesis">
@@ -307,7 +308,7 @@
 			<Reveal variant="up">
 				<div class="eyebrow bleed-head">FROM THE FILM</div>
 				<div class="gallery-bleed">
-					<Gallery items={filmImages} display="masonry" size="2" />
+					<LightboxGallery key="what-makes-us-human-film" items={filmImages} display="masonry" size="2" />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
@@ -331,7 +332,7 @@
 		<div class="concept-grid">
 			<Reveal variant="up">
 				<div class="eyebrow">CONCEPT ART · PRE-PRODUCTION</div>
-				<Gallery items={conceptImages} display="masonry-row" size="2" />
+				<LightboxGallery key="what-makes-us-human-concept" items={conceptImages} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 
@@ -369,7 +370,7 @@
 			</Reveal>
 			<Reveal variant="up" delay={120}>
 				<div class="gallery-bleed">
-					<Gallery items={btsImages} display="masonry" size="2" />
+					<LightboxGallery key="what-makes-us-human-bts" items={btsImages} display="masonry" size="2" />
 				</div>
 			</Reveal>
 		</div>
@@ -384,12 +385,16 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<Gallery items={premiereImages} display="masonry-row" size="2" />
+				<LightboxGallery key="what-makes-us-human-premiere" items={premiereImages} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" autoplay_video />
+	<LightboxGallery
+		bind:this={gallery}
+		key="what-makes-us-human"
+		items={sectionExtras}
+		autoplay_video />
 </SectionShell>
 
 <style>

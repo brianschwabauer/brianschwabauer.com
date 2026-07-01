@@ -4,7 +4,8 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const reel = [
 		{
@@ -117,7 +118,7 @@
 		},
 		...reel,
 	];
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="freelancer" year="2016" label="Freelancer" theme="hustle">
@@ -253,7 +254,7 @@
 				<h3 class="sub">Wedding films</h3>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<Gallery items={weddingImages} display="masonry-row" size="2" />
+				<LightboxGallery key="freelancer-wedding" items={weddingImages} display="masonry-row" size="2" />
 			</Reveal>
 		</div>
 
@@ -284,7 +285,7 @@
 		</div>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" />
+	<LightboxGallery bind:this={gallery} key="freelancer" items={sectionExtras} />
 </SectionShell>
 
 <style>

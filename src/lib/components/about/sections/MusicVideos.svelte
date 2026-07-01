@@ -4,7 +4,8 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import Expandable from '../primitives/Expandable.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { type GalleryItem } from '@delightstack/components/media';
+	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const flavaImages: GalleryItem[] = [
 		{
@@ -174,7 +175,7 @@
 			alt: 'You Derive Me Crazy (2010) — calculus parody music video',
 		},
 	];
-	let gallery = $state<ReturnType<typeof Gallery>>();
+	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="music-videos" year="2009" label="Music Videos" theme="audio">
@@ -288,7 +289,7 @@
 				</Reveal>
 				<Reveal variant="up" delay={120}>
 					<div class="gallery-bleed">
-						<Gallery items={flavaImages} display="masonry" size="2" />
+						<LightboxGallery key="music-videos-flava" items={flavaImages} display="masonry" size="2" />
 					</div>
 				</Reveal>
 				<Reveal variant="up" delay={160}>
@@ -322,7 +323,7 @@
 				</Reveal>
 				<Reveal variant="up" delay={120}>
 					<div class="gallery-bleed">
-						<Gallery items={calcImages} display="masonry" size="2" />
+						<LightboxGallery key="music-videos-calc" items={calcImages} display="masonry" size="2" />
 					</div>
 				</Reveal>
 				<Reveal variant="up" delay={160}>
@@ -354,7 +355,7 @@
 		</Reveal>
 	</div>
 
-	<Gallery bind:this={gallery} items={sectionExtras} display="lightbox" autoplay_video />
+	<LightboxGallery bind:this={gallery} key="music-videos" items={sectionExtras} autoplay_video />
 </SectionShell>
 
 <style>
