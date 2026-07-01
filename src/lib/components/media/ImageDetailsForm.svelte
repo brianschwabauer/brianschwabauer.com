@@ -61,12 +61,12 @@
 <div class="form">
 	<header class="form-header">
 		{#if showBack}
-			<button type="button" class="back-btn" onclick={onCancel} aria-label="Back">
+			<Button icon transparent size="0" onclick={onCancel} aria-label="Back">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
 					<line x1="19" y1="12" x2="5" y2="12" />
 					<polyline points="12 19 5 12 12 5" />
 				</svg>
-			</button>
+			</Button>
 		{/if}
 		<h3 class="form-title">{title}</h3>
 	</header>
@@ -122,24 +122,6 @@
 		font-weight: 600;
 		color: var(--color-text);
 		margin: 0;
-	}
-
-	.back-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 32px;
-		height: 32px;
-		border: none;
-		border-radius: var(--radius-sm);
-		background: transparent;
-		color: var(--color-text-secondary);
-		cursor: pointer;
-	}
-	.back-btn:hover {
-		transition-duration: 0s;
-		background: var(--color-bg-secondary);
-		color: var(--color-text);
 	}
 
 	.preview {

@@ -25,6 +25,7 @@
 		key,
 		items,
 		display = 'lightbox',
+		meta_display_fullscreen = 'always',
 		...rest
 	}: {
 		/** Stable identifier used in the `?media=<key>` deep-link param. */
@@ -37,9 +38,26 @@
 		 * on click, and the slide↔URL sync deep-links them all the same.
 		 */
 		display?: GalleryDisplay;
+		/**
+		 * Show the caption bar over the fullscreen carousel. Defaults to `'always'`
+		 * (this site captions its media) instead of the Gallery default of `'none'`.
+		 */
+		meta_display_fullscreen?: 'none' | 'always';
 		/** Forwarded to the underlying Gallery (e.g. `size`, `autoplay_video`). */
 		[prop: string]: unknown;
 	} = $props();
+
+	// The Gallery renders its thumbnail hover-overlay from `item.name`, but its
+	// fullscreen caption bar from `item.caption || item.name`. Our media data sets
+	// only `caption`, so mirror it into `name` (when absent) — that way the same
+	// caption shows both on thumbnail hover and in fullscreen, from one field.
+	const displayItems = $derived(
+		items.map((item) =>
+			item && typeof item === 'object' && item.caption && !item.name
+				? { ...item, name: item.caption }
+				: item,
+		),
+	);
 
 	let inner = $state<ReturnType<typeof Gallery>>();
 
@@ -134,4 +152,10 @@
 	});
 </script>
 
-<Gallery bind:this={inner} bind:slide {items} {display} {...rest} />
+<Gallery
+	bind:this={inner}
+	bind:slide
+	items={displayItems}
+	{display}
+	{meta_display_fullscreen}
+	{...rest} />

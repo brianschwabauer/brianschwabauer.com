@@ -16,6 +16,17 @@
 	--color-accent-hover: #00a090;
 	--color-accent-light: rgba(0, 180, 160, 0.1);
 
+	/* delightstack pairs its accent-styled controls (e.g. `<Button accent>`) as
+	   `--color-accent` background + `--color-accent-text` label, and derives the
+	   label from --color-accent. Because we pin --color-accent to a bright
+	   mid-tone teal (not delightstack's dark-clamped accent), the auto-derived
+	   label came out a near-identical light teal — i.e. muted/low-contrast.
+	   Pin the label to white to restore contrast (matches the site's
+	   white-on-teal button convention); dim it for the disabled state. */
+	--color-accent-text: #ffffff;
+	--color-accent-text-active: #ffffff;
+	--color-accent-text-disabled: rgba(255, 255, 255, 0.72);
+
 	/* Semantic Colors */
 	--color-success: #22c55e;
 	--color-warning: #f59e0b;
@@ -188,6 +199,18 @@ h5 {
 }
 h6 {
 	font-size: var(--text-lg);
+}
+
+/* delightstack's Modal renders its title as a bare <h2> inside its <header>.
+   The global `h2 { font-size: var(--text-4xl) }` above (which predates
+   delightstack) bleeds in and makes every modal title oversized. Normalize the
+   modal-header title to a proper dialog size so all delightstack modals match.
+   A component can still override with a more specific selector — e.g.
+   MediaLibrary's `.modal.media-modal header h2` intentionally goes smaller. */
+.modal header h2 {
+	font-size: var(--text-xl);
+	font-weight: 600;
+	line-height: var(--leading-tight);
 }
 
 a {
