@@ -69,7 +69,7 @@
 			const ok = await alert({
 				title: 'Remove this redirect?',
 				message: `${row.from || '(empty)'} → ${row.to || '(empty)'} will be removed on save.`,
-				continueText: 'Remove',
+				continue_text: 'Remove',
 				destructive: true,
 			});
 			if (!ok) return;

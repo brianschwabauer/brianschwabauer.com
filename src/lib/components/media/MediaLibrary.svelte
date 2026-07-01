@@ -253,7 +253,7 @@
 		const ok = await alert({
 			title: 'Delete image?',
 			message: `“${image.file_name ?? image.slug}” will be removed from your library. This can’t be undone.`,
-			continueText: 'Delete',
+			continue_text: 'Delete',
 			destructive: true,
 		});
 		if (!ok) return;

@@ -49,7 +49,7 @@
 				bind:value={slug}
 				placeholder="my-post-slug"
 				prefix="/blog/"
-				helper="Changing the slug also changes the public URL." />
+				description="Changing the slug also changes the public URL." />
 		</div>
 		<div class="field">
 			<Input
@@ -57,7 +57,7 @@
 				label="Summary"
 				bind:value={summary}
 				placeholder="Brief summary (leave blank to auto-generate from content)…"
-				helper="Used for SEO, social previews, and the post listings." />
+				description="Used for SEO, social previews, and the post listings." />
 		</div>
 		<div class="actions">
 			<Button onclick={() => (open = false)}>Done</Button>

@@ -154,7 +154,7 @@
 		const ok = await alert({
 			title: 'Delete this post?',
 			message: `“${post.title}” will be removed permanently. This can’t be undone.`,
-			continueText: 'Delete',
+			continue_text: 'Delete',
 			destructive: true,
 		});
 		if (!ok) return;
