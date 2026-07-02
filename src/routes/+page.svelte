@@ -93,6 +93,10 @@
 		color: #fff;
 		position: relative;
 		isolation: isolate;
+		/* Full-bleed elements are 100vw wide, which overshoots by the scrollbar
+		   width on platforms with classic scrollbars — clip instead of letting
+		   the page scroll sideways. */
+		overflow-x: clip;
 	}
 	:global(html) {
 		scroll-padding-top: 80px;

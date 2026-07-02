@@ -133,7 +133,7 @@
 		pointer-events: none;
 	}
 	.container {
-		max-width: 78rem;
+		max-width: 80rem;
 		margin: 0 auto;
 		padding: 0 clamp(1rem, 3vw, 2rem);
 		position: relative;

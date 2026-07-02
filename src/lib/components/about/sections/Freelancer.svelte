@@ -2,6 +2,7 @@
 	import SectionShell from '../primitives/SectionShell.svelte';
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
+	import GradientCollapse from '../primitives/GradientCollapse.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
@@ -178,18 +179,20 @@
 			</Reveal>
 
 			<Reveal variant="up" delay={100}>
-				<div class="reel-grid">
-					{#each reel as item, i}
-						<figure class="reel-card" style:--i={i}>
-							<LazyMedia
-								src={item.src}
-								alt={item.caption}
-								ratio="16 / 9"
-								onclick={(e) => gallery?.open(1 + i, e.currentTarget)} />
-							<figcaption>{item.caption}</figcaption>
-						</figure>
-					{/each}
-				</div>
+				<GradientCollapse label="Show the full reel" collapsedHeight="24rem">
+					<div class="reel-grid">
+						{#each reel as item, i}
+							<figure class="reel-card" style:--i={i}>
+								<LazyMedia
+									src={item.src}
+									alt={item.caption}
+									ratio="16 / 9"
+									onclick={(e) => gallery?.open(1 + i, e.currentTarget)} />
+								<figcaption>{item.caption}</figcaption>
+							</figure>
+						{/each}
+					</div>
+				</GradientCollapse>
 			</Reveal>
 		</div>
 
@@ -254,7 +257,11 @@
 				<h3 class="sub">Wedding films</h3>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<LightboxGallery key="freelancer-wedding" items={weddingImages} display="masonry-row" size="2" />
+				<LightboxGallery
+					key="freelancer-wedding"
+					items={weddingImages}
+					display="masonry-row"
+					size="2" />
 			</Reveal>
 		</div>
 

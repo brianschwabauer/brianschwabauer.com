@@ -12,26 +12,52 @@
 	} = $props();
 
 	let el = $state<HTMLElement | null>(null);
+	let stickyEl = $state<HTMLElement | null>(null);
 	let progress = $state(0);
 
 	$effect(() => {
 		if (!el) return;
 		const onScroll = () => {
 			const rect = el!.getBoundingClientRect();
-			const vh = window.innerHeight || 1;
-			// rect.height = vh (sticky window) + pinHeight (extra scroll room).
+			// Measure the sticky window itself (100svh) instead of
+			// window.innerHeight, which changes when the mobile URL bar collapses
+			// and would make the progress mapping jump mid-scrub.
+			const vh = stickyEl?.offsetHeight || window.innerHeight || 1;
+			// rect.height = sticky window + pinHeight (extra scroll room).
 			// Track progress from when the section's top hits viewport top (start of pin)
 			// to when the sticky reaches the bottom of its container (end of pin).
 			const t = -rect.top;
 			const span = rect.height - vh;
 			progress = span > 0 ? Math.max(0, Math.min(1, t / span)) : 0;
 		};
-		onScroll();
-		window.addEventListener('scroll', onScroll, { passive: true });
-		window.addEventListener('resize', onScroll);
+		// Only track scroll while the cycler is near the viewport.
+		let listening = false;
+		const listen = (on: boolean) => {
+			if (on === listening) return;
+			listening = on;
+			if (on) {
+				onScroll();
+				window.addEventListener('scroll', onScroll, { passive: true });
+				window.addEventListener('resize', onScroll);
+			} else {
+				window.removeEventListener('scroll', onScroll);
+				window.removeEventListener('resize', onScroll);
+			}
+		};
+		// Fail-open: start listening immediately; the observer only *pauses*
+		// tracking once it has actually reported the cycler as off-screen.
+		listen(true);
+		if (typeof IntersectionObserver === 'undefined') {
+			return () => listen(false);
+		}
+		const io = new IntersectionObserver(
+			(entries) => listen(entries.some((e) => e.isIntersecting)),
+			{ rootMargin: '100% 0px' },
+		);
+		io.observe(el);
 		return () => {
-			window.removeEventListener('scroll', onScroll);
-			window.removeEventListener('resize', onScroll);
+			io.disconnect();
+			listen(false);
 		};
 	});
 
@@ -44,7 +70,7 @@
 	style:--c={color}
 	style:--pin-height={pinHeight}
 	aria-hidden="true">
-	<div class="sticky">
+	<div class="sticky" bind:this={stickyEl}>
 		<div class="stage">
 			{#each years as y, i (y)}
 				{@const offset = i - virtualIndex}
@@ -55,7 +81,7 @@
 			{/each}
 		</div>
 		<div class="rail">
-			<div class="fill" style:width="{progress * 100}%"></div>
+			<div class="fill" style:transform="scaleX({progress})"></div>
 		</div>
 		{#if caption}
 			<div class="caption">{caption}</div>
@@ -67,15 +93,15 @@
 	.year-cycler {
 		position: relative;
 		width: 100%;
-		/* sticky window (100vh) + scroll distance (pinHeight) */
-		height: calc(100vh + var(--pin-height));
+		/* sticky window (100svh) + scroll distance (pinHeight) */
+		height: calc(100svh + var(--pin-height));
 		pointer-events: none;
 		user-select: none;
 	}
 	.sticky {
 		position: sticky;
 		top: 0;
-		height: 100vh;
+		height: 100svh;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -116,8 +142,10 @@
 	}
 	.fill {
 		height: 100%;
+		width: 100%;
 		background: var(--c);
-		transition: width 80ms linear;
+		transform-origin: left;
+		transition: transform 80ms linear;
 	}
 	.caption {
 		font-family: var(--font-mono);

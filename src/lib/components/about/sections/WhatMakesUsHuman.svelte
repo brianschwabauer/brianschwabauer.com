@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import Expandable from '../primitives/Expandable.svelte';
+	import GradientCollapse from '../primitives/GradientCollapse.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -308,7 +308,11 @@
 			<Reveal variant="up">
 				<div class="eyebrow bleed-head">FROM THE FILM</div>
 				<div class="gallery-bleed">
-					<LightboxGallery key="what-makes-us-human-film" items={filmImages} display="masonry" size="2" />
+					<LightboxGallery
+						key="what-makes-us-human-film"
+						items={filmImages}
+						display="masonry"
+						size="2" />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
@@ -332,7 +336,11 @@
 		<div class="concept-grid">
 			<Reveal variant="up">
 				<div class="eyebrow">CONCEPT ART · PRE-PRODUCTION</div>
-				<LightboxGallery key="what-makes-us-human-concept" items={conceptImages} display="masonry-row" size="2" />
+				<LightboxGallery
+					key="what-makes-us-human-concept"
+					items={conceptImages}
+					display="masonry-row"
+					size="2" />
 			</Reveal>
 		</div>
 
@@ -369,9 +377,16 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<div class="gallery-bleed">
-					<LightboxGallery key="what-makes-us-human-bts" items={btsImages} display="masonry" size="2" />
-				</div>
+				<GradientCollapse
+					class="gallery-bleed"
+					label="Show all 16 production stills"
+					collapsedHeight="30rem">
+					<LightboxGallery
+						key="what-makes-us-human-bts"
+						items={btsImages}
+						display="masonry"
+						size="2" />
+				</GradientCollapse>
 			</Reveal>
 		</div>
 
@@ -385,7 +400,11 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<LightboxGallery key="what-makes-us-human-premiere" items={premiereImages} display="masonry-row" size="2" />
+				<LightboxGallery
+					key="what-makes-us-human-premiere"
+					items={premiereImages}
+					display="masonry-row"
+					size="2" />
 			</Reveal>
 		</div>
 	</div>

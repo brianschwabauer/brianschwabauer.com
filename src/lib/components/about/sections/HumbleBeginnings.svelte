@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import Expandable from '../primitives/Expandable.svelte';
+	import GradientCollapse from '../primitives/GradientCollapse.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -364,7 +364,7 @@
 		</ul>
 
 		<Reveal variant="up">
-			<Expandable label="The longer story — how the process worked">
+			<GradientCollapse label="The longer story — how the process worked">
 				<div class="prose">
 					<p>
 						Every weekend looked the same. I'd ride over to Kevin's house. We'd come up
@@ -392,7 +392,7 @@
 						split has basically held to this day.
 					</p>
 				</div>
-			</Expandable>
+			</GradientCollapse>
 		</Reveal>
 	</div>
 

@@ -6,7 +6,6 @@
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
-	import Expandable from '../primitives/Expandable.svelte';
 
 	const dashboardMockupsImages: GalleryItem[] = [
 		{

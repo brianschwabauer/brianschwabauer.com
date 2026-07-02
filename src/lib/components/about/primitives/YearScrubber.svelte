@@ -35,7 +35,20 @@
 			.map((s) => document.getElementById(s.id))
 			.filter((el): el is HTMLElement => !!el);
 
+		// Debounce scroll-driven hash writes: Safari rate-limits history API
+		// calls, and fast scrubbing through 16 sections can exceed the quota.
+		// The URL only needs to be right once scrolling settles.
+		let hashTimer = 0;
+		const queueHash = (id: string) => {
+			window.clearTimeout(hashTimer);
+			hashTimer = window.setTimeout(() => {
+				if (!jumping) setSectionHash(hashFor(id));
+			}, 200);
+		};
+
+		let ticking = false;
 		const update = () => {
+			ticking = false;
 			const sh = document.documentElement.scrollHeight - window.innerHeight;
 			scrollPercent = sh > 0 ? window.scrollY / sh : 0;
 			let current = sections[0]?.id ?? '';
@@ -46,12 +59,18 @@
 			}
 			if (current !== activeId) {
 				activeId = current;
-				if (!jumping) setSectionHash(hashFor(current));
+				if (!jumping) queueHash(current);
 			}
 		};
+		// Coalesce scroll events into one measurement per frame.
+		const onScroll = () => {
+			if (ticking) return;
+			ticking = true;
+			requestAnimationFrame(update);
+		};
 		update();
-		window.addEventListener('scroll', update, { passive: true });
-		window.addEventListener('resize', update);
+		window.addEventListener('scroll', onScroll, { passive: true });
+		window.addEventListener('resize', onScroll);
 
 		// Restore a deep-linked section on load. The browser/SvelteKit will have
 		// attempted a native hash scroll already, but content-visibility estimates
@@ -62,15 +81,16 @@
 		}
 
 		return () => {
-			window.removeEventListener('scroll', update);
-			window.removeEventListener('resize', update);
+			window.clearTimeout(hashTimer);
+			window.removeEventListener('scroll', onScroll);
+			window.removeEventListener('resize', onScroll);
 		};
 	});
 </script>
 
 <aside class="year-scrubber" aria-label="Page navigation">
 	<div class="rail">
-		<div class="fill" style:height="{scrollPercent * 100}%"></div>
+		<div class="fill" style:transform="scaleY({scrollPercent})"></div>
 	</div>
 	<ul>
 		{#each stops as stop}
@@ -98,6 +118,18 @@
 		pointer-events: auto;
 		font-family: var(--font-mono);
 	}
+	/* Subtle scrim so the labels stay legible when full-bleed galleries scroll
+	   underneath — invisible against the dark page, earns its keep over images. */
+	.year-scrubber::before {
+		content: '';
+		position: absolute;
+		inset: -0.6rem -0.6rem -0.6rem -1rem;
+		background: rgba(6, 6, 10, 0.42);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		border-radius: 14px;
+		z-index: -1;
+	}
 	.rail {
 		position: absolute;
 		right: 11px;
@@ -109,12 +141,11 @@
 	}
 	.fill {
 		position: absolute;
-		left: 0;
-		right: 0;
-		top: 0;
+		inset: 0;
 		background: linear-gradient(180deg, #00f2c3, #00b4a0 60%, #6c63ff);
 		border-radius: 2px;
-		transition: height 80ms linear;
+		transform-origin: top;
+		transition: transform 80ms linear;
 	}
 	ul {
 		list-style: none;
