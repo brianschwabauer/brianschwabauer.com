@@ -16,6 +16,7 @@
 	import Entrepreneurship from '$lib/components/about/sections/Entrepreneurship.svelte';
 	import ShowAndTour from '$lib/components/about/sections/ShowAndTour.svelte';
 	import SideProjects from '$lib/components/about/sections/SideProjects.svelte';
+	import Creed from '$lib/components/about/sections/Creed.svelte';
 	import YearScrubber from '$lib/components/about/primitives/YearScrubber.svelte';
 	import EmptyYearMark from '$lib/components/about/primitives/EmptyYearMark.svelte';
 	import YearCycler from '$lib/components/about/primitives/YearCycler.svelte';
@@ -40,6 +41,7 @@
 		{ id: 'entrepreneurship', year: '2017', label: 'Entrepreneurship' },
 		{ id: 'showandtour', year: '2019', label: 'Show&Tour' },
 		{ id: 'side-projects', year: 'Today', label: 'Side Projects' },
+		{ id: 'creed', year: 'Always', label: 'The Creed' },
 	];
 </script>
 
@@ -82,6 +84,7 @@
 		color="#00f2c3"
 		caption="Building Show&Tour" />
 	<SideProjects />
+	<Creed />
 </div>
 
 <style>
