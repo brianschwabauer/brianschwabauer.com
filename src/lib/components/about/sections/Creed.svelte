@@ -47,9 +47,9 @@
 		let userHolding = false; // frame opened by the user
 		let dragMode: 'rotate' | 'scale' | null = null;
 
-		const adj = { r: -3.5, s: 1, k: 0 };
+		const adj = { r: -3.5, s: 1 };
 		const applyAdj = () => {
-			fixTransform = `rotate(${adj.r}deg) scale(${adj.s}) skewX(${adj.k}deg)`;
+			fixTransform = `rotate(${adj.r}deg) scale(${adj.s})`;
 		};
 
 		// ---- user interaction: select, drag-scale, drag-rotate ----
@@ -130,33 +130,54 @@
 		};
 
 		// ---- the automated cursor ----
-		// a corner of the heading's current visual bounds, as a cursor offset
-		// from the stage centre (where the cursor svg is anchored)
-		const randomCorner = () => {
+		// the visual centre of a specific frame handle, as a cursor offset from
+		// the stage centre (where the cursor svg is anchored). Handle elements
+		// carry the frame's live transform, so this stays accurate however the
+		// heading has been rotated or scaled — including by the user.
+		const handleOffset = (sel: string) => {
+			const el = stage.querySelector(sel);
+			if (!el) return { x: '0px', y: '0px' };
+			const h = el.getBoundingClientRect();
 			const s = stage.getBoundingClientRect();
-			const t = target.getBoundingClientRect();
-			const cx = s.left + s.width / 2;
-			const cy = s.top + s.height / 2;
-			const corners = [
-				[t.left, t.top],
-				[t.right, t.top],
-				[t.left, t.bottom],
-				[t.right, t.bottom],
-			];
-			const [x, y] = corners[Math.floor(Math.random() * corners.length)];
-			return { x: `${Math.round(x - cx)}px`, y: `${Math.round(y - cy)}px` };
+			return {
+				x: `${Math.round(h.left + h.width / 2 - (s.left + s.width / 2))}px`,
+				y: `${Math.round(h.top + h.height / 2 - (s.top + s.height / 2))}px`,
+			};
 		};
 
-		const glideAndClick = async (pos: { x: string; y: string }) => {
-			cursorPos = pos;
+		const CORNERS = ['.h-tl', '.h-tr', '.h-bl', '.h-br'];
+
+		// glide to a handle, press, and drag: the adjustment eases in over ~900ms
+		// while the cursor re-anchors to the handle every frame, so the mouse
+		// visibly moves *with* the frame as it manipulates it
+		const dragEdit = async (sel: string, animate: (t: number) => void) => {
+			cursorPos = handleOffset(sel);
 			cursorShown = true;
-			await sleep(1100); // glide
+			await sleep(1100); // glide in
 			if (!alive) return;
+			boxShown = true; // selection appears on press
 			cursorClicking = true;
 			ringKey++;
-			await sleep(160);
-			cursorClicking = false;
-			await sleep(280);
+			await sleep(300);
+			fixNoTransition = true; // the frame follows the drag directly
+			cursorGlide = false; // ...and so does the cursor
+			const t0 = performance.now();
+			const ms = 900;
+			while (alive) {
+				const t = Math.min(1, (performance.now() - t0) / ms);
+				animate(t * t * (3 - 2 * t)); // smoothstep
+				applyAdj();
+				cursorPos = handleOffset(sel);
+				if (t >= 1) break;
+				await sleep(16);
+			}
+			fixNoTransition = false;
+			cursorClicking = false; // release
+			await sleep(450);
+			cursorGlide = true;
+			boxShown = false; // deselect — edit finished
+			await sleep(250);
+			await cursorAway();
 		};
 
 		const cursorAway = async () => {
@@ -172,16 +193,12 @@
 			await sleep(600);
 			if (!alive) return;
 			await waitForIdle();
-			await glideAndClick({ x: 'min(90px, 14vw)', y: '-10px' });
-			if (!alive) return;
-			boxShown = true; // frame pops on for the edit
-			await sleep(750);
-			adj.r = 0; // the one adjustment that actually helps
-			applyAdj();
-			await sleep(1000);
-			boxShown = false; // deselect — edit finished
-			await sleep(250);
-			await cursorAway();
+			// first edit: grab the rotate handle and straighten the heading —
+			// the one adjustment that actually helps
+			const r0 = adj.r;
+			await dragEdit('.rotate-h', (t) => {
+				adj.r = +(r0 * (1 - t)).toFixed(2);
+			});
 
 			let first = true;
 			while (alive) {
@@ -189,24 +206,28 @@
 				if (!alive) return;
 				await waitForIdle();
 				if (!alive) return;
-				await glideAndClick(randomCorner());
-				if (!alive) return;
-				boxShown = true;
-				await sleep(500);
 				if (first) {
-					adj.s = 0.94; // definitely needed to be a touch smaller
+					// definitely needed to be a touch smaller
+					const s0 = adj.s;
+					await dragEdit(CORNERS[Math.floor(Math.random() * CORNERS.length)], (t) => {
+						adj.s = +(s0 + (0.94 - s0) * t).toFixed(3);
+					});
 					first = false;
-				} else {
-					const pick = Math.floor(Math.random() * 3);
-					if (pick === 0) adj.r = +(Math.random() * 6 - 3).toFixed(1);
-					else if (pick === 1) adj.s = +(0.88 + Math.random() * 0.18).toFixed(3);
-					else adj.k = +(Math.random() * 10 - 5).toFixed(1);
+					continue;
 				}
-				applyAdj();
-				await sleep(1000);
-				boxShown = false;
-				await sleep(250);
-				await cursorAway();
+				if (Math.random() < 0.5) {
+					const from = adj.r;
+					const to = +(Math.random() * 6 - 3).toFixed(1);
+					await dragEdit('.rotate-h', (t) => {
+						adj.r = +(from + (to - from) * t).toFixed(2);
+					});
+				} else {
+					const from = adj.s;
+					const to = +(0.88 + Math.random() * 0.18).toFixed(3);
+					await dragEdit(CORNERS[Math.floor(Math.random() * CORNERS.length)], (t) => {
+						adj.s = +(from + (to - from) * t).toFixed(3);
+					});
+				}
 			}
 		};
 
@@ -543,6 +564,7 @@
 
 		<ol class="tenets">
 			<li class="tenet t1">
+				<div class="design-grid" aria-hidden="true"></div>
 				<Reveal variant="up">
 					<div class="numeral" aria-hidden="true">I</div>
 					<div class="fix-stage" bind:this={fixStage}>
@@ -802,6 +824,20 @@
 	}
 
 	/* ---- "Details matter" fix-it sequence ---- */
+	/* a faint design-canvas grid, like the artboard of a design tool */
+	.design-grid {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: calc(50% - 50vw);
+		width: 100vw;
+		background-image:
+			linear-gradient(rgba(255, 255, 255, 0.125) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(255, 255, 255, 0.125) 1px, transparent 1px);
+		background-size: 28px 28px;
+		mask-image: radial-gradient(ellipse 72% 68% at 50% 50%, #000 35%, transparent 78%);
+		pointer-events: none;
+	}
 	.fix-stage {
 		position: relative;
 		display: inline-block;
