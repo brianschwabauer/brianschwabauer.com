@@ -289,20 +289,20 @@
 
 <style>
 	.blog-page {
-		max-width: var(--container-xl);
+		max-width: var(--breakpoint-xl);
 		margin: 0 auto;
-		padding: var(--space-12) var(--space-4) var(--space-24);
+		padding: var(--space-8) var(--space-3) var(--space-10);
 	}
 
 	@media (min-width: 768px) {
 		.blog-page {
-			padding: var(--space-12) var(--space-8) var(--space-24);
+			padding: var(--space-8) var(--space-7) var(--space-10);
 		}
 	}
 
 	.blog-header {
 		text-align: center;
-		margin-bottom: var(--space-10);
+		margin-bottom: var(--space-8);
 	}
 
 	/* Sizing/weight/letter-spacing mirror /contact's .title so the two pages
@@ -315,7 +315,7 @@
 		font-weight: 900;
 		line-height: 1.15;
 		letter-spacing: -0.03em;
-		margin: 0 0 var(--space-4);
+		margin: 0 0 var(--space-3);
 	}
 
 	/* Gradient is identical to /contact's .title-line — the gradient lives on
@@ -325,7 +325,7 @@
 	.blog-title-line {
 		display: inline-block;
 		padding-bottom: 0.1em;
-		background: linear-gradient(95deg, var(--color-text) 0%, var(--color-accent) 90%);
+		background: linear-gradient(95deg, var(--color-text) 0%, var(--color-action) 90%);
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
@@ -353,7 +353,7 @@
 
 	.blog-subtitle {
 		font-size: var(--text-lg);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		max-width: 32rem;
 		margin: 0 auto;
 		line-height: var(--leading-relaxed);
@@ -363,16 +363,16 @@
 	.blog-filters {
 		display: flex;
 		justify-content: center;
-		margin-bottom: var(--space-12);
+		margin-bottom: var(--space-8);
 	}
 
 	.featured-section {
-		margin-bottom: var(--space-12);
+		margin-bottom: var(--space-8);
 	}
 
 	.featured-grid {
 		display: grid;
-		gap: var(--space-6);
+		gap: var(--space-5);
 		/* Anchor outgoing cards (position:absolute during their fade-out) so
 		   they freeze at their previous grid spot — see FeaturedPostCard.svelte's
 		   fadeOut. */
@@ -382,7 +382,7 @@
 	@media (min-width: 1024px) {
 		.featured-grid {
 			grid-template-columns: repeat(2, 1fr);
-			gap: var(--space-8);
+			gap: var(--space-7);
 		}
 
 		.featured-grid.single {
@@ -401,7 +401,7 @@
 
 	.posts-grid {
 		display: grid;
-		gap: var(--space-6);
+		gap: var(--space-5);
 		/* See .featured-grid — anchors absolutely-positioned exiting cards. */
 		position: relative;
 	}
@@ -409,7 +409,7 @@
 	@media (min-width: 768px) {
 		.posts-grid {
 			grid-template-columns: repeat(2, 1fr);
-			gap: var(--space-8);
+			gap: var(--space-7);
 		}
 	}
 
@@ -421,7 +421,7 @@
 
 	.empty-state {
 		text-align: center;
-		padding: var(--space-16);
+		padding: var(--space-9);
 		color: var(--color-text-muted);
 	}
 

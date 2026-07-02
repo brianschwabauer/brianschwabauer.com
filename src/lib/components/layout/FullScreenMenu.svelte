@@ -52,7 +52,7 @@
 		inset: 0;
 		background: rgba(0, 0, 0, 0.5);
 		backdrop-filter: blur(4px);
-		z-index: var(--z-modal-backdrop);
+		z-index: var(--layer-drawer);
 		animation: fade-in 200ms ease;
 	}
 
@@ -63,8 +63,8 @@
 		bottom: 0;
 		width: min(320px, 80vw);
 		background: var(--color-surface);
-		z-index: var(--z-modal);
-		padding: var(--space-20) var(--space-8);
+		z-index: var(--layer-modal);
+		padding: var(--space-10) var(--space-7);
 		animation: slide-in 300ms ease;
 	}
 
@@ -72,7 +72,7 @@
 		list-style: none;
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-4);
+		gap: var(--space-3);
 	}
 
 	.menu-item {
@@ -85,16 +85,16 @@
 		font-size: var(--text-2xl);
 		font-weight: 600;
 		color: var(--color-text);
-		padding: var(--space-3) 0;
+		padding: var(--space-2) 0;
 		transition:
-			color var(--transition-fast),
-			transform var(--transition-fast);
+			color var(--duration-fast),
+			transform var(--duration-fast);
 	}
 
 	.menu-link:hover,
 	.menu-link.active {
 		transition-duration: 0s;
-		color: var(--color-accent);
+		color: var(--color-action);
 		transform: translateX(var(--space-2));
 	}
 

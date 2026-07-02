@@ -128,7 +128,7 @@
 	.title-editor {
 		position: relative;
 		max-width: var(--measure);
-		margin: 0 auto var(--space-4);
+		margin: 0 auto var(--space-3);
 	}
 
 	/* Typography lives by itself so it isn't shadowed by the focus reset's

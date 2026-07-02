@@ -106,7 +106,7 @@
 	.form {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-4);
+		gap: var(--space-3);
 		height: 100%;
 		min-height: 0;
 	}
@@ -131,7 +131,7 @@
 		max-height: 220px;
 		border-radius: var(--radius-md);
 		overflow: hidden;
-		background-color: var(--color-bg-secondary);
+		background-color: var(--color-bg-muted);
 		flex-shrink: 0;
 	}
 
@@ -145,7 +145,7 @@
 	.fields {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		flex: 1;
 		min-height: 0;
 		overflow-y: auto;

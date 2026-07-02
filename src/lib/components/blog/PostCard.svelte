@@ -68,14 +68,14 @@
 		border-radius: var(--radius-lg);
 		overflow: hidden;
 		transition:
-			border-color var(--transition-fast),
-			transform var(--transition-fast),
-			box-shadow var(--transition-fast);
+			border-color var(--duration-fast),
+			transform var(--duration-fast),
+			box-shadow var(--duration-fast);
 	}
 
 	.post-card:hover {
 		transition-duration: 0s;
-		border-color: var(--color-accent);
+		border-color: var(--color-action);
 		transform: translateY(-4px);
 		box-shadow: var(--shadow-lg);
 	}
@@ -119,15 +119,15 @@
 	.post-body {
 		display: flex;
 		flex-direction: column;
-		padding: var(--space-6);
+		padding: var(--space-5);
 		flex: 1;
 	}
 
 	.post-meta {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
-		margin-bottom: var(--space-3);
+		gap: var(--space-2);
+		margin-bottom: var(--space-2);
 		font-size: var(--text-sm);
 	}
 
@@ -138,15 +138,15 @@
 	.post-title {
 		font-size: var(--text-xl);
 		font-weight: 600;
-		margin-bottom: var(--space-3);
+		margin-bottom: var(--space-2);
 		line-height: var(--leading-tight);
 		color: var(--color-text);
 	}
 
 	.post-excerpt {
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		line-height: var(--leading-relaxed);
-		margin-bottom: var(--space-4);
+		margin-bottom: var(--space-3);
 		flex: 1;
 	}
 
@@ -154,13 +154,13 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-2);
-		margin-bottom: var(--space-4);
+		margin-bottom: var(--space-3);
 	}
 
 	.tag {
 		font-size: var(--text-xs);
 		padding: var(--space-1) var(--space-2);
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 		border-radius: var(--radius-sm);
 		color: var(--color-text-muted);
 	}
@@ -171,14 +171,14 @@
 		gap: var(--space-2);
 		font-size: var(--text-sm);
 		font-weight: 500;
-		color: var(--color-accent);
+		color: var(--color-action);
 		margin-top: auto;
 	}
 
 	.read-more svg {
 		width: 16px;
 		height: 16px;
-		transition: transform var(--transition-fast);
+		transition: transform var(--duration-fast);
 	}
 
 	.post-card:hover .read-more svg {

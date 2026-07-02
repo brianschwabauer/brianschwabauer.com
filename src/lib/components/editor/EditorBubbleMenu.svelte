@@ -330,7 +330,7 @@
 	.bubble-menu {
 		position: absolute;
 		/* Sit above the topbar (z-index 3) but below the delightstack Modal
-		   (--layer-5 = 5) so opening a modal hides this menu visually. */
+		   (--layer-modal) so opening a modal hides this menu visually. */
 		z-index: 4;
 		display: flex;
 		align-items: center;
@@ -371,10 +371,10 @@
 	}
 	.bm-btn:hover {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 	}
 	.bm-btn.active {
-		background: var(--color-accent);
+		background: var(--color-action);
 		color: white;
 	}
 	.bm-btn.small {
@@ -385,11 +385,11 @@
 		font-size: 0.7rem;
 	}
 	.bm-btn.ai {
-		color: var(--color-accent);
+		color: var(--color-action);
 	}
 	.bm-btn.ai:hover {
 		transition-duration: 0s;
-		background: var(--color-accent-light);
+		background: var(--color-action-bg);
 	}
 
 	.bm-sep {
@@ -417,6 +417,6 @@
 		outline: none;
 	}
 	.link-input:focus {
-		border-color: var(--color-accent);
+		border-color: var(--color-action);
 	}
 </style>

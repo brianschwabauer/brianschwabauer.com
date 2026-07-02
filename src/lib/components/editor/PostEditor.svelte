@@ -377,14 +377,14 @@
 	.edit-topbar {
 		position: sticky;
 		top: 0;
-		/* Stay below the delightstack Modal (--layer-5 = z-index 5) so its
+		/* Stay below the delightstack Modal (backdrop at --layer-modal) so its
 		   backdrop covers the topbar when it opens. */
 		z-index: 3;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--space-3);
-		padding: var(--space-3) var(--space-4);
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-3);
 		background: color-mix(in oklch, var(--color-bg) 92%, transparent);
 		backdrop-filter: blur(10px);
 		border-bottom: 1px solid var(--color-border);
@@ -393,7 +393,7 @@
 	.topbar-left {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		min-width: 0;
 		flex: 1;
 	}
@@ -405,13 +405,13 @@
 		width: 32px;
 		height: 32px;
 		border-radius: var(--radius-sm);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		flex-shrink: 0;
 	}
 	.back-link:hover {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
-		color: var(--color-accent);
+		background: var(--color-bg-muted);
+		color: var(--color-action);
 	}
 
 	.topbar-title {
@@ -431,14 +431,14 @@
 	}
 
 	.unsaved {
-		color: var(--color-accent);
+		color: var(--color-action);
 		font-size: var(--text-xs);
 		line-height: 1;
 	}
 	.new-badge {
 		padding: 2px var(--space-2);
 		border-radius: var(--radius-full);
-		background: color-mix(in oklch, var(--color-accent) 14%, transparent);
+		background: color-mix(in oklch, var(--color-action) 14%, transparent);
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		font-weight: 600;
@@ -455,15 +455,15 @@
 		display: inline-flex;
 		align-items: center;
 		gap: var(--space-1);
-		padding: var(--space-2) var(--space-3);
-		color: var(--color-text-secondary);
+		padding: var(--space-2) var(--space-2);
+		color: var(--color-text-muted);
 		font-size: var(--text-sm);
 		border-radius: var(--radius-sm);
 	}
 	.preview-link:hover {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
-		color: var(--color-accent);
+		background: var(--color-bg-muted);
+		color: var(--color-action);
 	}
 
 	@media (max-width: 640px) {
@@ -474,8 +474,8 @@
 
 	.error-banner {
 		max-width: var(--prose-wide);
-		margin: var(--space-3) auto 0;
-		padding: var(--space-3) var(--space-4);
+		margin: var(--space-2) auto 0;
+		padding: var(--space-2) var(--space-3);
 		background: color-mix(in oklch, var(--color-error) 12%, transparent);
 		border: 1px solid var(--color-error);
 		border-radius: var(--radius-md);
@@ -486,12 +486,12 @@
 	.edit-canvas {
 		max-width: var(--prose-wide);
 		margin: 0 auto;
-		padding: var(--space-12) var(--space-4) var(--space-24);
+		padding: var(--space-8) var(--space-3) var(--space-10);
 	}
 
 	@media (min-width: 768px) {
 		.edit-canvas {
-			padding: var(--space-16) var(--space-8) var(--space-24);
+			padding: var(--space-9) var(--space-7) var(--space-10);
 		}
 	}
 </style>

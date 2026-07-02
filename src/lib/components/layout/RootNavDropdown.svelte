@@ -256,12 +256,12 @@
 		top: 12px;
 		left: 0;
 		right: 0;
-		z-index: 250; /* above header (--z-sticky: 200) */
+		z-index: 250; /* above header (--layer-sticky: 200) */
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 0 var(--space-4);
-		max-width: var(--container-xl);
+		padding: 0 var(--space-3);
+		max-width: var(--breakpoint-xl);
 		margin: 0 auto;
 		pointer-events: none;
 		/* feedback on press is the squish + ripple — no blue tap flash */
@@ -269,7 +269,7 @@
 	}
 	@media (min-width: 768px) {
 		.bar {
-			padding: 0 var(--space-8);
+			padding: 0 var(--space-7);
 		}
 	}
 

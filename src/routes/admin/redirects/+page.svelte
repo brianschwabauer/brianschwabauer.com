@@ -258,15 +258,15 @@
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;
-		gap: var(--space-4);
-		margin-bottom: var(--space-6);
+		gap: var(--space-3);
+		margin-bottom: var(--space-5);
 		flex-wrap: wrap;
 	}
 
 	.page-title-group {
 		display: flex;
 		align-items: flex-start;
-		gap: var(--space-3);
+		gap: var(--space-2);
 	}
 
 	h1 {
@@ -285,14 +285,14 @@
 		font-family: var(--font-mono, ui-monospace, monospace);
 		font-size: 0.85em;
 		padding: 1px 5px;
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 		border-radius: var(--radius-sm);
 	}
 
 	.page-actions {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		flex-wrap: wrap;
 	}
 
@@ -302,8 +302,8 @@
 	}
 
 	.alert {
-		padding: var(--space-3) var(--space-4);
-		margin-bottom: var(--space-4);
+		padding: var(--space-2) var(--space-3);
+		margin-bottom: var(--space-3);
 		background: rgba(220, 60, 60, 0.08);
 		border: 1px solid rgba(220, 60, 60, 0.35);
 		color: #d33;
@@ -313,14 +313,14 @@
 
 	.empty {
 		text-align: center;
-		padding: var(--space-16) var(--space-4);
+		padding: var(--space-9) var(--space-3);
 		background: var(--color-surface);
 		border: 1px dashed var(--color-border);
 		border-radius: var(--radius-lg);
 	}
 
 	.empty p {
-		margin-bottom: var(--space-4);
+		margin-bottom: var(--space-3);
 		color: var(--color-text-muted);
 	}
 
@@ -365,7 +365,7 @@
 	}
 
 	.add-row {
-		margin-top: var(--space-3);
+		margin-top: var(--space-2);
 	}
 
 	@media (max-width: 720px) {
@@ -379,7 +379,7 @@
 				'to to to to'
 				'status note note note';
 			gap: var(--space-2);
-			padding: var(--space-3);
+			padding: var(--space-2);
 			background: var(--color-bg);
 			border: 1px solid var(--color-border);
 			border-radius: var(--radius-sm);

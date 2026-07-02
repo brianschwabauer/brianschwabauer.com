@@ -318,17 +318,17 @@
 	.bg-settings {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		width: 280px;
 		max-width: 80vw;
 		padding: var(--space-2);
 		/* Bridge delightstack's form-token namespace (--c-*) to the app's accent
 		   so the Range matches the green Buttons instead of falling back to blue. */
-		--c-action: var(--color-accent);
-		--c-action-active: var(--color-accent);
+		--c-action: var(--color-action);
+		--c-action-active: var(--color-action);
 		--c-action-text: #fff;
 		--c-bg-6: color-mix(in oklch, var(--color-text) 16%, transparent);
-		--c-text-2: var(--color-text-secondary);
+		--c-text-2: var(--color-text-muted);
 	}
 
 	.bg-field {
@@ -341,13 +341,13 @@
 	.bg-label {
 		font-size: var(--text-xs);
 		font-weight: 500;
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 	}
 
 	.bg-grid2 {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: var(--space-3);
+		gap: var(--space-2);
 	}
 
 	/* Stretch segmented groups to full width. The inner <button> must stretch
@@ -373,17 +373,17 @@
 		gap: var(--space-2);
 		width: 100%;
 		min-height: 180px;
-		padding: var(--space-8);
+		padding: var(--space-7);
 		border: 2px dashed var(--color-border);
 		border-radius: var(--radius-lg);
-		background: var(--color-bg-secondary);
-		color: var(--color-text-secondary);
+		background: var(--color-bg-muted);
+		color: var(--color-text-muted);
 		cursor: pointer;
 	}
 	.bg-empty:hover {
 		transition-duration: 0s;
-		border-color: var(--color-accent);
-		color: var(--color-accent);
+		border-color: var(--color-action);
+		color: var(--color-action);
 	}
 	.bg-empty-title {
 		font-weight: 600;

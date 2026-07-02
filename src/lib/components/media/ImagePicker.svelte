@@ -77,14 +77,14 @@
 	.picker-label {
 		font-size: var(--text-xs);
 		font-weight: 500;
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 	}
 
 	.picker-current {
 		display: flex;
-		gap: var(--space-4);
+		gap: var(--space-3);
 		align-items: flex-start;
-		padding: var(--space-3);
+		padding: var(--space-2);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
 		background: var(--color-surface);
@@ -121,7 +121,7 @@
 
 	.picker-alt {
 		font-size: var(--text-sm);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 	}
 
 	.picker-alt-missing {
@@ -140,11 +140,11 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: var(--space-3);
-		padding: var(--space-6);
+		gap: var(--space-2);
+		padding: var(--space-5);
 		border: 1px dashed var(--color-border);
 		border-radius: var(--radius-md);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 	}
 
 	.picker-empty p {

@@ -144,7 +144,7 @@
 		</div>
 		<div class="prompt-actions">
 			<Button translucent onclick={handleCancel}>{cancelText}</Button>
-			<Button accent onclick={handleConfirm}>{confirmText}</Button>
+			<Button onclick={handleConfirm}>{confirmText}</Button>
 		</div>
 	</div>
 </Modal>
@@ -153,7 +153,7 @@
 	.prompt {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		padding: var(--space-2) 0;
 	}
 

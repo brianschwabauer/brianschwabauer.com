@@ -42,24 +42,24 @@
 		   and clipped to the pill shape. */
 		position: relative;
 		overflow: hidden;
-		padding: var(--space-2) var(--space-4);
+		padding: var(--space-2) var(--space-3);
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-full);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		font-size: var(--text-sm);
 		font-weight: 500;
 		cursor: pointer;
 		transition:
-			background-color var(--transition-fast),
-			color var(--transition-fast),
-			border-color var(--transition-fast),
+			background-color var(--duration-fast),
+			color var(--duration-fast),
+			border-color var(--duration-fast),
 			transform 200ms ease;
 	}
 
 	.filter-btn:hover {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 		color: var(--color-text);
 	}
 
@@ -73,8 +73,8 @@
 	}
 
 	.filter-btn.active {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
+		background: var(--color-action);
+		border-color: var(--color-action);
 		color: white;
 	}
 </style>

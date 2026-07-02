@@ -224,7 +224,7 @@
 			cursor: pointer;
 		}
 		.mobile-bar button.active {
-			background: var(--color-accent);
+			background: var(--color-action);
 			color: white;
 		}
 		.mobile-bar code {

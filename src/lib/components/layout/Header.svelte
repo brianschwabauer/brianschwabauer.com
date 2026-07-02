@@ -123,11 +123,11 @@
 		top: 0;
 		left: 0;
 		right: 0;
-		z-index: var(--z-sticky);
-		padding: var(--space-4) 0;
+		z-index: var(--layer-sticky);
+		padding: var(--space-3) 0;
 		transition:
-			background-color var(--transition-normal),
-			backdrop-filter var(--transition-normal);
+			background-color var(--duration-normal),
+			backdrop-filter var(--duration-normal);
 	}
 
 	.header.scrolled {
@@ -148,14 +148,14 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		max-width: var(--container-xl);
+		max-width: var(--breakpoint-xl);
 		margin: 0 auto;
-		padding: 0 var(--space-4);
+		padding: 0 var(--space-3);
 	}
 
 	@media (min-width: 768px) {
 		.header-inner {
-			padding: 0 var(--space-8);
+			padding: 0 var(--space-7);
 		}
 	}
 
@@ -173,8 +173,8 @@
 		transition:
 			opacity 200ms ease,
 			transform 200ms ease,
-			background-color var(--transition-fast),
-			box-shadow var(--transition-fast),
+			background-color var(--duration-fast),
+			box-shadow var(--duration-fast),
 			visibility 0s linear 0s;
 	}
 	.logo:hover .logo-img {
@@ -188,7 +188,7 @@
 		outline: none;
 	}
 	.logo:focus-visible {
-		outline: 2px solid var(--color-accent);
+		outline: 2px solid var(--color-action);
 		outline-offset: 2px;
 	}
 	.logo.on-dark:focus-visible {
@@ -208,7 +208,7 @@
 	.logo-img {
 		height: 32px;
 		width: auto;
-		transition: transform var(--transition-fast);
+		transition: transform var(--duration-fast);
 	}
 
 	.logo-img.invert {
@@ -233,7 +233,7 @@
 	.header-actions {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		margin-left: auto;
 		@media (max-width: 768px) {
 			gap: var(--space-1);
@@ -247,16 +247,16 @@
 		font-weight: 700;
 		letter-spacing: 0.16em;
 		text-transform: uppercase;
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		padding: 0.55rem 1rem;
 		border-radius: 999px;
 		border: 1px solid var(--color-border);
 		-webkit-tap-highlight-color: transparent;
 		transition:
-			color var(--transition-fast),
-			background-color var(--transition-fast),
-			border-color var(--transition-fast),
-			transform var(--transition-fast);
+			color var(--duration-fast),
+			background-color var(--duration-fast),
+			border-color var(--duration-fast),
+			transform var(--duration-fast);
 		@media (max-width: 768px) {
 			padding: 0.45rem 0.75rem;
 			letter-spacing: 0.05em;
@@ -273,7 +273,7 @@
 		transition-duration: 0s;
 		color: var(--color-text);
 		background: var(--color-surface);
-		border-color: var(--color-accent);
+		border-color: var(--color-action);
 	}
 	.nav-link.on-dark {
 		color: rgba(255, 255, 255, 0.78);
@@ -288,9 +288,9 @@
 	.nav-link.active,
 	.nav-link.active:hover {
 		transition-duration: 0s;
-		color: var(--color-accent);
-		background: var(--color-accent-light);
-		border-color: var(--color-accent);
+		color: var(--color-action);
+		background: var(--color-action-bg);
+		border-color: var(--color-action);
 	}
 	.nav-link.active.on-dark,
 	.nav-link.active.on-dark:hover {
@@ -309,19 +309,19 @@
 		height: 36px;
 		border-radius: 999px;
 		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		background: transparent;
 		-webkit-tap-highlight-color: transparent;
 		transition:
-			color var(--transition-fast),
-			background-color var(--transition-fast),
-			border-color var(--transition-fast),
-			transform var(--transition-fast);
+			color var(--duration-fast),
+			background-color var(--duration-fast),
+			border-color var(--duration-fast),
+			transform var(--duration-fast);
 		&:hover {
 			transition-duration: 0s;
 			color: var(--color-text);
 			background: var(--color-surface);
-			border-color: var(--color-accent);
+			border-color: var(--color-action);
 			transition: none;
 		}
 		&:active {

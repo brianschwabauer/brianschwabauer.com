@@ -45,22 +45,22 @@
 		border: 1px solid var(--color-border);
 		color: var(--color-text);
 		transition:
-			background-color var(--transition-fast),
-			border-color var(--transition-fast);
+			background-color var(--duration-fast),
+			border-color var(--duration-fast);
 	}
 
 	.theme-toggle:hover {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
-		border-color: var(--color-accent);
+		background: var(--color-bg-muted);
+		border-color: var(--color-action);
 	}
 
 	.theme-toggle svg {
 		width: 20px;
 		height: 20px;
 		transition:
-			transform var(--transition-normal),
-			opacity var(--transition-fast);
+			transform var(--duration-normal),
+			opacity var(--duration-fast);
 	}
 
 	.sun-icon {

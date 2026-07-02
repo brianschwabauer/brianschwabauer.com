@@ -303,7 +303,7 @@
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-full);
 		background: var(--color-surface);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		cursor: pointer;
 		transition:
 			color 120ms ease,
@@ -314,9 +314,9 @@
 	.plus-btn:hover,
 	.plus-btn.open {
 		transition-duration: 0s;
-		color: var(--color-accent);
-		border-color: var(--color-accent);
-		background: var(--color-accent-light);
+		color: var(--color-action);
+		border-color: var(--color-action);
+		background: var(--color-action-bg);
 	}
 	.plus-btn.open {
 		transform: rotate(45deg);
@@ -355,7 +355,7 @@
 	}
 	.pm-item:hover {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 	}
 	.pm-item svg,
 	.pm-item .pm-icon {
@@ -363,7 +363,7 @@
 		justify-self: center;
 		font-weight: 700;
 		font-size: var(--text-xs);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 	}
 	.pm-label {
 		grid-area: label;

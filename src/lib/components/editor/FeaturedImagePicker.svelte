@@ -423,7 +423,7 @@
 		display: block;
 		width: 100%;
 		max-width: var(--measure);
-		margin: 0 auto var(--space-10);
+		margin: 0 auto var(--space-8);
 		border-radius: var(--radius-lg);
 		cursor: pointer;
 		text-align: left;
@@ -444,12 +444,12 @@
 	.placeholder {
 		display: flex;
 		align-items: center;
-		gap: var(--space-4);
-		padding: var(--space-8);
+		gap: var(--space-3);
+		padding: var(--space-7);
 		border: 2px dashed var(--color-border);
 		border-radius: var(--radius-lg);
-		color: var(--color-text-secondary);
-		background: var(--color-bg-secondary);
+		color: var(--color-text-muted);
+		background: var(--color-bg-muted);
 		transition:
 			border-color 150ms ease,
 			color 150ms ease,
@@ -461,9 +461,9 @@
 	.featured:hover .placeholder,
 	.featured.focused .placeholder {
 		transition-duration: 0s;
-		border-color: var(--color-accent);
-		color: var(--color-accent);
-		background: var(--color-accent-light);
+		border-color: var(--color-action);
+		color: var(--color-action);
+		background: var(--color-action-bg);
 	}
 
 	.placeholder-text {
@@ -488,7 +488,7 @@
 		margin: 0;
 		overflow: hidden;
 		border-radius: var(--radius-lg);
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 		aspect-ratio: 2.35;
 		touch-action: pan-y;
 	}
@@ -524,7 +524,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		padding: var(--space-3) var(--space-4);
+		padding: var(--space-2) var(--space-3);
 	}
 
 	.reposition-hint {
@@ -548,8 +548,8 @@
 
 	.featured-toolbar {
 		position: absolute;
-		top: var(--space-3);
-		right: var(--space-3);
+		top: var(--space-2);
+		right: var(--space-2);
 		display: flex;
 		gap: 2px;
 		padding: 4px;
@@ -591,11 +591,11 @@
 		background: rgba(255, 255, 255, 0.18);
 	}
 	.ft-btn.primary {
-		background: var(--color-accent);
+		background: var(--color-action);
 	}
 	.ft-btn.primary:hover {
 		transition-duration: 0s;
-		background: var(--color-accent);
+		background: var(--color-action);
 		filter: brightness(1.1);
 	}
 	.ft-btn.danger:hover {

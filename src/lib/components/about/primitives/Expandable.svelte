@@ -70,7 +70,7 @@
 		transform: translateY(-1px);
 	}
 	.toggle.bold {
-		background: var(--color-accent, #00b4a0);
+		background: var(--color-action, #00b4a0);
 		color: #fff;
 		border: 0;
 	}

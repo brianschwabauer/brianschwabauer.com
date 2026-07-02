@@ -24,13 +24,13 @@
 		max-width: var(--measure);
 		margin: 0 auto;
 		text-align: center;
-		padding: var(--space-24) var(--space-4);
+		padding: var(--space-10) var(--space-3);
 	}
 	.not-found h1 {
-		margin-bottom: var(--space-4);
+		margin-bottom: var(--space-3);
 	}
 	.not-found p {
-		color: var(--color-text-secondary);
-		margin-bottom: var(--space-8);
+		color: var(--color-text-muted);
+		margin-bottom: var(--space-7);
 	}
 </style>
