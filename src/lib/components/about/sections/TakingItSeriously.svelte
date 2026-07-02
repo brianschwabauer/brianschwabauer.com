@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import Expandable from '../primitives/Expandable.svelte';
+	import GradientCollapse from '../primitives/GradientCollapse.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -168,7 +168,7 @@
 		<LightboxGallery bind:this={gallery} key="taking-it-seriously" items={sectionExtras} />
 
 		<Reveal>
-			<Expandable label="The Flash-era stack, for the people who remember">
+			<GradientCollapse label="The Flash-era stack, for the people who remember">
 				<div class="prose">
 					<p>
 						Looking back: iWeb → Dreamweaver → Flash + ActionScript. The blog was a
@@ -182,7 +182,7 @@
 						this.
 					</p>
 				</div>
-			</Expandable>
+			</GradientCollapse>
 		</Reveal>
 	</div>
 </SectionShell>

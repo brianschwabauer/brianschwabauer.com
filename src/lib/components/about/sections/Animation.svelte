@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import Expandable from '../primitives/Expandable.svelte';
+	import GradientCollapse from '../primitives/GradientCollapse.svelte';
 	import PinScrub from '../primitives/PinScrub.svelte';
 	import ScrubVideo from '../primitives/ScrubVideo.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
@@ -284,7 +284,11 @@
 				<div class="storyboard">
 					<div class="story-eyebrow bleed-head">FROM THE SHOT LIST</div>
 					<div class="gallery-bleed">
-						<LightboxGallery key="animation-calamity" items={calamityImages} display="masonry" size="2" />
+						<LightboxGallery
+							key="animation-calamity"
+							items={calamityImages}
+							display="masonry"
+							size="2" />
 					</div>
 				</div>
 			</Reveal>
@@ -355,9 +359,16 @@
 
 			<Reveal variant="up" delay={100}>
 				<div class="exposure-grid">
-					<div class="gallery-bleed">
-						<LightboxGallery key="animation-exposure" items={exposureImages} display="masonry" size="2" />
-					</div>
+					<GradientCollapse
+						class="gallery-bleed"
+						label="Show all the VFX + BTS shots"
+						collapsedHeight="30rem">
+						<LightboxGallery
+							key="animation-exposure"
+							items={exposureImages}
+							display="masonry"
+							size="2" />
+					</GradientCollapse>
 				</div>
 			</Reveal>
 
@@ -373,7 +384,7 @@
 			</Reveal>
 
 			<Reveal>
-				<Expandable label="The film-making tricks behind the shoot">
+				<GradientCollapse label="The film-making tricks behind the shoot">
 					<div class="prose">
 						<p>
 							We wanted to shoot in rain at night, but couldn't wait for the weather, so
@@ -392,7 +403,7 @@
 							past the camera. Looking back at it, I'm still genuinely proud of that one.
 						</p>
 					</div>
-				</Expandable>
+				</GradientCollapse>
 			</Reveal>
 		</div>
 
@@ -470,7 +481,11 @@
 		</div>
 	</div>
 
-	<LightboxGallery bind:this={gallery} key="animation" items={sectionExtras} autoplay_video />
+	<LightboxGallery
+		bind:this={gallery}
+		key="animation"
+		items={sectionExtras}
+		autoplay_video />
 </SectionShell>
 
 <style>
@@ -623,7 +638,7 @@
 	}
 	.transformer-stage :global(.transformer-video) {
 		width: 100vw;
-		height: 100vh;
+		height: 100svh;
 		object-fit: contain;
 		filter: drop-shadow(0 30px 60px rgba(108, 99, 255, 0.35));
 	}

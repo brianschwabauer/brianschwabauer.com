@@ -15,8 +15,38 @@
 
 	let fwdVideo = $state<HTMLVideoElement | null>(null);
 	let revVideo = $state<HTMLVideoElement | null>(null);
+	let wrapEl = $state<HTMLElement | null>(null);
 	let duration = $state(0);
 	let activeIsReverse = $state(false);
+	// Don't download two full videos during initial page load — wait until the
+	// pin section is within ~1.5 viewports, then upgrade preload and warm the
+	// decoders.
+	let near = $state(false);
+
+	// Fallback: scroll progress arriving means the pin is on screen, whether or
+	// not the IntersectionObserver has managed to report yet.
+	$effect(() => {
+		if (!near && progress > 0.001) near = true;
+	});
+
+	$effect(() => {
+		if (!wrapEl || near) return;
+		if (typeof IntersectionObserver === 'undefined') {
+			near = true;
+			return;
+		}
+		const io = new IntersectionObserver(
+			(entries) => {
+				if (entries.some((e) => e.isIntersecting)) {
+					near = true;
+					io.disconnect();
+				}
+			},
+			{ rootMargin: '150% 0px' },
+		);
+		io.observe(wrapEl);
+		return () => io.disconnect();
+	});
 
 	// Two stacked video elements, one playing the original (camera→robot)
 	// and one playing a pre-encoded reversed copy (robot→camera). We chase
@@ -195,7 +225,11 @@
 	$effect(() => {
 		const fv = fwdVideo;
 		const rv = revVideo;
-		if (!fv || !rv) return;
+		if (!fv || !rv || !near) return;
+		// The preload attribute flips to "auto" with `near`; nudge the fetch in
+		// case the browser ignored the attribute change.
+		if (fv.readyState === 0) fv.load();
+		if (rv.readyState === 0) rv.load();
 		refreshDuration();
 		const onMeta = () => {
 			refreshDuration();
@@ -221,8 +255,10 @@
 		fv.addEventListener('loadedmetadata', onMeta);
 		fv.addEventListener('durationchange', onMeta);
 		fv.addEventListener('canplay', onMeta);
-		fv.addEventListener('loadeddata', kickFwd, { once: true });
-		rv.addEventListener('loadeddata', kickRev, { once: true });
+		if (fv.readyState >= 2) kickFwd();
+		else fv.addEventListener('loadeddata', kickFwd, { once: true });
+		if (rv.readyState >= 2) kickRev();
+		else rv.addEventListener('loadeddata', kickRev, { once: true });
 		return () => {
 			fv.removeEventListener('loadedmetadata', onMeta);
 			fv.removeEventListener('durationchange', onMeta);
@@ -234,14 +270,14 @@
 	});
 </script>
 
-<div class="scrub-wrap {klass}">
+<div class="scrub-wrap {klass}" bind:this={wrapEl}>
 	<!-- svelte-ignore a11y_media_has_caption -->
 	<video
 		bind:this={fwdVideo}
 		{src}
 		muted
 		playsinline
-		preload="auto"
+		preload={near ? 'auto' : 'metadata'}
 		disablepictureinpicture
 		disableremoteplayback
 		aria-label={ariaLabel}
@@ -254,7 +290,7 @@
 		src={reverseSrc}
 		muted
 		playsinline
-		preload="auto"
+		preload={near ? 'auto' : 'metadata'}
 		disablepictureinpicture
 		disableremoteplayback
 		aria-hidden="true"

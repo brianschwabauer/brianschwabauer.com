@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import Expandable from '../primitives/Expandable.svelte';
+	import GradientCollapse from '../primitives/GradientCollapse.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
@@ -386,7 +386,7 @@
 		</div>
 
 		<Reveal>
-			<Expandable label="What we learned filming for two months in a row">
+			<GradientCollapse label="What we learned filming for two months in a row">
 				<div class="prose">
 					<p>
 						Filming day after day in midwestern August heat is a different kind of work.
@@ -401,7 +401,7 @@
 						reach, and finished it.
 					</p>
 				</div>
-			</Expandable>
+			</GradientCollapse>
 		</Reveal>
 	</div>
 

@@ -35,7 +35,7 @@
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
-<SectionShell id="side-projects" year="Now" label="Side projects" theme="side">
+<SectionShell id="side-projects" year="Today" label="Side projects" theme="side">
 	<div class="container">
 		<Reveal>
 			<YearMark year="2026 →" subtitle="Side projects · for fun" color="#a78bfa" />

@@ -8,7 +8,9 @@
 			| ((detail: { index: number; element: HTMLButtonElement }) => void)
 			| undefined,
 	}: {
-		images: Array<string | { src: string; caption?: string }>;
+		images: Array<
+			string | { src: string; caption?: string; width?: number; height?: number }
+		>;
 		height?: number;
 		speed?: number;
 		direction?: 'left' | 'right';
@@ -18,6 +20,11 @@
 	const normalized = $derived(
 		images.map((i) => (typeof i === 'string' ? { src: i } : i)),
 	);
+	// Reserve each frame's width up front (from the item's intrinsic dimensions)
+	// so the infinitely-looping track doesn't change length — and visibly jump —
+	// as lazy images load in.
+	const ratioOf = (i: { width?: number; height?: number }) =>
+		i.width && i.height ? `${i.width} / ${i.height}` : '4 / 3';
 	const doubled = $derived([...normalized, ...normalized]);
 	const clickable = $derived(typeof onframeclick === 'function');
 </script>
@@ -39,12 +46,22 @@
 					type="button"
 					aria-label={item.caption ?? 'Open image'}
 					onclick={(e) => onframeclick?.({ index: realIndex, element: e.currentTarget })}>
-					<img src={item.src} alt={item.caption ?? ''} loading="lazy" decoding="async" />
+					<img
+						src={item.src}
+						alt={item.caption ?? ''}
+						style:aspect-ratio={ratioOf(item)}
+						loading="lazy"
+						decoding="async" />
 					{#if item.caption}<span class="caption">{item.caption}</span>{/if}
 				</button>
 			{:else}
 				<figure class="frame">
-					<img src={item.src} alt={item.caption ?? ''} loading="lazy" decoding="async" />
+					<img
+						src={item.src}
+						alt={item.caption ?? ''}
+						style:aspect-ratio={ratioOf(item)}
+						loading="lazy"
+						decoding="async" />
 					{#if item.caption}<figcaption>{item.caption}</figcaption>{/if}
 				</figure>
 			{/if}
@@ -113,6 +130,8 @@
 		height: 100%;
 		width: auto;
 		display: block;
+		/* The inline aspect-ratio (from item dimensions) sizes `width: auto`
+		   before the image loads, keeping the marquee loop length stable. */
 		object-fit: cover;
 	}
 	.frame-button {
@@ -150,6 +169,13 @@
 	.frame:hover .caption {
 		transition-duration: 0s;
 		opacity: 1;
+	}
+	/* No hover on touch devices — captions would be unreachable; show them. */
+	@media (hover: none) {
+		figcaption,
+		.frame .caption {
+			opacity: 1;
+		}
 	}
 	@media (prefers-reduced-motion: reduce) {
 		.track {

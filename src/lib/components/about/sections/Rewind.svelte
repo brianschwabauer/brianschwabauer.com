@@ -1,66 +1,45 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import SectionShell from '../primitives/SectionShell.svelte';
-	import Reveal from '../primitives/Reveal.svelte';
+	import PinScrub from '../primitives/PinScrub.svelte';
 
 	const currentYear = new Date().getFullYear();
 	const START_YEAR = 2006;
 
-	let displayYear = $state(currentYear);
-	let animating = $state(false);
-	let sectionEl = $state<HTMLElement | null>(null);
-
+	// Under reduced motion the pin collapses to a static scene — show the tape
+	// fully rewound instead of frozen at "today".
+	let reduced = $state(false);
 	onMount(() => {
-		if (!sectionEl) return;
-		if (typeof IntersectionObserver === 'undefined') {
-			displayYear = START_YEAR;
-			return;
-		}
-		let started = false;
-		const obs = new IntersectionObserver(
-			(entries) => {
-				for (const entry of entries) {
-					if (!entry.isIntersecting || started) continue;
-					started = true;
-					obs.disconnect();
-					runRewind();
-				}
-			},
-			{ threshold: 0.4 },
-		);
-		obs.observe(sectionEl);
-		return () => obs.disconnect();
+		const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+		reduced = mq.matches;
+		const onChange = () => (reduced = mq.matches);
+		mq.addEventListener('change', onChange);
+		return () => mq.removeEventListener('change', onChange);
 	});
 
-	function runRewind() {
-		animating = true;
-		const start = performance.now();
-		const dur = 3800;
-		let raf = 0;
-		const tick = (t: number) => {
-			const p = Math.min(1, (t - start) / dur);
-			const eased = 1 - Math.pow(1 - p, 3);
-			displayYear = Math.round(currentYear - (currentYear - START_YEAR) * eased);
-			if (p < 1) {
-				raf = requestAnimationFrame(tick);
-			} else {
-				animating = false;
-			}
-		};
-		raf = requestAnimationFrame(tick);
-		return () => cancelAnimationFrame(raf);
-	}
+	// Heavy ease-in-out: the first and last years linger long enough to actually
+	// read (they're the ones that matter), while the middle years whip past as
+	// pure motion — leaning into the time-travel blur rather than fighting it.
+	const easeInOut = (t: number) =>
+		t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-	function scrollToOrigin() {
-		const el = document.getElementById('humble-beginnings');
-		if (!el) return;
-		const top = el.getBoundingClientRect().top + window.scrollY - 64;
-		window.scrollTo({ top });
-	}
-
-	const percent = $derived(
-		((currentYear - displayYear) / (currentYear - START_YEAR)) * 100,
+	const YEARS = Array.from(
+		{ length: currentYear - START_YEAR + 1 },
+		(_, i) => START_YEAR + i,
 	);
+
+	// Continuous position on the timeline (today → 2006) for the year flight.
+	const yearFloatAt = (p: number) =>
+		currentYear - (currentYear - START_YEAR) * easeInOut(p);
+
+	// Tape geometry: as p goes 0→1 the tape mass moves from the right (take-up)
+	// reel back onto the left (supply) reel.
+	const PACK_MIN = 15;
+	const PACK_MAX = 30;
+	const packLeft = (p: number) => PACK_MIN + (PACK_MAX - PACK_MIN) * p;
+	const packRight = (p: number) => PACK_MAX - (PACK_MAX - PACK_MIN) * p;
+	// Reels spin backwards while rewinding; several full turns over the scrub.
+	const spin = (p: number) => -p * 1440;
 </script>
 
 <SectionShell id="rewind" year={String(currentYear)} label="Rewind" theme="rewind">
@@ -69,35 +48,101 @@
 		<div class="vignette"></div>
 	</div>
 
-	<div class="container" bind:this={sectionEl}>
-		<Reveal variant="up" delay={120}>
-			<h2 class="title">Where it all started.</h2>
-		</Reveal>
-
-		<Reveal variant="up" delay={220}>
-			<p class="lede">
-				Before the startup, the apps, the company &mdash; there was a miniDV camera, a
-				bedroom wall painted green, and a friend named Kevin.
-			</p>
-		</Reveal>
-
-		<Reveal variant="up" delay={300}>
-			<div class="counter" class:animating>
-				<div class="counter-label">
-					<span class="rew" aria-hidden="true">◄◄</span>
-					Rewinding…
+	<PinScrub height="260vh" class="rewind-pin">
+		{#snippet children({ progress })}
+			{@const p = reduced ? 1 : progress}
+			{@const yearFloat = yearFloatAt(p)}
+			{@const done = p >= 0.995}
+			<div class="scene">
+				<div class="intro">
+					<div class="eyebrow">
+						<span class="rew-icon" class:running={p > 0.01 && !done} aria-hidden="true">
+							◄◄
+						</span>
+						Rewind the tape
+					</div>
+					<h2 class="title">Where it all started.</h2>
+					<p class="lede">
+						That's today. But none of it started with a company. It started with a miniDV
+						camera, a bedroom wall painted green, and a friend named Kevin.
+						<strong>Keep scrolling to rewind twenty years.</strong>
+					</p>
 				</div>
-				<div class="counter-number" aria-live="off">{displayYear}</div>
-				<div class="counter-rail">
-					<div class="counter-fill" style:width="{percent}%"></div>
+
+				<div class="cassette" class:done>
+					<svg
+						viewBox="0 0 340 210"
+						role="img"
+						aria-label="A cassette tape rewinding from {currentYear} back to {START_YEAR} as you scroll">
+						<!-- shell -->
+						<rect x="4" y="4" width="332" height="202" rx="16" class="shell" />
+						<!-- corner screws -->
+						<circle cx="22" cy="22" r="3" class="screw" />
+						<circle cx="318" cy="22" r="3" class="screw" />
+						<circle cx="22" cy="188" r="3" class="screw" />
+						<circle cx="318" cy="188" r="3" class="screw" />
+						<!-- label -->
+						<rect x="28" y="20" width="284" height="52" rx="8" class="label" />
+						<text x="170" y="42" class="label-text" text-anchor="middle">
+							HUNKY SPUNKY PRODUCTIONS
+						</text>
+						<text x="170" y="60" class="label-sub" text-anchor="middle">
+							TAPE 01 · {START_YEAR}–{currentYear}
+						</text>
+						<!-- tape window -->
+						<rect x="58" y="88" width="224" height="84" rx="12" class="window" />
+						<!-- tape packs -->
+						<circle cx="112" cy="130" r={packLeft(p)} class="pack" />
+						<circle cx="228" cy="130" r={packRight(p)} class="pack" />
+						<!-- tape path across the head -->
+						<path
+							d="M 112 {130 + packLeft(p)} L 145 168 L 195 168 L 228 {130 + packRight(p)}"
+							class="tape" />
+						<!-- hubs + spokes, spinning with scroll -->
+						{#each [112, 228] as cx (cx)}
+							<g transform="rotate({spin(p)} {cx} 130)">
+								<circle {cx} cy="130" r="11" class="hub" />
+								{#each [0, 60, 120, 180, 240, 300] as a (a)}
+									<line
+										x1={cx + 5 * Math.cos((a * Math.PI) / 180)}
+										y1={130 + 5 * Math.sin((a * Math.PI) / 180)}
+										x2={cx + 10.5 * Math.cos((a * Math.PI) / 180)}
+										y2={130 + 10.5 * Math.sin((a * Math.PI) / 180)}
+										class="spoke" />
+								{/each}
+							</g>
+						{/each}
+					</svg>
 				</div>
-				<div class="counter-meta">
-					<span>{currentYear}</span>
-					<span>{START_YEAR}</span>
+
+				<!-- Years fly past the camera as the tape rewinds: the year being
+				     left behind blows up toward the viewer and fades, while the
+				     next one back approaches from the distance. -->
+				<div
+					class="year-stage"
+					class:done
+					role="img"
+					aria-label="Rewinding to {Math.round(yearFloat)}">
+					{#each YEARS as y (y)}
+						{@const t = y - yearFloat}
+						{#if Math.abs(t) < 1}
+							{@const passing = Math.max(0, t)}
+							{@const approaching = Math.max(0, -t)}
+							<!-- Squared opacity falloff: the year nearest "now" reads at
+							     near-full strength while its neighbors drop off quickly,
+							     so two mid-flight years never compete at similar alpha. -->
+							<span
+								class="year-fly"
+								style:transform="scale({1 + passing * 2.4 - approaching * 0.55})"
+								style:opacity={Math.pow(1 - Math.max(passing, approaching), 1.8)}>
+								{y}
+							</span>
+						{/if}
+					{/each}
 				</div>
 			</div>
-		</Reveal>
-	</div>
+		{/snippet}
+	</PinScrub>
 </SectionShell>
 
 <style>
@@ -107,6 +152,11 @@
 			radial-gradient(circle at 50% 100%, rgba(255, 156, 74, 0.1), transparent 60%),
 			linear-gradient(180deg, #050a10, #0a0a12 50%, #100a06);
 		color: #fff;
+	}
+	/* The pinned scene provides its own vertical rhythm — the shell's default
+	   block padding would just push the sticky start/end points around. */
+	:global(.section-shell[data-theme='rewind']) {
+		padding-block: 0;
 	}
 	.bg {
 		position: absolute;
@@ -134,85 +184,34 @@
 			#050a10 100%
 		);
 	}
-	.container {
+
+	.scene {
 		position: relative;
 		z-index: 1;
-		max-width: 64rem;
-		margin: 0 auto;
-		padding: 0 clamp(1rem, 3vw, 2rem);
+		width: min(64rem, 100%);
+		padding: clamp(1rem, 3vw, 2rem);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: clamp(1rem, 2.5vh, 2rem);
 		text-align: center;
-		display: flex;
-		flex-direction: column;
+	}
+	.eyebrow {
+		display: inline-flex;
 		align-items: center;
-		gap: 1.4rem;
-	}
-	@keyframes rewind-spin {
-		0%,
-		100% {
-			transform: translateX(0);
-		}
-		50% {
-			transform: translateX(-3px);
-		}
-	}
-
-	.title {
-		font-size: clamp(2rem, 5vw, 3.4rem);
-		font-weight: 800;
-		line-height: 1.1;
-		letter-spacing: -0.025em;
-		margin: 0;
-		max-width: 52rem;
-	}
-	.grad {
-		background: linear-gradient(95deg, #c8c2ff, #00f2c3);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
-	}
-	.grad.accent {
-		background: linear-gradient(95deg, #ff9c4a, #ffd54a);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
-	}
-	.lede {
-		font-size: clamp(1.05rem, 1.6vw, 1.2rem);
-		line-height: 1.55;
-		max-width: 44rem;
-		color: rgba(255, 255, 255, 0.7);
-		margin: 0;
-	}
-
-	.counter {
-		width: min(28rem, 92%);
-		padding: 1.4rem 1.5rem;
-		background: rgba(0, 0, 0, 0.45);
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 16px;
-		backdrop-filter: blur(10px);
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		text-align: left;
-	}
-	.counter-label {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		gap: 0.6rem;
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
 		letter-spacing: 0.32em;
 		text-transform: uppercase;
 		color: rgba(255, 255, 255, 0.6);
+		margin-bottom: 0.9rem;
 	}
-	.rew {
-		display: inline-block;
+	.rew-icon {
 		color: #ff9c4a;
 		opacity: 0.6;
 	}
-	.counter.animating .rew {
-		opacity: 1;
+	.rew-icon.running {
 		animation: rew-pulse 700ms ease-in-out infinite;
 	}
 	@keyframes rew-pulse {
@@ -224,82 +223,122 @@
 			opacity: 1;
 		}
 	}
-	.counter-number {
-		font-family: var(--font-mono);
-		font-size: clamp(2.8rem, 7vw, 4rem);
+	.title {
+		font-size: clamp(2rem, 5vw, 3.4rem);
 		font-weight: 800;
-		letter-spacing: -0.02em;
-		font-variant-numeric: tabular-nums;
-		color: #fff;
-		line-height: 1;
+		line-height: 1.1;
+		letter-spacing: -0.025em;
+		margin: 0 0 0.7rem;
 	}
-	.counter-rail {
-		height: 3px;
-		background: rgba(255, 255, 255, 0.12);
-		border-radius: 4px;
-		overflow: hidden;
-		margin-top: 0.4rem;
+	.lede {
+		font-size: clamp(1rem, 1.6vw, 1.2rem);
+		line-height: 1.55;
+		max-width: 44rem;
+		color: rgba(255, 255, 255, 0.7);
+		margin: 0 auto;
 	}
-	.counter-fill {
-		height: 100%;
-		background: linear-gradient(90deg, #ff9c4a, #6c63ff);
-		transition: width 80ms linear;
-	}
-	.counter-meta {
-		display: flex;
-		justify-content: space-between;
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		color: rgba(255, 255, 255, 0.55);
-		letter-spacing: 0.08em;
+	.lede strong {
+		color: #ff9c4a;
+		font-weight: 600;
 	}
 
-	.cta {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.6rem;
-		background: rgba(255, 255, 255, 0.05);
-		color: #fff;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		padding: 0.85rem 1.5rem;
-		border-radius: 999px;
-		font: inherit;
-		font-weight: 600;
-		cursor: pointer;
-		transition:
-			background 200ms ease,
-			transform 200ms ease,
-			border-color 200ms ease;
+	.cassette {
+		width: min(420px, 82vw);
+		filter: drop-shadow(0 24px 60px rgba(255, 156, 74, 0.12));
 	}
-	.cta:hover {
-		transition-duration: 0s;
-		background: rgba(255, 255, 255, 0.12);
-		border-color: rgba(255, 156, 74, 0.55);
-		transform: translateY(-2px);
+	.cassette svg {
+		width: 100%;
+		height: auto;
+		display: block;
 	}
-	.cta:focus-visible {
-		outline: 2px solid #ff9c4a;
-		outline-offset: 3px;
+	.shell {
+		fill: rgba(255, 255, 255, 0.03);
+		stroke: rgba(255, 255, 255, 0.2);
+		stroke-width: 1.5;
 	}
-	.cta svg {
-		width: 18px;
-		height: 18px;
-		animation: bob 2.4s ease-in-out infinite;
+	.screw {
+		fill: rgba(255, 255, 255, 0.25);
 	}
-	@keyframes bob {
-		0%,
-		100% {
-			transform: translateY(0);
-		}
-		50% {
-			transform: translateY(4px);
+	.label {
+		fill: rgba(255, 156, 74, 0.07);
+		stroke: rgba(255, 156, 74, 0.35);
+		stroke-width: 1;
+	}
+	.label-text {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.22em;
+		fill: rgba(255, 255, 255, 0.85);
+	}
+	.label-sub {
+		font-family: var(--font-mono);
+		font-size: 9px;
+		letter-spacing: 0.3em;
+		fill: rgba(255, 255, 255, 0.45);
+	}
+	.window {
+		fill: rgba(0, 0, 0, 0.5);
+		stroke: rgba(255, 255, 255, 0.15);
+		stroke-width: 1;
+	}
+	.pack {
+		fill: #241608;
+		stroke: rgba(255, 156, 74, 0.45);
+		stroke-width: 1.5;
+	}
+	.tape {
+		fill: none;
+		stroke: rgba(255, 156, 74, 0.55);
+		stroke-width: 2;
+	}
+	.hub {
+		fill: #0d0d12;
+		stroke: #ff9c4a;
+		stroke-width: 1.5;
+	}
+	.spoke {
+		stroke: #ff9c4a;
+		stroke-width: 1.5;
+		stroke-linecap: round;
+	}
+	.cassette.done .hub,
+	.cassette.done .spoke {
+		stroke: #7dffc9;
+	}
+
+	.year-stage {
+		position: relative;
+		width: 100%;
+		height: clamp(8rem, 24vw, 18rem);
+		display: grid;
+		place-items: center;
+		margin-top: -0.5rem;
+	}
+	.year-fly {
+		position: absolute;
+		font-family: var(--font-mono);
+		font-weight: 900;
+		font-size: clamp(7rem, 22vw, 17rem);
+		line-height: 1;
+		letter-spacing: -0.04em;
+		font-variant-numeric: tabular-nums;
+		color: transparent;
+		-webkit-text-stroke: 2.5px #ff9c4a;
+		user-select: none;
+		pointer-events: none;
+	}
+	.year-stage.done .year-fly {
+		-webkit-text-stroke-color: #7dffc9;
+		text-shadow: 0 0 60px rgba(125, 255, 201, 0.25);
+	}
+	@media (max-width: 640px) {
+		.year-fly {
+			-webkit-text-stroke-width: 1.5px;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.eyebrow svg,
-		.cta svg,
-		.rew {
+		.rew-icon.running {
 			animation: none;
 		}
 	}

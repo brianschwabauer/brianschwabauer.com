@@ -633,7 +633,9 @@ select:focus {
 	width: 100vw;
 	margin-left: calc(50% - 50vw);
 	margin-right: calc(50% - 50vw);
-	padding-inline: clamp(0.5rem, 2.5vw, 2rem);
+	/* Same gutter as the sections' .container so left edges stay aligned on
+	   small screens where the bleed padding and container padding meet. */
+	padding-inline: clamp(1rem, 3vw, 2rem);
 	box-sizing: border-box;
 	/* The delightstack masonry layout sizes its columns with @container queries,
 	   so it needs a query container ancestor — without one it collapses to a
@@ -660,7 +662,7 @@ select:focus {
 	   to 0 and, being component-scoped, outranks this rule) can't cancel the
 	   horizontal breakout. These elements never need their own side margins. */
 	margin-inline: calc(50% - 50vw) !important;
-	padding-inline: clamp(0.5rem, 2.5vw, 2rem);
+	padding-inline: clamp(1rem, 3vw, 2rem);
 	box-sizing: border-box;
 	/* Only the left edge needs to reach the gallery; keep the text itself at a
 	   readable measure (a tighter per-section max-width on the prose still wins). */

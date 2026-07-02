@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import Expandable from '../primitives/Expandable.svelte';
+	import GradientCollapse from '../primitives/GradientCollapse.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -306,7 +306,11 @@
 				<p>The funniest thing we'd ever made, by a country mile.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<LightboxGallery key="green-screen-xyz" items={xyzImages} display="masonry-row" size="2" />
+				<LightboxGallery
+					key="green-screen-xyz"
+					items={xyzImages}
+					display="masonry-row"
+					size="2" />
 			</Reveal>
 		</div>
 
@@ -439,7 +443,11 @@
 			</Reveal>
 
 			<Reveal variant="up" delay={100}>
-				<LightboxGallery key="green-screen-vfx" items={vfxImages} display="masonry" size="0" />
+				<LightboxGallery
+					key="green-screen-vfx"
+					items={vfxImages}
+					display="masonry"
+					size="0" />
 			</Reveal>
 		</div>
 
@@ -453,7 +461,11 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<LightboxGallery key="green-screen-nuisance" items={nuisanceImages} display="masonry-row" size="2" />
+				<LightboxGallery
+					key="green-screen-nuisance"
+					items={nuisanceImages}
+					display="masonry-row"
+					size="2" />
 			</Reveal>
 			<Reveal variant="up" delay={150}>
 				<div class="inline-video">
@@ -490,7 +502,7 @@
 		</div>
 
 		<Reveal>
-			<Expandable label="Why we never planned. Why it worked anyway.">
+			<GradientCollapse label="Why we never planned. Why it worked anyway.">
 				<div class="prose">
 					<p>
 						This was the pattern: we picked an effect we'd never done before. We dove
@@ -504,11 +516,15 @@
 						later (next section over) was about stop-motion. Everything was an excuse.
 					</p>
 				</div>
-			</Expandable>
+			</GradientCollapse>
 		</Reveal>
 	</div>
 
-	<LightboxGallery bind:this={gallery} key="green-screen" items={sectionExtras} autoplay_video />
+	<LightboxGallery
+		bind:this={gallery}
+		key="green-screen"
+		items={sectionExtras}
+		autoplay_video />
 </SectionShell>
 
 <style>
@@ -814,12 +830,17 @@
 	.pac-runner {
 		position: absolute;
 		top: 50%;
+		left: 0;
 		width: var(--pac-size);
 		height: var(--pac-size);
 		margin-top: calc(var(--pac-size) / -2);
-		left: calc(var(--p, 0) * (100vw + var(--pac-size) + 80px) - var(--pac-size) - 20px);
+		/* transform instead of `left` — compositor-only, no layout/paint on every
+		   scroll frame while --p updates. */
+		transform: translateX(
+			calc(var(--p, 0) * (100vw + var(--pac-size) + 80px) - var(--pac-size) - 20px)
+		);
 		filter: drop-shadow(0 0 32px rgba(255, 217, 52, 0.55));
-		will-change: left;
+		will-change: transform;
 	}
 	.pac-runner svg {
 		width: 100%;

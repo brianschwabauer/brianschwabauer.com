@@ -9,7 +9,7 @@
 		delay = 0,
 		distance = 60,
 		once = true,
-		threshold = 0.15,
+		threshold = 0,
 		class: klass = '',
 	}: {
 		children: Snippet;
@@ -72,30 +72,42 @@
 	bind:this={el}
 	class="reveal {klass}"
 	class:visible
+	class:blur={variant === 'blur'}
 	style:--reveal-initial-transform={initial(variant, distance)}
-	style:--reveal-delay="{delay}ms"
-	style:--reveal-blur={variant === 'blur' ? '8px' : '0'}>
+	style:--reveal-delay="{delay}ms">
 	{@render children()}
 </div>
 
 <style>
+	/* The hidden state only applies once we know JS will run — otherwise SSR'd
+	   content would paint invisible forever when scripts fail (and would delay
+	   LCP behind hydration on slow connections). */
+	@media (scripting: enabled) {
+		.reveal:not(.visible) {
+			opacity: 0;
+			transform: var(--reveal-initial-transform);
+		}
+		.reveal.blur:not(.visible) {
+			filter: blur(8px);
+		}
+	}
 	.reveal {
-		opacity: 0;
-		transform: var(--reveal-initial-transform);
-		filter: blur(var(--reveal-blur));
+		transition:
+			opacity 800ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay),
+			transform 800ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay);
+	}
+	/* filter transitions force expensive repaints — only pay for them on the
+	   variant that actually blurs. */
+	.reveal.blur {
 		transition:
 			opacity 800ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay),
 			transform 800ms cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay),
 			filter 800ms ease var(--reveal-delay);
-		will-change: opacity, transform, filter;
-	}
-	.reveal.visible {
-		opacity: 1;
-		transform: none;
-		filter: blur(0);
 	}
 	@media (prefers-reduced-motion: reduce) {
-		.reveal {
+		.reveal,
+		.reveal:not(.visible),
+		.reveal.blur:not(.visible) {
 			transition: none;
 			transform: none;
 			filter: none;

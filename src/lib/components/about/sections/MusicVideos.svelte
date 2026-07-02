@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import Expandable from '../primitives/Expandable.svelte';
+	import GradientCollapse from '../primitives/GradientCollapse.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -227,120 +227,130 @@
 		</div>
 
 		<div class="track">
-			<div class="track-num">01</div>
-			<div class="track-body">
-				<Reveal>
+			<Reveal>
+				<div class="track-head">
+					<span class="track-num" aria-hidden="true">01</span>
 					<h3 class="sub">
 						Flashlight <span class="dot">·</span>
 						2007
 					</h3>
-					<p>
-						Our first original song, written and recorded with Kevin. A guy goes slowly
-						insane searching for a flashlight he can't find. The music video has way more
-						shots, way more quick cuts, and starts to actually feel like a music video.
-					</p>
-				</Reveal>
-				<Reveal variant="up" delay={120}>
-					<div class="paired">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_plays_guitar.avif"
-							alt="Brian plays guitar"
-							ratio="16 / 9"
-							onclick={(e) => gallery?.open(0, e.currentTarget)} />
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif"
-							alt="Summoning a guitar via reversed footage"
-							ratio="16 / 9"
-							onclick={(e) => gallery?.open(1, e.currentTarget)} />
-					</div>
-				</Reveal>
-				<Reveal variant="up" delay={160}>
-					<div class="track-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/poster.jpg"
-							alt="Flashlight (2007) — music video"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(2, e.currentTarget)} />
-					</div>
-				</Reveal>
-			</div>
+				</div>
+				<p class="track-copy">
+					Our first original song, written and recorded with Kevin. A guy goes slowly
+					insane searching for a flashlight he can't find. The music video has way more
+					shots, way more quick cuts, and starts to actually feel like a music video.
+				</p>
+			</Reveal>
+			<Reveal variant="up" delay={120}>
+				<div class="paired">
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_plays_guitar.avif"
+						alt="Brian plays guitar"
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(0, e.currentTarget)} />
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif"
+						alt="Summoning a guitar via reversed footage"
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(1, e.currentTarget)} />
+				</div>
+			</Reveal>
+			<Reveal variant="up" delay={160}>
+				<div class="track-video">
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/poster.jpg"
+						alt="Flashlight (2007) — music video"
+						ratio="16 / 9"
+						video
+						onclick={(e) => gallery?.open(2, e.currentTarget)} />
+				</div>
+			</Reveal>
 		</div>
 
 		<div class="track">
-			<div class="track-num">02</div>
-			<div class="track-body">
-				<Reveal class="bleed-head">
+			<Reveal>
+				<div class="track-head">
+					<span class="track-num" aria-hidden="true">02</span>
 					<h3 class="sub">
 						Do Da Flava G <span class="dot">·</span>
 						2010
 					</h3>
-					<p>
-						We wrote a rap song for a friend, made him "into a rapper", filmed my whole
-						family doing a goofy family dance to it — grandparents included — and shot the
-						music video. It placed in a local film festival. I think second.
-					</p>
-					<p>
-						I also built a whole Flash website for the fake artist. There was a game on
-						the site: press a number on the keyboard and the animated Flava G character
-						would do that dance. We wrote four songs for him. We only ever shot a music
-						video for one.
-					</p>
-				</Reveal>
-				<Reveal variant="up" delay={120}>
-					<div class="gallery-bleed">
-						<LightboxGallery key="music-videos-flava" items={flavaImages} display="masonry" size="2" />
-					</div>
-				</Reveal>
-				<Reveal variant="up" delay={160}>
-					<div class="track-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/poster.jpg"
-							alt="Do Da Flava G (2010) — music video"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(3, e.currentTarget)} />
-					</div>
-				</Reveal>
-			</div>
+				</div>
+				<p class="track-copy">
+					We wrote a rap song for a friend, made him "into a rapper", filmed my whole
+					family doing a goofy family dance to it — grandparents included — and shot the
+					music video. It placed in a local film festival. I think second.
+				</p>
+				<p class="track-copy">
+					I also built a whole Flash website for the fake artist. There was a game on the
+					site: press a number on the keyboard and the animated Flava G character would do
+					that dance. We wrote four songs for him. We only ever shot a music video for
+					one.
+				</p>
+			</Reveal>
+			<Reveal variant="up" delay={120}>
+				<GradientCollapse
+					class="gallery-bleed"
+					label="Show the whole family dance"
+					collapsedHeight="30rem">
+					<LightboxGallery
+						key="music-videos-flava"
+						items={flavaImages}
+						display="masonry"
+						size="2" />
+				</GradientCollapse>
+			</Reveal>
+			<Reveal variant="up" delay={160}>
+				<div class="track-video">
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/poster.jpg"
+						alt="Do Da Flava G (2010) — music video"
+						ratio="16 / 9"
+						video
+						onclick={(e) => gallery?.open(3, e.currentTarget)} />
+				</div>
+			</Reveal>
 		</div>
 
 		<div class="track">
-			<div class="track-num">03</div>
-			<div class="track-body">
-				<Reveal class="bleed-head">
+			<Reveal>
+				<div class="track-head">
+					<span class="track-num" aria-hidden="true">03</span>
 					<h3 class="sub">
 						You Derive Me Crazy <span class="dot">·</span>
 						2010
 					</h3>
-					<p>
-						AP Calculus had just wrapped, so my teacher let us be creative. We wrote a
-						parody — set to Britney Spears' "You Drive Me Crazy" — with lyrics full of
-						calc puns. Shot it in class, used greenscreen to put the whole class into
-						virtual sets, and turned in the most absurd math project the school had ever
-						seen.
-					</p>
-				</Reveal>
-				<Reveal variant="up" delay={120}>
-					<div class="gallery-bleed">
-						<LightboxGallery key="music-videos-calc" items={calcImages} display="masonry" size="2" />
-					</div>
-				</Reveal>
-				<Reveal variant="up" delay={160}>
-					<div class="track-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/poster.jpg"
-							alt="You Derive Me Crazy (2010) — calculus parody music video"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(4, e.currentTarget)} />
-					</div>
-				</Reveal>
-			</div>
+				</div>
+				<p class="track-copy">
+					AP Calculus had just wrapped, so my teacher let us be creative. We wrote a
+					parody — set to Britney Spears' "You Drive Me Crazy" — with lyrics full of calc
+					puns. Shot it in class, used greenscreen to put the whole class into virtual
+					sets, and turned in the most absurd math project the school had ever seen.
+				</p>
+			</Reveal>
+			<Reveal variant="up" delay={120}>
+				<div class="gallery-bleed">
+					<LightboxGallery
+						key="music-videos-calc"
+						items={calcImages}
+						display="masonry"
+						size="2" />
+				</div>
+			</Reveal>
+			<Reveal variant="up" delay={160}>
+				<div class="track-video">
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/poster.jpg"
+						alt="You Derive Me Crazy (2010) — calculus parody music video"
+						ratio="16 / 9"
+						video
+						onclick={(e) => gallery?.open(4, e.currentTarget)} />
+				</div>
+			</Reveal>
 		</div>
 
 		<Reveal>
-			<Expandable label="An honest take on the music side">
+			<GradientCollapse label="An honest take on the music side">
 				<div class="prose">
 					<p>
 						We were not good musicians. The recordings live somewhere on a hard drive
@@ -351,11 +361,15 @@
 						film I make differently because of those years.
 					</p>
 				</div>
-			</Expandable>
+			</GradientCollapse>
 		</Reveal>
 	</div>
 
-	<LightboxGallery bind:this={gallery} key="music-videos" items={sectionExtras} autoplay_video />
+	<LightboxGallery
+		bind:this={gallery}
+		key="music-videos"
+		items={sectionExtras}
+		autoplay_video />
 </SectionShell>
 
 <style>
@@ -519,27 +533,29 @@
 	}
 
 	.track {
-		display: grid;
-		grid-template-columns: auto 1fr;
-		gap: clamp(1.5rem, 3vw, 2.5rem);
-		margin: 3rem 0;
+		margin: 4.5rem 0;
 	}
-	@media (max-width: 640px) {
-		.track {
-			grid-template-columns: 1fr;
-		}
+	/* Numeral and title share a baseline row, so 01 → 02 → 03 line up down the
+	   page while the galleries below still bleed to the full viewport. */
+	.track-head {
+		display: flex;
+		align-items: baseline;
+		gap: clamp(0.9rem, 2vw, 1.4rem);
+		margin-bottom: 0.75rem;
 	}
 	.track-num {
 		font-family: var(--font-mono);
-		font-size: clamp(3rem, 6vw, 5rem);
+		font-size: clamp(2.6rem, 5vw, 4rem);
 		font-weight: 900;
 		color: transparent;
 		-webkit-text-stroke: 2px #ff7ad0;
 		letter-spacing: -0.02em;
 		line-height: 1;
-		position: sticky;
-		top: 100px;
-		height: max-content;
+		flex: 0 0 auto;
+	}
+	.track-copy {
+		max-width: 46rem;
+		line-height: 1.65;
 	}
 	.sub {
 		font-size: clamp(1.5rem, 2.8vw, 2.2rem);
