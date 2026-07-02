@@ -241,7 +241,7 @@
 	.error-page {
 		max-width: var(--measure);
 		margin: 0 auto;
-		padding: var(--space-8) var(--space-4) var(--space-24);
+		padding: var(--space-7) var(--space-3) var(--space-10);
 	}
 
 	/* Two-column layout when there's a 404 image to surface. Content keeps its
@@ -253,7 +253,7 @@
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) auto;
 		grid-template-areas: 'content image';
-		gap: var(--space-6) var(--space-10);
+		gap: var(--space-5) var(--space-8);
 		align-items: start;
 	}
 
@@ -271,7 +271,7 @@
 		border-radius: var(--radius-md);
 		/* Nudge the image down so it visually aligns with the title rather
 		   than the tiny eyebrow status code above it. */
-		margin-top: var(--space-10);
+		margin-top: var(--space-8);
 	}
 
 	@media (max-width: 720px) {
@@ -280,12 +280,12 @@
 		}
 		.lost-image {
 			width: clamp(160px, 50vw, 240px);
-			margin: 0 0 var(--space-6);
+			margin: 0 0 var(--space-5);
 		}
 	}
 
 	.error-head {
-		margin-bottom: var(--space-8);
+		margin-bottom: var(--space-7);
 	}
 
 	.error-code {
@@ -302,12 +302,12 @@
 		font-size: clamp(2rem, 6vw, 3.25rem);
 		font-weight: 700;
 		line-height: 1.05;
-		margin: 0 0 var(--space-4);
+		margin: 0 0 var(--space-3);
 		letter-spacing: -0.01em;
 	}
 
 	.error-detail {
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		font-size: var(--text-base);
 		line-height: 1.6;
 		max-width: 60ch;
@@ -315,7 +315,7 @@
 
 	.error-detail code {
 		font-family: var(--font-mono, ui-monospace, monospace);
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 		padding: 2px 6px;
 		border-radius: var(--radius-sm);
 		font-size: 0.9em;
@@ -325,22 +325,22 @@
 	.search-input {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
-		padding: var(--space-3) var(--space-4);
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-3);
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
-		margin-bottom: var(--space-8);
+		margin-bottom: var(--space-7);
 		transition:
-			border-color var(--transition-fast),
-			box-shadow var(--transition-fast);
+			border-color var(--duration-fast),
+			box-shadow var(--duration-fast);
 	}
 
 	.search-input:hover,
 	.search-input:focus-within {
 		transition-duration: 0s;
-		border-color: var(--color-accent);
-		box-shadow: 0 0 0 4px var(--color-accent-light);
+		border-color: var(--color-action);
+		box-shadow: 0 0 0 4px var(--color-action-bg);
 	}
 
 	.search-input svg {
@@ -378,7 +378,7 @@
 		font-family: var(--font-mono, ui-monospace, monospace);
 		font-size: 0.7rem;
 		padding: 2px 6px;
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-sm);
 		color: var(--color-text-muted);
@@ -391,13 +391,13 @@
 		letter-spacing: 0.18em;
 		text-transform: uppercase;
 		color: var(--color-text-muted);
-		margin: 0 0 var(--space-4);
+		margin: 0 0 var(--space-3);
 	}
 
 	.suggestion-list {
 		list-style: none;
 		padding: 0;
-		margin: 0 0 var(--space-8);
+		margin: 0 0 var(--space-7);
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
@@ -405,23 +405,23 @@
 
 	.suggestion {
 		display: flex;
-		gap: var(--space-4);
+		gap: var(--space-3);
 		align-items: stretch;
-		padding: var(--space-3);
+		padding: var(--space-2);
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
 		text-decoration: none;
 		color: inherit;
 		transition:
-			border-color var(--transition-fast),
-			transform var(--transition-fast),
-			box-shadow var(--transition-fast);
+			border-color var(--duration-fast),
+			transform var(--duration-fast),
+			box-shadow var(--duration-fast);
 	}
 
 	.suggestion:hover {
 		transition-duration: 0s;
-		border-color: var(--color-accent);
+		border-color: var(--color-action);
 		transform: translateY(-2px);
 		box-shadow: var(--shadow-lg);
 	}
@@ -438,7 +438,7 @@
 	}
 
 	.suggestion-thumb.placeholder {
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 	}
 
 	.suggestion-thumb img {
@@ -458,7 +458,7 @@
 
 	.suggestion-meta {
 		display: flex;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		align-items: baseline;
 		font-family: var(--font-mono, ui-monospace, monospace);
 		font-size: 0.65rem;
@@ -468,7 +468,7 @@
 	}
 
 	.suggestion-label {
-		color: var(--color-accent);
+		color: var(--color-action);
 	}
 
 	.suggestion-title {
@@ -479,7 +479,7 @@
 	}
 
 	.suggestion-summary {
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		font-size: 0.92rem;
 		line-height: 1.45;
 		margin: 0;
@@ -492,13 +492,13 @@
 
 	.actions {
 		display: flex;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		flex-wrap: wrap;
 	}
 
 	@media (max-width: 540px) {
 		.suggestion {
-			gap: var(--space-3);
+			gap: var(--space-2);
 		}
 		.suggestion-thumb {
 			width: 64px;

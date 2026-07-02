@@ -542,7 +542,7 @@
 	}
 
 	.sm-empty {
-		padding: var(--space-3);
+		padding: var(--space-2);
 		color: var(--color-text-muted);
 		font-size: var(--text-xs);
 		text-align: center;
@@ -567,7 +567,7 @@
 	.sm-item.active,
 	.sm-item:hover {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 	}
 
 	.sm-icon {
@@ -575,7 +575,7 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 	}
 	.sm-glyph {
 		font-weight: 700;

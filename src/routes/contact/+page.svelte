@@ -262,18 +262,18 @@
 	.contact-page {
 		max-width: 44rem;
 		margin: 0 auto;
-		padding: var(--space-12) var(--space-4) var(--space-24);
+		padding: var(--space-8) var(--space-3) var(--space-10);
 	}
 	@media (min-width: 768px) {
 		.contact-page {
-			padding: var(--space-12) var(--space-8) var(--space-24);
+			padding: var(--space-8) var(--space-7) var(--space-10);
 		}
 	}
 
 	/* ---- header ---------------------------------------------------------- */
 	.contact-header {
 		text-align: center;
-		margin-bottom: var(--space-10);
+		margin-bottom: var(--space-8);
 	}
 
 	.title {
@@ -287,14 +287,14 @@
 		   stay inside the painted area. */
 		line-height: 1.15;
 		letter-spacing: -0.03em;
-		margin: 0 0 var(--space-4);
+		margin: 0 0 var(--space-3);
 		min-height: 1.25em;
 		position: relative;
 	}
 	.title-line {
 		display: inline-block;
 		padding-bottom: 0.1em;
-		background: linear-gradient(95deg, var(--color-text) 0%, var(--color-accent) 90%);
+		background: linear-gradient(95deg, var(--color-text) 0%, var(--color-action) 90%);
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
@@ -314,7 +314,7 @@
 	}
 	.lede {
 		font-size: var(--text-lg);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		max-width: 32rem;
 		margin: 0 auto;
 		line-height: var(--leading-relaxed);
@@ -326,20 +326,20 @@
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-xl);
-		padding: var(--space-6);
+		padding: var(--space-5);
 		box-shadow: var(--shadow-lg);
 	}
 	@media (min-width: 640px) {
 		.card {
-			padding: var(--space-8);
+			padding: var(--space-7);
 		}
 	}
 
 	/* ---- fields --------------------------------------------------------- */
 	.field-row {
 		display: grid;
-		gap: var(--space-4);
-		margin-bottom: var(--space-4);
+		gap: var(--space-3);
+		margin-bottom: var(--space-3);
 	}
 	@media (min-width: 560px) {
 		.field-row {
@@ -357,12 +357,12 @@
 		display: flex;
 		align-items: baseline;
 		justify-content: space-between;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		font-family: var(--font-mono);
 		font-size: 0.7rem;
 		letter-spacing: 0.18em;
 		text-transform: uppercase;
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 	}
 	.field input,
 	.field textarea {
@@ -391,9 +391,9 @@
 	.field input:focus,
 	.field textarea:focus {
 		outline: none;
-		border-color: var(--color-accent);
+		border-color: var(--color-action);
 		background: var(--color-surface);
-		box-shadow: 0 0 0 4px var(--color-accent-light);
+		box-shadow: 0 0 0 4px var(--color-action-bg);
 	}
 	.field input:disabled,
 	.field textarea:disabled {
@@ -402,7 +402,7 @@
 	}
 
 	.message-field {
-		margin-bottom: var(--space-4);
+		margin-bottom: var(--space-3);
 	}
 	.char-count {
 		position: absolute;
@@ -431,7 +431,7 @@
 		transition: color 200ms ease;
 	}
 	.vibe[data-tone='short'] {
-		color: var(--color-accent);
+		color: var(--color-action);
 	}
 	.vibe[data-tone='good'] {
 		color: var(--color-success);
@@ -448,7 +448,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		margin-top: var(--space-2);
 	}
 	.send-arrow {
@@ -465,13 +465,13 @@
 		text-wrap: balance;
 	}
 	.fine-print a {
-		color: var(--color-accent);
+		color: var(--color-action);
 		text-decoration: none;
-		border-bottom: 1px dotted color-mix(in srgb, var(--color-accent) 50%, transparent);
+		border-bottom: 1px dotted color-mix(in srgb, var(--color-action) 50%, transparent);
 	}
 	.fine-print a:hover {
 		transition-duration: 0s;
-		border-bottom-color: var(--color-accent);
+		border-bottom-color: var(--color-action);
 	}
 
 	.form-error {
@@ -481,7 +481,7 @@
 		border-radius: var(--radius-md);
 		padding: 0.7rem 0.95rem;
 		font-size: 0.9rem;
-		margin-bottom: var(--space-4);
+		margin-bottom: var(--space-3);
 	}
 
 	/* ---- success card --------------------------------------------------- */
@@ -501,12 +501,12 @@
 	}
 	.success h2 {
 		font-size: 1.8rem;
-		margin: var(--space-4) 0 var(--space-2);
-		color: var(--color-accent);
+		margin: var(--space-3) 0 var(--space-2);
+		color: var(--color-action);
 	}
 	.success p {
-		color: var(--color-text-secondary);
-		margin: 0 auto var(--space-6);
+		color: var(--color-text-muted);
+		margin: 0 auto var(--space-5);
 		max-width: 26rem;
 		line-height: var(--leading-relaxed);
 	}
@@ -518,7 +518,7 @@
 		height: 90px;
 		margin: var(--space-2) 0;
 		overflow: hidden;
-		color: var(--color-accent);
+		color: var(--color-action);
 	}
 	.plane {
 		position: absolute;
@@ -561,7 +561,7 @@
 	.trail span {
 		display: inline-block;
 		height: 2px;
-		background: color-mix(in srgb, var(--color-accent) 40%, transparent);
+		background: color-mix(in srgb, var(--color-action) 40%, transparent);
 		border-radius: 999px;
 		opacity: 0;
 		animation: trail-puff 1400ms ease-out forwards;

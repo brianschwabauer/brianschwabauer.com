@@ -363,7 +363,7 @@
 	/* ── BlogImage in-editor styling (mirrors the public post) ─────────── */
 	.body-host :global(figure.blog-img) {
 		position: relative;
-		margin: var(--space-8) auto;
+		margin: var(--space-7) auto;
 		display: block;
 	}
 
@@ -414,7 +414,7 @@
 
 	.body-host :global(figure.blog-img .blog-img-inner) {
 		position: relative;
-		background: var(--blog-img-bg, var(--color-bg-secondary));
+		background: var(--blog-img-bg, var(--color-bg-muted));
 		border-radius: var(--radius-sm);
 		overflow: hidden;
 		aspect-ratio: var(--blog-img-aspect, auto);
@@ -474,7 +474,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		padding: var(--space-6) var(--space-4) var(--space-3);
+		padding: var(--space-5) var(--space-3) var(--space-2);
 		color: white;
 		font-size: 0.875rem;
 		line-height: 1.4;
@@ -643,11 +643,11 @@
 
 	.body-host :global(figure.blog-img .blog-img-toolbar button:hover) {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 	}
 
 	.body-host :global(figure.blog-img .blog-img-toolbar button.is-active) {
-		background: var(--color-accent);
+		background: var(--color-action);
 		color: white;
 	}
 
@@ -682,7 +682,7 @@
 		display: none;
 		flex-direction: column;
 		justify-content: space-between;
-		padding: var(--space-3) var(--space-4);
+		padding: var(--space-2) var(--space-3);
 		pointer-events: none;
 		background: linear-gradient(
 			to bottom,
@@ -722,8 +722,8 @@
 	   repos mode, replacing the width-mode toolbar. */
 	.body-host :global(figure.blog-img .blog-img-repos-toolbar) {
 		position: absolute;
-		top: var(--space-3);
-		right: var(--space-3);
+		top: var(--space-2);
+		right: var(--space-2);
 		display: none;
 		gap: 2px;
 		padding: 4px;
@@ -757,16 +757,16 @@
 		background: rgba(255, 255, 255, 0.18);
 	}
 	.body-host :global(figure.blog-img .blog-img-repos-toolbar button.primary) {
-		background: var(--color-accent);
+		background: var(--color-action);
 	}
 	.body-host :global(figure.blog-img .blog-img-repos-toolbar button.primary:hover) {
 		transition-duration: 0s;
-		background: var(--color-accent);
+		background: var(--color-action);
 		filter: brightness(1.1);
 	}
 
 	.body-host :global(figure.blog-img.is-selected) {
-		outline: 2px solid var(--color-accent);
+		outline: 2px solid var(--color-action);
 		outline-offset: 4px;
 		border-radius: 4px;
 	}
@@ -776,7 +776,7 @@
 	   interactive UI is rendered by BlogGalleryEditor.svelte inside it. ──── */
 	.body-host :global(.blog-gallery) {
 		position: relative;
-		margin: var(--space-8) auto;
+		margin: var(--space-7) auto;
 		display: block;
 		/* The SSR placeholder (renderDoc) and the hydrated node-view preview both
 		   render a real Gallery here; its grid/masonry layout needs an inline-size
@@ -801,7 +801,7 @@
 		transform: translateX(-50%);
 	}
 	.body-host :global(.blog-gallery.is-selected) {
-		outline: 2px solid var(--color-accent);
+		outline: 2px solid var(--color-action);
 		outline-offset: 6px;
 		border-radius: 4px;
 	}
@@ -809,7 +809,7 @@
 	/* ── BlogVideo (in-editor) — horizontal resize, mirrors BlogImage ────── */
 	.body-host :global(figure.blog-video) {
 		position: relative;
-		margin: var(--space-8) auto;
+		margin: var(--space-7) auto;
 		display: block;
 	}
 
@@ -965,15 +965,15 @@
 	}
 	.body-host :global(figure.blog-video .blog-video-toolbar button:hover) {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 	}
 	.body-host :global(figure.blog-video .blog-video-toolbar button.is-active) {
-		background: var(--color-accent);
+		background: var(--color-action);
 		color: white;
 	}
 
 	.body-host :global(figure.blog-video.is-selected) {
-		outline: 2px solid var(--color-accent);
+		outline: 2px solid var(--color-action);
 		outline-offset: 4px;
 		border-radius: 4px;
 	}
@@ -981,9 +981,9 @@
 	/* ── BlogAudio (in-editor) ──────────────────────────────────────────── */
 	.body-host :global(figure.blog-audio) {
 		max-width: var(--measure);
-		margin: var(--space-8) auto;
-		padding: var(--space-4);
-		background: var(--color-bg-secondary);
+		margin: var(--space-7) auto;
+		padding: var(--space-3);
+		background: var(--color-bg-muted);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
 	}
@@ -1007,7 +1007,7 @@
 	}
 
 	.body-host :global(figure.blog-audio.ProseMirror-selectednode) {
-		outline: 2px solid var(--color-accent);
+		outline: 2px solid var(--color-action);
 		outline-offset: 4px;
 		border-radius: 4px;
 	}

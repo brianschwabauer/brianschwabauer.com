@@ -351,8 +351,8 @@
 		flex-wrap: wrap;
 		align-items: center;
 		gap: var(--space-1);
-		padding: var(--space-2) var(--space-3);
-		background: var(--color-bg-secondary);
+		padding: var(--space-2) var(--space-2);
+		background: var(--color-bg-muted);
 		border-bottom: 1px solid var(--color-border);
 	}
 
@@ -368,11 +368,11 @@
 		width: 32px;
 		height: 32px;
 		border-radius: var(--radius-sm);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		font-size: var(--text-sm);
 		transition:
-			background-color var(--transition-fast),
-			color var(--transition-fast);
+			background-color var(--duration-fast),
+			color var(--duration-fast);
 	}
 
 	.toolbar-btn:hover {
@@ -382,7 +382,7 @@
 	}
 
 	.toolbar-btn.active {
-		background: var(--color-accent);
+		background: var(--color-action);
 		color: white;
 	}
 
@@ -417,7 +417,7 @@
 
 	.editor-content {
 		min-height: 300px;
-		padding: var(--space-8) var(--space-4);
+		padding: var(--space-7) var(--space-3);
 	}
 
 	.editor-content :global(.ProseMirror) {
@@ -441,7 +441,7 @@
 	*/
 	.editor-content :global(figure.blog-img) {
 		position: relative;
-		margin: var(--space-8) auto;
+		margin: var(--space-7) auto;
 		display: block;
 	}
 
@@ -468,7 +468,7 @@
 
 	.editor-content :global(figure.blog-img .blog-img-inner) {
 		position: relative;
-		background: var(--blog-img-bg, var(--color-bg-secondary));
+		background: var(--blog-img-bg, var(--color-bg-muted));
 		border-radius: var(--radius-sm);
 		overflow: hidden;
 		aspect-ratio: var(--blog-img-aspect, auto);
@@ -495,7 +495,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		padding: var(--space-6) var(--space-4) var(--space-3);
+		padding: var(--space-5) var(--space-3) var(--space-2);
 		color: white;
 		font-size: 0.875rem;
 		line-height: 1.4;
@@ -649,7 +649,7 @@
 		border: none;
 		border-radius: var(--radius-sm);
 		background: transparent;
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		font-size: var(--text-xs);
 		font-weight: 600;
 		cursor: pointer;
@@ -657,12 +657,12 @@
 
 	.editor-content :global(figure.blog-img .blog-img-toolbar button:hover) {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 		color: var(--color-text);
 	}
 
 	.editor-content :global(figure.blog-img .blog-img-toolbar button.is-active) {
-		background: var(--color-accent);
+		background: var(--color-action);
 		color: white;
 	}
 
@@ -691,7 +691,7 @@
 		display: none;
 		flex-direction: column;
 		justify-content: space-between;
-		padding: var(--space-3) var(--space-4);
+		padding: var(--space-2) var(--space-3);
 		pointer-events: none;
 		background: linear-gradient(
 			to bottom,
@@ -729,8 +729,8 @@
 
 	.editor-content :global(figure.blog-img .blog-img-repos-toolbar) {
 		position: absolute;
-		top: var(--space-3);
-		right: var(--space-3);
+		top: var(--space-2);
+		right: var(--space-2);
 		display: none;
 		gap: 2px;
 		padding: 4px;
@@ -764,16 +764,16 @@
 		background: rgba(255, 255, 255, 0.18);
 	}
 	.editor-content :global(figure.blog-img .blog-img-repos-toolbar button.primary) {
-		background: var(--color-accent);
+		background: var(--color-action);
 	}
 	.editor-content :global(figure.blog-img .blog-img-repos-toolbar button.primary:hover) {
 		transition-duration: 0s;
-		background: var(--color-accent);
+		background: var(--color-action);
 		filter: brightness(1.1);
 	}
 
 	.editor-content :global(figure.blog-img.is-selected) {
-		outline: 2px solid var(--color-accent);
+		outline: 2px solid var(--color-action);
 		outline-offset: 2px;
 	}
 </style>

@@ -407,11 +407,11 @@
 		display: flex;
 		align-items: flex-start;
 		justify-content: center;
-		padding: 8vh var(--space-4) var(--space-4);
+		padding: 8vh var(--space-3) var(--space-3);
 		background: rgba(6, 6, 10, 0.55);
 		backdrop-filter: blur(14px) saturate(140%);
 		-webkit-backdrop-filter: blur(14px) saturate(140%);
-		z-index: var(--z-modal-backdrop);
+		z-index: var(--layer-drawer);
 		animation: fade-in 180ms ease;
 	}
 
@@ -433,8 +433,8 @@
 	.search-bar {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
-		padding: var(--space-4) var(--space-5);
+		gap: var(--space-2);
+		padding: var(--space-3) var(--space-4);
 		border-bottom: 1px solid var(--color-border);
 	}
 
@@ -466,7 +466,7 @@
 	.results {
 		flex: 1;
 		overflow-y: auto;
-		padding: var(--space-2) var(--space-3) var(--space-3);
+		padding: var(--space-2) var(--space-2) var(--space-2);
 	}
 
 	.section-label {
@@ -475,11 +475,11 @@
 		letter-spacing: 0.18em;
 		text-transform: uppercase;
 		color: var(--color-text-muted);
-		padding: var(--space-3) var(--space-3) var(--space-2);
+		padding: var(--space-2) var(--space-2) var(--space-2);
 	}
 
 	.state {
-		padding: var(--space-6) var(--space-4);
+		padding: var(--space-5) var(--space-3);
 		text-align: center;
 		color: var(--color-text-muted);
 		font-size: var(--text-sm);
@@ -490,7 +490,7 @@
 	}
 
 	.inline-link {
-		color: var(--color-accent);
+		color: var(--color-action);
 		font: inherit;
 		text-decoration: underline;
 		padding: 0;
@@ -500,10 +500,10 @@
 	.result {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		width: 100%;
 		text-align: left;
-		padding: var(--space-2) var(--space-3);
+		padding: var(--space-2) var(--space-2);
 		border-radius: var(--radius-md);
 		color: inherit;
 		background: transparent;
@@ -513,7 +513,7 @@
 	.result:hover,
 	.result.active {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 	}
 
 	.result-thumb {
@@ -540,7 +540,7 @@
 	.result-head {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		margin-bottom: 2px;
 		font-size: 0.66rem;
 		font-family: var(--font-mono);
@@ -549,7 +549,7 @@
 	}
 
 	.result-category {
-		color: var(--color-accent);
+		color: var(--color-action);
 		font-weight: 600;
 	}
 
@@ -566,7 +566,7 @@
 
 	.result-summary {
 		font-size: 0.82rem;
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		line-height: 1.4;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -586,7 +586,7 @@
 		font-size: 0.62rem;
 		padding: 1px var(--space-2);
 		border-radius: var(--radius-full);
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 		color: var(--color-text-muted);
 		font-family: var(--font-mono);
 		letter-spacing: 0.06em;
@@ -596,10 +596,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--space-3);
-		padding: var(--space-3) var(--space-4);
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-3);
 		border-top: 1px solid var(--color-border);
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 	}
 
 	.full-btn {
@@ -608,21 +608,21 @@
 		gap: var(--space-2);
 		font-size: var(--text-sm);
 		font-weight: 500;
-		padding: var(--space-2) var(--space-3);
+		padding: var(--space-2) var(--space-2);
 		border-radius: var(--radius-md);
 		color: var(--color-text);
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		transition:
-			background-color var(--transition-fast),
-			border-color var(--transition-fast);
+			background-color var(--duration-fast),
+			border-color var(--duration-fast);
 	}
 
 	.full-btn:hover {
 		transition-duration: 0s;
-		background: var(--color-accent-light);
-		border-color: var(--color-accent);
-		color: var(--color-accent);
+		background: var(--color-action-bg);
+		border-color: var(--color-action);
+		color: var(--color-action);
 	}
 
 	.full-btn.ghost {
@@ -636,7 +636,7 @@
 
 	.footer-status {
 		font-size: var(--text-sm);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 	}
 
 	.hint {
@@ -667,7 +667,7 @@
 		border: 1px solid var(--color-border);
 		font-family: var(--font-mono);
 		font-size: 0.65rem;
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 	}
 
 	@keyframes fade-in {

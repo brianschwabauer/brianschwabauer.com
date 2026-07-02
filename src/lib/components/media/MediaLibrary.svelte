@@ -1149,13 +1149,13 @@
 		grid-template-rows: 100%;
 		flex: 1;
 		min-height: 0;
-		gap: var(--space-4);
+		gap: var(--space-3);
 	}
 
 	.library-main {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		min-height: 0;
 		min-width: 0;
 	}
@@ -1165,7 +1165,7 @@
 		min-width: 0;
 		display: flex;
 		flex-direction: column;
-		padding-left: var(--space-4);
+		padding-left: var(--space-3);
 		border-left: 1px solid var(--color-border);
 	}
 
@@ -1189,14 +1189,14 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: end;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		flex-wrap: wrap;
 	}
 
 	.toolbar-left {
 		display: flex;
 		align-items: end;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		flex: 1;
 		min-width: 0;
 	}
@@ -1215,17 +1215,17 @@
 	.ml-settings {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		width: 240px;
 		max-width: 80vw;
 		padding: var(--space-1);
 		/* Bridge delightstack's form-token namespace (--c-*) to the app accent so
 		   the Range matches the accent instead of falling back to its blue. */
-		--c-action: var(--color-accent);
-		--c-action-active: var(--color-accent);
+		--c-action: var(--color-action);
+		--c-action-active: var(--color-action);
 		--c-action-text: #fff;
 		--c-bg-6: color-mix(in oklch, var(--color-text) 16%, transparent);
-		--c-text-2: var(--color-text-secondary);
+		--c-text-2: var(--color-text-muted);
 	}
 	.ml-field {
 		display: flex;
@@ -1236,7 +1236,7 @@
 	.ml-label {
 		font-size: var(--text-xs);
 		font-weight: 500;
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 	}
 
 	.year {
@@ -1250,7 +1250,7 @@
 	}
 
 	.error {
-		padding: var(--space-2) var(--space-3);
+		padding: var(--space-2) var(--space-2);
 		background: rgba(239, 68, 68, 0.1);
 		border: 1px solid var(--color-error);
 		border-radius: var(--radius-md);
@@ -1266,7 +1266,7 @@
 		padding: var(--space-2);
 		border: 2px dashed transparent;
 		border-radius: var(--radius-md);
-		transition: border-color var(--transition-fast), background var(--transition-fast);
+		transition: border-color var(--duration-fast), background var(--duration-fast);
 	}
 	/* While sweeping a marquee, don't let the gesture select text/images. */
 	.dropzone.marquee-active,
@@ -1281,24 +1281,24 @@
 		position: fixed;
 		z-index: 99998;
 		pointer-events: none;
-		border: 1px solid var(--color-accent);
-		background: color-mix(in oklch, var(--color-accent) 14%, transparent);
+		border: 1px solid var(--color-action);
+		background: color-mix(in oklch, var(--color-action) 14%, transparent);
 		border-radius: 2px;
 	}
 
 	.dropzone.active {
-		border-color: var(--color-accent);
-		background: color-mix(in oklch, var(--color-accent) 8%, transparent);
+		border-color: var(--color-action);
+		background: color-mix(in oklch, var(--color-action) 8%, transparent);
 	}
 
 	.empty {
 		text-align: center;
-		padding: var(--space-12) var(--space-4);
-		color: var(--color-text-secondary);
+		padding: var(--space-8) var(--space-3);
+		color: var(--color-text-muted);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: var(--space-3);
+		gap: var(--space-2);
 	}
 
 	.empty .hint {
@@ -1310,7 +1310,7 @@
 		display: grid;
 		/* Fixed column count driven by the saved view setting (fewer = bigger). */
 		grid-template-columns: repeat(var(--ml-cols, 5), minmax(0, 1fr));
-		gap: var(--space-3);
+		gap: var(--space-2);
 	}
 
 	.tile {
@@ -1325,9 +1325,9 @@
 		border-radius: var(--radius-md);
 		overflow: hidden;
 		cursor: pointer;
-		/* A touch darker than --color-bg-secondary so the tile reads clearly
+		/* A touch darker than --color-bg-muted so the tile reads clearly
 		   against the modal background and the letterbox is visible. */
-		background: color-mix(in oklch, var(--color-text) 9%, var(--color-bg-secondary));
+		background: color-mix(in oklch, var(--color-text) 9%, var(--color-bg-muted));
 		text-align: left;
 	}
 
@@ -1347,9 +1347,9 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 		font-size: var(--text-xs);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		padding: var(--space-2);
 		text-align: center;
 	}
@@ -1363,7 +1363,7 @@
 
 	/* ── Multi-select ─────────────────────────────────────────────────── */
 	.tile.selected {
-		outline: 3px solid var(--color-accent);
+		outline: 3px solid var(--color-action);
 		outline-offset: -3px;
 	}
 
@@ -1383,8 +1383,8 @@
 		box-shadow: var(--shadow-sm);
 	}
 	.tile.selected .tile-check {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
+		background: var(--color-action);
+		border-color: var(--color-action);
 		color: white;
 	}
 
@@ -1404,7 +1404,7 @@
 		color: white;
 		text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
 		opacity: 0;
-		transition: opacity var(--transition-fast);
+		transition: opacity var(--duration-fast);
 		z-index: 1;
 		&::before {
 			content: "";
@@ -1459,7 +1459,7 @@
 		display: flex;
 		gap: var(--space-1);
 		opacity: 0;
-		transition: opacity var(--transition-fast);
+		transition: opacity var(--duration-fast);
 	}
 	.tile:hover .tile-actions,
 	.tile:focus-within .tile-actions {
@@ -1475,9 +1475,9 @@
 		justify-content: center;
 		font-size: var(--text-lg);
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-action);
 		pointer-events: none;
-		background: color-mix(in oklch, var(--color-accent) 4%, transparent);
+		background: color-mix(in oklch, var(--color-action) 4%, transparent);
 		border-radius: var(--radius-md);
 	}
 
@@ -1529,7 +1529,7 @@
 		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		padding: var(--space-1);
 	}
 
@@ -1538,7 +1538,7 @@
 		/* Same fixed column count as the browse grid (shared view setting). */
 		grid-template-columns: repeat(var(--ml-cols, 5), minmax(0, 1fr));
 		align-content: start;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		/* Fill the scroll area so there's empty space below the tiles to start a
 		   marquee from (rows stay packed at the top via align-content). */
 		flex: 1;
@@ -1553,7 +1553,7 @@
 		border-radius: var(--radius-md);
 		overflow: hidden;
 		cursor: grab;
-		background: color-mix(in oklch, var(--color-text) 9%, var(--color-bg-secondary));
+		background: color-mix(in oklch, var(--color-text) 9%, var(--color-bg-muted));
 		border: 1px solid var(--color-border);
 		user-select: none;
 		-webkit-user-select: none;
@@ -1582,7 +1582,7 @@
 		filter: grayscale(0.25);
 	}
 	.rtile.marked {
-		outline-color: var(--color-accent);
+		outline-color: var(--color-action);
 	}
 	.rtile img {
 		width: 100%;
@@ -1605,7 +1605,7 @@
 		width: 22px;
 		height: 22px;
 		border-radius: var(--radius-full);
-		background: var(--color-accent);
+		background: var(--color-action);
 		color: #fff;
 		font-size: 12px;
 		font-weight: 700;
@@ -1622,7 +1622,7 @@
 		justify-content: flex-end;
 		padding: var(--space-1);
 		opacity: 0;
-		transition: opacity var(--transition-fast);
+		transition: opacity var(--duration-fast);
 		/* The overlay covers the whole tile (inset:0). Without this it would sit
 		   on top of the tile and swallow every pointerdown — onTileDown bails when
 		   the press lands on `.rtile-actions`, so the drag never starts. Let
@@ -1689,7 +1689,7 @@
 		inset: 0;
 		border-radius: var(--radius-md);
 		overflow: hidden;
-		background: color-mix(in oklch, var(--color-text) 9%, var(--color-bg-secondary));
+		background: color-mix(in oklch, var(--color-text) 9%, var(--color-bg-muted));
 		border: 1px solid var(--color-border);
 		box-shadow:
 			0 22px 44px rgba(0, 0, 0, 0.36),
@@ -1727,7 +1727,7 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: var(--radius-full);
-		background: var(--color-accent);
+		background: var(--color-action);
 		color: #fff;
 		font-size: 12px;
 		font-weight: 700;

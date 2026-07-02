@@ -274,18 +274,18 @@
 		position: relative;
 		max-width: var(--prose-wide);
 		margin: 0 auto;
-		padding: var(--space-8) var(--space-4) var(--space-24);
+		padding: var(--space-7) var(--space-3) var(--space-10);
 	}
 
 	.edit-post-fab {
 		position: fixed;
-		bottom: var(--space-4);
-		right: var(--space-4);
+		bottom: var(--space-3);
+		right: var(--space-3);
 		z-index: 30;
 		display: inline-flex;
 		align-items: center;
 		gap: var(--space-2);
-		padding: var(--space-2) var(--space-3);
+		padding: var(--space-2) var(--space-2);
 		background: var(--color-surface);
 		color: var(--color-text);
 		border: 1px solid var(--color-border);
@@ -300,14 +300,14 @@
 
 	.edit-post-fab:hover {
 		transition-duration: 0s;
-		color: var(--color-accent);
-		border-color: var(--color-accent);
+		color: var(--color-action);
+		border-color: var(--color-action);
 	}
 
 	.draft-banner {
 		max-width: var(--measure);
-		margin: 0 auto var(--space-6);
-		padding: var(--space-2) var(--space-4);
+		margin: 0 auto var(--space-5);
+		padding: var(--space-2) var(--space-3);
 		text-align: center;
 		font-size: var(--text-sm);
 		color: var(--color-warning);
@@ -318,20 +318,20 @@
 
 	@media (min-width: 768px) {
 		.post-page {
-			padding: var(--space-8) var(--space-8) var(--space-24);
+			padding: var(--space-7) var(--space-7) var(--space-10);
 		}
 	}
 
 	.post-header {
 		max-width: var(--measure);
-		margin: 0 auto var(--space-10);
+		margin: 0 auto var(--space-8);
 	}
 
 	.post-meta {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
-		margin-bottom: var(--space-4);
+		gap: var(--space-2);
+		margin-bottom: var(--space-3);
 		font-size: var(--text-sm);
 	}
 
@@ -345,7 +345,7 @@
 		line-height: 1.15;
 		letter-spacing: -0.02em;
 		color: var(--color-text);
-		margin-bottom: var(--space-6);
+		margin-bottom: var(--space-5);
 	}
 
 	@media (min-width: 768px) {
@@ -356,9 +356,9 @@
 
 	.post-excerpt {
 		font-size: 1.25rem;
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		line-height: 1.5;
-		margin-bottom: var(--space-6);
+		margin-bottom: var(--space-5);
 		font-weight: 400;
 	}
 
@@ -371,30 +371,30 @@
 	.tag {
 		display: inline-block;
 		font-size: var(--text-sm);
-		padding: var(--space-1) var(--space-3);
-		background: var(--color-bg-secondary);
+		padding: var(--space-1) var(--space-2);
+		background: var(--color-bg-muted);
 		border: 1px solid transparent;
 		border-radius: var(--radius-full);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		text-decoration: none;
 		-webkit-tap-highlight-color: transparent;
 		transition:
-			color var(--transition-fast),
-			background-color var(--transition-fast),
-			border-color var(--transition-fast),
-			transform var(--transition-fast);
+			color var(--duration-fast),
+			background-color var(--duration-fast),
+			border-color var(--duration-fast),
+			transform var(--duration-fast);
 	}
 	.tag:hover {
 		transition-duration: 0s;
 		color: var(--color-text);
 		background: var(--color-surface);
-		border-color: var(--color-accent);
+		border-color: var(--color-action);
 	}
 	.tag:focus {
 		outline: none;
 	}
 	.tag:focus-visible {
-		outline: 2px solid var(--color-accent);
+		outline: 2px solid var(--color-action);
 		outline-offset: 2px;
 	}
 	.tag:active {
@@ -411,7 +411,7 @@
 	}
 
 	.post-featured {
-		margin: 0 auto var(--space-12);
+		margin: 0 auto var(--space-8);
 		max-width: var(--measure);
 		overflow: hidden;
 		border-radius: var(--radius-lg);
@@ -429,13 +429,13 @@
 	   width and typography. We keep the wrapper full --prose-wide so any
 	   wide/full-bleed figure inside can break out beyond --measure. */
 	.post-content {
-		margin: 0 auto var(--space-12);
+		margin: 0 auto var(--space-8);
 	}
 
 	.post-footer {
 		max-width: var(--measure);
 		margin: 0 auto;
-		padding-top: var(--space-8);
+		padding-top: var(--space-7);
 		border-top: 1px solid var(--color-border);
 	}
 
@@ -443,17 +443,17 @@
 		max-width: var(--measure);
 		margin: 0 auto;
 		text-align: center;
-		padding: var(--space-24) 0;
+		padding: var(--space-10) 0;
 	}
 
 	.not-found h1 {
 		font-size: var(--text-3xl);
-		margin-bottom: var(--space-4);
+		margin-bottom: var(--space-3);
 	}
 
 	.not-found p {
-		color: var(--color-text-secondary);
-		margin-bottom: var(--space-8);
+		color: var(--color-text-muted);
+		margin-bottom: var(--space-7);
 	}
 
 	/* ── BlogImage rendering ──────────────────────────────────────────────
@@ -464,7 +464,7 @@
 	*/
 	.post-content :global(figure.blog-img) {
 		position: relative;
-		margin: var(--space-10) auto;
+		margin: var(--space-8) auto;
 		display: block;
 	}
 
@@ -494,7 +494,7 @@
 		display: block;
 		width: 100%;
 		height: auto;
-		background: var(--blog-img-bg, var(--color-bg-secondary));
+		background: var(--blog-img-bg, var(--color-bg-muted));
 		border-radius: var(--radius-md);
 	}
 
@@ -531,7 +531,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		padding: var(--space-8) var(--space-4) var(--space-3);
+		padding: var(--space-7) var(--space-3) var(--space-2);
 		color: white;
 		font-size: 0.9375rem;
 		line-height: 1.4;
@@ -551,7 +551,7 @@
 	   grid stands in; on mount it's replaced by a delightstack Gallery (which
 	   provides the click→Carousel lightbox). */
 	.post-content :global(.blog-gallery) {
-		margin: var(--space-10) auto;
+		margin: var(--space-8) auto;
 		display: block;
 		/* The delightstack Gallery's grid/masonry layouts use @container queries
 		   and cqw units, so its wrapper must establish an inline-size container. */
@@ -579,7 +579,7 @@
 	   Three width modes mirror BlogImage. `.blog-video-mount` is the poster
 	   placeholder shown until blog/[slug] hydrates a delightstack Video into it. */
 	.post-content :global(figure.blog-video) {
-		margin: var(--space-10) auto;
+		margin: var(--space-8) auto;
 		display: block;
 	}
 
@@ -647,7 +647,7 @@
 
 	.post-content :global(figure.blog-video figcaption),
 	.post-content :global(figure.blog-audio figcaption) {
-		margin-top: var(--space-3);
+		margin-top: var(--space-2);
 		font-size: 0.9375rem;
 		line-height: 1.4;
 		color: var(--color-text-muted);
@@ -657,9 +657,9 @@
 	/* ── BlogAudio (native <audio>) ─────────────────────────────────────── */
 	.post-content :global(figure.blog-audio) {
 		max-width: var(--measure);
-		margin: var(--space-10) auto;
-		padding: var(--space-4);
-		background: var(--color-bg-secondary);
+		margin: var(--space-8) auto;
+		padding: var(--space-3);
+		background: var(--color-bg-muted);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
 	}
@@ -669,7 +669,7 @@
 		font-weight: 600;
 		font-size: 0.9375rem;
 		margin-bottom: var(--space-2);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 	}
 
 	.post-content :global(figure.blog-audio audio) {

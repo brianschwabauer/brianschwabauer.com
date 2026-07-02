@@ -67,28 +67,28 @@
 
 <style>
 	.footer {
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 		border-top: 1px solid var(--color-border);
-		padding: var(--space-16) 0 var(--space-8);
-		margin-top: var(--space-24);
+		padding: var(--space-9) 0 var(--space-7);
+		margin-top: var(--space-10);
 	}
 
 	.footer-inner {
-		max-width: var(--container-xl);
+		max-width: var(--breakpoint-xl);
 		margin: 0 auto;
-		padding: 0 var(--space-4);
+		padding: 0 var(--space-3);
 	}
 
 	@media (min-width: 768px) {
 		.footer-inner {
-			padding: 0 var(--space-8);
+			padding: 0 var(--space-7);
 		}
 	}
 
 	.footer-content {
 		display: grid;
-		gap: var(--space-8);
-		margin-bottom: var(--space-12);
+		gap: var(--space-7);
+		margin-bottom: var(--space-8);
 	}
 
 	@media (min-width: 768px) {
@@ -112,7 +112,7 @@
 	}
 
 	.footer-tagline {
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		margin-top: var(--space-2);
 		margin-bottom: 0;
 	}
@@ -124,18 +124,18 @@
 	}
 
 	.footer-nav a {
-		color: var(--color-text-secondary);
-		transition: color var(--transition-fast);
+		color: var(--color-text-muted);
+		transition: color var(--duration-fast);
 	}
 
 	.footer-nav a:hover {
 		transition-duration: 0s;
-		color: var(--color-accent);
+		color: var(--color-action);
 	}
 
 	.footer-social {
 		display: flex;
-		gap: var(--space-4);
+		gap: var(--space-3);
 	}
 
 	.social-link {
@@ -146,17 +146,17 @@
 		height: 40px;
 		background: var(--color-surface);
 		border-radius: var(--radius-full);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		transition:
-			color var(--transition-fast),
-			background-color var(--transition-fast),
-			transform var(--transition-fast);
+			color var(--duration-fast),
+			background-color var(--duration-fast),
+			transform var(--duration-fast);
 	}
 
 	.social-link:hover {
 		transition-duration: 0s;
-		color: var(--color-accent);
-		background: var(--color-accent-light);
+		color: var(--color-action);
+		background: var(--color-action-bg);
 		transform: translateY(-2px);
 	}
 
@@ -166,7 +166,7 @@
 	}
 
 	.footer-bottom {
-		padding-top: var(--space-8);
+		padding-top: var(--space-7);
 		border-top: 1px solid var(--color-border);
 		text-align: center;
 	}

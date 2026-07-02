@@ -73,22 +73,22 @@
 
 <style>
 	.description {
-		color: var(--color-text-secondary);
-		margin-bottom: var(--space-6);
+		color: var(--color-text-muted);
+		margin-bottom: var(--space-5);
 	}
 
 	.error {
-		padding: var(--space-3) var(--space-4);
+		padding: var(--space-2) var(--space-3);
 		background: rgba(239, 68, 68, 0.1);
 		border: 1px solid var(--color-error);
 		border-radius: var(--radius-md);
 		color: var(--color-error);
-		margin-bottom: var(--space-4);
+		margin-bottom: var(--space-3);
 		font-size: var(--text-sm);
 	}
 
 	.field {
-		margin-bottom: var(--space-6);
+		margin-bottom: var(--space-5);
 	}
 
 	.field label {
@@ -106,7 +106,7 @@
 
 	.actions {
 		display: flex;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		justify-content: flex-end;
 	}
 </style>

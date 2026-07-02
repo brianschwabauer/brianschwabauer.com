@@ -30,22 +30,22 @@
 		justify-content: center;
 		min-height: 60vh;
 		text-align: center;
-		padding: var(--space-8);
+		padding: var(--space-7);
 	}
 
 	.auth-required h1 {
-		margin-bottom: var(--space-4);
+		margin-bottom: var(--space-3);
 	}
 
 	.auth-required p {
-		color: var(--color-text-secondary);
-		margin-bottom: var(--space-8);
+		color: var(--color-text-muted);
+		margin-bottom: var(--space-7);
 	}
 
 	.admin-main {
 		max-width: var(--prose-wide);
 		margin: 0 auto;
-		padding: var(--space-8) var(--space-6);
+		padding: var(--space-7) var(--space-5);
 	}
 
 	.admin-main.full-bleed {

@@ -356,18 +356,18 @@
 		align-items: center;
 		gap: var(--space-2);
 		max-width: var(--measure);
-		margin: 0 auto var(--space-8);
+		margin: 0 auto var(--space-7);
 	}
 
 	.pill {
 		display: inline-flex;
 		align-items: center;
 		gap: var(--space-2);
-		padding: var(--space-1) var(--space-3);
-		background: var(--color-bg-secondary);
+		padding: var(--space-1) var(--space-2);
+		background: var(--color-bg-muted);
 		border: 1px solid transparent;
 		border-radius: var(--radius-full);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		font-size: var(--text-sm);
 		font-weight: 500;
 		cursor: pointer;
@@ -389,11 +389,11 @@
 
 	.status-pill.published {
 		background: rgba(0, 180, 160, 0.12);
-		color: var(--color-accent);
+		color: var(--color-action);
 	}
 
 	.status-pill.published svg {
-		color: var(--color-accent);
+		color: var(--color-action);
 	}
 
 	.date-pill {
@@ -491,7 +491,7 @@
 		display: block;
 		width: 100%;
 		text-align: left;
-		padding: var(--space-2) var(--space-3);
+		padding: var(--space-2) var(--space-2);
 		border: none;
 		background: transparent;
 		color: var(--color-text);
@@ -503,7 +503,7 @@
 	.suggestion:hover,
 	.suggestion.active {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
-		color: var(--color-accent);
+		background: var(--color-bg-muted);
+		color: var(--color-action);
 	}
 </style>

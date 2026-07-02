@@ -388,8 +388,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--space-3);
-		margin-bottom: var(--space-6);
+		gap: var(--space-2);
+		margin-bottom: var(--space-5);
 	}
 
 	.brand {
@@ -397,7 +397,7 @@
 		align-items: center;
 		text-decoration: none;
 		border-radius: var(--radius-sm);
-		transition: opacity var(--transition-fast);
+		transition: opacity var(--duration-fast);
 	}
 
 	.brand:hover {
@@ -424,9 +424,9 @@
 	.controls {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		align-items: end;
-		margin-bottom: var(--space-6);
+		margin-bottom: var(--space-5);
 	}
 
 	/* Search grows; the three filters share the rest of the row and only wrap
@@ -442,8 +442,8 @@
 	}
 
 	.action-error {
-		padding: var(--space-3) var(--space-4);
-		margin-bottom: var(--space-4);
+		padding: var(--space-2) var(--space-3);
+		margin-bottom: var(--space-3);
 		background: rgba(220, 60, 60, 0.08);
 		border: 1px solid rgba(220, 60, 60, 0.35);
 		color: #d33;
@@ -465,15 +465,15 @@
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
 		transition:
-			border-color var(--transition-fast),
-			background-color var(--transition-fast),
-			opacity var(--transition-fast);
+			border-color var(--duration-fast),
+			background-color var(--duration-fast),
+			opacity var(--duration-fast);
 	}
 
 	.post-item:hover {
 		transition-duration: 0s;
-		border-color: var(--color-accent);
-		background: var(--color-bg-secondary);
+		border-color: var(--color-action);
+		background: var(--color-bg-muted);
 	}
 
 	.post-item.pinned {
@@ -490,8 +490,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--space-3);
-		padding: var(--space-4) var(--space-2) var(--space-4) var(--space-5);
+		gap: var(--space-2);
+		padding: var(--space-3) var(--space-2) var(--space-3) var(--space-4);
 		text-decoration: none;
 		color: inherit;
 		min-width: 0;
@@ -516,7 +516,7 @@
 		justify-content: center;
 		width: 1.25rem;
 		height: 1.25rem;
-		color: var(--color-accent);
+		color: var(--color-action);
 	}
 
 	.pin-badge svg {
@@ -527,7 +527,7 @@
 	.post-meta {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		font-size: var(--text-sm);
 		flex-wrap: wrap;
 	}
@@ -535,7 +535,7 @@
 	.post-status {
 		padding: var(--space-1) var(--space-2);
 		border-radius: var(--radius-sm);
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 		color: var(--color-text-muted);
 		font-weight: 500;
 		text-transform: capitalize;
@@ -543,7 +543,7 @@
 
 	.post-status.published {
 		background: rgba(0, 180, 160, 0.1);
-		color: var(--color-accent);
+		color: var(--color-action);
 	}
 
 	.post-status.archived {
@@ -564,8 +564,8 @@
 	.post-tag {
 		padding: 2px var(--space-2);
 		border-radius: var(--radius-full);
-		background: var(--color-bg-secondary);
-		color: var(--color-text-secondary);
+		background: var(--color-bg-muted);
+		color: var(--color-text-muted);
 		font-size: 0.7rem;
 	}
 
@@ -577,7 +577,7 @@
 	.post-actions {
 		display: flex;
 		align-items: center;
-		padding-right: var(--space-3);
+		padding-right: var(--space-2);
 	}
 
 	.more-icon {
@@ -597,7 +597,7 @@
 		align-items: center;
 		gap: var(--space-2);
 		width: 100%;
-		padding: var(--space-2) var(--space-3);
+		padding: var(--space-2) var(--space-2);
 		background: transparent;
 		border: 0;
 		border-radius: var(--radius-sm);
@@ -606,13 +606,13 @@
 		text-align: left;
 		cursor: pointer;
 		transition:
-			background-color var(--transition-fast),
-			color var(--transition-fast);
+			background-color var(--duration-fast),
+			color var(--duration-fast);
 	}
 
 	.menu-item:hover {
 		transition-duration: 0s;
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 	}
 
 	.menu-item.danger {
@@ -636,14 +636,14 @@
 
 	.empty-state {
 		text-align: center;
-		padding: var(--space-16);
+		padding: var(--space-9);
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
 	}
 
 	.empty-state p {
-		color: var(--color-text-secondary);
-		margin-bottom: var(--space-6);
+		color: var(--color-text-muted);
+		margin-bottom: var(--space-5);
 	}
 </style>

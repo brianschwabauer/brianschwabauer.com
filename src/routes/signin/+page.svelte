@@ -54,13 +54,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: var(--space-8);
+		padding: var(--space-7);
 	}
 
 	.signin-card {
 		width: 100%;
 		max-width: 400px;
-		padding: var(--space-8);
+		padding: var(--space-7);
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
@@ -73,30 +73,30 @@
 	}
 
 	.description {
-		color: var(--color-text-secondary);
-		margin-bottom: var(--space-8);
+		color: var(--color-text-muted);
+		margin-bottom: var(--space-7);
 	}
 
 	.providers {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-3);
-		margin-bottom: var(--space-8);
+		gap: var(--space-2);
+		margin-bottom: var(--space-7);
 	}
 
 	.provider-btn {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		width: 100%;
-		padding: var(--space-3) var(--space-4);
+		padding: var(--space-2) var(--space-3);
 		border-radius: var(--radius-md);
 		font-weight: 500;
 		font-size: var(--text-base);
 		transition:
-			background-color var(--transition-fast),
-			transform var(--transition-fast);
+			background-color var(--duration-fast),
+			transform var(--duration-fast);
 	}
 
 	.provider-btn:active {

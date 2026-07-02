@@ -86,14 +86,14 @@
 		border-radius: var(--radius-lg);
 		overflow: hidden;
 		transition:
-			border-color var(--transition-fast),
-			transform var(--transition-fast),
-			box-shadow var(--transition-fast);
+			border-color var(--duration-fast),
+			transform var(--duration-fast),
+			box-shadow var(--duration-fast);
 	}
 
 	.featured-card:hover {
 		transition-duration: 0s;
-		border-color: var(--color-accent);
+		border-color: var(--color-action);
 		transform: translateY(-4px);
 		box-shadow: var(--shadow-lg);
 	}
@@ -131,13 +131,13 @@
 	.featured-body {
 		display: flex;
 		flex-direction: column;
-		padding: var(--space-8);
+		padding: var(--space-7);
 		flex: 1;
 	}
 
 	@media (min-width: 768px) {
 		.featured-body {
-			padding: var(--space-10);
+			padding: var(--space-8);
 		}
 	}
 
@@ -145,8 +145,8 @@
 		display: flex;
 		align-items: center;
 		flex-wrap: wrap;
-		gap: var(--space-3);
-		margin-bottom: var(--space-4);
+		gap: var(--space-2);
+		margin-bottom: var(--space-3);
 		font-size: var(--text-sm);
 	}
 
@@ -157,7 +157,7 @@
 		padding: var(--space-1) var(--space-2);
 		border-radius: var(--radius-sm);
 		background: rgba(0, 180, 160, 0.12);
-		color: var(--color-accent);
+		color: var(--color-action);
 		font-weight: 600;
 		font-size: var(--text-xs);
 		letter-spacing: 0.04em;
@@ -177,7 +177,7 @@
 		font-size: var(--text-2xl);
 		font-weight: 700;
 		line-height: var(--leading-tight);
-		margin-bottom: var(--space-4);
+		margin-bottom: var(--space-3);
 		color: var(--color-text);
 	}
 
@@ -195,9 +195,9 @@
 
 	.featured-excerpt {
 		font-size: var(--text-lg);
-		color: var(--color-text-secondary);
+		color: var(--color-text-muted);
 		line-height: var(--leading-relaxed);
-		margin-bottom: var(--space-5);
+		margin-bottom: var(--space-4);
 		flex: 1;
 	}
 
@@ -205,13 +205,13 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-2);
-		margin-bottom: var(--space-5);
+		margin-bottom: var(--space-4);
 	}
 
 	.tag {
 		font-size: var(--text-xs);
 		padding: var(--space-1) var(--space-2);
-		background: var(--color-bg-secondary);
+		background: var(--color-bg-muted);
 		border-radius: var(--radius-sm);
 		color: var(--color-text-muted);
 	}
@@ -222,14 +222,14 @@
 		gap: var(--space-2);
 		font-size: var(--text-base);
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-action);
 		margin-top: auto;
 	}
 
 	.read-more svg {
 		width: 18px;
 		height: 18px;
-		transition: transform var(--transition-fast);
+		transition: transform var(--duration-fast);
 	}
 
 	.featured-card:hover .read-more svg {
