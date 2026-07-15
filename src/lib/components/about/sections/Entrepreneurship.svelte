@@ -240,8 +240,13 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
+				<div class="gal-eyebrow">FROM THE TOWER SHOOT · {towerImages.length} PHOTOS</div>
 				<div class="gallery-contained">
-					<LightboxGallery key="entrepreneurship-tower" items={towerImages} display="masonry" size="2" />
+					<LightboxGallery
+						key="entrepreneurship-tower"
+						items={towerImages}
+						display="masonry"
+						size="1" />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={150}>
@@ -305,7 +310,11 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<LightboxGallery key="entrepreneurship-engagement" items={engagementImages} display="masonry-row" size="2" />
+				<LightboxGallery
+					key="entrepreneurship-engagement"
+					items={engagementImages}
+					display="masonry-row"
+					size="2" />
 			</Reveal>
 			<Reveal variant="up" delay={150}>
 				<ArchiveFrame
@@ -363,7 +372,11 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<LightboxGallery key="entrepreneurship-markable" items={markableImages} display="masonry-row" size="2" />
+				<LightboxGallery
+					key="entrepreneurship-markable"
+					items={markableImages}
+					display="masonry-row"
+					size="2" />
 			</Reveal>
 		</div>
 
@@ -419,6 +432,14 @@
 
 	.lockup {
 		margin-bottom: 4rem;
+	}
+	.gal-eyebrow {
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.32em;
+		text-transform: uppercase;
+		color: #00d6ff;
+		margin-bottom: 0.75rem;
 	}
 	.eyebrow {
 		font-family: var(--font-mono);

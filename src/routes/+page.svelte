@@ -73,11 +73,17 @@
 	<Festivals {signedIn} />
 	<College />
 	<Spunksters />
-	<EmptyYearMark year="2014" color="#ffd934" />
+	<EmptyYearMark
+		year="2014"
+		color="#ffd934"
+		note="No releases this year — just film sets, coursework, and a growing pile of notes, all quietly pointed at one thing: the senior thesis." />
 	<WhatMakesUsHuman />
 	<Freelancer />
 	<Entrepreneurship />
-	<EmptyYearMark year="2018" color="#00d6ff" />
+	<EmptyYearMark
+		year="2018"
+		color="#00d6ff"
+		note="Heads-down year: client work paying the bills while the idea that became Show&Tour kept getting sketched and re-sketched." />
 	<ShowAndTour />
 	<YearCycler
 		years={[2020, 2021, 2022, 2023, 2024, 2025]}

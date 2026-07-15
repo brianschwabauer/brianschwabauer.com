@@ -282,7 +282,7 @@
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="gallery-bleed">
-					<LightboxGallery key="show-and-tour-dashboards" items={dashboardMockupsImages} display="masonry" size="2" />
+					<LightboxGallery key="show-and-tour-dashboards" items={dashboardMockupsImages} display="masonry" size="1" />
 				</div>
 			</Reveal>
 		</div>

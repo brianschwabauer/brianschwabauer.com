@@ -4,6 +4,7 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import GradientCollapse from '../primitives/GradientCollapse.svelte';
+	import { Comparison } from '@delightstack/components/display';
 	import PinScrub from '../primitives/PinScrub.svelte';
 	import ScrubVideo from '../primitives/ScrubVideo.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
@@ -436,16 +437,18 @@
 
 			<Reveal variant="up" delay={100}>
 				<div class="iprez-row">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez-brian_as_new_anchor_in_front_of_green_screen_behind_the_scenes.avif"
-						alt="Brian on greenscreen"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(6, e.currentTarget)} />
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez-kevin_as_weather_man_on_green_screen_raw_shot.avif"
-						alt="Kevin on greenscreen"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(7, e.currentTarget)} />
+					<!-- Drag between the raw greenscreen shot and the finished
+					     virtual-studio composite. -->
+					<div class="iprez-compare">
+						<Comparison
+							before="https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez-brian_as_new_anchor_in_front_of_green_screen_behind_the_scenes.avif"
+							after="https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez/poster.jpg"
+							before_alt="Brian on greenscreen, raw shot"
+							after_alt="The finished 3D virtual newsroom composite"
+							label_before="GREENSCREEN"
+							label_after="ON AIR"
+							snaps={[50]} />
+					</div>
 					<LazyMedia
 						src="https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez-film_snapshot_of_kevin_as_news_anchor.avif"
 						alt="Kevin in the final cut"
@@ -706,9 +709,19 @@
 		gap: 0.75rem;
 		margin-top: 2rem;
 	}
+	/* The raw-vs-composite wipe earns the extra width. */
+	.iprez-compare {
+		grid-column: span 2;
+	}
+	.iprez-row :global(.comparison img) {
+		height: 100%;
+	}
 	@media (max-width: 768px) {
 		.iprez-row {
 			grid-template-columns: 1fr;
+		}
+		.iprez-compare {
+			grid-column: auto;
 		}
 	}
 
@@ -745,5 +758,20 @@
 	}
 	.extra-video summary::-webkit-details-marker {
 		display: none;
+	}
+	.extra-video summary {
+		transition: background 200ms ease;
+	}
+	.extra-video summary:hover {
+		transition-duration: 0s;
+		background: rgba(108, 99, 255, 0.12);
+	}
+	.extra-video summary::after {
+		content: '▾';
+		display: inline-block;
+		transition: transform 250ms ease;
+	}
+	.extra-video[open] summary::after {
+		transform: rotate(180deg);
 	}
 </style>

@@ -3,6 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
+	import SnapStrip from '../primitives/SnapStrip.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -135,6 +136,7 @@
 		},
 	];
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
+	let btsGallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
 <SectionShell id="spunksters" year="2013" label="The Spunksters" theme="spunksters">
@@ -226,12 +228,18 @@
 
 		<Reveal variant="up">
 			<div class="bts">
-				<div class="bts-eyebrow bleed-head">BEHIND THE SCENES</div>
-				<div class="gallery-bleed">
-					<LightboxGallery key="spunksters-photos" items={spunkstersImages} display="masonry" size="2" />
+				<div class="bts-eyebrow bleed-head">
+					BEHIND THE SCENES · {spunkstersImages.length} PHOTOS
 				</div>
+				<SnapStrip
+					items={spunkstersImages}
+					onitemclick={({ index, element }) => btsGallery?.open(index, element)} />
 			</div>
 		</Reveal>
+		<LightboxGallery
+			bind:this={btsGallery}
+			key="spunksters-photos"
+			items={spunkstersImages} />
 
 		<div class="bubbly-bros">
 			<Reveal variant="left">
@@ -313,7 +321,11 @@
 		</Reveal>
 	</div>
 
-	<LightboxGallery bind:this={gallery} key="spunksters" items={sectionExtras} autoplay_video />
+	<LightboxGallery
+		bind:this={gallery}
+		key="spunksters"
+		items={sectionExtras}
+		autoplay_video />
 </SectionShell>
 
 <style>

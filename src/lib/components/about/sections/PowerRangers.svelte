@@ -362,7 +362,7 @@
 				<div class="bts-strip">
 					<div class="bts-eyebrow bleed-head">FROM THE FILM</div>
 					<div class="gallery-bleed">
-						<LightboxGallery key="power-rangers-pr2-stills" items={pr2StillImages} display="masonry" size="2" />
+						<LightboxGallery key="power-rangers-pr2-stills" items={pr2StillImages} display="masonry" size="1" />
 					</div>
 				</div>
 			</Reveal>

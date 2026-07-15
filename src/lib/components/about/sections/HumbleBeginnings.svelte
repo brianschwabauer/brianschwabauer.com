@@ -3,6 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
+	import ViewfinderFrame from '../primitives/ViewfinderFrame.svelte';
 	import GradientCollapse from '../primitives/GradientCollapse.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
@@ -265,18 +266,22 @@
 			</Reveal>
 			<div class="fight-pair">
 				<Reveal variant="left" delay={100}>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo.avif"
-						alt="Brian and Kevin fight in slow motion"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(1, e.currentTarget)} />
+					<ViewfinderFrame timecode="00:04:12:08">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo.avif"
+							alt="Brian and Kevin fight in slow motion"
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(1, e.currentTarget)} />
+					</ViewfinderFrame>
 				</Reveal>
 				<Reveal variant="right" delay={200}>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo_2.avif"
-						alt="Round two, still in slowmo"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(2, e.currentTarget)} />
+					<ViewfinderFrame timecode="00:07:33:19">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo_2.avif"
+							alt="Round two, still in slowmo"
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(2, e.currentTarget)} />
+					</ViewfinderFrame>
 				</Reveal>
 			</div>
 		</div>

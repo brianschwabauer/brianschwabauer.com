@@ -643,6 +643,15 @@ select:focus {
 	container-type: inline-size;
 }
 
+/* Touch devices have no hover — the delightstack gallery's hover-only thumb
+   captions would be unreachable, so keep them visible there. */
+@media (hover: none) {
+	.gallery .gallery-item .name.hover-only {
+		transform: translate3d(0, 0, 0);
+		backdrop-filter: blur(5px);
+	}
+}
+
 /* Masonry gallery that should stay at its parent's width (e.g. nested inside a
    bordered card or narrow column) rather than bleeding to the viewport. Still
    establishes the @container context the masonry layout needs. */

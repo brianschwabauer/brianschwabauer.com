@@ -312,7 +312,7 @@
 						key="what-makes-us-human-film"
 						items={filmImages}
 						display="masonry"
-						size="2" />
+						size="1" />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
