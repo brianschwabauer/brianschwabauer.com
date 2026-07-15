@@ -56,6 +56,12 @@
 			width: 480,
 			height: 204,
 		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-logo_animation.avif',
+			width: 480,
+			height: 204,
+		},
 	];
 
 	const conceptImages: GalleryItem[] = [
@@ -198,6 +204,156 @@
 			width: 2048,
 			height: 1367,
 		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-063.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-089.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-093.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-105.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-112.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-114.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-140.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-193.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-196.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-212.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-233.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-251.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-254.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-255.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-270.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-284.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-297.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-323.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-324.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-334.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-344.avif',
+			width: 2048,
+			height: 1367,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-07-22_what_makes_us_human-behind_the_scenes_set_photo_stillframe_02.jpg',
+			width: 960,
+			height: 540,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-07-22_what_makes_us_human-behind_the_scenes_set_photo_stillframe_03.jpg',
+			width: 960,
+			height: 540,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-07-22_what_makes_us_human-behind_the_scenes_set_photo_stillframe_04.jpg',
+			width: 960,
+			height: 540,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-behind_the_scenes_set_photo_stillframe-164.jpg',
+			width: 640,
+			height: 640,
+		},
 	];
 
 	const premiereImages: GalleryItem[] = [
@@ -224,6 +380,51 @@
 			src: 'https://cdn.brianschwabauer.com/media/2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-what_makes_us_human_crew_group_photo.avif',
 			width: 2048,
 			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-brian_schwabauer_3.jpg',
+			width: 2048,
+			height: 1365,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-brian_schwabauer_1.jpg',
+			width: 240,
+			height: 320,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-brian_schwabauer_2.jpg',
+			width: 240,
+			height: 320,
+		},
+	];
+
+	const posterImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-film_poster-minimalistic.jpg',
+			width: 648,
+			height: 960,
+			caption: 'The minimalist cut',
+			alt: 'What Makes Us Human — minimalist poster',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-film_poster-villian.avif',
+			width: 1167,
+			height: 1803,
+			caption: 'The villain one-sheet',
+			alt: 'What Makes Us Human — villain poster',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-film_poster-villain_in_times_magazine.avif',
+			width: 1365,
+			height: 2048,
+			caption: 'In-world prop — the villain on a Times cover',
+			alt: 'What Makes Us Human — villain on a mocked-up Times magazine cover',
 		},
 	];
 
@@ -344,6 +545,22 @@
 			</Reveal>
 		</div>
 
+		<div class="poster-grid">
+			<Reveal variant="up">
+				<div class="eyebrow">THE POSTER SERIES</div>
+				<p class="poster-note">
+					Part of treating it like a real release: a set of one-sheets — including an
+					in-world <em>Times</em>
+					cover we mocked up as a prop for the film itself.
+				</p>
+				<LightboxGallery
+					key="what-makes-us-human-posters"
+					items={posterImages}
+					display="masonry-row"
+					size="2" />
+			</Reveal>
+		</div>
+
 		<div class="prod-stats">
 			<Reveal>
 				<div class="stat">
@@ -379,7 +596,7 @@
 			<Reveal variant="up" delay={120}>
 				<GradientCollapse
 					class="gallery-bleed"
-					label="Show all 16 production stills"
+					label="Show all 41 production stills"
 					collapsedHeight="30rem">
 					<LightboxGallery
 						key="what-makes-us-human-bts"
@@ -562,9 +779,20 @@
 
 	.film-grid,
 	.concept-grid,
+	.poster-grid,
 	.bts-block,
 	.premiere-block {
 		margin: 4rem 0;
+	}
+	.poster-note {
+		max-width: 46rem;
+		line-height: 1.6;
+		opacity: 0.82;
+		margin: 0 0 1.5rem;
+	}
+	.poster-note em {
+		font-style: italic;
+		color: #00f2c3;
 	}
 
 	.prod-stats > :global(.reveal) {

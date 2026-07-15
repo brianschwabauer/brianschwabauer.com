@@ -118,6 +118,16 @@
 			alt: 'The actual business card',
 		},
 		...reel,
+		{
+			type: 'video' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2015-06-27_jordan_and_brian_wedding-highlight_video/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2015-06-27_jordan_and_brian_wedding-highlight_video/poster.jpg',
+			width: 1920,
+			height: 818,
+			caption: 'Jordan & Brian (2015) — our wedding highlight film',
+			alt: 'Jordan & Brian (2015) — wedding highlight film',
+		},
 	];
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
@@ -255,8 +265,23 @@
 		<div class="weddings">
 			<Reveal>
 				<h3 class="sub">Wedding films</h3>
+				<p>
+					Many of them — most for other couples. But the one I'm proudest of is the one I
+					was standing in: Jordan and I got married in June 2015, and I cut our own
+					highlight film.
+				</p>
 			</Reveal>
-			<Reveal variant="up" delay={100}>
+			<Reveal variant="up" delay={80}>
+				<div class="inline-video">
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2015-06-27_jordan_and_brian_wedding-highlight_video/poster.jpg"
+						alt="Jordan & Brian (2015) — our wedding highlight film"
+						ratio="1920 / 818"
+						video
+						onclick={(e) => gallery?.open(11, e.currentTarget)} />
+				</div>
+			</Reveal>
+			<Reveal variant="up" delay={120}>
 				<LightboxGallery
 					key="freelancer-wedding"
 					items={weddingImages}
@@ -402,6 +427,14 @@
 		font-size: clamp(1.5rem, 2.6vw, 2.1rem);
 		font-weight: 800;
 		margin: 0 0 0.6rem;
+	}
+	.weddings p {
+		max-width: 44rem;
+		line-height: 1.6;
+		margin: 0 0 1rem;
+	}
+	.inline-video {
+		margin: 1.5rem 0 0.75rem;
 	}
 
 	.reel-grid {

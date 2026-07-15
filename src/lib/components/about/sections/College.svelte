@@ -272,6 +272,15 @@
 			caption: 'Legacy (2015)',
 			alt: 'Legacy (2015)',
 		},
+		{
+			type: 'video',
+			src: 'https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/master.m3u8',
+			poster: 'https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/poster.jpg',
+			width: 1920,
+			height: 1080,
+			caption: 'Fugue (2014) — 48-hour film',
+			alt: 'Fugue (2014) — 48-hour film',
+		},
 	];
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
@@ -303,7 +312,11 @@
 			<div class="strip">
 				<div class="strip-eyebrow bleed-head">A WHIRLWIND OF CLASS PROJECTS</div>
 				<div class="gallery-bleed">
-					<LightboxGallery key="college-various" items={variousImages} display="masonry" size="1" />
+					<LightboxGallery
+						key="college-various"
+						items={variousImages}
+						display="masonry"
+						size="1" />
 				</div>
 				<div class="strip-note">
 					MED 365 silent film · chase scene · complexity edit · ART 230 stop-motion · ART
@@ -414,7 +427,11 @@
 
 			<Reveal variant="up" delay={100}>
 				<div class="node-bts">
-					<LightboxGallery key="college-node-bts" items={nodeBTSImages} display="masonry-row" size="2" />
+					<LightboxGallery
+						key="college-node-bts"
+						items={nodeBTSImages}
+						display="masonry-row"
+						size="2" />
 				</div>
 			</Reveal>
 
@@ -528,12 +545,37 @@
 			</Reveal>
 		</div>
 
+		<div class="fugue">
+			<Reveal>
+				<h3 class="sub">Fugue — my first 48-hour film (2014)</h3>
+				<p>
+					Before Split Life there was <strong>Fugue</strong>
+					, my first crack at
+					<strong>SATO 48</strong>
+					— the region's 48-hour film race. You're handed a genre, a prop, and a line of dialogue
+					at kickoff, then get 48 sleepless hours to write, shoot, score, and cut a finished
+					short. It's the film that taught me how much you can actually pull off in two days
+					— and set up the swing I took the next year.
+				</p>
+			</Reveal>
+			<Reveal variant="up" delay={100}>
+				<div class="inline-video">
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/poster.jpg"
+						alt="Fugue (2014) — 48-hour film"
+						ratio="16 / 9"
+						video
+						onclick={(e) => gallery?.open(17, e.currentTarget)} />
+				</div>
+			</Reveal>
+		</div>
+
 		<div class="split-life">
 			<Reveal>
 				<h3 class="sub">Split Life — a 48-hour film, in stereo (2015)</h3>
 				<p>
-					48-hour film festival. I wanted to do something nobody had done before. So I
-					made a film with
+					The next year, back at SATO 48, I wanted to do something nobody had done before.
+					So I made a film with
 					<strong>
 						two oner-shot perspectives, shown side-by-side at the same time, in real time
 					</strong>
@@ -673,7 +715,11 @@
 				<div class="oneup-bts">
 					<div class="bts-eyebrow bleed-head">ONE UP — BTS</div>
 					<div class="gallery-bleed">
-						<LightboxGallery key="college-oneup-bts" items={oneUpBTSImages} display="masonry" size="1" />
+						<LightboxGallery
+							key="college-oneup-bts"
+							items={oneUpBTSImages}
+							display="masonry"
+							size="1" />
 					</div>
 				</div>
 			</Reveal>
@@ -698,7 +744,11 @@
 		</div>
 	</div>
 
-	<LightboxGallery bind:this={gallery} key="college" items={sectionExtras} autoplay_video />
+	<LightboxGallery
+		bind:this={gallery}
+		key="college"
+		items={sectionExtras}
+		autoplay_video />
 </SectionShell>
 
 <style>
@@ -766,6 +816,7 @@
 	.node-block,
 	.pickvid,
 	.bear-bus,
+	.fugue,
 	.split-life,
 	.more-projects,
 	.bassless {
