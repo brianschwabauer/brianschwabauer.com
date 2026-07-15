@@ -107,7 +107,7 @@
 	];
 
 	// Standalone clickable LazyMedias in document order:
-	// 0: business card image, 1..N: reel cards
+	// 0: business card, 1..10: reel cards, 11: wedding film, 12: 2015 demo reel
 	const sectionExtras: GalleryItem[] = [
 		{
 			type: 'image' as const,
@@ -127,6 +127,16 @@
 			height: 818,
 			caption: 'Jordan & Brian (2015) — our wedding highlight film',
 			alt: 'Jordan & Brian (2015) — wedding highlight film',
+		},
+		{
+			type: 'video' as const,
+			src: 'https://cdn.brianschwabauer.com/media/2015-08-24_brian_demo_reel_2015/master.m3u8',
+			poster:
+				'https://cdn.brianschwabauer.com/media/2015-08-24_brian_demo_reel_2015/poster.jpg',
+			width: 1920,
+			height: 818,
+			caption: 'Brian Schwabauer — 2015 demo reel',
+			alt: 'Brian Schwabauer — 2015 demo reel',
 		},
 	];
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
@@ -182,14 +192,45 @@
 			</Reveal>
 		</div>
 
+		<div class="reel-feature">
+			<Reveal>
+				<div class="reel-eyebrow">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
+						<polygon points="6,4 22,12 6,20" fill="currentColor" />
+					</svg>
+					<span>THE 2015 DEMO REEL · 1:32</span>
+				</div>
+				<h3 class="reel-headline">Ten years of work. Ninety seconds.</h3>
+				<p class="reel-copy">
+					By 2015 I had almost a decade behind me — short films, music videos, motion
+					graphics, VFX, wedding films, brand work. This is the reel I cut from all of it.
+					It's still the fastest way to see what these years actually looked like.
+				</p>
+			</Reveal>
+			<Reveal variant="up" delay={120}>
+				<div class="reel-stage">
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2015-08-24_brian_demo_reel_2015/poster.jpg"
+						alt="Brian Schwabauer — 2015 demo reel"
+						ratio="1920 / 818"
+						rounded={false}
+						video
+						onclick={(e) => gallery?.open(12, e.currentTarget)} />
+				</div>
+			</Reveal>
+		</div>
+
 		<div class="reel-block">
 			<Reveal>
-				<h3 class="sub">A slice of the portfolio</h3>
-				<p>Brand work, motion graphics, logo animations, promos. A taste:</p>
+				<h3 class="sub">The pieces behind it</h3>
+				<p>
+					The individual work the reel was cut from — brand, motion graphics, logo
+					animations, promos:
+				</p>
 			</Reveal>
 
 			<Reveal variant="up" delay={100}>
-				<GradientCollapse label="Show the full reel" collapsedHeight="24rem">
+				<GradientCollapse label="Show the full portfolio" collapsedHeight="24rem">
 					<div class="reel-grid">
 						{#each reel as item, i}
 							<figure class="reel-card" style:--i={i}>
@@ -317,7 +358,11 @@
 		</div>
 	</div>
 
-	<LightboxGallery bind:this={gallery} key="freelancer" items={sectionExtras} />
+	<LightboxGallery
+		bind:this={gallery}
+		key="freelancer"
+		items={sectionExtras}
+		autoplay_video />
 </SectionShell>
 
 <style>
@@ -417,11 +462,15 @@
 		color: rgba(250, 242, 226, 0.7);
 	}
 
+	.reel-feature,
 	.reel-block,
 	.portfolio-list,
 	.weddings,
 	.archives {
 		margin: 4rem 0;
+	}
+	.reel-feature {
+		margin: 4.5rem 0;
 	}
 	.sub {
 		font-size: clamp(1.5rem, 2.6vw, 2.1rem);
@@ -435,6 +484,44 @@
 	}
 	.inline-video {
 		margin: 1.5rem 0 0.75rem;
+	}
+
+	.reel-eyebrow {
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+		font-family: var(--font-mono);
+		font-size: 0.78rem;
+		letter-spacing: 0.28em;
+		color: #ffb84d;
+		margin-bottom: 0.85rem;
+	}
+	.reel-eyebrow svg {
+		width: 14px;
+		height: 14px;
+	}
+	.reel-headline {
+		font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+		font-weight: 900;
+		line-height: 1.05;
+		letter-spacing: -0.02em;
+		margin: 0 0 0.7rem;
+	}
+	.reel-copy {
+		max-width: 46rem;
+		line-height: 1.6;
+		margin: 0;
+		color: rgba(250, 242, 226, 0.85);
+	}
+	.reel-stage {
+		position: relative;
+		margin-top: 1.75rem;
+		border-radius: 14px;
+		overflow: hidden;
+		border: 1px solid rgba(255, 184, 77, 0.3);
+		box-shadow:
+			0 40px 90px rgba(0, 0, 0, 0.55),
+			0 6px 24px rgba(255, 184, 77, 0.14);
 	}
 
 	.reel-grid {
