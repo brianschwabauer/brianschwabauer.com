@@ -81,7 +81,7 @@
 				'Our first film with a real script. Greenscreen, a soundtrack, multiple takes.',
 		},
 		{
-			slug: '2008-02-29_02.29.08',
+			slug: '2008-02-25_02.29.08',
 			title: '02.29.08',
 			date: '2008-02-29',
 			private: true,
