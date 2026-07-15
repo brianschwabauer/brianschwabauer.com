@@ -118,18 +118,6 @@
 		pointer-events: auto;
 		font-family: var(--font-mono);
 	}
-	/* Subtle scrim so the labels stay legible when full-bleed galleries scroll
-	   underneath — invisible against the dark page, earns its keep over images. */
-	.year-scrubber::before {
-		content: '';
-		position: absolute;
-		inset: -0.6rem -0.6rem -0.6rem -1rem;
-		background: rgba(6, 6, 10, 0.42);
-		backdrop-filter: blur(10px);
-		-webkit-backdrop-filter: blur(10px);
-		border-radius: 14px;
-		z-index: -1;
-	}
 	.rail {
 		position: absolute;
 		right: 11px;
@@ -173,6 +161,13 @@
 		color: rgba(255, 255, 255, 0.55);
 		font-size: 0.7rem;
 		letter-spacing: 0.05em;
+		/* Text shadow instead of a backdrop panel: enough separation when
+		   full-bleed images pass underneath, without a distracting box. The
+		   scrubber is a bonus affordance — it's OK if it isn't always perfectly
+		   legible over busy imagery. */
+		text-shadow:
+			0 1px 3px rgba(0, 0, 0, 0.9),
+			0 0 12px rgba(0, 0, 0, 0.7);
 		transition: color 200ms ease;
 	}
 	button:hover {
@@ -204,11 +199,14 @@
 	}
 	.dot {
 		display: block;
+		position: relative;
 		width: 8px;
 		height: 8px;
 		border-radius: 50%;
 		background: rgba(255, 255, 255, 0.25);
-		box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.4);
+		box-shadow:
+			inset 0 0 0 2px rgba(0, 0, 0, 0.4),
+			0 1px 4px rgba(0, 0, 0, 0.8);
 		transition:
 			background 200ms ease,
 			transform 200ms ease;
@@ -216,6 +214,35 @@
 	button.active .dot {
 		background: #00f2c3;
 		transform: scale(1.4);
+	}
+	/* Crossing detent: a small ring bursts out of the dot each time a new
+	   section becomes active while scrolling. */
+	.dot::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: 50%;
+		border: 2px solid #00f2c3;
+		opacity: 0;
+		pointer-events: none;
+	}
+	button.active .dot::after {
+		animation: detent 450ms ease-out;
+	}
+	@keyframes detent {
+		from {
+			opacity: 0.9;
+			transform: scale(1);
+		}
+		to {
+			opacity: 0;
+			transform: scale(2.6);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		button.active .dot::after {
+			animation: none;
+		}
 	}
 	button.active {
 		color: #fff;

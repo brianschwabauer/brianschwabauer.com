@@ -340,8 +340,34 @@
 		<div class="award-banner">
 			<Reveal>
 				<div class="award-num">
+					<svg class="laurel laurel-l" viewBox="0 0 40 100" aria-hidden="true">
+						<path
+							d="M34 6 C18 22 12 42 14 62 C16 78 24 90 36 96"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							stroke-linecap="round" />
+						{#each [12, 26, 40, 54, 68, 82] as y, i (y)}
+							<path
+								d="M {17 - i * 0.6} {y} q -12 -2 -15 -12 q 12 -2 15 12 Z"
+								fill="currentColor" />
+						{/each}
+					</svg>
 					<span class="num-digit">20</span>
 					<span class="num-plus">+</span>
+					<svg class="laurel laurel-r" viewBox="0 0 40 100" aria-hidden="true">
+						<path
+							d="M6 6 C22 22 28 42 26 62 C24 78 16 90 4 96"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							stroke-linecap="round" />
+						{#each [12, 26, 40, 54, 68, 82] as y, i (y)}
+							<path
+								d="M {23 + i * 0.6} {y} q 12 -2 15 -12 q -12 -2 -15 12 Z"
+								fill="currentColor" />
+						{/each}
+					</svg>
 				</div>
 				<div class="award-meta">
 					<div class="award-title">awards won at film festivals in high school</div>
@@ -377,8 +403,15 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
+				<div class="gal-eyebrow bleed-head">
+					YARD SALE · {yardSaleImages.length} STILLS
+				</div>
 				<div class="gallery-bleed">
-					<LightboxGallery key="festivals-yard-sale" items={yardSaleImages} display="masonry" size="2" />
+					<LightboxGallery
+						key="festivals-yard-sale"
+						items={yardSaleImages}
+						display="masonry"
+						size="1" />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={160}>
@@ -528,7 +561,11 @@
 				</Reveal>
 
 				<Reveal variant="up" delay={150}>
-					<LightboxGallery key="festivals-live-broadcast" items={liveBroadcastImages} display="masonry-row" size="2" />
+					<LightboxGallery
+						key="festivals-live-broadcast"
+						items={liveBroadcastImages}
+						display="masonry-row"
+						size="2" />
 				</Reveal>
 
 				<Reveal variant="up" delay={180}>
@@ -562,8 +599,15 @@
 				</Reveal>
 
 				<Reveal variant="up" delay={120}>
+					<div class="gal-eyebrow bleed-head">
+						THE BLOCK PARTY · {blockPartyImages.length} PHOTOS
+					</div>
 					<div class="gallery-bleed">
-						<LightboxGallery key="festivals-block-party" items={blockPartyImages} display="masonry" size="2" />
+						<LightboxGallery
+							key="festivals-block-party"
+							items={blockPartyImages}
+							display="masonry"
+							size="2" />
 					</div>
 				</Reveal>
 
@@ -705,6 +749,18 @@
 	.award-num {
 		display: flex;
 		align-items: baseline;
+	}
+	.laurel {
+		width: clamp(1.6rem, 4vw, 3rem);
+		height: auto;
+		align-self: center;
+		color: rgba(255, 58, 58, 0.75);
+	}
+	.laurel-l {
+		margin-right: 0.35rem;
+	}
+	.laurel-r {
+		margin-left: 0.35rem;
 	}
 	.num-digit {
 		font-size: clamp(4rem, 12vw, 8rem);
@@ -976,6 +1032,30 @@
 	}
 	.extra-video summary::-webkit-details-marker {
 		display: none;
+	}
+	.extra-video summary {
+		transition: background 200ms ease;
+	}
+	.extra-video summary:hover {
+		transition-duration: 0s;
+		background: rgba(255, 184, 77, 0.12);
+	}
+	.extra-video summary::after {
+		content: '▾';
+		display: inline-block;
+		transition: transform 250ms ease;
+	}
+	.extra-video[open] summary::after {
+		transform: rotate(180deg);
+	}
+
+	.gal-eyebrow {
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.32em;
+		text-transform: uppercase;
+		color: #ffb84d;
+		margin-bottom: 0.75rem;
 	}
 
 	.block-party-videos {

@@ -290,6 +290,47 @@
 		};
 	});
 
+	// ---- counter-scroll drift for tenet copy ----------------------------------
+	// Each tenet is a ~90svh scene with its copy flex-centered, which used to
+	// leave the top/bottom halves as bare background while scrolling between
+	// tenets. This action tracks the scene's traverse through the viewport
+	// (same var-write mechanic as the aurora above — never churns Svelte
+	// state) and CSS slides the copy toward whichever half is on screen.
+	function tenetDrift(el: HTMLElement) {
+		if (reducedMotion()) {
+			el.style.setProperty('--tenet-p', '0.5');
+			return;
+		}
+		let raf = 0;
+		let visible = false;
+		const update = () => {
+			raf = 0;
+			const r = el.getBoundingClientRect();
+			const vh = window.innerHeight;
+			const p = Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
+			el.style.setProperty('--tenet-p', p.toFixed(4));
+		};
+		const schedule = () => {
+			if (visible && !raf) raf = requestAnimationFrame(update);
+		};
+		const io = new IntersectionObserver(([entry]) => {
+			visible = entry.isIntersecting;
+			schedule();
+		});
+		io.observe(el);
+		window.addEventListener('scroll', schedule, { passive: true });
+		window.addEventListener('resize', schedule);
+		update();
+		return {
+			destroy() {
+				io.disconnect();
+				window.removeEventListener('scroll', schedule);
+				window.removeEventListener('resize', schedule);
+				if (raf) cancelAnimationFrame(raf);
+			},
+		};
+	}
+
 	// ---- "Do things that don't matter" paper-airplane flock -------------------
 	// Planes wander the full viewport width on gentle S-curves, always
 	// nose-first. They spawn and expire on their own, clicking anywhere in the
@@ -563,67 +604,69 @@
 		</header>
 
 		<ol class="tenets">
-			<li class="tenet t1">
+			<li class="tenet t1" use:tenetDrift>
 				<div class="design-grid" aria-hidden="true"></div>
-				<Reveal variant="up">
-					<div class="numeral" aria-hidden="true">I</div>
-					<div class="fix-stage" bind:this={fixStage}>
-						<div
-							class="fix-target"
-							bind:this={fixTargetEl}
-							class:boxed={boxShown}
-							class:no-transition={fixNoTransition}
-							style:transform={fixTransform}>
-							<h3 class="statement">Details matter.</h3>
-							<div class="select-box" aria-hidden="true">
-								<span class="handle rotate-h"></span>
-								<span class="handle h-tl"></span>
-								<span class="handle h-tc"></span>
-								<span class="handle h-tr"></span>
-								<span class="handle h-ml"></span>
-								<span class="handle h-mr"></span>
-								<span class="handle h-bl"></span>
-								<span class="handle h-bc"></span>
-								<span class="handle h-br"></span>
+				<div class="tenet-drift">
+					<Reveal variant="up">
+						<div class="numeral" aria-hidden="true">I</div>
+						<div class="fix-stage" bind:this={fixStage}>
+							<div
+								class="fix-target"
+								bind:this={fixTargetEl}
+								class:boxed={boxShown}
+								class:no-transition={fixNoTransition}
+								style:transform={fixTransform}>
+								<h3 class="statement">Details matter.</h3>
+								<div class="select-box" aria-hidden="true">
+									<span class="handle rotate-h"></span>
+									<span class="handle h-tl"></span>
+									<span class="handle h-tc"></span>
+									<span class="handle h-tr"></span>
+									<span class="handle h-ml"></span>
+									<span class="handle h-mr"></span>
+									<span class="handle h-bl"></span>
+									<span class="handle h-bc"></span>
+									<span class="handle h-br"></span>
+								</div>
 							</div>
+							{#key ringKey}
+								{#if ringKey > 0}
+									<span
+										class="click-ring"
+										aria-hidden="true"
+										style:--cx={cursorPos.x}
+										style:--cy={cursorPos.y}>
+									</span>
+								{/if}
+							{/key}
+							<svg
+								class="fix-cursor"
+								class:shown={cursorShown}
+								class:clicking={cursorClicking}
+								class:no-glide={!cursorGlide}
+								style:--cx={cursorPos.x}
+								style:--cy={cursorPos.y}
+								viewBox="0 0 24 24"
+								aria-hidden="true">
+								<path
+									d="M5 2 L5 19 L9.5 15.2 L12.4 21.6 L15.2 20.3 L12.3 14 L18 13.6 Z"
+									fill="#fff"
+									stroke="#06060a"
+									stroke-width="1.4"
+									stroke-linejoin="round" />
+							</svg>
 						</div>
-						{#key ringKey}
-							{#if ringKey > 0}
-								<span
-									class="click-ring"
-									aria-hidden="true"
-									style:--cx={cursorPos.x}
-									style:--cy={cursorPos.y}>
-								</span>
-							{/if}
-						{/key}
-						<svg
-							class="fix-cursor"
-							class:shown={cursorShown}
-							class:clicking={cursorClicking}
-							class:no-glide={!cursorGlide}
-							style:--cx={cursorPos.x}
-							style:--cy={cursorPos.y}
-							viewBox="0 0 24 24"
-							aria-hidden="true">
-							<path
-								d="M5 2 L5 19 L9.5 15.2 L12.4 21.6 L15.2 20.3 L12.3 14 L18 13.6 Z"
-								fill="#fff"
-								stroke="#06060a"
-								stroke-width="1.4"
-								stroke-linejoin="round" />
-						</svg>
-					</div>
-					<p class="body">
-						If I want someone to care about what I make, I have to care first — all the
-						way down to the details nobody will ever notice. Everything I do, I do with
-						intention.
-					</p>
-					<p class="fine">You read this tiny line. See? The details get noticed.</p>
-				</Reveal>
+						<p class="body">
+							If I want someone to care about what I make, I have to care first — all the
+							way down to the details nobody will ever notice. Everything I do, I do with
+							intention.
+						</p>
+						<p class="fine">You read this tiny line. See? The details get noticed.</p>
+					</Reveal>
+				</div>
 			</li>
 
-			<li class="tenet t2" bind:this={auroraEl}>
+			<li class="tenet t2" bind:this={auroraEl} use:tenetDrift>
 				<div class="aurora" aria-hidden="true">
 					<div class="stars"></div>
 					<div class="ribbons">
@@ -632,18 +675,20 @@
 						<div class="ribbon r3"></div>
 					</div>
 				</div>
-				<Reveal variant="up">
-					<div class="numeral" aria-hidden="true">II</div>
-					<h3 class="statement"><span class="grad">Make it beautiful.</span></h3>
-					<p class="body">
-						For all of human history we've cared how things look. The paintings and the
-						cathedrals we refuse to let go of are the beautiful ones. Beauty isn't
-						decoration on top of the work — it's part of why the work lasts.
-					</p>
-				</Reveal>
+				<div class="tenet-drift">
+					<Reveal variant="up">
+						<div class="numeral" aria-hidden="true">II</div>
+						<h3 class="statement"><span class="grad">Make it beautiful.</span></h3>
+						<p class="body">
+							For all of human history we've cared how things look. The paintings and the
+							cathedrals we refuse to let go of are the beautiful ones. Beauty isn't
+							decoration on top of the work — it's part of why the work lasts.
+						</p>
+					</Reveal>
+				</div>
 			</li>
 
-			<li class="tenet t3" bind:this={t3El}>
+			<li class="tenet t3" bind:this={t3El} use:tenetDrift>
 				<div class="plane-field" bind:this={planeFieldEl} aria-hidden="true">
 					{#each planes as p (p.id)}
 						<div class="plane" use:planeEl={p.id}>
@@ -658,23 +703,25 @@
 						</div>
 					{/each}
 				</div>
-				<Reveal variant="up">
-					<div class="t3-copy">
-						<div class="numeral" aria-hidden="true">III</div>
-						<h3 class="statement">
-							Do things that <s>don't</s>
-							matter.
-						</h3>
-						<p class="body">
-							The lego stop-motion. The Pacman PowerPoint trick. The treehouse in the
-							backyard. None of it "mattered" — and every bit of it became a tool I used
-							later on something that did. The loop hasn't changed: pick a thing I've
-							never done. Try it. Fail in public. Add it to the toolbag. Use it on the
-							next thing that matters more.
-						</p>
-						<p class="fine">psst — try clicking. it won't accomplish anything.</p>
-					</div>
-				</Reveal>
+				<div class="tenet-drift">
+					<Reveal variant="up">
+						<div class="t3-copy">
+							<div class="numeral" aria-hidden="true">III</div>
+							<h3 class="statement">
+								Do things that <s>don't</s>
+								matter.
+							</h3>
+							<p class="body">
+								The lego stop-motion. The Pacman PowerPoint trick. The treehouse in the
+								backyard. None of it "mattered" — and every bit of it became a tool I used
+								later on something that did. The loop hasn't changed: pick a thing I've
+								never done. Try it. Fail in public. Add it to the toolbag. Use it on the
+								next thing that matters more.
+							</p>
+							<p class="fine">psst — try clicking. it won't accomplish anything.</p>
+						</div>
+					</Reveal>
+				</div>
 			</li>
 		</ol>
 
@@ -757,6 +804,22 @@
 	.tenet :global(.reveal) {
 		position: relative;
 		z-index: 1;
+	}
+	/* Slide the copy toward the visible half of the 90svh scene so the space
+	   between tenets shows the incoming statement materializing instead of
+	   bare background. */
+	.tenet-drift {
+		position: relative;
+		z-index: 1;
+		/* p < 0.5 = scene entering from below → pull the copy UP toward the
+		   visible top half; p > 0.5 = leaving above → let it ride DOWN into
+		   the visible bottom half. */
+		transform: translateY(calc((var(--tenet-p, 0.5) - 0.5) * 28svh));
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.tenet-drift {
+			transform: none;
+		}
 	}
 	.numeral {
 		font-family: var(--font-mono);

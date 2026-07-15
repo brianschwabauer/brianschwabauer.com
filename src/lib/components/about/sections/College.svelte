@@ -303,7 +303,7 @@
 			<div class="strip">
 				<div class="strip-eyebrow bleed-head">A WHIRLWIND OF CLASS PROJECTS</div>
 				<div class="gallery-bleed">
-					<LightboxGallery key="college-various" items={variousImages} display="masonry" size="2" />
+					<LightboxGallery key="college-various" items={variousImages} display="masonry" size="1" />
 				</div>
 				<div class="strip-note">
 					MED 365 silent film · chase scene · complexity edit · ART 230 stop-motion · ART
@@ -673,7 +673,7 @@
 				<div class="oneup-bts">
 					<div class="bts-eyebrow bleed-head">ONE UP — BTS</div>
 					<div class="gallery-bleed">
-						<LightboxGallery key="college-oneup-bts" items={oneUpBTSImages} display="masonry" size="2" />
+						<LightboxGallery key="college-oneup-bts" items={oneUpBTSImages} display="masonry" size="1" />
 					</div>
 				</div>
 			</Reveal>

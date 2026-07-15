@@ -3,10 +3,13 @@
 		year,
 		color = '#ffffff',
 		height = '60vh',
+		note = '',
 	}: {
 		year: string | number;
 		color?: string;
 		height?: string;
+		/** Optional "meanwhile…" footnote so a gap year reads as intentional. */
+		note?: string;
 	} = $props();
 
 	let el = $state<HTMLElement | null>(null);
@@ -44,10 +47,16 @@
 	style:--drift="{drift}vw"
 	style:--year-color={color}
 	style:--block-height={height}
-	aria-hidden="true">
+	aria-hidden={note ? undefined : 'true'}>
 	<span class="tick tick-l"></span>
-	<span class="year">{year}</span>
+	<span class="year" aria-hidden="true">{year}</span>
 	<span class="tick tick-r"></span>
+	{#if note}
+		<p class="note">
+			<span class="note-label">Meanwhile</span>
+			{note}
+		</p>
+	{/if}
 </div>
 
 <style>
@@ -87,6 +96,29 @@
 		max-width: 22vw;
 		background: linear-gradient(90deg, transparent, var(--year-color) 50%, transparent);
 		opacity: calc(var(--w) * 0.5);
+	}
+	.note {
+		position: absolute;
+		left: 50%;
+		bottom: clamp(1.5rem, 8vh, 4rem);
+		transform: translateX(-50%);
+		width: min(34rem, 86vw);
+		margin: 0;
+		text-align: center;
+		font-size: 0.95rem;
+		line-height: 1.55;
+		color: rgba(255, 255, 255, 0.55);
+		opacity: calc(var(--w) * 1.2);
+	}
+	.note-label {
+		display: block;
+		margin-bottom: 0.35rem;
+		font-family: var(--font-mono);
+		font-size: 0.66rem;
+		letter-spacing: 0.32em;
+		text-transform: uppercase;
+		color: var(--year-color);
+		opacity: 0.8;
 	}
 	@media (max-width: 640px) {
 		.year {

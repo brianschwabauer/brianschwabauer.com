@@ -334,7 +334,7 @@
 						key="music-videos-calc"
 						items={calcImages}
 						display="masonry"
-						size="2" />
+						size="1" />
 				</div>
 			</Reveal>
 			<Reveal variant="up" delay={160}>
