@@ -4,7 +4,7 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
-	import { cut } from '$lib/cut.svelte';
+	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -399,6 +399,14 @@
 			</Reveal>
 		</div>
 
+		<Reveal variant="up" delay={100}>
+			<PeekGallery key="green-screen-vfx" items={vfxImages} peek={6} size="0" />
+		</Reveal>
+
+		<Reveal variant="up" delay={100}>
+			<PeekGallery key="green-screen-nuisance" items={nuisanceImages} peek={6} size="2" />
+		</Reveal>
+
 		<!-- Everything past the trick itself: how it was built, and the three
 		     films that came out of learning After Effects. -->
 		<DirectorCut scenes={5}>
@@ -445,14 +453,6 @@
 						lightsaber. Get hit by a car. Animate a logo.
 					</p>
 				</Reveal>
-
-				<Reveal variant="up" delay={100}>
-					<LightboxGallery
-						key="green-screen-vfx"
-						items={vfxImages}
-						display="masonry"
-						size="0" />
-				</Reveal>
 			</div>
 
 			<div class="nuisance-block">
@@ -464,13 +464,6 @@
 						tripod and let the trick do the work. We turned the test into a fake
 						infomercial.
 					</p>
-				</Reveal>
-				<Reveal variant="up" delay={100}>
-					<LightboxGallery
-						key="green-screen-nuisance"
-						items={nuisanceImages}
-						display="masonry-row"
-						size="2" />
 				</Reveal>
 				<Reveal variant="up" delay={150}>
 					<div class="inline-video">
@@ -522,16 +515,6 @@
 				</div>
 			</Reveal>
 		</DirectorCut>
-
-		{#if !cut.director}
-			<!-- Headless twins of the folded galleries: their thumbnails are cut,
-			     but `?media=` links to them still have to resolve. -->
-			<LightboxGallery key="green-screen-vfx" items={vfxImages} display="lightbox" />
-			<LightboxGallery
-				key="green-screen-nuisance"
-				items={nuisanceImages}
-				display="lightbox" />
-		{/if}
 	</div>
 
 	<LightboxGallery

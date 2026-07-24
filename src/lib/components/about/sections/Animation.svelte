@@ -4,7 +4,7 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
-	import { cut } from '$lib/cut.svelte';
+	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import { Comparison } from '@delightstack/components/display';
 	import PinScrub from '../primitives/PinScrub.svelte';
 	import ScrubVideo from '../primitives/ScrubVideo.svelte';
@@ -370,21 +370,21 @@
 				</div>
 			</Reveal>
 
+			<Reveal variant="up" delay={100}>
+				<div class="exposure-grid">
+					<div class="gallery-bleed">
+						<PeekGallery
+							key="animation-exposure"
+							items={exposureImages}
+							peek={6}
+							size="2" />
+					</div>
+				</div>
+			</Reveal>
+
 			<!-- How Exposure was actually made: every VFX and BTS frame, and the
 			     tricks behind the shoot. The film itself plays in both cuts. -->
 			<DirectorCut scenes={exposureImages.length + 1}>
-				<Reveal variant="up" delay={100}>
-					<div class="exposure-grid">
-						<div class="gallery-bleed">
-							<LightboxGallery
-								key="animation-exposure"
-								items={exposureImages}
-								display="masonry"
-								size="2" />
-						</div>
-					</div>
-				</Reveal>
-
 				<Reveal>
 					<div class="prose">
 						<p>
@@ -406,15 +406,6 @@
 					</div>
 				</Reveal>
 			</DirectorCut>
-
-			{#if !cut.director}
-				<!-- Headless twin of the folded gallery: its thumbnails are cut, but
-				     `?media=` links to them still have to resolve. -->
-				<LightboxGallery
-					key="animation-exposure"
-					items={exposureImages}
-					display="lightbox" />
-			{/if}
 		</div>
 
 		<div class="iprez">

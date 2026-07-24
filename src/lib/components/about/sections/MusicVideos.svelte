@@ -4,7 +4,7 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
-	import { cut } from '$lib/cut.svelte';
+	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -315,6 +315,18 @@
 			</Reveal>
 		</div>
 
+		<Reveal variant="up" delay={120}>
+			<div class="gallery-bleed">
+				<PeekGallery key="music-videos-flava" items={flavaImages} peek={6} size="2" />
+			</div>
+		</Reveal>
+
+		<Reveal variant="up" delay={120}>
+			<div class="gallery-bleed">
+				<PeekGallery key="music-videos-calc" items={calcImages} peek={6} size="1" />
+			</div>
+		</Reveal>
+
 		<!-- The stills from all three shoots. The songs themselves stay in both
 		     cuts; these are the production photos behind them. -->
 		<DirectorCut scenes={3}>
@@ -332,26 +344,6 @@
 						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 				</div>
 			</Reveal>
-
-			<Reveal variant="up" delay={120}>
-				<div class="gallery-bleed">
-					<LightboxGallery
-						key="music-videos-flava"
-						items={flavaImages}
-						display="masonry"
-						size="2" />
-				</div>
-			</Reveal>
-
-			<Reveal variant="up" delay={120}>
-				<div class="gallery-bleed">
-					<LightboxGallery
-						key="music-videos-calc"
-						items={calcImages}
-						display="masonry"
-						size="1" />
-				</div>
-			</Reveal>
 		</DirectorCut>
 
 		<Reveal>
@@ -366,13 +358,6 @@
 				</p>
 			</div>
 		</Reveal>
-
-		{#if !cut.director}
-			<!-- Headless twins of the folded galleries: their thumbnails are cut,
-			     but `?media=` links to them still have to resolve. -->
-			<LightboxGallery key="music-videos-flava" items={flavaImages} display="lightbox" />
-			<LightboxGallery key="music-videos-calc" items={calcImages} display="lightbox" />
-		{/if}
 	</div>
 
 	<LightboxGallery

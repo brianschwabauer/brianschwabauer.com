@@ -289,7 +289,7 @@
 		<!-- One fold for the whole back half of the toy-camera years: two
 		     scenes and the process they taught. The vault below closes the
 		     section in both cuts. -->
-		<DirectorCut scenes={3}>
+		<DirectorCut scenes={3 + earlyFilms.length}>
 			<Reveal variant="up">
 				<div class="karate">
 					<div class="karate-text">
@@ -361,47 +361,47 @@
 					</p>
 				</div>
 			</Reveal>
+
+			<Reveal variant="up">
+				<h3 class="vault-heading">
+					<span class="vault-line"></span>
+					The vault — every short, in order
+				</h3>
+				<p class="vault-sub">
+					These are bad. Some of them are wonderful-bad. They are <em>
+						where every other section of this page came from.
+					</em>
+				</p>
+			</Reveal>
+
+			<ul class="films">
+				{#each earlyFilms as film, i}
+					<Reveal variant="up" delay={50 + (i % 3) * 80}>
+						<li class="film">
+							<div class="film-head">
+								<span class="film-index">№ {String(i + 1).padStart(2, '0')}</span>
+								<span class="film-date">{film.date}</span>
+								{#if film.private}<span class="film-tag">private</span>{/if}
+							</div>
+							<h4 class="film-title">{film.title}</h4>
+							<p class="film-blurb">{film.blurb}</p>
+							{#if signedIn && FILM_BASE_INDEX >= 0}
+								<button
+									type="button"
+									class="film-play"
+									onclick={(e) => gallery?.open(FILM_BASE_INDEX + i, e.currentTarget)}
+									aria-label="Play {film.title}">
+									<svg viewBox="0 0 24 24" aria-hidden="true">
+										<polygon points="8,5 19,12 8,19" fill="currentColor" />
+									</svg>
+									<span>Play film</span>
+								</button>
+							{/if}
+						</li>
+					</Reveal>
+				{/each}
+			</ul>
 		</DirectorCut>
-
-		<Reveal variant="up">
-			<h3 class="vault-heading">
-				<span class="vault-line"></span>
-				The vault — every short, in order
-			</h3>
-			<p class="vault-sub">
-				These are bad. Some of them are wonderful-bad. They are <em>
-					where every other section of this page came from.
-				</em>
-			</p>
-		</Reveal>
-
-		<ul class="films">
-			{#each earlyFilms as film, i}
-				<Reveal variant="up" delay={50 + (i % 3) * 80}>
-					<li class="film">
-						<div class="film-head">
-							<span class="film-index">№ {String(i + 1).padStart(2, '0')}</span>
-							<span class="film-date">{film.date}</span>
-							{#if film.private}<span class="film-tag">private</span>{/if}
-						</div>
-						<h4 class="film-title">{film.title}</h4>
-						<p class="film-blurb">{film.blurb}</p>
-						{#if signedIn && FILM_BASE_INDEX >= 0}
-							<button
-								type="button"
-								class="film-play"
-								onclick={(e) => gallery?.open(FILM_BASE_INDEX + i, e.currentTarget)}
-								aria-label="Play {film.title}">
-								<svg viewBox="0 0 24 24" aria-hidden="true">
-									<polygon points="8,5 19,12 8,19" fill="currentColor" />
-								</svg>
-								<span>Play film</span>
-							</button>
-						{/if}
-					</li>
-				</Reveal>
-			{/each}
-		</ul>
 	</div>
 
 	<LightboxGallery

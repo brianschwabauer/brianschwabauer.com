@@ -4,7 +4,7 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
-	import { cut } from '$lib/cut.svelte';
+	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
@@ -350,35 +350,35 @@
 				</p>
 			</Reveal>
 
+			<Reveal variant="up" delay={100}>
+				<div class="bts-strip">
+					<div class="bts-eyebrow bleed-head">BEHIND THE SCENES</div>
+					<div class="gallery-bleed">
+						<PeekGallery
+							key="power-rangers-pr2-bts"
+							items={pr2BTSImages}
+							peek={6}
+							size="2" />
+					</div>
+				</div>
+			</Reveal>
+
+			<Reveal variant="up" delay={150}>
+				<div class="bts-strip">
+					<div class="bts-eyebrow bleed-head">FROM THE FILM</div>
+					<div class="gallery-bleed">
+						<PeekGallery
+							key="power-rangers-pr2-stills"
+							items={pr2StillImages}
+							peek={6}
+							size="1" />
+					</div>
+				</div>
+			</Reveal>
+
 			<!-- The second film's archive: both photo sets, the premiere pair, and
 			     what two months of shooting actually taught us. -->
 			<DirectorCut scenes={4}>
-				<Reveal variant="up" delay={100}>
-					<div class="bts-strip">
-						<div class="bts-eyebrow bleed-head">BEHIND THE SCENES</div>
-						<div class="gallery-bleed">
-							<LightboxGallery
-								key="power-rangers-pr2-bts"
-								items={pr2BTSImages}
-								display="masonry"
-								size="2" />
-						</div>
-					</div>
-				</Reveal>
-
-				<Reveal variant="up" delay={150}>
-					<div class="bts-strip">
-						<div class="bts-eyebrow bleed-head">FROM THE FILM</div>
-						<div class="gallery-bleed">
-							<LightboxGallery
-								key="power-rangers-pr2-stills"
-								items={pr2StillImages}
-								display="masonry"
-								size="1" />
-						</div>
-					</div>
-				</Reveal>
-
 				<div class="premiere-2">
 					<Reveal variant="left">
 						<LazyMedia
@@ -414,19 +414,6 @@
 				</Reveal>
 			</DirectorCut>
 		</div>
-
-		{#if !cut.director}
-			<!-- Headless twins of the folded galleries: their thumbnails are cut,
-			     but `?media=` links to them still have to resolve. -->
-			<LightboxGallery
-				key="power-rangers-pr2-bts"
-				items={pr2BTSImages}
-				display="lightbox" />
-			<LightboxGallery
-				key="power-rangers-pr2-stills"
-				items={pr2StillImages}
-				display="lightbox" />
-		{/if}
 	</div>
 
 	<LightboxGallery

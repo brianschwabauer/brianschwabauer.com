@@ -5,7 +5,7 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
-	import { cut } from '$lib/cut.svelte';
+	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -576,37 +576,38 @@
 			</Reveal>
 		</div>
 
+		<Reveal variant="up">
+			<div class="strip">
+				<div class="strip-eyebrow bleed-head">A WHIRLWIND OF CLASS PROJECTS</div>
+				<div class="gallery-bleed">
+					<PeekGallery key="college-various" items={variousImages} peek={6} size="1" />
+				</div>
+				<div class="strip-note">
+					MED 365 silent film · chase scene · complexity edit · ART 230 stop-motion · ART
+					300 disturbance · MED 465 One Up
+				</div>
+			</div>
+		</Reveal>
+
+		<Reveal variant="up" delay={100}>
+			<div class="node-bts">
+				<PeekGallery key="college-node-bts" items={nodeBTSImages} peek={6} size="2" />
+			</div>
+		</Reveal>
+
+		<Reveal variant="up" delay={120}>
+			<div class="oneup-bts">
+				<div class="bts-eyebrow bleed-head">ONE UP — BTS</div>
+				<div class="gallery-bleed">
+					<PeekGallery key="college-oneup-bts" items={oneUpBTSImages} peek={6} size="1" />
+				</div>
+			</div>
+		</Reveal>
+
 		<!-- The college appendix: the class-project reel, NODE's behind-the-
 		     scenes and production notes, how Split Life was synchronised, and
 		     the other films from these years. -->
 		<DirectorCut scenes={9}>
-			<Reveal variant="up">
-				<div class="strip">
-					<div class="strip-eyebrow bleed-head">A WHIRLWIND OF CLASS PROJECTS</div>
-					<div class="gallery-bleed">
-						<LightboxGallery
-							key="college-various"
-							items={variousImages}
-							display="masonry"
-							size="1" />
-					</div>
-					<div class="strip-note">
-						MED 365 silent film · chase scene · complexity edit · ART 230 stop-motion ·
-						ART 300 disturbance · MED 465 One Up
-					</div>
-				</div>
-			</Reveal>
-
-			<Reveal variant="up" delay={100}>
-				<div class="node-bts">
-					<LightboxGallery
-						key="college-node-bts"
-						items={nodeBTSImages}
-						display="masonry-row"
-						size="2" />
-				</div>
-			</Reveal>
-
 			<Reveal>
 				<div class="prose">
 					<p>
@@ -711,32 +712,8 @@
 						</article>
 					</div>
 				</Reveal>
-
-				<Reveal variant="up" delay={120}>
-					<div class="oneup-bts">
-						<div class="bts-eyebrow bleed-head">ONE UP — BTS</div>
-						<div class="gallery-bleed">
-							<LightboxGallery
-								key="college-oneup-bts"
-								items={oneUpBTSImages}
-								display="masonry"
-								size="1" />
-						</div>
-					</div>
-				</Reveal>
 			</div>
 		</DirectorCut>
-
-		{#if !cut.director}
-			<!-- Headless twins of the folded galleries: their thumbnails are cut,
-			     but `?media=` links to them still have to resolve. -->
-			<LightboxGallery key="college-various" items={variousImages} display="lightbox" />
-			<LightboxGallery key="college-node-bts" items={nodeBTSImages} display="lightbox" />
-			<LightboxGallery
-				key="college-oneup-bts"
-				items={oneUpBTSImages}
-				display="lightbox" />
-		{/if}
 
 		<div class="bassless">
 			<Reveal>

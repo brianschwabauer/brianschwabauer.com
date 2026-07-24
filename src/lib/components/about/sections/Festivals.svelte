@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
-	import { cut } from '$lib/cut.svelte';
+	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
@@ -577,6 +577,27 @@
 				</Reveal>
 			</div>
 
+			<Reveal variant="up" delay={150}>
+				<PeekGallery
+					key="festivals-live-broadcast"
+					items={liveBroadcastImages}
+					peek={6}
+					size="2" />
+			</Reveal>
+
+			<Reveal variant="up" delay={120}>
+				<div class="gal-eyebrow bleed-head">
+					THE BLOCK PARTY · {blockPartyImages.length} PHOTOS
+				</div>
+				<div class="gallery-bleed">
+					<PeekGallery
+						key="festivals-block-party"
+						items={blockPartyImages}
+						peek={6}
+						size="2" />
+				</div>
+			</Reveal>
+
 			<!-- The KSMS archive: the three things I built around the broadcast,
 			     the control-room stills, and the block-party photo sets. The shows
 			     themselves play in both cuts. -->
@@ -642,14 +663,6 @@
 					</Reveal>
 				</div>
 
-				<Reveal variant="up" delay={150}>
-					<LightboxGallery
-						key="festivals-live-broadcast"
-						items={liveBroadcastImages}
-						display="masonry-row"
-						size="2" />
-				</Reveal>
-
 				<Reveal variant="up" delay={180}>
 					<div class="inline-video">
 						<LazyMedia
@@ -658,19 +671,6 @@
 							ratio="16 / 9"
 							video
 							onclick={(e) => extrasGallery?.open(5, e.currentTarget)} />
-					</div>
-				</Reveal>
-
-				<Reveal variant="up" delay={120}>
-					<div class="gal-eyebrow bleed-head">
-						THE BLOCK PARTY · {blockPartyImages.length} PHOTOS
-					</div>
-					<div class="gallery-bleed">
-						<LightboxGallery
-							key="festivals-block-party"
-							items={blockPartyImages}
-							display="masonry"
-							size="2" />
 					</div>
 				</Reveal>
 
@@ -692,19 +692,6 @@
 					</div>
 				</Reveal>
 			</DirectorCut>
-
-			{#if !cut.director}
-				<!-- Headless twins of the folded galleries: their thumbnails are cut,
-				     but `?media=` links to them still have to resolve. -->
-				<LightboxGallery
-					key="festivals-live-broadcast"
-					items={liveBroadcastImages}
-					display="lightbox" />
-				<LightboxGallery
-					key="festivals-block-party"
-					items={blockPartyImages}
-					display="lightbox" />
-			{/if}
 		</div>
 
 		<div class="last-film">
