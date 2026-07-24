@@ -6,7 +6,11 @@ import { defineConfig } from 'vite';
 // can run the @delightstack/images Cloudflare Container locally. In
 // production both routes are served by the same image-worker, reached via
 // the IMAGE_PROCESSOR service binding from the main worker.
-const IMAGE_WORKER_URL = process.env.IMAGE_WORKER_URL || 'http://localhost:8788';
+//
+// Dev ports for this project: 5180 site, 6180 image worker, 6181 its
+// inspector. The worker's two live in wrangler.images.toml's [dev] section —
+// keep this URL in sync with them.
+const IMAGE_WORKER_URL = process.env.IMAGE_WORKER_URL || 'http://127.0.0.1:6180';
 
 export default defineConfig({
 	plugins: [sveltekit()],
@@ -31,6 +35,10 @@ export default defineConfig({
 	},
 	server: {
 		port: 5180,
+		// Fail loudly rather than drifting to the next free port — other repos'
+		// vite servers share this band, and a silent shift would put the site
+		// somewhere the printed URL and OAuth callbacks don't expect.
+		strictPort: true,
 		proxy: {
 			'/api/images': { target: IMAGE_WORKER_URL, changeOrigin: true },
 			'/cdn/image': { target: IMAGE_WORKER_URL, changeOrigin: true },

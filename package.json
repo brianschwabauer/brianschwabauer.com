@@ -4,9 +4,10 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
-		"dev:images": "DOCKER_HOST=${DOCKER_HOST:-unix:///var/run/docker.sock} wrangler dev --config wrangler.images.toml --port 8788 --persist-to .wrangler/state",
-		"dev:all": "concurrently -n site,images -c cyan,magenta \"pnpm dev\" \"pnpm dev:images\"",
+		"dev": "concurrently -n site,images -c cyan,magenta \"pnpm dev:site\" \"pnpm dev:images\"",
+		"dev:all": "pnpm dev",
+		"dev:site": "vite dev",
+		"dev:images": "DOCKER_HOST=${DOCKER_HOST:-unix:///var/run/docker.sock} wrangler dev --config wrangler.images.toml --persist-to .wrangler/state",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",

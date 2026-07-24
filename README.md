@@ -88,11 +88,19 @@ wrangler secret put AUTH_SECRET
 ### Develop
 
 ```sh
-pnpm dev          # site only, http://localhost:5180
-pnpm dev:images   # image-processing worker (requires Docker)
-pnpm dev:all      # both, side by side
+pnpm dev          # site + image worker, side by side (`pnpm dev:all` is an alias)
+pnpm dev:site     # site only, http://localhost:5180
+pnpm dev:images   # image-processing worker only, :6180 (requires Docker)
 pnpm check        # type-check
 ```
+
+Dev ports are pinned so this project can run alongside other local dev servers:
+`5180` site, `6180` image worker, `6181` the worker's inspector. The site's port
+lives in `vite.config.ts` (with `strictPort`, so a clash fails loudly instead of
+silently moving); the worker's two live in the `[dev]` section of
+`wrangler.images.toml`. The worker sits in the 61xx block on purpose — wrangler's
+defaults (`8787` / `9229`) and vite's auto-increment band (`5173`+) are both
+crowded by other repos.
 
 ## Deployment
 

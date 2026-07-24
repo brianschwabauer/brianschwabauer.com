@@ -16,7 +16,7 @@ declare global {
 				SEND_EMAIL: SendEmail;
 				// Service binding to the brianschwabauer-images worker.
 				// In dev, vite proxies /api/images/* and /cdn/image/* directly to
-				// localhost:8787 instead of going through this binding.
+				// localhost:6180 instead of going through this binding.
 				IMAGE_PROCESSOR: Fetcher;
 				ADMIN_EMAILS: string;
 				CONTACT_FROM_EMAIL: string;
