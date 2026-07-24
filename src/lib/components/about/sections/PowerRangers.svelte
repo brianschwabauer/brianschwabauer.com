@@ -241,7 +241,7 @@
 	let extrasGallery = $state<ReturnType<typeof LightboxGallery>>();
 </script>
 
-<SectionShell id="power-rangers" year="2008" label="Power Rangers 360" theme="ranger">
+<SectionShell id="power-rangers" year="2008" label="Feature Length" theme="ranger">
 	<div class="container">
 		<Reveal>
 			<YearMark year="2008" subtitle="Feature Length" color="#ffcc33" />

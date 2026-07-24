@@ -23,15 +23,20 @@
 <SectionShell
 	id="what-im-up-to"
 	year={String(currentYear)}
-	label="What I'm up to"
+	label="Which brings us to now"
 	theme="snt">
 	<div class="bg" aria-hidden="true"></div>
 	<div class="container">
 		<div class="grid">
 			<div class="copy">
+				<Reveal variant="up">
+					<!-- Closes the cassette metaphor Rewind opened, twenty years back. -->
+					<p class="playback">&#9205; Playback complete — you're all caught up.</p>
+				</Reveal>
+
 				<Reveal variant="up" delay={60}>
 					<h2 class="title">
-						What I'm <span class="grad">up to</span>
+						Which brings us <span class="grad">to now</span>
 					</h2>
 				</Reveal>
 
@@ -51,7 +56,8 @@
 
 				<Reveal variant="up" delay={220}>
 					<p class="lede">
-						I'm full-time building <a
+						Twenty years of tapes, timelines, and terminals later — this is what all of it
+						was pointed at. I'm full-time building <a
 							href="https://showandtour.com"
 							target="_blank"
 							rel="noopener">
@@ -81,8 +87,8 @@
 									stroke-linejoin="round" />
 							</svg>
 						</a>
-						<a class="cta-ghost" href="#showandtour">
-							The longer story
+						<a class="cta-ghost" href="#creed">
+							Why I build this way
 							<svg viewBox="0 0 24 24" aria-hidden="true">
 								<path
 									d="M12 4v16M6 14l6 6 6-6"
@@ -187,6 +193,14 @@
 		}
 	}
 
+	.playback {
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		opacity: 0.6;
+		margin: 0 0 1.1rem;
+	}
 	.title {
 		font-size: clamp(2.8rem, 7vw, 5rem);
 		font-weight: 900;

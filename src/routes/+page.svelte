@@ -44,7 +44,7 @@
 		{ id: 'ticket-booth', year: 'Lobby', label: 'Choose Your Cut' },
 		{ id: 'humble-beginnings', year: '2006', label: 'Humble Beginnings' },
 		{ id: 'green-screen', year: '2007', label: 'Green Screen' },
-		{ id: 'power-rangers', year: '2008', label: 'Power Rangers' },
+		{ id: 'power-rangers', year: '2008', label: 'Feature Length' },
 		{ id: 'taking-it-seriously', year: '2009', label: 'First Websites' },
 		{ id: 'music-videos', year: '2009', label: 'Music Videos' },
 		{ id: 'animation', year: '2010', label: 'Animation & VFX' },
@@ -56,6 +56,7 @@
 		{ id: 'entrepreneurship', year: '2017', label: 'Entrepreneurship' },
 		{ id: 'showandtour', year: '2019', label: 'Show&Tour' },
 		{ id: 'side-projects', year: 'Today', label: 'Side Projects' },
+		{ id: 'what-im-up-to', year: 'Now', label: 'Which Brings Us to Now' },
 		{ id: 'creed', year: 'Always', label: 'The Creed' },
 	];
 </script>
@@ -78,7 +79,6 @@
 
 	<Hero isMobile={data.isMobile} />
 	<TicketBooth />
-	<WhatImUpTo />
 	<Rewind />
 	<HumbleBeginnings {signedIn} />
 	<GreenScreen {signedIn} />
@@ -106,6 +106,7 @@
 		color="#00f2c3"
 		caption="Building Show&Tour" />
 	<SideProjects />
+	<WhatImUpTo />
 	<Creed />
 </div>
 
