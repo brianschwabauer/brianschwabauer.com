@@ -21,6 +21,7 @@
 	import SideProjects from '$lib/components/about/sections/SideProjects.svelte';
 	import Creed from '$lib/components/about/sections/Creed.svelte';
 	import YearScrubber from '$lib/components/about/primitives/YearScrubber.svelte';
+	import ChapterCard from '$lib/components/about/primitives/ChapterCard.svelte';
 	import EmptyYearMark from '$lib/components/about/primitives/EmptyYearMark.svelte';
 	import YearCycler from '$lib/components/about/primitives/YearCycler.svelte';
 	import RootNavDropdown from '$lib/components/layout/RootNavDropdown.svelte';
@@ -80,6 +81,7 @@
 	<Hero isMobile={data.isMobile} />
 	<TicketBooth />
 	<Rewind />
+	<ChapterCard act={1} />
 	<HumbleBeginnings {signedIn} />
 	<GreenScreen {signedIn} />
 	<PowerRangers />
@@ -87,6 +89,7 @@
 	<MusicVideos />
 	<Animation />
 	<Festivals {signedIn} />
+	<ChapterCard act={2} />
 	<College />
 	<Spunksters />
 	<EmptyYearMark
@@ -94,6 +97,7 @@
 		color="#ffd934"
 		note="No releases this year — just film sets, coursework, and a growing pile of notes, all quietly pointed at one thing: the senior thesis." />
 	<WhatMakesUsHuman />
+	<ChapterCard act={3} />
 	<Freelancer />
 	<Entrepreneurship />
 	<EmptyYearMark
