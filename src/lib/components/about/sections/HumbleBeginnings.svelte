@@ -286,47 +286,82 @@
 			</div>
 		</div>
 
-		<Reveal variant="up">
-			<div class="karate">
-				<div class="karate-text">
-					<h3 class="subtle">
-						<span class="caret">▌</span>
-						Pre-school special effects
-					</h3>
-					<p>
-						A year after The Fight Scene we made <strong>Ninja Men</strong>
-						. We pre-cut an apple, jammed a toothpick into it to hold it together, and let a
-						karate chop "split" it cleanly. Seventh-grade ingenuity I'm still a little proud
-						of.
-					</p>
+		<!-- One fold for the whole back half of the toy-camera years: two
+		     scenes and the process they taught. The vault below closes the
+		     section in both cuts. -->
+		<DirectorCut scenes={3}>
+			<Reveal variant="up">
+				<div class="karate">
+					<div class="karate-text">
+						<h3 class="subtle">
+							<span class="caret">▌</span>
+							Pre-school special effects
+						</h3>
+						<p>
+							A year after The Fight Scene we made <strong>Ninja Men</strong>
+							. We pre-cut an apple, jammed a toothpick into it to hold it together, and let
+							a karate chop "split" it cleanly. Seventh-grade ingenuity I'm still a little proud
+							of.
+						</p>
+					</div>
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2007-09-09_ninja_men-grant_splits_apple_with_karate_chop_special_effect.avif"
+						alt="The karate-chop apple split"
+						ratio="16 / 9"
+						class="karate-media"
+						onclick={(e) => gallery?.open(3, e.currentTarget)} />
 				</div>
-				<LazyMedia
-					src="https://cdn.brianschwabauer.com/media/2007-09-09_ninja_men-grant_splits_apple_with_karate_chop_special_effect.avif"
-					alt="The karate-chop apple split"
-					ratio="16 / 9"
-					class="karate-media"
-					onclick={(e) => gallery?.open(3, e.currentTarget)} />
-			</div>
-		</Reveal>
+			</Reveal>
 
-		<Reveal>
-			<div class="quick-cuts">
-				<div class="qc-meta">
-					<div class="qc-title">02.29.08</div>
-					<div class="qc-sub">Leap-day shorts contest · 29 seconds</div>
+			<Reveal>
+				<div class="quick-cuts">
+					<div class="qc-meta">
+						<div class="qc-title">02.29.08</div>
+						<div class="qc-sub">Leap-day shorts contest · 29 seconds</div>
+						<p>
+							The local paper ran a 29-second short film contest for leap day. The
+							constraint forced us to learn quick cuts for the first time. We placed 2nd.
+							The technique stuck with us forever.
+						</p>
+					</div>
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2008-02-25_02.29.08-editing_with_quick_shots.avif"
+						alt="Editing with quick cuts on 02.29.08"
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(4, e.currentTarget)} />
+				</div>
+			</Reveal>
+
+			<Reveal variant="up">
+				<div class="prose">
 					<p>
-						The local paper ran a 29-second short film contest for leap day. The
-						constraint forced us to learn quick cuts for the first time. We placed 2nd.
-						The technique stuck with us forever.
+						Every weekend looked the same. I'd ride over to Kevin's house. We'd come up
+						with whatever crazy thing we could that day. We'd film it. We'd edit it. All
+						within a day, sometimes two. Then we'd repeat that loop, over and over.
+					</p>
+					<p>
+						We upgraded our camera to one that recorded to a hard drive. We got a computer
+						with actual editing software (we'd been editing <em>
+							directly on the camera
+						</em>
+						before). We still didn't have lights or mics. But we started learning how to piece
+						together multiple shots in a row to build a real narrative.
+					</p>
+					<p>
+						With our new software, we could finally start doing "special effects". The
+						first one was speed manipulation. The second was greenscreen, which is its own
+						section below. Each project added a new tool to the toolbag. Each tool
+						combined with the others to unlock the next one. That stacking is the entire
+						story of this page, really.
+					</p>
+					<p>
+						Around this time I noticed I had a real knack for the technical side. Kevin
+						was the better actor, so he started to act more. I started to film more. That
+						split has basically held to this day.
 					</p>
 				</div>
-				<LazyMedia
-					src="https://cdn.brianschwabauer.com/media/2008-02-25_02.29.08-editing_with_quick_shots.avif"
-					alt="Editing with quick cuts on 02.29.08"
-					ratio="16 / 9"
-					onclick={(e) => gallery?.open(4, e.currentTarget)} />
-			</div>
-		</Reveal>
+			</Reveal>
+		</DirectorCut>
 
 		<Reveal variant="up">
 			<h3 class="vault-heading">
@@ -367,38 +402,6 @@
 				</Reveal>
 			{/each}
 		</ul>
-
-		<Reveal variant="up">
-			<DirectorCut>
-				<div class="prose">
-					<p>
-						Every weekend looked the same. I'd ride over to Kevin's house. We'd come up
-						with whatever crazy thing we could that day. We'd film it. We'd edit it. All
-						within a day, sometimes two. Then we'd repeat that loop, over and over.
-					</p>
-					<p>
-						We upgraded our camera to one that recorded to a hard drive. We got a computer
-						with actual editing software (we'd been editing <em>
-							directly on the camera
-						</em>
-						before). We still didn't have lights or mics. But we started learning how to piece
-						together multiple shots in a row to build a real narrative.
-					</p>
-					<p>
-						With our new software, we could finally start doing "special effects". The
-						first one was speed manipulation. The second was greenscreen, which is its own
-						section below. Each project added a new tool to the toolbag. Each tool
-						combined with the others to unlock the next one. That stacking is the entire
-						story of this page, really.
-					</p>
-					<p>
-						Around this time I noticed I had a real knack for the technical side. Kevin
-						was the better actor, so he started to act more. I started to film more. That
-						split has basically held to this day.
-					</p>
-				</div>
-			</DirectorCut>
-		</Reveal>
 	</div>
 
 	<LightboxGallery

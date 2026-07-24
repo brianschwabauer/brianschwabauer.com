@@ -5,6 +5,7 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import { cut } from '$lib/cut.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -308,23 +309,6 @@
 			</Reveal>
 		</div>
 
-		<Reveal variant="up">
-			<div class="strip">
-				<div class="strip-eyebrow bleed-head">A WHIRLWIND OF CLASS PROJECTS</div>
-				<div class="gallery-bleed">
-					<LightboxGallery
-						key="college-various"
-						items={variousImages}
-						display="masonry"
-						size="1" />
-				</div>
-				<div class="strip-note">
-					MED 365 silent film · chase scene · complexity edit · ART 230 stop-motion · ART
-					300 disturbance · MED 465 One Up
-				</div>
-			</div>
-		</Reveal>
-
 		<div class="fb-block">
 			<Reveal>
 				<div class="fb-grid">
@@ -425,16 +409,6 @@
 				</div>
 			</Reveal>
 
-			<Reveal variant="up" delay={100}>
-				<div class="node-bts">
-					<LightboxGallery
-						key="college-node-bts"
-						items={nodeBTSImages}
-						display="masonry-row"
-						size="2" />
-				</div>
-			</Reveal>
-
 			<Reveal variant="up" delay={150}>
 				<div class="node-viewer">
 					<ArchiveFrame
@@ -443,20 +417,6 @@
 						ratio="16 / 10"
 						label="Try the original 360 viewer" />
 				</div>
-			</Reveal>
-
-			<Reveal>
-				<DirectorCut>
-					<div class="prose">
-						<p>
-							A 360 video is only half the problem. You also have to <em>guide</em>
-							the viewer. At certain timecodes I disable the keyboard, smoothly animate the
-							camera to a target azimuth + FOV (with easing), then release control back to the
-							user. I also added a CSS letterbox overlay to force a 2.35 aspect ratio across
-							the whole webpage — surprisingly fiddly in 2014.
-						</p>
-					</div>
-				</DirectorCut>
 			</Reveal>
 		</div>
 
@@ -614,116 +574,169 @@
 						onclick={(e) => gallery?.open(12, e.currentTarget)} />
 				</div>
 			</Reveal>
-
-			<Reveal>
-				<DirectorCut>
-					<div class="prose">
-						<p>
-							To make the two shots line up frame-perfect over multiple minutes, I built a
-							master spreadsheet of every event in the film with exact timecodes. I then
-							recorded my own voice giving every cue ("3, 2, 1, open the door") at those
-							exact timecodes, and blasted that audio through the house during filming so
-							every actor and operator knew exactly what should be happening.
-						</p>
-						<p>
-							The actors had to be at exact locations at exact times. Plus a handful of
-							hidden cuts I had to fix in VFX. Plus I scored the music myself, late at
-							night, on the deadline. Plus all the cue audio had to be replaced in post.
-						</p>
-						<p>
-							The story is okay. The lighting is okay. The script is okay. But I did the
-							thing I set out to do, which was: invent a new kind of edit. I'm still proud
-							of that.
-						</p>
-					</div>
-				</DirectorCut>
-			</Reveal>
 		</div>
 
-		<div class="more-projects">
-			<Reveal>
-				<h3 class="sub-small">Other films from these years:</h3>
-			</Reveal>
-
-			<Reveal variant="up" delay={80}>
-				<div class="film-quad">
-					<article class="film-quad-card">
-						<h4>
-							Katie Bauer's Breakup <span class="film-year">2014</span>
-						</h4>
-						<p>
-							Directing-class group film. I script-supervised, edited, and did the VFX.
-							The character realizes she's inside a film and tries to escape it; boom mic
-							crashes the frame on purpose.
-						</p>
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2014-05-15_katie_bauers_breakup/poster.jpg"
-							alt="Katie Bauer's Breakup (2014)"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(13, e.currentTarget)} />
-					</article>
-					<article class="film-quad-card">
-						<h4>
-							One Up <span class="film-year">2014</span>
-						</h4>
-						<p>
-							Cinematography-class short. Two guys try to one-up each other to land the
-							same job. Real lighting setups, real coverage.
-						</p>
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up/poster.jpg"
-							alt="One Up (2014)"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(14, e.currentTarget)} />
-					</article>
-					<article class="film-quad-card">
-						<h4>
-							Nice to Meet You <span class="film-year">2014</span>
-						</h4>
-						<p>
-							Senior-thesis warmup, shot in Canon RAW on a 5D mkIV with Magic Lantern
-							firmware. The girl on the bench was on the phone the whole time.
-						</p>
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2014-09-02_nice_to_meet_you/poster.jpg"
-							alt="Nice to Meet You (2014)"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(15, e.currentTarget)} />
-					</article>
-					<article class="film-quad-card">
-						<h4>
-							Legacy <span class="film-year">2015</span>
-						</h4>
-						<p>
-							A quiet 2-character short for my directing class. A husband obsessed with
-							his career, a wife who wants him home. Conversation as conflict.
-						</p>
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2015-04-22_legacy/poster.jpg"
-							alt="Legacy (2015)"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(16, e.currentTarget)} />
-					</article>
-				</div>
-			</Reveal>
-
-			<Reveal variant="up" delay={120}>
-				<div class="oneup-bts">
-					<div class="bts-eyebrow bleed-head">ONE UP — BTS</div>
+		<!-- The college appendix: the class-project reel, NODE's behind-the-
+		     scenes and production notes, how Split Life was synchronised, and
+		     the other films from these years. -->
+		<DirectorCut scenes={9}>
+			<Reveal variant="up">
+				<div class="strip">
+					<div class="strip-eyebrow bleed-head">A WHIRLWIND OF CLASS PROJECTS</div>
 					<div class="gallery-bleed">
 						<LightboxGallery
-							key="college-oneup-bts"
-							items={oneUpBTSImages}
+							key="college-various"
+							items={variousImages}
 							display="masonry"
 							size="1" />
 					</div>
+					<div class="strip-note">
+						MED 365 silent film · chase scene · complexity edit · ART 230 stop-motion ·
+						ART 300 disturbance · MED 465 One Up
+					</div>
 				</div>
 			</Reveal>
-		</div>
+
+			<Reveal variant="up" delay={100}>
+				<div class="node-bts">
+					<LightboxGallery
+						key="college-node-bts"
+						items={nodeBTSImages}
+						display="masonry-row"
+						size="2" />
+				</div>
+			</Reveal>
+
+			<Reveal>
+				<div class="prose">
+					<p>
+						A 360 video is only half the problem. You also have to <em>guide</em>
+						the viewer. At certain timecodes I disable the keyboard, smoothly animate the camera
+						to a target azimuth + FOV (with easing), then release control back to the user.
+						I also added a CSS letterbox overlay to force a 2.35 aspect ratio across the whole
+						webpage — surprisingly fiddly in 2014.
+					</p>
+				</div>
+			</Reveal>
+
+			<Reveal>
+				<div class="prose">
+					<p>
+						To make the two shots line up frame-perfect over multiple minutes, I built a
+						master spreadsheet of every event in the film with exact timecodes. I then
+						recorded my own voice giving every cue ("3, 2, 1, open the door") at those
+						exact timecodes, and blasted that audio through the house during filming so
+						every actor and operator knew exactly what should be happening.
+					</p>
+					<p>
+						The actors had to be at exact locations at exact times. Plus a handful of
+						hidden cuts I had to fix in VFX. Plus I scored the music myself, late at
+						night, on the deadline. Plus all the cue audio had to be replaced in post.
+					</p>
+					<p>
+						The story is okay. The lighting is okay. The script is okay. But I did the
+						thing I set out to do, which was: invent a new kind of edit. I'm still proud
+						of that.
+					</p>
+				</div>
+			</Reveal>
+
+			<div class="more-projects">
+				<Reveal>
+					<h3 class="sub-small">Other films from these years:</h3>
+				</Reveal>
+
+				<Reveal variant="up" delay={80}>
+					<div class="film-quad">
+						<article class="film-quad-card">
+							<h4>
+								Katie Bauer's Breakup <span class="film-year">2014</span>
+							</h4>
+							<p>
+								Directing-class group film. I script-supervised, edited, and did the VFX.
+								The character realizes she's inside a film and tries to escape it; boom
+								mic crashes the frame on purpose.
+							</p>
+							<LazyMedia
+								src="https://cdn.brianschwabauer.com/media/2014-05-15_katie_bauers_breakup/poster.jpg"
+								alt="Katie Bauer's Breakup (2014)"
+								ratio="16 / 9"
+								video
+								onclick={(e) => gallery?.open(13, e.currentTarget)} />
+						</article>
+						<article class="film-quad-card">
+							<h4>
+								One Up <span class="film-year">2014</span>
+							</h4>
+							<p>
+								Cinematography-class short. Two guys try to one-up each other to land the
+								same job. Real lighting setups, real coverage.
+							</p>
+							<LazyMedia
+								src="https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up/poster.jpg"
+								alt="One Up (2014)"
+								ratio="16 / 9"
+								video
+								onclick={(e) => gallery?.open(14, e.currentTarget)} />
+						</article>
+						<article class="film-quad-card">
+							<h4>
+								Nice to Meet You <span class="film-year">2014</span>
+							</h4>
+							<p>
+								Senior-thesis warmup, shot in Canon RAW on a 5D mkIV with Magic Lantern
+								firmware. The girl on the bench was on the phone the whole time.
+							</p>
+							<LazyMedia
+								src="https://cdn.brianschwabauer.com/media/2014-09-02_nice_to_meet_you/poster.jpg"
+								alt="Nice to Meet You (2014)"
+								ratio="16 / 9"
+								video
+								onclick={(e) => gallery?.open(15, e.currentTarget)} />
+						</article>
+						<article class="film-quad-card">
+							<h4>
+								Legacy <span class="film-year">2015</span>
+							</h4>
+							<p>
+								A quiet 2-character short for my directing class. A husband obsessed with
+								his career, a wife who wants him home. Conversation as conflict.
+							</p>
+							<LazyMedia
+								src="https://cdn.brianschwabauer.com/media/2015-04-22_legacy/poster.jpg"
+								alt="Legacy (2015)"
+								ratio="16 / 9"
+								video
+								onclick={(e) => gallery?.open(16, e.currentTarget)} />
+						</article>
+					</div>
+				</Reveal>
+
+				<Reveal variant="up" delay={120}>
+					<div class="oneup-bts">
+						<div class="bts-eyebrow bleed-head">ONE UP — BTS</div>
+						<div class="gallery-bleed">
+							<LightboxGallery
+								key="college-oneup-bts"
+								items={oneUpBTSImages}
+								display="masonry"
+								size="1" />
+						</div>
+					</div>
+				</Reveal>
+			</div>
+		</DirectorCut>
+
+		{#if !cut.director}
+			<!-- Headless twins of the folded galleries: their thumbnails are cut,
+			     but `?media=` links to them still have to resolve. -->
+			<LightboxGallery key="college-various" items={variousImages} display="lightbox" />
+			<LightboxGallery key="college-node-bts" items={nodeBTSImages} display="lightbox" />
+			<LightboxGallery
+				key="college-oneup-bts"
+				items={oneUpBTSImages}
+				display="lightbox" />
+		{/if}
 
 		<div class="bassless">
 			<Reveal>

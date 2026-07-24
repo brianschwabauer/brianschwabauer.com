@@ -6,7 +6,6 @@
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
-
 	const dashboardMockupsImages: GalleryItem[] = [
 		{
 			type: 'image',
@@ -282,7 +281,11 @@
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="gallery-bleed">
-					<LightboxGallery key="show-and-tour-dashboards" items={dashboardMockupsImages} display="masonry" size="1" />
+					<LightboxGallery
+						key="show-and-tour-dashboards"
+						items={dashboardMockupsImages}
+						display="masonry"
+						size="1" />
 				</div>
 			</Reveal>
 		</div>
@@ -293,7 +296,11 @@
 				<p>What the photographer's clients actually see.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<LightboxGallery key="show-and-tour-delivery" items={deliveryPagesImages} display="masonry-row" size="2" />
+				<LightboxGallery
+					key="show-and-tour-delivery"
+					items={deliveryPagesImages}
+					display="masonry-row"
+					size="2" />
 			</Reveal>
 		</div>
 
@@ -303,7 +310,11 @@
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="gallery-bleed">
-					<LightboxGallery key="show-and-tour-brand" items={brandImages} display="masonry" size="2" />
+					<LightboxGallery
+						key="show-and-tour-brand"
+						items={brandImages}
+						display="masonry"
+						size="2" />
 				</div>
 			</Reveal>
 		</div>

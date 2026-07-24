@@ -4,7 +4,6 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
-	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import { cut } from '$lib/cut.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
@@ -243,20 +242,6 @@
 					shots, way more quick cuts, and starts to actually feel like a music video.
 				</p>
 			</Reveal>
-			<Reveal variant="up" delay={120}>
-				<div class="paired">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_plays_guitar.avif"
-						alt="Brian plays guitar"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(0, e.currentTarget)} />
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif"
-						alt="Summoning a guitar via reversed footage"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(1, e.currentTarget)} />
-				</div>
-			</Reveal>
 			<Reveal variant="up" delay={160}>
 				<div class="track-video">
 					<LazyMedia
@@ -290,20 +275,6 @@
 					one.
 				</p>
 			</Reveal>
-			<Reveal variant="up" delay={120}>
-				<!-- The gallery stays mounted in both cuts so its `?media=` deep links
-				     always resolve; the theatrical cut only drops the thumbnails. -->
-				<div class="gallery-bleed">
-					<LightboxGallery
-						key="music-videos-flava"
-						items={flavaImages}
-						display={cut.director ? 'masonry' : 'lightbox'}
-						size="2" />
-				</div>
-				{#if !cut.director}
-					<DeletedScenes scenes={flavaImages.length} />
-				{/if}
-			</Reveal>
 			<Reveal variant="up" delay={160}>
 				<div class="track-video">
 					<LazyMedia
@@ -332,15 +303,6 @@
 					sets, and turned in the most absurd math project the school had ever seen.
 				</p>
 			</Reveal>
-			<Reveal variant="up" delay={120}>
-				<div class="gallery-bleed">
-					<LightboxGallery
-						key="music-videos-calc"
-						items={calcImages}
-						display="masonry"
-						size="1" />
-				</div>
-			</Reveal>
 			<Reveal variant="up" delay={160}>
 				<div class="track-video">
 					<LazyMedia
@@ -353,20 +315,64 @@
 			</Reveal>
 		</div>
 
-		<Reveal>
-			<DirectorCut>
-				<div class="prose">
-					<p>
-						We were not good musicians. The recordings live somewhere on a hard drive
-						between "endearing" and "unlistenable", depending on the track. But the music
-						videos taught me <em>so much</em>
-						about editing to tempo, about how a cut can land on a beat, about how a small change
-						in audio can completely change what a viewer feels in a shot. I cut every short
-						film I make differently because of those years.
-					</p>
+		<!-- The stills from all three shoots. The songs themselves stay in both
+		     cuts; these are the production photos behind them. -->
+		<DirectorCut scenes={3}>
+			<Reveal variant="up" delay={120}>
+				<div class="paired">
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_plays_guitar.avif"
+						alt="Brian plays guitar"
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(0, e.currentTarget)} />
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif"
+						alt="Summoning a guitar via reversed footage"
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 				</div>
-			</DirectorCut>
+			</Reveal>
+
+			<Reveal variant="up" delay={120}>
+				<div class="gallery-bleed">
+					<LightboxGallery
+						key="music-videos-flava"
+						items={flavaImages}
+						display="masonry"
+						size="2" />
+				</div>
+			</Reveal>
+
+			<Reveal variant="up" delay={120}>
+				<div class="gallery-bleed">
+					<LightboxGallery
+						key="music-videos-calc"
+						items={calcImages}
+						display="masonry"
+						size="1" />
+				</div>
+			</Reveal>
+		</DirectorCut>
+
+		<Reveal>
+			<div class="prose">
+				<p>
+					We were not good musicians. The recordings live somewhere on a hard drive
+					between "endearing" and "unlistenable", depending on the track. But the music
+					videos taught me <em>so much</em>
+					about editing to tempo, about how a cut can land on a beat, about how a small change
+					in audio can completely change what a viewer feels in a shot. I cut every short film
+					I make differently because of those years.
+				</p>
+			</div>
 		</Reveal>
+
+		{#if !cut.director}
+			<!-- Headless twins of the folded galleries: their thumbnails are cut,
+			     but `?media=` links to them still have to resolve. -->
+			<LightboxGallery key="music-videos-flava" items={flavaImages} display="lightbox" />
+			<LightboxGallery key="music-videos-calc" items={calcImages} display="lightbox" />
+		{/if}
 	</div>
 
 	<LightboxGallery

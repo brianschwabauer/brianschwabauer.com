@@ -4,6 +4,7 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import { cut } from '$lib/cut.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -386,6 +387,21 @@
 				</Reveal>
 			</div>
 
+			<Reveal variant="up" delay={200}>
+				<div class="pac-video">
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack/poster.jpg"
+						alt="Pac-Attack (2008) — full short"
+						ratio="16 / 9"
+						video
+						onclick={(e) => gallery?.open(5, e.currentTarget)} />
+				</div>
+			</Reveal>
+		</div>
+
+		<!-- Everything past the trick itself: how it was built, and the three
+		     films that came out of learning After Effects. -->
+		<DirectorCut scenes={5}>
 			<Reveal variant="up" delay={150}>
 				<div class="pac-flow">
 					<div class="pac-step">
@@ -420,89 +436,77 @@
 				</div>
 			</Reveal>
 
-			<Reveal variant="up" delay={200}>
-				<div class="pac-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack/poster.jpg"
-						alt="Pac-Attack (2008) — full short"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(5, e.currentTarget)} />
-				</div>
-			</Reveal>
-		</div>
+			<div class="ae-block">
+				<Reveal variant="up">
+					<h3 class="sub">Discovering After Effects</h3>
+					<p>
+						Our editor couldn't take us further. So I picked up After Effects and started
+						running tests — every VFX artist's rite of passage. Clone yourself. Build a
+						lightsaber. Get hit by a car. Animate a logo.
+					</p>
+				</Reveal>
 
-		<div class="ae-block">
-			<Reveal variant="up">
-				<h3 class="sub">Discovering After Effects</h3>
-				<p>
-					Our editor couldn't take us further. So I picked up After Effects and started
-					running tests — every VFX artist's rite of passage. Clone yourself. Build a
-					lightsaber. Get hit by a car. Animate a logo.
-				</p>
-			</Reveal>
+				<Reveal variant="up" delay={100}>
+					<LightboxGallery
+						key="green-screen-vfx"
+						items={vfxImages}
+						display="masonry"
+						size="0" />
+				</Reveal>
+			</div>
 
-			<Reveal variant="up" delay={100}>
-				<LightboxGallery
-					key="green-screen-vfx"
-					items={vfxImages}
-					display="masonry"
-					size="0" />
-			</Reveal>
-		</div>
+			<div class="nuisance-block">
+				<Reveal variant="up">
+					<h3 class="sub">Nuisance-B-Gone</h3>
+					<p>
+						Once I learned After Effects had a "rotoscope" capability, I had to test it.
+						Cut out a chair before it vanishes. Cut out a shoe. Stay locked-off on a
+						tripod and let the trick do the work. We turned the test into a fake
+						infomercial.
+					</p>
+				</Reveal>
+				<Reveal variant="up" delay={100}>
+					<LightboxGallery
+						key="green-screen-nuisance"
+						items={nuisanceImages}
+						display="masonry-row"
+						size="2" />
+				</Reveal>
+				<Reveal variant="up" delay={150}>
+					<div class="inline-video">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone/poster.jpg"
+							alt="Nuisance-B-Gone — the fake infomercial"
+							ratio="16 / 9"
+							video
+							onclick={(e) => gallery?.open(6, e.currentTarget)} />
+					</div>
+				</Reveal>
+			</div>
 
-		<div class="nuisance-block">
-			<Reveal variant="up">
-				<h3 class="sub">Nuisance-B-Gone</h3>
-				<p>
-					Once I learned After Effects had a "rotoscope" capability, I had to test it. Cut
-					out a chair before it vanishes. Cut out a shoe. Stay locked-off on a tripod and
-					let the trick do the work. We turned the test into a fake infomercial.
-				</p>
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<LightboxGallery
-					key="green-screen-nuisance"
-					items={nuisanceImages}
-					display="masonry-row"
-					size="2" />
-			</Reveal>
-			<Reveal variant="up" delay={150}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone/poster.jpg"
-						alt="Nuisance-B-Gone — the fake infomercial"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(6, e.currentTarget)} />
-				</div>
-			</Reveal>
-		</div>
+			<div class="sideline-block">
+				<Reveal variant="up">
+					<h3 class="sub">Sideline Huddler</h3>
+					<p>
+						My sister Amanda "invented" a warm blanket with a waterproof shell for outdoor
+						sports — basically a Snuggie you could take outside, before Snuggies existed.
+						We made her a fake commercial that put her into rain, snow, and fire via green
+						screen.
+					</p>
+				</Reveal>
+				<Reveal variant="up" delay={100}>
+					<div class="inline-video">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2009-02-13_sideline_huddler/poster.jpg"
+							alt="Sideline Huddler — Amanda's invention commercial"
+							ratio="16 / 9"
+							video
+							onclick={(e) => gallery?.open(7, e.currentTarget)} />
+					</div>
+				</Reveal>
+			</div>
 
-		<div class="sideline-block">
-			<Reveal variant="up">
-				<h3 class="sub">Sideline Huddler</h3>
-				<p>
-					My sister Amanda "invented" a warm blanket with a waterproof shell for outdoor
-					sports — basically a Snuggie you could take outside, before Snuggies existed. We
-					made her a fake commercial that put her into rain, snow, and fire via green
-					screen.
-				</p>
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2009-02-13_sideline_huddler/poster.jpg"
-						alt="Sideline Huddler — Amanda's invention commercial"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(7, e.currentTarget)} />
-				</div>
-			</Reveal>
-		</div>
-
-		<Reveal>
-			<DirectorCut>
+			<Reveal>
 				<div class="prose">
 					<p>
 						This was the pattern: we picked an effect we'd never done before. We dove
@@ -516,8 +520,18 @@
 						later (next section over) was about stop-motion. Everything was an excuse.
 					</p>
 				</div>
-			</DirectorCut>
-		</Reveal>
+			</Reveal>
+		</DirectorCut>
+
+		{#if !cut.director}
+			<!-- Headless twins of the folded galleries: their thumbnails are cut,
+			     but `?media=` links to them still have to resolve. -->
+			<LightboxGallery key="green-screen-vfx" items={vfxImages} display="lightbox" />
+			<LightboxGallery
+				key="green-screen-nuisance"
+				items={nuisanceImages}
+				display="lightbox" />
+		{/if}
 	</div>
 
 	<LightboxGallery

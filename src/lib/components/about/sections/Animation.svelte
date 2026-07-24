@@ -4,7 +4,6 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
-	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import { cut } from '$lib/cut.svelte';
 	import { Comparison } from '@delightstack/components/display';
 	import PinScrub from '../primitives/PinScrub.svelte';
@@ -360,23 +359,6 @@
 				</PinScrub>
 			</div>
 
-			<Reveal variant="up" delay={100}>
-				<div class="exposure-grid">
-					<!-- The gallery stays mounted in both cuts so its `?media=` deep links
-					     always resolve; the theatrical cut only drops the thumbnails. -->
-					<div class="gallery-bleed">
-						<LightboxGallery
-							key="animation-exposure"
-							items={exposureImages}
-							display={cut.director ? 'masonry' : 'lightbox'}
-							size="2" />
-					</div>
-					{#if !cut.director}
-						<DeletedScenes scenes={exposureImages.length} />
-					{/if}
-				</div>
-			</Reveal>
-
 			<Reveal variant="up" delay={130}>
 				<div class="inline-video">
 					<LazyMedia
@@ -388,8 +370,22 @@
 				</div>
 			</Reveal>
 
-			<Reveal>
-				<DirectorCut>
+			<!-- How Exposure was actually made: every VFX and BTS frame, and the
+			     tricks behind the shoot. The film itself plays in both cuts. -->
+			<DirectorCut scenes={exposureImages.length + 1}>
+				<Reveal variant="up" delay={100}>
+					<div class="exposure-grid">
+						<div class="gallery-bleed">
+							<LightboxGallery
+								key="animation-exposure"
+								items={exposureImages}
+								display="masonry"
+								size="2" />
+						</div>
+					</div>
+				</Reveal>
+
+				<Reveal>
 					<div class="prose">
 						<p>
 							We wanted to shoot in rain at night, but couldn't wait for the weather, so
@@ -408,8 +404,17 @@
 							past the camera. Looking back at it, I'm still genuinely proud of that one.
 						</p>
 					</div>
-				</DirectorCut>
-			</Reveal>
+				</Reveal>
+			</DirectorCut>
+
+			{#if !cut.director}
+				<!-- Headless twin of the folded gallery: its thumbnails are cut, but
+				     `?media=` links to them still have to resolve. -->
+				<LightboxGallery
+					key="animation-exposure"
+					items={exposureImages}
+					display="lightbox" />
+			{/if}
 		</div>
 
 		<div class="iprez">

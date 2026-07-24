@@ -2,6 +2,8 @@
 	import SectionShell from '../primitives/SectionShell.svelte';
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
+	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import { cut } from '$lib/cut.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
@@ -458,65 +460,8 @@
 				</p>
 			</Reveal>
 
-			<div class="control-room">
-				<Reveal variant="up" delay={80}>
-					<div class="cr-card">
-						<div class="cr-eyebrow">SITE</div>
-						<h4>The KSMS website</h4>
-						<p>
-							I built two versions: an animated, interactive Flash version that won "Best
-							Interactive Site" at a local competition, then a WordPress version once
-							Flash started its slow death so future students could keep updating it.
-						</p>
-						<div class="cr-media">
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2010-07-30_ksms_flash_website_large_version_screen_recording-main_menu.avif"
-								alt="KSMS Flash site (later version)"
-								ratio="4 / 3"
-								onclick={(e) => extrasGallery?.open(2, e.currentTarget)} />
-						</div>
-					</div>
-				</Reveal>
-
-				<Reveal variant="up" delay={140}>
-					<div class="cr-card">
-						<div class="cr-eyebrow">GAME</div>
-						<h4>"Scott Hirons Experience"</h4>
-						<p>
-							A Flash game where you play as Mr. Hirons defending the building from
-							astronauts by shooting tennis balls. With actual scoring this time. The
-							furthest I'd gotten on a complete game.
-						</p>
-						<div class="cr-media">
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2010-01-01_scott_hirons_experience_flash_game_screen_recording-gameplay.avif"
-								alt="Scott Hirons Experience gameplay"
-								ratio="4 / 3"
-								onclick={(e) => extrasGallery?.open(3, e.currentTarget)} />
-						</div>
-					</div>
-				</Reveal>
-
-				<Reveal variant="up" delay={200}>
-					<div class="cr-card">
-						<div class="cr-eyebrow">EXPERIMENT</div>
-						<h4>"Hall View"</h4>
-						<p>
-							Google Street View, but for our school. I walked around with a camera, shot
-							360-stitched panoramas at every hallway junction, then built a minimap-based
-							viewer so you could click a dot to "stand" at that point. QuickTime did the
-							actual panorama rendering.
-						</p>
-						<div class="cr-media">
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2010-08-18_ksms_hallview_full_page_screen_recording.avif"
-								alt="KSMS Hall View screen recording"
-								ratio="4 / 3"
-								onclick={(e) => extrasGallery?.open(4, e.currentTarget)} />
-						</div>
-					</div>
-				</Reveal>
-			</div>
+			<!-- The three things I built around the broadcast rather than for it.
+			     The station itself, and the shows, stay in both cuts. -->
 
 			<div class="live-broadcast">
 				<Reveal>
@@ -560,25 +505,6 @@
 					</div>
 				</Reveal>
 
-				<Reveal variant="up" delay={150}>
-					<LightboxGallery
-						key="festivals-live-broadcast"
-						items={liveBroadcastImages}
-						display="masonry-row"
-						size="2" />
-				</Reveal>
-
-				<Reveal variant="up" delay={180}>
-					<div class="inline-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip/poster.jpg"
-							alt="KSMS live broadcast · basketball vs SM-NW (2011) — broadcast opener"
-							ratio="16 / 9"
-							video
-							onclick={(e) => extrasGallery?.open(5, e.currentTarget)} />
-					</div>
-				</Reveal>
-
 				<p class="aside">
 					The tape decks were our "instant replay" rig. Each camera also fed a tape deck
 					that recorded its input to a DV tape. When something happened we wanted to
@@ -596,37 +522,6 @@
 						sketches. Stand-up. Improv. A live band. A custom motion-graphics package.
 						Everything KSMS had taught us, in one night.
 					</p>
-				</Reveal>
-
-				<Reveal variant="up" delay={120}>
-					<div class="gal-eyebrow bleed-head">
-						THE BLOCK PARTY · {blockPartyImages.length} PHOTOS
-					</div>
-					<div class="gallery-bleed">
-						<LightboxGallery
-							key="festivals-block-party"
-							items={blockPartyImages}
-							display="masonry"
-							size="2" />
-					</div>
-				</Reveal>
-
-				<Reveal variant="up" delay={150}>
-					<div class="trick-shot">
-						<div class="ts-info">
-							<div class="ts-eyebrow">PROMO · "This is KSMS"</div>
-							<p>
-								To promote Block Party I made a trick-shot commercial: a member of KSMS
-								hits a basketball from an absurd distance. (Yes, the make is a VFX trick.)
-								It got people talking.
-							</p>
-						</div>
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2011-04-14_this_is_ksms-basketball_trick_shot_with_vfx.avif"
-							alt="The KSMS trick shot"
-							ratio="16 / 9"
-							onclick={(e) => extrasGallery?.open(6, e.currentTarget)} />
-					</div>
 				</Reveal>
 
 				<Reveal variant="up" delay={180}>
@@ -681,6 +576,135 @@
 					</div>
 				</Reveal>
 			</div>
+
+			<!-- The KSMS archive: the three things I built around the broadcast,
+			     the control-room stills, and the block-party photo sets. The shows
+			     themselves play in both cuts. -->
+			<DirectorCut scenes={7}>
+				<div class="control-room">
+					<Reveal variant="up" delay={80}>
+						<div class="cr-card">
+							<div class="cr-eyebrow">SITE</div>
+							<h4>The KSMS website</h4>
+							<p>
+								I built two versions: an animated, interactive Flash version that won
+								"Best Interactive Site" at a local competition, then a WordPress version
+								once Flash started its slow death so future students could keep updating
+								it.
+							</p>
+							<div class="cr-media">
+								<LazyMedia
+									src="https://cdn.brianschwabauer.com/media/2010-07-30_ksms_flash_website_large_version_screen_recording-main_menu.avif"
+									alt="KSMS Flash site (later version)"
+									ratio="4 / 3"
+									onclick={(e) => extrasGallery?.open(2, e.currentTarget)} />
+							</div>
+						</div>
+					</Reveal>
+
+					<Reveal variant="up" delay={140}>
+						<div class="cr-card">
+							<div class="cr-eyebrow">GAME</div>
+							<h4>"Scott Hirons Experience"</h4>
+							<p>
+								A Flash game where you play as Mr. Hirons defending the building from
+								astronauts by shooting tennis balls. With actual scoring this time. The
+								furthest I'd gotten on a complete game.
+							</p>
+							<div class="cr-media">
+								<LazyMedia
+									src="https://cdn.brianschwabauer.com/media/2010-01-01_scott_hirons_experience_flash_game_screen_recording-gameplay.avif"
+									alt="Scott Hirons Experience gameplay"
+									ratio="4 / 3"
+									onclick={(e) => extrasGallery?.open(3, e.currentTarget)} />
+							</div>
+						</div>
+					</Reveal>
+
+					<Reveal variant="up" delay={200}>
+						<div class="cr-card">
+							<div class="cr-eyebrow">EXPERIMENT</div>
+							<h4>"Hall View"</h4>
+							<p>
+								Google Street View, but for our school. I walked around with a camera,
+								shot 360-stitched panoramas at every hallway junction, then built a
+								minimap-based viewer so you could click a dot to "stand" at that point.
+								QuickTime did the actual panorama rendering.
+							</p>
+							<div class="cr-media">
+								<LazyMedia
+									src="https://cdn.brianschwabauer.com/media/2010-08-18_ksms_hallview_full_page_screen_recording.avif"
+									alt="KSMS Hall View screen recording"
+									ratio="4 / 3"
+									onclick={(e) => extrasGallery?.open(4, e.currentTarget)} />
+							</div>
+						</div>
+					</Reveal>
+				</div>
+
+				<Reveal variant="up" delay={150}>
+					<LightboxGallery
+						key="festivals-live-broadcast"
+						items={liveBroadcastImages}
+						display="masonry-row"
+						size="2" />
+				</Reveal>
+
+				<Reveal variant="up" delay={180}>
+					<div class="inline-video">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip/poster.jpg"
+							alt="KSMS live broadcast · basketball vs SM-NW (2011) — broadcast opener"
+							ratio="16 / 9"
+							video
+							onclick={(e) => extrasGallery?.open(5, e.currentTarget)} />
+					</div>
+				</Reveal>
+
+				<Reveal variant="up" delay={120}>
+					<div class="gal-eyebrow bleed-head">
+						THE BLOCK PARTY · {blockPartyImages.length} PHOTOS
+					</div>
+					<div class="gallery-bleed">
+						<LightboxGallery
+							key="festivals-block-party"
+							items={blockPartyImages}
+							display="masonry"
+							size="2" />
+					</div>
+				</Reveal>
+
+				<Reveal variant="up" delay={150}>
+					<div class="trick-shot">
+						<div class="ts-info">
+							<div class="ts-eyebrow">PROMO · "This is KSMS"</div>
+							<p>
+								To promote Block Party I made a trick-shot commercial: a member of KSMS
+								hits a basketball from an absurd distance. (Yes, the make is a VFX trick.)
+								It got people talking.
+							</p>
+						</div>
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2011-04-14_this_is_ksms-basketball_trick_shot_with_vfx.avif"
+							alt="The KSMS trick shot"
+							ratio="16 / 9"
+							onclick={(e) => extrasGallery?.open(6, e.currentTarget)} />
+					</div>
+				</Reveal>
+			</DirectorCut>
+
+			{#if !cut.director}
+				<!-- Headless twins of the folded galleries: their thumbnails are cut,
+				     but `?media=` links to them still have to resolve. -->
+				<LightboxGallery
+					key="festivals-live-broadcast"
+					items={liveBroadcastImages}
+					display="lightbox" />
+				<LightboxGallery
+					key="festivals-block-party"
+					items={blockPartyImages}
+					display="lightbox" />
+			{/if}
 		</div>
 
 		<div class="last-film">

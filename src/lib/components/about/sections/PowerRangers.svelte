@@ -4,6 +4,7 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import { cut } from '$lib/cut.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
@@ -349,68 +350,83 @@
 				</p>
 			</Reveal>
 
-			<Reveal variant="up" delay={100}>
-				<div class="bts-strip">
-					<div class="bts-eyebrow bleed-head">BEHIND THE SCENES</div>
-					<div class="gallery-bleed">
-						<LightboxGallery
-							key="power-rangers-pr2-bts"
-							items={pr2BTSImages}
-							display="masonry"
-							size="2" />
+			<!-- The second film's archive: both photo sets, the premiere pair, and
+			     what two months of shooting actually taught us. -->
+			<DirectorCut scenes={4}>
+				<Reveal variant="up" delay={100}>
+					<div class="bts-strip">
+						<div class="bts-eyebrow bleed-head">BEHIND THE SCENES</div>
+						<div class="gallery-bleed">
+							<LightboxGallery
+								key="power-rangers-pr2-bts"
+								items={pr2BTSImages}
+								display="masonry"
+								size="2" />
+						</div>
 					</div>
-				</div>
-			</Reveal>
+				</Reveal>
 
-			<Reveal variant="up" delay={150}>
-				<div class="bts-strip">
-					<div class="bts-eyebrow bleed-head">FROM THE FILM</div>
-					<div class="gallery-bleed">
-						<LightboxGallery
-							key="power-rangers-pr2-stills"
-							items={pr2StillImages}
-							display="masonry"
-							size="1" />
+				<Reveal variant="up" delay={150}>
+					<div class="bts-strip">
+						<div class="bts-eyebrow bleed-head">FROM THE FILM</div>
+						<div class="gallery-bleed">
+							<LightboxGallery
+								key="power-rangers-pr2-stills"
+								items={pr2StillImages}
+								display="masonry"
+								size="1" />
+						</div>
 					</div>
-				</div>
-			</Reveal>
+				</Reveal>
 
-			<div class="premiere-2">
-				<Reveal variant="left">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif"
-						alt="The PR360 II premiere projector setup"
-						ratio="4 / 3"
-						onclick={(e) => extrasGallery?.open(1, e.currentTarget)} />
+				<div class="premiere-2">
+					<Reveal variant="left">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif"
+							alt="The PR360 II premiere projector setup"
+							ratio="4 / 3"
+							onclick={(e) => extrasGallery?.open(1, e.currentTarget)} />
+					</Reveal>
+					<Reveal variant="right" delay={100}>
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg"
+							alt="Brian and Kevin at the PR360 II premiere"
+							ratio="4 / 3"
+							onclick={(e) => extrasGallery?.open(2, e.currentTarget)} />
+					</Reveal>
+				</div>
+
+				<Reveal>
+					<div class="prose">
+						<p>
+							Filming day after day in midwestern August heat is a different kind of work.
+							By week three, everyone is tired. Performances slip. Composition slips.
+							Patience slips. We learned to plan harder. We learned what call sheets were
+							for. We learned what an actual production day's energy looks like. None of
+							that is in a film school book — you can only learn it by doing it.
+						</p>
+						<p>
+							Looking back, neither of these movies is good. But I'm still proud of them.
+							They were the first time we tried something that should have been out of
+							reach, and finished it.
+						</p>
+					</div>
 				</Reveal>
-				<Reveal variant="right" delay={100}>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg"
-						alt="Brian and Kevin at the PR360 II premiere"
-						ratio="4 / 3"
-						onclick={(e) => extrasGallery?.open(2, e.currentTarget)} />
-				</Reveal>
-			</div>
+			</DirectorCut>
 		</div>
 
-		<Reveal>
-			<DirectorCut>
-				<div class="prose">
-					<p>
-						Filming day after day in midwestern August heat is a different kind of work.
-						By week three, everyone is tired. Performances slip. Composition slips.
-						Patience slips. We learned to plan harder. We learned what call sheets were
-						for. We learned what an actual production day's energy looks like. None of
-						that is in a film school book — you can only learn it by doing it.
-					</p>
-					<p>
-						Looking back, neither of these movies is good. But I'm still proud of them.
-						They were the first time we tried something that should have been out of
-						reach, and finished it.
-					</p>
-				</div>
-			</DirectorCut>
-		</Reveal>
+		{#if !cut.director}
+			<!-- Headless twins of the folded galleries: their thumbnails are cut,
+			     but `?media=` links to them still have to resolve. -->
+			<LightboxGallery
+				key="power-rangers-pr2-bts"
+				items={pr2BTSImages}
+				display="lightbox" />
+			<LightboxGallery
+				key="power-rangers-pr2-stills"
+				items={pr2StillImages}
+				display="lightbox" />
+		{/if}
 	</div>
 
 	<LightboxGallery
