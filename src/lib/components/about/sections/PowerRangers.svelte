@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import GradientCollapse from '../primitives/GradientCollapse.svelte';
+	import DirectorCut from '../primitives/DirectorCut.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
@@ -353,7 +353,11 @@
 				<div class="bts-strip">
 					<div class="bts-eyebrow bleed-head">BEHIND THE SCENES</div>
 					<div class="gallery-bleed">
-						<LightboxGallery key="power-rangers-pr2-bts" items={pr2BTSImages} display="masonry" size="2" />
+						<LightboxGallery
+							key="power-rangers-pr2-bts"
+							items={pr2BTSImages}
+							display="masonry"
+							size="2" />
 					</div>
 				</div>
 			</Reveal>
@@ -362,7 +366,11 @@
 				<div class="bts-strip">
 					<div class="bts-eyebrow bleed-head">FROM THE FILM</div>
 					<div class="gallery-bleed">
-						<LightboxGallery key="power-rangers-pr2-stills" items={pr2StillImages} display="masonry" size="1" />
+						<LightboxGallery
+							key="power-rangers-pr2-stills"
+							items={pr2StillImages}
+							display="masonry"
+							size="1" />
 					</div>
 				</div>
 			</Reveal>
@@ -386,7 +394,7 @@
 		</div>
 
 		<Reveal>
-			<GradientCollapse label="What we learned filming for two months in a row">
+			<DirectorCut>
 				<div class="prose">
 					<p>
 						Filming day after day in midwestern August heat is a different kind of work.
@@ -401,13 +409,19 @@
 						reach, and finished it.
 					</p>
 				</div>
-			</GradientCollapse>
+			</DirectorCut>
 		</Reveal>
 	</div>
 
-	<LightboxGallery bind:this={reelGallery} key="power-rangers-reel" items={pr1ReelImages} />
+	<LightboxGallery
+		bind:this={reelGallery}
+		key="power-rangers-reel"
+		items={pr1ReelImages} />
 
-	<LightboxGallery bind:this={extrasGallery} key="power-rangers-extras" items={sectionExtras} />
+	<LightboxGallery
+		bind:this={extrasGallery}
+		key="power-rangers-extras"
+		items={sectionExtras} />
 </SectionShell>
 
 <style>

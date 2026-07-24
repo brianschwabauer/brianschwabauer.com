@@ -3,7 +3,9 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import GradientCollapse from '../primitives/GradientCollapse.svelte';
+	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import DeletedScenes from '../primitives/DeletedScenes.svelte';
+	import { cut } from '$lib/cut.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -289,16 +291,18 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<GradientCollapse
-					class="gallery-bleed"
-					label="Show the whole family dance"
-					collapsedHeight="30rem">
+				<!-- The gallery stays mounted in both cuts so its `?media=` deep links
+				     always resolve; the theatrical cut only drops the thumbnails. -->
+				<div class="gallery-bleed">
 					<LightboxGallery
 						key="music-videos-flava"
 						items={flavaImages}
-						display="masonry"
+						display={cut.director ? 'masonry' : 'lightbox'}
 						size="2" />
-				</GradientCollapse>
+				</div>
+				{#if !cut.director}
+					<DeletedScenes scenes={flavaImages.length} />
+				{/if}
 			</Reveal>
 			<Reveal variant="up" delay={160}>
 				<div class="track-video">
@@ -350,7 +354,7 @@
 		</div>
 
 		<Reveal>
-			<GradientCollapse label="An honest take on the music side">
+			<DirectorCut>
 				<div class="prose">
 					<p>
 						We were not good musicians. The recordings live somewhere on a hard drive
@@ -361,7 +365,7 @@
 						film I make differently because of those years.
 					</p>
 				</div>
-			</GradientCollapse>
+			</DirectorCut>
 		</Reveal>
 	</div>
 

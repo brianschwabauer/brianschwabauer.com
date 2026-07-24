@@ -2,7 +2,7 @@
 	import SectionShell from '../primitives/SectionShell.svelte';
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
-	import GradientCollapse from '../primitives/GradientCollapse.svelte';
+	import DirectorCut from '../primitives/DirectorCut.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
@@ -230,7 +230,7 @@
 			</Reveal>
 
 			<Reveal variant="up" delay={100}>
-				<GradientCollapse label="Show the full portfolio" collapsedHeight="24rem">
+				<DirectorCut scenes={reel.length}>
 					<div class="reel-grid">
 						{#each reel as item, i}
 							<figure class="reel-card" style:--i={i}>
@@ -243,7 +243,7 @@
 							</figure>
 						{/each}
 					</div>
-				</GradientCollapse>
+				</DirectorCut>
 			</Reveal>
 		</div>
 

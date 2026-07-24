@@ -1,5 +1,6 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import { untrack, type Snippet } from 'svelte';
+	import { cut } from '$lib/cut.svelte';
 
 	let {
 		id,
@@ -18,6 +19,8 @@
 	} = $props();
 
 	let el = $state<HTMLElement | null>(null);
+	/** Last height written into contain-intrinsic-size (0 = nothing recorded). */
+	let stamped = 0;
 
 	// Stamp the section's real rendered height into contain-intrinsic-size.
 	// Without this, every section far from the viewport is laid out at the
@@ -33,7 +36,6 @@
 		const rendered = () =>
 			typeof el!.checkVisibility !== 'function' ||
 			el!.checkVisibility({ contentVisibilityAuto: true });
-		let stamped = 0;
 		const ro = new ResizeObserver((entries) => {
 			if (!rendered()) return;
 			for (const entry of entries) {
@@ -49,6 +51,21 @@
 		});
 		ro.observe(el);
 		return () => ro.disconnect();
+	});
+
+	// Switching the theatrical/director cut changes almost every section's height
+	// at once. A height remembered from the *other* cut is worse than no memory:
+	// skipped sections keep standing in at a size they no longer have, so the
+	// page carries screen-long phantom gaps and every hash jump lands nowhere
+	// until the reader has scrolled past to force a re-measure. Drop the stamp
+	// and let the observer re-record from scratch.
+	$effect(() => {
+		const active_cut = cut.value;
+		untrack(() => {
+			if (!active_cut) return;
+			stamped = 0;
+			if (el) el.style.containIntrinsicSize = '';
+		});
 	});
 </script>
 

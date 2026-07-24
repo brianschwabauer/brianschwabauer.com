@@ -4,7 +4,7 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
-	import GradientCollapse from '../primitives/GradientCollapse.svelte';
+	import DirectorCut from '../primitives/DirectorCut.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -446,7 +446,7 @@
 			</Reveal>
 
 			<Reveal>
-				<GradientCollapse label={'What it took to make the viewer feel "directed"'}>
+				<DirectorCut>
 					<div class="prose">
 						<p>
 							A 360 video is only half the problem. You also have to <em>guide</em>
@@ -456,7 +456,7 @@
 							the whole webpage — surprisingly fiddly in 2014.
 						</p>
 					</div>
-				</GradientCollapse>
+				</DirectorCut>
 			</Reveal>
 		</div>
 
@@ -616,7 +616,7 @@
 			</Reveal>
 
 			<Reveal>
-				<GradientCollapse label="The tricks that let two real-time oners line up">
+				<DirectorCut>
 					<div class="prose">
 						<p>
 							To make the two shots line up frame-perfect over multiple minutes, I built a
@@ -636,7 +636,7 @@
 							of that.
 						</p>
 					</div>
-				</GradientCollapse>
+				</DirectorCut>
 			</Reveal>
 		</div>
 

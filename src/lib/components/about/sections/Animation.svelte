@@ -3,7 +3,9 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import GradientCollapse from '../primitives/GradientCollapse.svelte';
+	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import DeletedScenes from '../primitives/DeletedScenes.svelte';
+	import { cut } from '$lib/cut.svelte';
 	import { Comparison } from '@delightstack/components/display';
 	import PinScrub from '../primitives/PinScrub.svelte';
 	import ScrubVideo from '../primitives/ScrubVideo.svelte';
@@ -360,16 +362,18 @@
 
 			<Reveal variant="up" delay={100}>
 				<div class="exposure-grid">
-					<GradientCollapse
-						class="gallery-bleed"
-						label="Show all the VFX + BTS shots"
-						collapsedHeight="30rem">
+					<!-- The gallery stays mounted in both cuts so its `?media=` deep links
+					     always resolve; the theatrical cut only drops the thumbnails. -->
+					<div class="gallery-bleed">
 						<LightboxGallery
 							key="animation-exposure"
 							items={exposureImages}
-							display="masonry"
+							display={cut.director ? 'masonry' : 'lightbox'}
 							size="2" />
-					</GradientCollapse>
+					</div>
+					{#if !cut.director}
+						<DeletedScenes scenes={exposureImages.length} />
+					{/if}
 				</div>
 			</Reveal>
 
@@ -385,7 +389,7 @@
 			</Reveal>
 
 			<Reveal>
-				<GradientCollapse label="The film-making tricks behind the shoot">
+				<DirectorCut>
 					<div class="prose">
 						<p>
 							We wanted to shoot in rain at night, but couldn't wait for the weather, so
@@ -404,7 +408,7 @@
 							past the camera. Looking back at it, I'm still genuinely proud of that one.
 						</p>
 					</div>
-				</GradientCollapse>
+				</DirectorCut>
 			</Reveal>
 		</div>
 

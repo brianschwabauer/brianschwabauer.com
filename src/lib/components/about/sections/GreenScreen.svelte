@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import GradientCollapse from '../primitives/GradientCollapse.svelte';
+	import DirectorCut from '../primitives/DirectorCut.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -502,7 +502,7 @@
 		</div>
 
 		<Reveal>
-			<GradientCollapse label="Why we never planned. Why it worked anyway.">
+			<DirectorCut>
 				<div class="prose">
 					<p>
 						This was the pattern: we picked an effect we'd never done before. We dove
@@ -516,7 +516,7 @@
 						later (next section over) was about stop-motion. Everything was an excuse.
 					</p>
 				</div>
-			</GradientCollapse>
+			</DirectorCut>
 		</Reveal>
 	</div>
 

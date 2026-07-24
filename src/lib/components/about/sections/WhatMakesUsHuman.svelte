@@ -3,7 +3,8 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import GradientCollapse from '../primitives/GradientCollapse.svelte';
+	import DeletedScenes from '../primitives/DeletedScenes.svelte';
+	import { cut } from '$lib/cut.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -594,16 +595,18 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<GradientCollapse
-					class="gallery-bleed"
-					label="Show all 41 production stills"
-					collapsedHeight="30rem">
+				<!-- The gallery stays mounted in both cuts so its `?media=` deep links
+				     always resolve; the theatrical cut only drops the thumbnails. -->
+				<div class="gallery-bleed">
 					<LightboxGallery
 						key="what-makes-us-human-bts"
 						items={btsImages}
-						display="masonry"
+						display={cut.director ? 'masonry' : 'lightbox'}
 						size="2" />
-				</GradientCollapse>
+				</div>
+				{#if !cut.director}
+					<DeletedScenes scenes={btsImages.length} />
+				{/if}
 			</Reveal>
 		</div>
 

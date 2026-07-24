@@ -2,12 +2,15 @@
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
 	import { scrollToSection, setSectionHash } from '$lib/sectionNav';
+	import { cut, setCut } from '$lib/cut.svelte';
 
 	let {
 		stops,
 	}: {
 		stops: Array<{ id: string; year: string; label: string }>;
 	} = $props();
+
+	let chip_el = $state<HTMLButtonElement>();
 
 	let activeId = $state(stops[0]?.id ?? '');
 	let scrollPercent = $state(0);
@@ -89,23 +92,36 @@
 </script>
 
 <aside class="year-scrubber" aria-label="Page navigation">
-	<div class="rail">
-		<div class="fill" style:transform="scaleY({scrollPercent})"></div>
+	<!-- Which edit of the page you're watching, and the fastest way to swap it.
+	     Deliberately quiet: it's a status readout first, a control second. -->
+	<button
+		bind:this={chip_el}
+		type="button"
+		class="cut-chip"
+		aria-label="Switch to the {cut.director ? 'theatrical' : "director's"} cut"
+		onclick={() => setCut(cut.director ? 'theatrical' : 'director', chip_el)}>
+		{cut.director ? "Director's cut" : 'Theatrical'}
+	</button>
+
+	<div class="track">
+		<div class="rail">
+			<div class="fill" style:transform="scaleY({scrollPercent})"></div>
+		</div>
+		<ul>
+			{#each stops as stop}
+				<li>
+					<button
+						type="button"
+						class:active={activeId === stop.id}
+						onclick={() => jump(stop.id)}>
+						<span class="year">{stop.year}</span>
+						<span class="label">{stop.label}</span>
+						<span class="dot" aria-hidden="true"></span>
+					</button>
+				</li>
+			{/each}
+		</ul>
 	</div>
-	<ul>
-		{#each stops as stop}
-			<li>
-				<button
-					type="button"
-					class:active={activeId === stop.id}
-					onclick={() => jump(stop.id)}>
-					<span class="year">{stop.year}</span>
-					<span class="label">{stop.label}</span>
-					<span class="dot" aria-hidden="true"></span>
-				</button>
-			</li>
-		{/each}
-	</ul>
 </aside>
 
 <style>
@@ -117,7 +133,57 @@
 		z-index: 50;
 		pointer-events: auto;
 		font-family: var(--font-mono);
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 0.7rem;
 	}
+	.track {
+		position: relative;
+	}
+
+	.cut-chip {
+		all: unset;
+		position: relative;
+		cursor: pointer;
+		padding: 0.28rem 0.6rem;
+		font-family: var(--font-mono);
+		font-size: 0.6rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		white-space: nowrap;
+		color: #fff;
+		border: 1px solid currentColor;
+		border-radius: 999px;
+		opacity: 0.5;
+		text-shadow:
+			0 1px 3px rgba(0, 0, 0, 0.9),
+			0 0 12px rgba(0, 0, 0, 0.7);
+		transition:
+			opacity 250ms ease,
+			background-color 250ms ease;
+	}
+	/* The pill is under 24px tall; grow the target without growing the pill. */
+	.cut-chip::before {
+		content: '';
+		position: absolute;
+		inset: -5px -2px;
+	}
+	.cut-chip:hover {
+		transition-duration: 0s;
+		opacity: 1;
+		background-color: rgba(255, 255, 255, 0.1);
+	}
+	.cut-chip:focus-visible {
+		opacity: 1;
+		outline: 2px solid currentColor;
+		outline-offset: 3px;
+	}
+	.cut-chip:active {
+		transition-duration: 0s;
+		scale: 0.96;
+	}
+
 	.rail {
 		position: absolute;
 		right: 11px;
@@ -150,7 +216,7 @@
 	ul::-webkit-scrollbar {
 		display: none;
 	}
-	button {
+	.track button {
 		all: unset;
 		cursor: pointer;
 		position: relative;
@@ -170,7 +236,7 @@
 			0 0 12px rgba(0, 0, 0, 0.7);
 		transition: color 200ms ease;
 	}
-	button:hover {
+	.track button:hover {
 		transition-duration: 0s;
 		color: #fff;
 	}
@@ -191,8 +257,8 @@
 			max-width 250ms ease,
 			opacity 250ms ease;
 	}
-	button:hover .label,
-	button.active .label {
+	.track button:hover .label,
+	.track button.active .label {
 		transition-duration: 0s;
 		max-width: 12rem;
 		opacity: 1;
@@ -211,7 +277,7 @@
 			background 200ms ease,
 			transform 200ms ease;
 	}
-	button.active .dot {
+	.track button.active .dot {
 		background: #00f2c3;
 		transform: scale(1.4);
 	}
@@ -226,7 +292,7 @@
 		opacity: 0;
 		pointer-events: none;
 	}
-	button.active .dot::after {
+	.track button.active .dot::after {
 		animation: detent 450ms ease-out;
 	}
 	@keyframes detent {
@@ -240,17 +306,24 @@
 		}
 	}
 	@media (prefers-reduced-motion: reduce) {
-		button.active .dot::after {
+		.track button.active .dot::after {
 			animation: none;
 		}
 	}
-	button.active {
+	.track button.active {
 		color: #fff;
 	}
 	/* On mobile the rail crowds the section content — section jumping is
-	   handled by the bottom nav dropdown there instead. */
+	   handled by the bottom nav dropdown there instead. The cut chip stays: it's
+	   the only always-available switch, so it moves to sit above that bar. */
 	@media (max-width: 768px) {
 		.year-scrubber {
+			top: auto;
+			bottom: 66px;
+			right: 0.75rem;
+			transform: none;
+		}
+		.track {
 			display: none;
 		}
 	}

@@ -4,7 +4,7 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ViewfinderFrame from '../primitives/ViewfinderFrame.svelte';
-	import GradientCollapse from '../primitives/GradientCollapse.svelte';
+	import DirectorCut from '../primitives/DirectorCut.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -369,7 +369,7 @@
 		</ul>
 
 		<Reveal variant="up">
-			<GradientCollapse label="The longer story — how the process worked">
+			<DirectorCut>
 				<div class="prose">
 					<p>
 						Every weekend looked the same. I'd ride over to Kevin's house. We'd come up
@@ -397,7 +397,7 @@
 						split has basically held to this day.
 					</p>
 				</div>
-			</GradientCollapse>
+			</DirectorCut>
 		</Reveal>
 	</div>
 
