@@ -227,94 +227,6 @@
 			</Reveal>
 		</div>
 
-		<div class="track">
-			<Reveal>
-				<div class="track-head">
-					<span class="track-num" aria-hidden="true">01</span>
-					<h3 class="sub">
-						Flashlight <span class="dot">·</span>
-						2007
-					</h3>
-				</div>
-				<p class="track-copy">
-					Our first original song, written and recorded with Kevin. A guy goes slowly
-					insane searching for a flashlight he can't find. The music video has way more
-					shots, way more quick cuts, and starts to actually feel like a music video.
-				</p>
-			</Reveal>
-			<Reveal variant="up" delay={160}>
-				<div class="track-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/poster.jpg"
-						alt="Flashlight (2007) — music video"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(2, e.currentTarget)} />
-				</div>
-			</Reveal>
-		</div>
-
-		<div class="track">
-			<Reveal>
-				<div class="track-head">
-					<span class="track-num" aria-hidden="true">02</span>
-					<h3 class="sub">
-						Do Da Flava G <span class="dot">·</span>
-						2010
-					</h3>
-				</div>
-				<p class="track-copy">
-					We wrote a rap song for a friend, made him "into a rapper", filmed my whole
-					family doing a goofy family dance to it — grandparents included — and shot the
-					music video. It placed in a local film festival. I think second.
-				</p>
-				<p class="track-copy">
-					I also built a whole Flash website for the fake artist. There was a game on the
-					site: press a number on the keyboard and the animated Flava G character would do
-					that dance. We wrote four songs for him. We only ever shot a music video for
-					one.
-				</p>
-			</Reveal>
-			<Reveal variant="up" delay={160}>
-				<div class="track-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/poster.jpg"
-						alt="Do Da Flava G (2010) — music video"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(3, e.currentTarget)} />
-				</div>
-			</Reveal>
-		</div>
-
-		<div class="track">
-			<Reveal>
-				<div class="track-head">
-					<span class="track-num" aria-hidden="true">03</span>
-					<h3 class="sub">
-						You Derive Me Crazy <span class="dot">·</span>
-						2010
-					</h3>
-				</div>
-				<p class="track-copy">
-					AP Calculus had just wrapped, so my teacher let us be creative. We wrote a
-					parody — set to Britney Spears' "You Drive Me Crazy" — with lyrics full of calc
-					puns. Shot it in class, used greenscreen to put the whole class into virtual
-					sets, and turned in the most absurd math project the school had ever seen.
-				</p>
-			</Reveal>
-			<Reveal variant="up" delay={160}>
-				<div class="track-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/poster.jpg"
-						alt="You Derive Me Crazy (2010) — calculus parody music video"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(4, e.currentTarget)} />
-				</div>
-			</Reveal>
-		</div>
-
 		<Reveal variant="up" delay={120}>
 			<div class="gallery-bleed">
 				<PeekGallery key="music-videos-flava" items={flavaImages} peek={6} size="2" />
@@ -327,9 +239,98 @@
 			</div>
 		</Reveal>
 
-		<!-- The stills from all three shoots. The songs themselves stay in both
-		     cuts; these are the production photos behind them. -->
-		<DirectorCut scenes={3}>
+		<!-- The three songs and the stills behind them. The photo sets above
+		     stay in both cuts. -->
+		<DirectorCut scenes={4}>
+			<div class="track">
+				<Reveal>
+					<div class="track-head">
+						<span class="track-num" aria-hidden="true">01</span>
+						<h3 class="sub">
+							Flashlight <span class="dot">·</span>
+							2007
+						</h3>
+					</div>
+					<p class="track-copy">
+						Our first original song, written and recorded with Kevin. A guy goes slowly
+						insane searching for a flashlight he can't find. The music video has way more
+						shots, way more quick cuts, and starts to actually feel like a music video.
+					</p>
+				</Reveal>
+				<Reveal variant="up" delay={160}>
+					<div class="track-video">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/poster.jpg"
+							alt="Flashlight (2007) — music video"
+							ratio="16 / 9"
+							video
+							onclick={(e) => gallery?.open(2, e.currentTarget)} />
+					</div>
+				</Reveal>
+			</div>
+
+			<div class="track">
+				<Reveal>
+					<div class="track-head">
+						<span class="track-num" aria-hidden="true">02</span>
+						<h3 class="sub">
+							Do Da Flava G <span class="dot">·</span>
+							2010
+						</h3>
+					</div>
+					<p class="track-copy">
+						We wrote a rap song for a friend, made him "into a rapper", filmed my whole
+						family doing a goofy family dance to it — grandparents included — and shot the
+						music video. It placed in a local film festival. I think second.
+					</p>
+					<p class="track-copy">
+						I also built a whole Flash website for the fake artist. There was a game on
+						the site: press a number on the keyboard and the animated Flava G character
+						would do that dance. We wrote four songs for him. We only ever shot a music
+						video for one.
+					</p>
+				</Reveal>
+				<Reveal variant="up" delay={160}>
+					<div class="track-video">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/poster.jpg"
+							alt="Do Da Flava G (2010) — music video"
+							ratio="16 / 9"
+							video
+							onclick={(e) => gallery?.open(3, e.currentTarget)} />
+					</div>
+				</Reveal>
+			</div>
+
+			<div class="track">
+				<Reveal>
+					<div class="track-head">
+						<span class="track-num" aria-hidden="true">03</span>
+						<h3 class="sub">
+							You Derive Me Crazy <span class="dot">·</span>
+							2010
+						</h3>
+					</div>
+					<p class="track-copy">
+						AP Calculus had just wrapped, so my teacher let us be creative. We wrote a
+						parody — set to Britney Spears' "You Drive Me Crazy" — with lyrics full of
+						calc puns. Shot it in class, used greenscreen to put the whole class into
+						virtual sets, and turned in the most absurd math project the school had ever
+						seen.
+					</p>
+				</Reveal>
+				<Reveal variant="up" delay={160}>
+					<div class="track-video">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/poster.jpg"
+							alt="You Derive Me Crazy (2010) — calculus parody music video"
+							ratio="16 / 9"
+							video
+							onclick={(e) => gallery?.open(4, e.currentTarget)} />
+					</div>
+				</Reveal>
+			</div>
+
 			<Reveal variant="up" delay={120}>
 				<div class="paired">
 					<LazyMedia

@@ -13,6 +13,7 @@
 	let {
 		scenes = 1,
 		label,
+		marker = true,
 		children,
 		class: klass = '',
 	}: {
@@ -21,6 +22,13 @@
 		scenes?: number;
 		/** Overrides the "N deleted scenes" text entirely. */
 		label?: string;
+		/**
+		 * Set false to leave no trace in the theatrical cut. For material the
+		 * theatrical cut is simply better off without — where advertising the
+		 * absence costs more attention than the content was worth. The section's
+		 * other marker still gets the reader to it.
+		 */
+		marker?: boolean;
 		/** Applied to the expanded content only — layout classes like
 		    `.gallery-bleed` describe the content, not the collapsed marker. */
 		class?: string;
@@ -36,7 +44,7 @@
 			<p class="micro">Director's cut</p>
 			{@render children()}
 		</div>
-	{:else}
+	{:else if marker}
 		<DeletedScenes {scenes} {label} />
 	{/if}
 </div>

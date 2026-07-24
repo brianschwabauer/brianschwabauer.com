@@ -230,7 +230,7 @@
 			</Reveal>
 
 			<Reveal variant="up" delay={100}>
-				<DirectorCut scenes={reel.length}>
+				<DirectorCut scenes={reel.length + 1}>
 					<div class="reel-grid">
 						{#each reel as item, i}
 							<figure class="reel-card" style:--i={i}>
@@ -243,126 +243,127 @@
 							</figure>
 						{/each}
 					</div>
+
+					<div class="portfolio-list">
+						<Reveal>
+							<h3 class="sub">More, for the curious</h3>
+							<ul>
+								<li>
+									<strong>Net Price Calculator</strong>
+									— a typography motion-graphics piece for the U.S. Department of Education's
+									Net Price Calculator video contest.
+									<em>1st place.</em>
+								</li>
+								<li>
+									<strong>Missouri Reverse Transfer</strong>
+									— promo for a State of Missouri program that lets 4-year students retroactively
+									earn their associates.
+								</li>
+								<li>
+									<strong>Bioblitz 2014</strong>
+									— highlight video for a local environment-awareness event.
+								</li>
+								<li>
+									<strong>DecisionFX</strong>
+									— logo animation for a Kansas City data-collection company.
+								</li>
+								<li>
+									<strong>URSA Experience</strong>
+									— promo animation for MSU's first-year summer program.
+								</li>
+								<li>
+									<strong>Engage Mobile</strong>
+									— 5-year anniversary logo piece using one icon from every app they'd ever
+									built.
+								</li>
+								<li>
+									<strong>Humane Society</strong>
+									— promo for the Southwest Missouri branch.
+								</li>
+								<li>
+									<strong>ADPi Recruitment</strong>
+									— sorority recruitment video at MSU.
+								</li>
+								<li>
+									<strong>"Met You" by Tamish</strong>
+									— official music video; I did the post, another videographer shot.
+								</li>
+								<li>
+									<strong>121 Live</strong>
+									— Kickstarter video for a startup that wanted to share private live streams
+									across the world.
+								</li>
+								<li>
+									<strong>Wedding films</strong>
+									— many. The Schwikes brand never took off. The work was great.
+								</li>
+							</ul>
+						</Reveal>
+					</div>
 				</DirectorCut>
 			</Reveal>
+
+			<div class="weddings">
+				<Reveal>
+					<h3 class="sub">Wedding films</h3>
+					<p>
+						Many of them — most for other couples. But the one I'm proudest of is the one
+						I was standing in: Jordan and I got married in June 2015, and I cut our own
+						highlight film.
+					</p>
+				</Reveal>
+				<Reveal variant="up" delay={80}>
+					<div class="inline-video">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2015-06-27_jordan_and_brian_wedding-highlight_video/poster.jpg"
+							alt="Jordan & Brian (2015) — our wedding highlight film"
+							ratio="1920 / 818"
+							video
+							onclick={(e) => gallery?.open(11, e.currentTarget)} />
+					</div>
+				</Reveal>
+				<Reveal variant="up" delay={120}>
+					<LightboxGallery
+						key="freelancer-wedding"
+						items={weddingImages}
+						display="masonry-row"
+						size="2" />
+				</Reveal>
+			</div>
+
+			<div class="archives">
+				<Reveal>
+					<h3 class="sub">Sites I built and archived</h3>
+					<p>
+						A handful of small-business marketing sites I designed and built during this
+						stretch. All of these still load — open them up.
+					</p>
+				</Reveal>
+				<Reveal variant="up" delay={100}>
+					<div class="archive-stack">
+						<ArchiveFrame
+							src="http://cdn.brianschwabauer.com/site/schwikes/index.html"
+							title="Schwikes — the wedding business that didn't quite happen"
+							label="Open Schwikes" />
+						<ArchiveFrame
+							src="https://cdn.brianschwabauer.com/site/nortonschmidt/v2/index.html"
+							title="Norton & Schmidt — engineering firm in KC"
+							label="Open Norton & Schmidt" />
+						<ArchiveFrame
+							src="https://cdn.brianschwabauer.com/site/soundraiser/index.html"
+							title="SoundRaiser — fundraising platform for music programs"
+							label="Open SoundRaiser" />
+					</div>
+				</Reveal>
+			</div>
 		</div>
 
-		<div class="portfolio-list">
-			<Reveal>
-				<h3 class="sub">More, for the curious</h3>
-				<ul>
-					<li>
-						<strong>Net Price Calculator</strong>
-						— a typography motion-graphics piece for the U.S. Department of Education's Net
-						Price Calculator video contest.
-						<em>1st place.</em>
-					</li>
-					<li>
-						<strong>Missouri Reverse Transfer</strong>
-						— promo for a State of Missouri program that lets 4-year students retroactively
-						earn their associates.
-					</li>
-					<li>
-						<strong>Bioblitz 2014</strong>
-						— highlight video for a local environment-awareness event.
-					</li>
-					<li>
-						<strong>DecisionFX</strong>
-						— logo animation for a Kansas City data-collection company.
-					</li>
-					<li>
-						<strong>URSA Experience</strong>
-						— promo animation for MSU's first-year summer program.
-					</li>
-					<li>
-						<strong>Engage Mobile</strong>
-						— 5-year anniversary logo piece using one icon from every app they'd ever built.
-					</li>
-					<li>
-						<strong>Humane Society</strong>
-						— promo for the Southwest Missouri branch.
-					</li>
-					<li>
-						<strong>ADPi Recruitment</strong>
-						— sorority recruitment video at MSU.
-					</li>
-					<li>
-						<strong>"Met You" by Tamish</strong>
-						— official music video; I did the post, another videographer shot.
-					</li>
-					<li>
-						<strong>121 Live</strong>
-						— Kickstarter video for a startup that wanted to share private live streams across
-						the world.
-					</li>
-					<li>
-						<strong>Wedding films</strong>
-						— many. The Schwikes brand never took off. The work was great.
-					</li>
-				</ul>
-			</Reveal>
-		</div>
-
-		<div class="weddings">
-			<Reveal>
-				<h3 class="sub">Wedding films</h3>
-				<p>
-					Many of them — most for other couples. But the one I'm proudest of is the one I
-					was standing in: Jordan and I got married in June 2015, and I cut our own
-					highlight film.
-				</p>
-			</Reveal>
-			<Reveal variant="up" delay={80}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2015-06-27_jordan_and_brian_wedding-highlight_video/poster.jpg"
-						alt="Jordan & Brian (2015) — our wedding highlight film"
-						ratio="1920 / 818"
-						video
-						onclick={(e) => gallery?.open(11, e.currentTarget)} />
-				</div>
-			</Reveal>
-			<Reveal variant="up" delay={120}>
-				<LightboxGallery
-					key="freelancer-wedding"
-					items={weddingImages}
-					display="masonry-row"
-					size="2" />
-			</Reveal>
-		</div>
-
-		<div class="archives">
-			<Reveal>
-				<h3 class="sub">Sites I built and archived</h3>
-				<p>
-					A handful of small-business marketing sites I designed and built during this
-					stretch. All of these still load — open them up.
-				</p>
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<div class="archive-stack">
-					<ArchiveFrame
-						src="http://cdn.brianschwabauer.com/site/schwikes/index.html"
-						title="Schwikes — the wedding business that didn't quite happen"
-						label="Open Schwikes" />
-					<ArchiveFrame
-						src="https://cdn.brianschwabauer.com/site/nortonschmidt/v2/index.html"
-						title="Norton & Schmidt — engineering firm in KC"
-						label="Open Norton & Schmidt" />
-					<ArchiveFrame
-						src="https://cdn.brianschwabauer.com/site/soundraiser/index.html"
-						title="SoundRaiser — fundraising platform for music programs"
-						label="Open SoundRaiser" />
-				</div>
-			</Reveal>
-		</div>
+		<LightboxGallery
+			bind:this={gallery}
+			key="freelancer"
+			items={sectionExtras}
+			autoplay_video />
 	</div>
-
-	<LightboxGallery
-		bind:this={gallery}
-		key="freelancer"
-		items={sectionExtras}
-		autoplay_video />
 </SectionShell>
 
 <style>

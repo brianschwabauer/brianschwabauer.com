@@ -420,43 +420,48 @@
 			</Reveal>
 		</div>
 
-		<div class="pickvid">
-			<Reveal>
-				<h3 class="sub">PickVid (2014) — a tiny social app</h3>
-				<p>
-					Another group project in the same class. Idea: a group of friends downloads the
-					app and gets a prompt ("take a sad selfie", "take a picture of something
-					funny"). Everyone uploads their photo to a shared S3 bucket. The app stitches
-					all the photos into a single hollywood-style movie trailer with intense music
-					and explosions — your friends as the cast. We shipped a working prototype.
-				</p>
-			</Reveal>
+		<!-- PickVid is a side project, not one of the films this section is
+		     about. No marker: the section already has one, and advertising
+		     this absence would cost more attention than it saves. -->
+		<DirectorCut marker={false}>
+			<div class="pickvid">
+				<Reveal>
+					<h3 class="sub">PickVid (2014) — a tiny social app</h3>
+					<p>
+						Another group project in the same class. Idea: a group of friends downloads
+						the app and gets a prompt ("take a sad selfie", "take a picture of something
+						funny"). Everyone uploads their photo to a shared S3 bucket. The app stitches
+						all the photos into a single hollywood-style movie trailer with intense music
+						and explosions — your friends as the cast. We shipped a working prototype.
+					</p>
+				</Reveal>
 
-			<Reveal variant="up" delay={100}>
-				<div class="pickvid-grid">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-demo_on_phone.avif"
-						alt="PickVid demo on a phone"
-						ratio="9 / 16"
-						onclick={(e) => gallery?.open(3, e.currentTarget)} />
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-logo_animation.avif"
-						alt="PickVid logo animation"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(4, e.currentTarget)} />
-				</div>
-			</Reveal>
-			<Reveal variant="up" delay={130}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video/poster.jpg"
-						alt="PickVid (2014) — promo video / demo"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(5, e.currentTarget)} />
-				</div>
-			</Reveal>
-		</div>
+				<Reveal variant="up" delay={100}>
+					<div class="pickvid-grid">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-demo_on_phone.avif"
+							alt="PickVid demo on a phone"
+							ratio="9 / 16"
+							onclick={(e) => gallery?.open(3, e.currentTarget)} />
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-logo_animation.avif"
+							alt="PickVid logo animation"
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(4, e.currentTarget)} />
+					</div>
+				</Reveal>
+				<Reveal variant="up" delay={130}>
+					<div class="inline-video">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video/poster.jpg"
+							alt="PickVid (2014) — promo video / demo"
+							ratio="16 / 9"
+							video
+							onclick={(e) => gallery?.open(5, e.currentTarget)} />
+					</div>
+				</Reveal>
+			</div>
+		</DirectorCut>
 
 		<div class="bear-bus">
 			<Reveal>
@@ -505,30 +510,35 @@
 			</Reveal>
 		</div>
 
-		<div class="fugue">
-			<Reveal>
-				<h3 class="sub">Fugue — my first 48-hour film (2014)</h3>
-				<p>
-					Before Split Life there was <strong>Fugue</strong>
-					, my first crack at
-					<strong>SATO 48</strong>
-					— the region's 48-hour film race. You're handed a genre, a prop, and a line of dialogue
-					at kickoff, then get 48 sleepless hours to write, shoot, score, and cut a finished
-					short. It's the film that taught me how much you can actually pull off in two days
-					— and set up the swing I took the next year.
-				</p>
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/poster.jpg"
-						alt="Fugue (2014) — 48-hour film"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(17, e.currentTarget)} />
-				</div>
-			</Reveal>
-		</div>
+		<!-- Fugue is a side project, not one of the films this section is
+		     about. No marker: the section already has one, and advertising
+		     this absence would cost more attention than it saves. -->
+		<DirectorCut marker={false}>
+			<div class="fugue">
+				<Reveal>
+					<h3 class="sub">Fugue — my first 48-hour film (2014)</h3>
+					<p>
+						Before Split Life there was <strong>Fugue</strong>
+						, my first crack at
+						<strong>SATO 48</strong>
+						— the region's 48-hour film race. You're handed a genre, a prop, and a line of dialogue
+						at kickoff, then get 48 sleepless hours to write, shoot, score, and cut a finished
+						short. It's the film that taught me how much you can actually pull off in two days
+						— and set up the swing I took the next year.
+					</p>
+				</Reveal>
+				<Reveal variant="up" delay={100}>
+					<div class="inline-video">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/poster.jpg"
+							alt="Fugue (2014) — 48-hour film"
+							ratio="16 / 9"
+							video
+							onclick={(e) => gallery?.open(17, e.currentTarget)} />
+					</div>
+				</Reveal>
+			</div>
+		</DirectorCut>
 
 		<div class="split-life">
 			<Reveal>

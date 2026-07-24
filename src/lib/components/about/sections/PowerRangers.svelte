@@ -251,9 +251,8 @@
 			<Reveal>
 				<div class="eyebrow">PROJECT 02 · A FULL-LENGTH FILM, ALMOST</div>
 				<h2 class="title">
-					<span class="word w1">POWER</span>
-					<span class="word w2">RANGERS</span>
-					<span class="word w3">360</span>
+					<span class="word w1">&ldquo;FEATURE LENGTH&rdquo;</span>
+					<span class="word w2">FILMS</span>
 				</h2>
 				<p class="lede">
 					We'd spent two summers on short films. We were ready for the big one — a
@@ -262,28 +261,6 @@
 					or world-building, so we borrowed an existing IP. We were thirteen.
 				</p>
 			</Reveal>
-		</div>
-
-		<div class="rangers">
-			{#each [{ name: 'RED', who: 'Brian', color: '#ff3a3a' }, { name: 'BLUE', who: 'Kevin', color: '#3a8cff' }, { name: 'YELLOW', who: 'Emma', color: '#ffd934' }, { name: 'WHITE', who: 'Amanda', color: '#ffffff' }] as r, i}
-				<Reveal variant="up" delay={i * 90}>
-					<div class="ranger-card" style:--c={r.color}>
-						<div class="ranger-helmet">
-							<svg viewBox="0 0 100 110" aria-hidden="true">
-								<path
-									d="M50 8 L82 26 L82 62 Q82 100 50 100 Q18 100 18 62 L18 26 Z"
-									fill="var(--c)"
-									stroke="#000"
-									stroke-width="2" />
-								<rect x="28" y="46" width="44" height="14" fill="#000" />
-								<path d="M50 8 L62 26 L38 26 Z" fill="#fff" opacity="0.18" />
-							</svg>
-						</div>
-						<div class="ranger-name">{r.name}</div>
-						<div class="ranger-who">played by {r.who}</div>
-					</div>
-				</Reveal>
-			{/each}
 		</div>
 
 		<div class="pr-grid">
@@ -455,19 +432,24 @@
 		margin-bottom: 1rem;
 	}
 	.title {
+		/* One line, phone to desktop — the clamp below is sized so the longest
+		   string still clears the narrowest gutter. */
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.1rem;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		justify-content: center;
+		align-items: baseline;
+		gap: 0.28em;
+		white-space: nowrap;
 		font-family: 'Inter', sans-serif;
 		font-weight: 900;
-		line-height: 0.9;
+		line-height: 0.95;
 		letter-spacing: -0.04em;
 		margin: 0;
 	}
 	.word {
 		display: inline-block;
-		font-size: clamp(3rem, 12vw, 9rem);
+		font-size: clamp(1.4rem, 6.6vw, 5rem);
 		background: linear-gradient(180deg, #ffd934 0%, #ffcc33 50%, #ffaa00 100%);
 		-webkit-background-clip: text;
 		background-clip: text;
@@ -480,9 +462,6 @@
 	}
 	.w2 {
 		animation: slamIn 1s cubic-bezier(0.2, 1, 0.3, 1.2) 0.15s both;
-	}
-	.w3 {
-		animation: slamIn 1s cubic-bezier(0.2, 1, 0.3, 1.2) 0.3s both;
 		color: #fff;
 		-webkit-text-stroke: 2px #ffcc33;
 	}
@@ -502,56 +481,6 @@
 		font-size: clamp(1.05rem, 1.6vw, 1.25rem);
 		line-height: 1.6;
 		opacity: 0.88;
-	}
-
-	.rangers {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 1rem;
-		margin: 0 0 4rem;
-	}
-	@media (max-width: 720px) {
-		.rangers {
-			grid-template-columns: repeat(2, 1fr);
-		}
-	}
-	.ranger-card {
-		text-align: center;
-		padding: 1.4rem 0.6rem;
-		background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
-		border: 1px solid var(--c);
-		border-radius: 12px;
-		position: relative;
-		overflow: hidden;
-		transition: transform 200ms ease;
-	}
-	.ranger-card:hover {
-		transition-duration: 0s;
-		transform: translateY(-4px);
-	}
-	.ranger-card::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: radial-gradient(circle at 50% 0%, var(--c), transparent 65%);
-		opacity: 0.16;
-	}
-	.ranger-helmet svg {
-		width: 70px;
-		height: auto;
-		filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
-	}
-	.ranger-name {
-		font-family: var(--font-mono);
-		font-weight: 800;
-		letter-spacing: 0.16em;
-		margin-top: 0.4rem;
-		color: var(--c);
-	}
-	.ranger-who {
-		font-size: 0.85rem;
-		opacity: 0.7;
-		margin-top: 0.2rem;
 	}
 
 	.pr-grid {
