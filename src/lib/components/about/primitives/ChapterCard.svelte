@@ -90,8 +90,11 @@
 	}
 </script>
 
-{#snippet titleCard(shown: boolean)}
-	<div class="title-card" class:shown>
+<!-- `below` places the card under the artwork in normal flow, for the acts whose
+     set piece stays on screen once it has played. Act I instead *replaces* its
+     countdown, so it centres the card over the empty stage. -->
+{#snippet titleCard(shown: boolean, below = false)}
+	<div class="title-card" class:shown class:below>
 		<p class="eyebrow">{meta.eyebrow}</p>
 		<h2>{meta.title}</h2>
 		{#if meta.sub}<p class="sub">{meta.sub}</p>{/if}
@@ -164,7 +167,7 @@
 					</dl>
 				</div>
 			</div>
-			{@render titleCard(clapped)}
+			{@render titleCard(clapped, true)}
 			<div class="splice" class:on={p >= 0.5 && p <= 0.515} aria-hidden="true"></div>
 		</div>
 	{:else}
@@ -185,7 +188,7 @@
 				</div>
 				<pre>{text}<span class="caret" class:done={typed}></span></pre>
 			</div>
-			{@render titleCard(typed)}
+			{@render titleCard(typed, true)}
 		</div>
 	{/if}
 {/snippet}
@@ -236,6 +239,16 @@
 	}
 	.title-card.shown {
 		opacity: 1;
+	}
+	/* In flow, under the set piece. The space is reserved from the first frame
+	   even while the card is invisible, so nothing jumps when it fades in. */
+	.title-card.below {
+		position: static;
+		margin-top: clamp(1.25rem, 3.5vw, 2.25rem);
+	}
+	/* Sitting under artwork rather than filling the frame, so it reads smaller. */
+	.title-card.below h2 {
+		font-size: clamp(2rem, 5.5vw, 4rem);
 	}
 	.eyebrow {
 		font-family: var(--font-mono);
@@ -361,9 +374,11 @@
 	.slate-stage {
 		position: relative;
 		display: grid;
-		place-items: center;
+		place-content: center;
+		justify-items: center;
 		width: 100%;
 		height: 100svh;
+		padding: clamp(1rem, 4vw, 2.5rem);
 		color: #fff;
 	}
 	.slate {
@@ -436,9 +451,11 @@
 	.editor-stage {
 		position: relative;
 		display: grid;
-		place-items: center;
+		place-content: center;
+		justify-items: center;
 		width: 100%;
 		height: 100svh;
+		padding: clamp(1rem, 4vw, 2.5rem);
 		color: #fff;
 	}
 	.editor {
