@@ -2,7 +2,6 @@
 	import { untrack } from 'svelte';
 	import SectionShell from '../primitives/SectionShell.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
-	import { confetti } from '@delightstack/components/feedback';
 
 	function sleep(ms: number) {
 		return new Promise((r) => setTimeout(r, ms));
@@ -534,52 +533,72 @@
 		};
 	});
 
-	// ---- bottom-of-page confetti cannons --------------------------------------
-	// Reaching the very bottom of the page earns a continuous celebration:
-	// cannons at the top corners of the footer fire 45° inward — aimed right at
-	// the sign-off — until you scroll back up.
+	// ---- "nothing is ever final" filename gag ---------------------------------
+	// The line renames itself one step further every time the fourth tenet comes
+	// back on screen, so the joke lands on the reader who scrolls back up to
+	// re-read it — the same person the tenet is about.
+	const FILENAMES = [
+		'homepage_final.svelte',
+		'homepage_final_v2.svelte',
+		'homepage_FINAL_final.svelte',
+		'homepage_FINAL_final_ACTUAL_v3.svelte',
+	];
+	/** Whole rewrite, backspace plus retype, fits in this budget. */
+	const RENAME_MS = 600;
+
+	let t4El = $state<HTMLElement | null>(null);
+	let filename = $state(FILENAMES[0]);
+	let renaming = $state(false);
+
 	$effect(() => {
-		if (reducedMotion()) return;
-		let stops: Array<() => void> | null = null;
-		const COLORS = ['#00f2c3', '#a78bfa', '#ffd66e', '#ff8b8b', '#00d6ff'];
-		const start = () => {
-			if (stops) return;
-			// anchor the emitters to the top edge of the footer, not the
-			// viewport bottom
-			const footer = document.querySelector('footer');
-			const y = footer
-				? Math.min(
-						1,
-						Math.max(0, footer.getBoundingClientRect().top / window.innerHeight),
-					)
-				: 1;
-			const base = {
-				colors: COLORS,
-				particle_count: 80,
-				start_velocity: 75,
-				duration: 1000,
-				z_index: 200,
+		if (!t4El || typeof IntersectionObserver === 'undefined') return;
+		let step = 0;
+		let timer = 0;
+		const rename = () => {
+			step += 1;
+			const target = FILENAMES[step % FILENAMES.length];
+			if (reducedMotion()) {
+				filename = target;
+				return;
+			}
+			const from = filename;
+			// Only rewrite the tail that actually differs — the shared
+			// `homepage_` stem never flickers.
+			let shared = 0;
+			while (
+				shared < from.length &&
+				shared < target.length &&
+				from[shared] === target[shared]
+			) {
+				shared += 1;
+			}
+			const keystrokes = from.length - shared + (target.length - shared);
+			const pace = Math.max(12, Math.round(RENAME_MS / Math.max(1, keystrokes)));
+			clearTimeout(timer);
+			renaming = true;
+			const tick = () => {
+				if (filename.length > shared && !target.startsWith(filename)) {
+					filename = filename.slice(0, -1); // backspace
+				} else if (filename.length < target.length) {
+					filename = target.slice(0, filename.length + 1); // retype
+				} else {
+					renaming = false;
+					return;
+				}
+				timer = window.setTimeout(tick, pace);
 			};
-			stops = [
-				confetti.cannon({ ...base, origin: { x: 0, y }, angle: 45 }),
-				confetti.cannon({ ...base, origin: { x: 1, y }, angle: 135 }),
-			];
+			tick();
 		};
-		const stop = () => {
-			stops?.forEach((s) => s());
-			stops = null;
-		};
-		const onScroll = () => {
-			const doc = document.documentElement;
-			const remaining = doc.scrollHeight - (window.scrollY + window.innerHeight);
-			if (remaining < 60) start();
-			else if (remaining > 240) stop(); // hysteresis so it doesn't stutter
-		};
-		window.addEventListener('scroll', onScroll, { passive: true });
-		onScroll();
+		const io = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) rename();
+			},
+			{ threshold: 0.4 },
+		);
+		io.observe(t4El);
 		return () => {
-			window.removeEventListener('scroll', onScroll);
-			stop();
+			io.disconnect();
+			clearTimeout(timer);
 		};
 	});
 </script>
@@ -592,13 +611,13 @@
 				<h2 class="title">
 					Everything on this page
 					<br />
-					<span class="title-accent">comes down to three things.</span>
+					<span class="title-accent">comes down to four things.</span>
 				</h2>
 				<p class="intro">
 					I started this page in 2006 with a stuffed-animal puppet show on a miniDV tape.
 					I'm wrapping it up with a platform that pays my bills. Strip away the twenty
 					years in between — the Flash games, the fake newscasts, the music videos, the
-					startups — and this is what's left. The three things I actually believe.
+					startups — and this is what's left. The four things I actually believe.
 				</p>
 			</Reveal>
 		</header>
@@ -720,6 +739,27 @@
 							</p>
 							<p class="fine">psst — try clicking. it won't accomplish anything.</p>
 						</div>
+					</Reveal>
+				</div>
+			</li>
+
+			<li class="tenet t4" bind:this={t4El} use:tenetDrift>
+				<div class="tenet-drift">
+					<Reveal variant="up">
+						<div class="numeral" aria-hidden="true">IV</div>
+						<h3 class="statement">Nothing is ever final.</h3>
+						<p class="body">
+							Every project on this page was the "final" version of something — right up
+							until the next one. The kid with the camcorder became the kid with a copy of
+							Flash became the guy with a compiler, and none of them were done. I will
+							never write "final" on a filename, and I mean that as a philosophy: the work
+							continues, the tools change, the story keeps going.
+						</p>
+						<p class="filename">
+							<span>{filename}</span>
+							<span class="caret" class:on={renaming} aria-hidden="true"></span>
+						</p>
+						<p class="fine">(see?)</p>
 					</Reveal>
 				</div>
 			</li>
@@ -876,6 +916,39 @@
 	}
 	.t3 {
 		--tenet-accent: #ff8b8b;
+	}
+	.t4 {
+		--tenet-accent: #ffd66e;
+	}
+
+	.filename {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 1px;
+		margin: 2.4rem 0 0;
+		font-family: var(--font-mono);
+		font-size: clamp(0.8rem, 1.6vw, 1rem);
+		color: var(--tenet-accent);
+		/* The name grows and shrinks a character at a time; without a floor the
+		   whole block would jump around under it mid-rewrite. */
+		min-height: 1.5em;
+		word-break: break-all;
+	}
+	.caret {
+		display: inline-block;
+		width: 0.55em;
+		height: 1.05em;
+		background: var(--tenet-accent);
+		opacity: 0;
+	}
+	/* Shown only while the name is actually being retyped — a caret parked on a
+	   line nothing is editing is just decoration. It does not blink. */
+	.caret.on {
+		opacity: 0.8;
+	}
+	.t4 .fine {
+		margin-top: 0.7rem;
 	}
 
 	.grad {
