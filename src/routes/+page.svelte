@@ -23,7 +23,6 @@
 	import Creed from '$lib/components/about/sections/Creed.svelte';
 	import TheEnd from '$lib/components/about/sections/TheEnd.svelte';
 	import Credits from '$lib/components/about/sections/Credits.svelte';
-	import CreditsStinger from '$lib/components/about/sections/CreditsStinger.svelte';
 	import YearScrubber from '$lib/components/about/primitives/YearScrubber.svelte';
 	import ChapterCard from '$lib/components/about/primitives/ChapterCard.svelte';
 	import EmptyYearMark from '$lib/components/about/primitives/EmptyYearMark.svelte';
@@ -121,7 +120,6 @@
 	<Creed />
 	<TheEnd />
 	<Credits />
-	<CreditsStinger />
 </div>
 
 <style>

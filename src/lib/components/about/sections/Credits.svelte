@@ -2,22 +2,36 @@
 	import SectionShell from '../primitives/SectionShell.svelte';
 
 	const REPO = 'github.com/brianschwabauer/brianschwabauer.com';
-	/** Roll speed, px/s. The crawl is slower — the perspective foreshortens it. */
-	const ROLL_SPEED = 70;
-	const CRAWL_SPEED = 50;
-	const FAST_FORWARD = 5;
-
-	const reducedMotion = () =>
-		window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	/**
+	 * Roll speed in *screen heights per second* rather than pixels — the credits
+	 * now play on the theatre screen in the photo, and that screen is a very
+	 * different size on a phone than on a monitor. Tying the speed to the screen
+	 * keeps a line's journey top-to-bottom at ~11s everywhere.
+	 */
+	const ROLL_RATE = 0.09;
 
 	let reduced = $state(false);
-	let crawl = $state(false);
-	let holding = $state(false);
-	let offset = $state(0);
+	let paused = $state(false);
 
 	let stage_el = $state<HTMLElement | null>(null);
-	let roll_el = $state<HTMLElement | null>(null);
-	let fin_el = $state<HTMLElement | null>(null);
+	let screen_el = $state<HTMLElement | null>(null);
+	let block_el = $state<HTMLElement | null>(null);
+
+	let block_height = $state(0);
+	let screen_height = $state(0);
+
+	/** One loop of the list, in seconds. */
+	const duration = $derived(
+		block_height && screen_height ? block_height / (screen_height * ROLL_RATE) : 0,
+	);
+	/**
+	 * A negative delay starts the loop mid-cycle instead of at the top of the
+	 * list: the tail of the credits is already sliding out and the heading is
+	 * about to rise into frame from the bottom edge of the screen.
+	 */
+	const delay = $derived(
+		duration ? -duration * ((block_height - screen_height) / block_height) : 0,
+	);
 
 	$effect(() => {
 		const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -27,63 +41,37 @@
 		return () => mq.removeEventListener('change', sync);
 	});
 
-	// The roll is time-based, never frame-based, so it reads at the same speed on
-	// a 60Hz laptop and a 120Hz phone. It only runs while the section is at least
-	// half on screen, and picks up exactly where it stopped — scrolling away and
-	// back does not restart the credits.
+	// The roll is one CSS animation over two identical copies of the list, so the
+	// wrap is invisible: by the time copy one has left the top, copy two sits
+	// exactly where copy one started. Its duration is measured, not guessed, so
+	// editing the credits doesn't quietly change how fast they crawl.
 	$effect(() => {
-		if (!stage_el || !roll_el) return;
-		if (reduced || typeof IntersectionObserver === 'undefined') return;
-		let raf = 0;
-		let last = 0;
-		const step = (now: number) => {
-			const delta = last ? (now - last) / 1000 : 0;
-			last = now;
-			const speed = (crawl ? CRAWL_SPEED : ROLL_SPEED) * (holding ? FAST_FORWARD : 1);
-			// Park with FIN centred rather than letting it sail off the top.
-			const end = fin_el
-				? stage_el!.clientHeight / 2 + fin_el.offsetTop + fin_el.offsetHeight / 2
-				: Infinity;
-			offset = Math.min(end, offset + speed * delta);
-			raf = offset < end ? requestAnimationFrame(step) : 0;
+		if (!block_el || !screen_el) return;
+		const measure = () => {
+			block_height = block_el?.offsetHeight ?? 0;
+			screen_height = screen_el?.offsetHeight ?? 0;
 		};
-		const io = new IntersectionObserver(
-			([entry]) => {
-				if (entry.isIntersecting && !raf) {
-					last = 0; // drop the gap spent off-screen instead of jumping
-					raf = requestAnimationFrame(step);
-				} else if (!entry.isIntersecting && raf) {
-					cancelAnimationFrame(raf);
-					raf = 0;
-				}
-			},
-			{ threshold: 0.5 },
-		);
-		io.observe(stage_el);
-		return () => {
-			io.disconnect();
-			if (raf) cancelAnimationFrame(raf);
-		};
+		// Measured up front rather than waiting on the observer's first callback:
+		// a tab that is hidden at mount never gets one, and the roll would sit
+		// frozen with no duration until something happened to resize it.
+		measure();
+		if (typeof ResizeObserver === 'undefined') return;
+		const ro = new ResizeObserver(measure);
+		ro.observe(block_el);
+		ro.observe(screen_el);
+		return () => ro.disconnect();
 	});
 
-	function onpointerdown(event: PointerEvent) {
-		// The crawl toggle lives inside the stage; pressing it shouldn't also
-		// fast-forward past the joke it turns on.
-		if ((event.target as HTMLElement | null)?.closest('.crawl-toggle')) return;
-		holding = true;
-	}
-
-	// Release is tracked on the window: a pointer that goes down on the credits
-	// and up somewhere else would otherwise leave the roll stuck at 5×.
+	// Parked while the section is off screen. It starts unpaused on purpose: if
+	// IntersectionObserver never reports (or isn't there at all), a running roll
+	// is the safe failure, not a frozen one.
 	$effect(() => {
-		if (!holding) return;
-		const release = () => (holding = false);
-		window.addEventListener('pointerup', release);
-		window.addEventListener('pointercancel', release);
-		return () => {
-			window.removeEventListener('pointerup', release);
-			window.removeEventListener('pointercancel', release);
-		};
+		if (!stage_el || typeof IntersectionObserver === 'undefined') return;
+		const io = new IntersectionObserver(([entry]) => (paused = !entry.isIntersecting), {
+			threshold: 0.25,
+		});
+		io.observe(stage_el);
+		return () => io.disconnect();
 	});
 </script>
 
@@ -162,6 +150,13 @@
 		<br />
 		for scrolling all twenty years.
 	</p>
+
+	<p class="fin">FIN</p>
+
+	<div class="stinger">
+		<p class="stinger-title">Brian Schwabauer will return</p>
+		<p class="stinger-sub">in: whatever gets built next.</p>
+	</div>
 {/snippet}
 
 <SectionShell
@@ -173,41 +168,34 @@
 	{#if reduced}
 		<div class="static">
 			{@render list()}
-			<p class="fin">FIN</p>
 		</div>
 	{:else}
-		<div
-			bind:this={stage_el}
-			class="stage"
-			class:crawling={crawl}
-			{onpointerdown}
-			role="presentation">
-			<button
-				type="button"
-				class="crawl-toggle"
-				aria-pressed={crawl}
-				onclick={() => (crawl = !crawl)}>
-				☆ Crawl mode
-			</button>
-			{#if crawl}
-				<p class="crawl-note">
-					(a long time ago, in a backyard far, far away — see also: star_wars_test, 2008)
-				</p>
-			{/if}
+		<div bind:this={stage_el} class="stage">
+			<!-- The photo is sized off the *screen* inside it, not off the viewport:
+			     whatever the window's shape, the whole screen plus a margin is in
+			     frame, and the rest of the auditorium crops away around it. -->
+			<div class="theater">
+				<img
+					class="photo"
+					src="/movie-theater.avif"
+					alt=""
+					width="2048"
+					height="1351"
+					fetchpriority="low"
+					decoding="async" />
 
-			<div class="viewport">
-				<div class="tilt">
-					<div bind:this={roll_el} class="roll" style:translate="0 {-offset}px">
-						{@render list()}
-						<p bind:this={fin_el} class="fin">FIN</p>
+				<div bind:this={screen_el} class="screen">
+					<div
+						class="roll"
+						class:paused
+						class:ready={duration > 0}
+						style:animation-duration="{duration}s"
+						style:animation-delay="{delay}s">
+						<div bind:this={block_el} class="loop">{@render list()}</div>
+						<div class="loop" aria-hidden="true" inert>{@render list()}</div>
 					</div>
 				</div>
 			</div>
-
-			<p class="hint">HOLD TO FAST-FORWARD · SCROLL TO SKIP</p>
-			{#if holding}
-				<p class="ff" aria-hidden="true">▶▶</p>
-			{/if}
 		</div>
 	{/if}
 </SectionShell>
@@ -219,7 +207,7 @@
 	}
 	/* Two classes beat the shell's one, so this wins without !important. The
 	   credits own the whole viewport — the shell's usual vertical padding would
-	   crop the roll. */
+	   crop the photo. */
 	:global(.section-shell.credits-shell) {
 		padding: 0;
 		contain-intrinsic-size: 1px 100svh;
@@ -230,89 +218,191 @@
 		}
 	}
 
+	/*
+	 * Where the screen sits inside movie-theater.avif (2048×1351), as unitless
+	 * fractions of the photo. Everything below is derived from these numbers, so
+	 * swapping the photo out is a six-line edit.
+	 */
 	.stage {
+		--screen-x: 0.2134;
+		--screen-y: 0.1865;
+		--screen-w: 0.5298;
+		--screen-h: 0.3375;
+		--screen-cx: 0.4783;
+		--photo-ratio: 0.6597; /* 1351/2048 */
+
+		/*
+		 * How much auditorium shows past the screen. Sideways it grows with the
+		 * window — 8px on a phone, which has none to spare, up to 250px on a
+		 * desktop. Overhead it stays small on purpose: cropping the ceiling
+		 * lights away is what buys the rows of seats below, and the seats are
+		 * what make the shot read as a theatre.
+		 */
+		--edge: clamp(8px, calc(23vw - 82px), 250px);
+		--above: clamp(24px, 5svh, 54px);
+		--below: 40px;
+
+		/* Whichever axis is tighter wins. The height candidate is expressed as a
+		   width so the two can be compared. */
+		--photo-w: min(
+			calc((100cqw - 2 * var(--edge)) / var(--screen-w)),
+			calc(
+				(100cqh - var(--above) - var(--below)) / (var(--screen-h) * var(--photo-ratio))
+			)
+		);
+		--photo-h: calc(var(--photo-w) * var(--photo-ratio));
+		/*
+		 * Where the picture starts, measured down from the top of the photo, and
+		 * fading in over the 14px below it. Normally that is `--above` clear of
+		 * the screen; the second term is the hard limit, because the lowest row
+		 * of ceiling lights ends at 12.5% of the frame and the whole point of
+		 * this crop is to lose them.
+		 */
+		--cut-top: max(
+			calc(var(--screen-y) * var(--photo-h) - var(--above) - 14px),
+			calc(0.128 * var(--photo-h))
+		);
+
 		position: relative;
 		height: 100svh;
 		overflow: clip;
-		/* Press-and-hold is the fast-forward; without this the browser starts a
-		   text selection instead. */
-		user-select: none;
-		cursor: default;
+		background: #000;
+		container-type: size;
 	}
-	.viewport {
+
+	/*
+	 * Hung from the *screen*, not centred as a picture: the screen's top edge
+	 * lands `--above` below the top of the section and everything else falls
+	 * where it falls. The second term is the floor — a photo shorter than the
+	 * section can't be pulled up past its own bottom edge, or the seats would
+	 * lift off the floor of the frame.
+	 */
+	.theater {
 		position: absolute;
-		inset: 0;
-		perspective: 350px;
+		left: 50%;
+		top: max(
+			calc(var(--above) - var(--screen-y) * var(--photo-h)),
+			calc(100cqh - var(--photo-h))
+		);
+		width: var(--photo-w);
+		height: var(--photo-h);
+		/* Centres the *screen* in the stage rather than the photo. */
+		translate: calc(var(--screen-cx) * -100%) 0;
+		/*
+		 * The top of the picture is cut away above the screen (see `--cut-top`).
+		 * On a wide window that line lands on the top edge of the section anyway;
+		 * on a tall one it does the real work, taking the ceiling lights with it
+		 * so the frame is screen and seats and nothing else. The remaining edges
+		 * are feathered for a different reason: a photo smaller than the section
+		 * would otherwise end in a hard cut against the black page.
+		 */
+		mask-image:
+			linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent),
+			linear-gradient(
+				transparent var(--cut-top),
+				#000 calc(var(--cut-top) + 14px),
+				#000 93%,
+				transparent
+			);
+		mask-composite: intersect;
 	}
-	/* Names roll straight through the bottom gutter where the hint sits, and the
-	   two were fighting each other for legibility. Dim the strip the hint lives
-	   in, the way a player fades its chrome band over the picture. */
-	.stage::after {
-		content: '';
+	.photo {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.screen {
 		position: absolute;
-		inset: auto 0 0 0;
-		height: clamp(4rem, 12vh, 7rem);
-		z-index: 1;
-		pointer-events: none;
-		background: linear-gradient(0deg, #000 20%, transparent);
-	}
-	.tilt {
-		position: absolute;
-		inset: 0;
-		transform-origin: bottom center;
-		transition: transform 400ms ease;
-	}
-	.stage.crawling .tilt {
-		transform: rotateX(24deg);
+		left: calc(var(--screen-x) * 100%);
+		top: calc(var(--screen-y) * 100%);
+		width: calc(var(--screen-w) * 100%);
+		height: calc(var(--screen-h) * 100%);
+		overflow: clip;
+		container-type: size;
+		/* Everything inside is sized in `em` off this one value, so the credits
+		   are the same picture at every screen size — just projected bigger or
+		   smaller, the way a real print is. `--photo-w` resolves against the
+		   stage, so this is genuinely "2.1% of the projected screen width". */
+		font-size: clamp(0.78rem, calc(var(--photo-w) * var(--screen-w) * 0.021), 1.5rem);
+		/* A screen showing white credits is a black screen. Most of the house
+		   lighting in the photo is washed out, but not all of it — what is left
+		   reads as the picture being *projected* rather than pasted on. */
+		background: radial-gradient(
+			130% 130% at 50% 38%,
+			rgba(0, 0, 0, 0.74),
+			rgba(0, 0, 0, 0.91)
+		);
 	}
 	.roll {
 		position: absolute;
-		/* Starts a full viewport below, so the first line rises into frame. */
-		top: 100%;
-		left: 50%;
-		width: min(56rem, 92vw);
-		margin-left: calc(min(56rem, 92vw) / -2);
+		top: 0;
+		left: 0;
+		width: 100%;
+		animation: none;
 	}
-	.stage.crawling .roll {
-		color: #ffe81f;
-		/* The perspective shrinks everything upstage; win the size back. */
-		font-size: 1.15em;
+	.roll.ready {
+		animation-name: roll;
+		animation-timing-function: linear;
+		animation-iteration-count: infinite;
+		animation-fill-mode: both;
 	}
-
+	.roll.paused {
+		animation-play-state: paused;
+	}
+	/*
+	 * Two identical copies, and the roll travels exactly one copy per cycle — so
+	 * the moment it snaps back, copy two is standing precisely where copy one
+	 * was. There is no restart to see.
+	 */
+	@keyframes roll {
+		from {
+			translate: 0 0;
+		}
+		to {
+			translate: 0 -50%;
+		}
+	}
+	/* The breath between the sign-off and the heading coming round again. */
+	.loop {
+		padding-bottom: 35cqh;
+	}
+	/* The name column gets the extra room: the roles are short and fixed, the
+	   names carry the long location and camera lists. */
 	.entry {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0 clamp(1rem, 3vw, 2.5rem);
-		margin-bottom: 1.6rem;
+		grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+		gap: 0 1.5em;
+		margin-bottom: 1.7em;
+		padding: 0 5%;
 	}
 	.role {
 		margin: 0;
 		text-align: right;
 		font-family: var(--font-mono);
-		font-size: 0.7rem;
+		font-size: 0.66em;
 		letter-spacing: 0.18em;
 		text-transform: uppercase;
 		line-height: 1.7;
 		color: rgba(246, 242, 232, 0.55);
 	}
-	.stage.crawling .role {
-		color: rgba(255, 232, 31, 0.6);
-	}
 	.name {
 		margin: 0;
 		text-align: left;
 		font-family: var(--font-display, 'Playfair Display', serif);
-		font-size: 1.05rem;
+		font-size: 1em;
 		line-height: 1.5;
 	}
-	/* Two columns on a phone leaves ~165px a side, which breaks "Matthew
+	/* Two columns on a narrow screen leaves ~80px a side, which breaks "Matthew
 	   Schwabauer, younger brother" across four lines. Stack instead — role over
-	   name, both centred — which is how narrow credits have always run. */
-	@media (max-width: 560px) {
+	   name, both centred — which is how narrow credits have always run. The query
+	   is on the screen's own type size, so it trips on a small phone rather than
+	   at some viewport width that no longer means anything here. */
+	@container (max-width: 38em) {
 		.entry {
 			grid-template-columns: 1fr;
-			gap: 0.15rem;
-			margin-bottom: 1.9rem;
+			gap: 0.15em;
+			margin-bottom: 2em;
 		}
 		.role,
 		.name {
@@ -322,42 +412,43 @@
 	.note {
 		display: block;
 		font-family: var(--font-sans);
-		font-size: 0.82rem;
+		font-size: 0.78em;
 		line-height: 1.5;
 		color: rgba(246, 242, 232, 0.6);
 	}
-	.stage.crawling .note {
-		color: rgba(255, 232, 31, 0.65);
-	}
-
 	.card-heading {
-		margin: 0 0 4rem;
+		margin: 0 0 3.5em;
+		padding: 0 6%;
 		text-align: center;
 		font-family: var(--font-display, 'Playfair Display', serif);
-		font-size: clamp(1.6rem, 4vw, 2.6rem);
-		letter-spacing: 0.16em;
+		font-size: 1.8em;
+		letter-spacing: 0.14em;
 		text-transform: uppercase;
+		text-wrap: balance;
 	}
 	.colophon,
 	.joke,
 	.rating,
 	.thanks,
-	.fin {
+	.fin,
+	.stinger {
 		text-align: center;
 	}
 	.colophon {
-		margin: 4rem auto 0;
-		max-width: 34rem;
+		margin: 4em auto 0;
+		max-width: 34em;
+		padding: 0 6%;
 	}
 	.colophon p {
-		margin: 0 0 0.35rem;
+		margin: 0 0 0.35em;
 		font-family: var(--font-display, 'Playfair Display', serif);
-		font-size: 1.05rem;
+		font-size: 1em;
 		line-height: 1.6;
 	}
-	.source {
+	.colophon .source {
 		font-family: var(--font-mono);
-		font-size: 0.78rem;
+		font-size: 0.74em;
+		word-break: break-word;
 	}
 	.colophon a {
 		color: inherit;
@@ -365,18 +456,20 @@
 		text-underline-offset: 3px;
 	}
 	.joke {
-		margin: 2.6rem auto 0;
-		max-width: 34rem;
+		margin: 2.6em auto 0;
+		max-width: 34em;
+		padding: 0 6%;
 		font-family: var(--font-display, 'Playfair Display', serif);
 		font-style: italic;
-		font-size: 1.05rem;
+		font-size: 1em;
 	}
 
 	.rating {
-		margin: 4rem auto 0;
-		max-width: 30rem;
-		padding: 1.1rem 1.4rem;
-		border: 2px solid #2f8f4e;
+		box-sizing: border-box;
+		margin: 4em auto 0;
+		max-width: 26em;
+		padding: 1.1em 1.4em;
+		border: 0.12em solid #2f8f4e;
 		border-radius: 2px;
 		background: rgba(47, 143, 78, 0.08);
 		text-transform: uppercase;
@@ -388,96 +481,54 @@
 	}
 	.rating-top,
 	.rating-bottom {
-		font-size: 0.6rem;
+		font-size: 0.56em;
 		letter-spacing: 0.2em;
 		color: rgba(246, 242, 232, 0.7);
 	}
-	.rating-letter {
-		margin: 0.35rem 0 !important;
-		font-size: 1.1rem;
+	.rating .rating-letter {
+		margin: 0.35em 0;
+		font-size: 1em;
 		font-weight: 700;
 		letter-spacing: 0.14em;
 	}
 
 	.thanks {
-		margin: 4rem auto 0;
-		max-width: 34rem;
+		margin: 4em auto 0;
+		max-width: 34em;
+		padding: 0 6%;
 		font-family: var(--font-display, 'Playfair Display', serif);
-		font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+		font-size: 1.25em;
 		line-height: 1.6;
 	}
 	.fin {
-		margin: 6rem auto 0;
+		margin: 5em auto 0;
 		font-family: var(--font-display, 'Playfair Display', serif);
 		font-style: italic;
-		font-size: clamp(2rem, 6vw, 3.5rem);
+		font-size: 2.6em;
 		letter-spacing: 0.2em;
 	}
 
-	.crawl-toggle {
-		position: absolute;
-		top: clamp(1rem, 3vw, 2rem);
-		right: clamp(1rem, 3vw, 2rem);
-		z-index: 2;
-		padding: 0.4rem 0.75rem;
-		font-family: var(--font-mono);
-		font-size: 0.65rem;
-		letter-spacing: 0.16em;
+	/* The stinger that used to be its own post-credits scene, now the last card
+	   of the roll. The gap above it is what sells it as a separate beat. */
+	.stinger {
+		margin: 7em auto 0;
+		max-width: 34em;
+		padding: 0 6%;
+	}
+	.stinger-title {
+		margin: 0 0 0.7em;
+		font-family: var(--font-display, 'Playfair Display', serif);
+		font-size: 1.5em;
+		line-height: 1.15;
+		letter-spacing: 0.04em;
 		text-transform: uppercase;
-		color: rgba(246, 242, 232, 0.7);
-		background: transparent;
-		border: 1px solid rgba(246, 242, 232, 0.25);
-		border-radius: 3px;
-		cursor: pointer;
-		transition:
-			color 250ms ease,
-			border-color 250ms ease;
 	}
-	.crawl-toggle:hover {
-		transition-duration: 0s;
-		color: #ffe81f;
-		border-color: rgba(255, 232, 31, 0.7);
-	}
-	.crawl-toggle[aria-pressed='true'] {
-		color: #ffe81f;
-		border-color: rgba(255, 232, 31, 0.7);
-	}
-	.crawl-note {
-		position: absolute;
-		top: calc(clamp(1rem, 3vw, 2rem) + 2.2rem);
-		right: clamp(1rem, 3vw, 2rem);
-		z-index: 2;
-		max-width: min(24rem, 60vw);
-		margin: 0;
-		text-align: right;
-		font-family: var(--font-mono);
-		font-size: 0.6rem;
-		line-height: 1.6;
-		color: rgba(255, 232, 31, 0.55);
-	}
-
-	.hint,
-	.ff {
-		position: absolute;
-		bottom: clamp(1rem, 3vw, 2rem);
-		z-index: 2;
+	.stinger-sub {
 		margin: 0;
 		font-family: var(--font-mono);
-		pointer-events: none;
-	}
-	.hint {
-		left: 50%;
-		translate: -50% 0;
-		font-size: 0.6rem;
-		letter-spacing: 0.2em;
-		white-space: nowrap;
-		color: rgba(246, 242, 232, 0.4);
-	}
-	.ff {
-		right: clamp(1rem, 3vw, 2rem);
-		font-size: 0.9rem;
-		letter-spacing: 0.1em;
-		color: rgba(246, 242, 232, 0.75);
+		font-size: 0.7em;
+		letter-spacing: 0.22em;
+		color: rgba(246, 242, 232, 0.5);
 	}
 
 	/* Reduced motion: no roll at all — the credits are just a page you read. */
@@ -485,5 +536,27 @@
 		max-width: min(56rem, 92vw);
 		margin: 0 auto;
 		padding: clamp(4rem, 10vw, 7rem) 0;
+		font-size: 1rem;
+	}
+	.static .entry,
+	.static .card-heading,
+	.static .colophon,
+	.static .joke,
+	.static .thanks,
+	.static .stinger {
+		padding: 0;
+	}
+	/* The container query above only knows about the projected screen, which the
+	   reduced-motion version doesn't have — so it needs the viewport rule too. */
+	@media (max-width: 35rem) {
+		.static .entry {
+			grid-template-columns: 1fr;
+			gap: 0.15em;
+			margin-bottom: 2em;
+		}
+		.static .role,
+		.static .name {
+			text-align: center;
+		}
 	}
 </style>
