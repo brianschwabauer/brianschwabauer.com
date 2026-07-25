@@ -4,7 +4,7 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
+	import ArchiveTabs from '../primitives/ArchiveTabs.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -334,25 +334,25 @@
 			<div class="archives">
 				<Reveal>
 					<h3 class="sub">Sites I built and archived</h3>
-					<p>
-						A handful of small-business marketing sites I designed and built during this
-						stretch. All of these still load — open them up.
-					</p>
+					<p>Three client sites, preserved exactly as they shipped:</p>
 				</Reveal>
 				<Reveal variant="up" delay={100}>
 					<div class="archive-stack">
-						<ArchiveFrame
-							src="http://cdn.brianschwabauer.com/site/schwikes/index.html"
-							title="Schwikes — the wedding business that didn't quite happen"
-							label="Open Schwikes" />
-						<ArchiveFrame
-							src="https://cdn.brianschwabauer.com/site/nortonschmidt/v2/index.html"
-							title="Norton & Schmidt — engineering firm in KC"
-							label="Open Norton & Schmidt" />
-						<ArchiveFrame
-							src="https://cdn.brianschwabauer.com/site/soundraiser/index.html"
-							title="SoundRaiser — fundraising platform for music programs"
-							label="Open SoundRaiser" />
+						<ArchiveTabs
+							tabs={[
+								{
+									title: 'Schwikes',
+									src: 'http://cdn.brianschwabauer.com/site/schwikes/index.html',
+								},
+								{
+									title: 'Norton & Schmidt',
+									src: 'https://cdn.brianschwabauer.com/site/nortonschmidt/v2/index.html',
+								},
+								{
+									title: 'SoundRaiser',
+									src: 'https://cdn.brianschwabauer.com/site/soundraiser/index.html',
+								},
+							]} />
 					</div>
 				</Reveal>
 			</div>
@@ -586,9 +586,6 @@
 	}
 
 	.archive-stack {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
 		margin-top: 1.5rem;
 	}
 </style>

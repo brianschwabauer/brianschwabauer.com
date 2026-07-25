@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
+	import ArchiveTabs from '../primitives/ArchiveTabs.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -316,12 +316,6 @@
 					display="masonry-row"
 					size="2" />
 			</Reveal>
-			<Reveal variant="up" delay={150}>
-				<ArchiveFrame
-					src="http://cdn.brianschwabauer.com/site/engagementgrower/index.html"
-					title="Engagement Grower marketing site"
-					label="Open the archived marketing site" />
-			</Reveal>
 		</div>
 
 		<div class="card project wyoti">
@@ -337,10 +331,18 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<ArchiveFrame
-					src="https://cdn.brianschwabauer.com/site/wyoti/index.html"
-					title="Wyoti — agency site"
-					label="Open Wyoti" />
+				<p class="archive-lead">Both companies' sites, archived in amber:</p>
+				<ArchiveTabs
+					tabs={[
+						{
+							title: 'Engagement Grower',
+							src: 'http://cdn.brianschwabauer.com/site/engagementgrower/index.html',
+						},
+						{
+							title: 'Wyoti',
+							src: 'https://cdn.brianschwabauer.com/site/wyoti/index.html',
+						},
+					]} />
 			</Reveal>
 		</div>
 
@@ -543,6 +545,11 @@
 		color: #00d6ff;
 		text-decoration: underline;
 		text-underline-offset: 4px;
+	}
+
+	.archive-lead {
+		margin: 0 0 0.9rem;
+		line-height: 1.6;
 	}
 
 	.bts-row {
