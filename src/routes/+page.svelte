@@ -17,6 +17,7 @@
 	import WhatMakesUsHuman from '$lib/components/about/sections/WhatMakesUsHuman.svelte';
 	import Freelancer from '$lib/components/about/sections/Freelancer.svelte';
 	import Entrepreneurship from '$lib/components/about/sections/Entrepreneurship.svelte';
+	import ShippedWall from '$lib/components/about/sections/ShippedWall.svelte';
 	import ShowAndTour from '$lib/components/about/sections/ShowAndTour.svelte';
 	import SideProjects from '$lib/components/about/sections/SideProjects.svelte';
 	import Creed from '$lib/components/about/sections/Creed.svelte';
@@ -55,6 +56,7 @@
 		{ id: 'what-makes-us-human', year: '2015', label: 'Senior Thesis' },
 		{ id: 'freelancer', year: '2016', label: 'Freelancer' },
 		{ id: 'entrepreneurship', year: '2017', label: 'Entrepreneurship' },
+		{ id: 'shipped-wall', year: '2015–18', label: 'The Wall of Shipped Screens' },
 		{ id: 'showandtour', year: '2019', label: 'Show&Tour' },
 		{ id: 'side-projects', year: 'Today', label: 'Side Projects' },
 		{ id: 'what-im-up-to', year: 'Now', label: 'Which Brings Us to Now' },
@@ -100,6 +102,7 @@
 	<ChapterCard act={3} />
 	<Freelancer />
 	<Entrepreneurship />
+	<ShippedWall />
 	<EmptyYearMark
 		year="2018"
 		color="#00d6ff"
