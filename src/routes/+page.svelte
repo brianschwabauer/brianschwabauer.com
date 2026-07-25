@@ -21,6 +21,9 @@
 	import ShowAndTour from '$lib/components/about/sections/ShowAndTour.svelte';
 	import SideProjects from '$lib/components/about/sections/SideProjects.svelte';
 	import Creed from '$lib/components/about/sections/Creed.svelte';
+	import TheEnd from '$lib/components/about/sections/TheEnd.svelte';
+	import Credits from '$lib/components/about/sections/Credits.svelte';
+	import CreditsStinger from '$lib/components/about/sections/CreditsStinger.svelte';
 	import YearScrubber from '$lib/components/about/primitives/YearScrubber.svelte';
 	import ChapterCard from '$lib/components/about/primitives/ChapterCard.svelte';
 	import EmptyYearMark from '$lib/components/about/primitives/EmptyYearMark.svelte';
@@ -61,6 +64,7 @@
 		{ id: 'side-projects', year: 'Today', label: 'Side Projects' },
 		{ id: 'what-im-up-to', year: 'Now', label: 'Which Brings Us to Now' },
 		{ id: 'creed', year: 'Always', label: 'The Creed' },
+		{ id: 'credits', year: 'Fin', label: 'Credits' },
 	];
 </script>
 
@@ -115,6 +119,9 @@
 	<SideProjects />
 	<WhatImUpTo />
 	<Creed />
+	<TheEnd />
+	<Credits />
+	<CreditsStinger />
 </div>
 
 <style>
