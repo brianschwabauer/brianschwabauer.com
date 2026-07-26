@@ -6,6 +6,7 @@
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
+	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -205,13 +206,13 @@
 
 	let reelGallery = $state<ReturnType<typeof LightboxGallery>>();
 
-	// Standalone clickable LazyMedias + inline video posters in document order.
-	// 0: Yard Sale inline video
-	// 1: Austin Fender (inside <details>)
+	// Standalone clickable LazyMedias + play triggers in document order.
+	// 0: Yard Sale
+	// 1: Austin Fender
 	// 2: KSMS site cr-card LazyMedia
 	// 3: Scott Hirons game cr-card LazyMedia
 	// 4: Hall View cr-card LazyMedia
-	// 5: live broadcast inline video
+	// 5: live broadcast opener
 	// 6: trick-shot LazyMedia
 	// 7: Block Party FULL SHOW video
 	// 8: Block Party TRAILER video
@@ -388,6 +389,21 @@
 				onframeclick={({ index, element }) => reelGallery?.open(index, element)} />
 		</Reveal>
 
+		<!-- The film that started the reel above. Orphaned under the Yard Sale
+		     stills it read as an afterthought; here it's the first entry in the
+		     festival run the banner just counted. -->
+		<Reveal variant="up" delay={140}>
+			<div class="first-submission">
+				<span class="fs-eyebrow">Where the run started</span>
+				<PlayFilm
+					label="Play Austin Fender"
+					title="Austin Fender (2008) — our first festival submission"
+					meta="2008 · first submission"
+					color="#ff3a3a"
+					onclick={(e) => extrasGallery?.open(1, e.currentTarget)} />
+			</div>
+		</Reveal>
+
 		<div class="yard-sale">
 			<Reveal class="bleed-head">
 				<h3 class="sub">Yard Sale (2009) — the one I was most proud of</h3>
@@ -403,6 +419,12 @@
 					together. The shot took so long that a nearby tree's shadow moves across the
 					screen faster than the animals do. I still laugh at that.
 				</p>
+				<PlayFilm
+					label="Play the short"
+					title="Yard Sale (2009) — the stuffed-animal short"
+					meta="2009"
+					color="#ff3a3a"
+					onclick={(e) => extrasGallery?.open(0, e.currentTarget)} />
 			</Reveal>
 			<Reveal variant="up" delay={120}>
 				<div class="gal-eyebrow bleed-head">
@@ -415,32 +437,6 @@
 						display="masonry"
 						size="1" />
 				</div>
-			</Reveal>
-			<Reveal variant="up" delay={160}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale/poster.jpg"
-						alt="Yard Sale (2009) — the stuffed-animal short"
-						ratio="16 / 9"
-						video
-						onclick={(e) => extrasGallery?.open(0, e.currentTarget)} />
-				</div>
-			</Reveal>
-
-			<Reveal variant="up" delay={200}>
-				<details class="extra-video">
-					<summary>
-						Also watch — Austin Fender (2008) · our first festival submission
-					</summary>
-					<div class="inline-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2008-03-19_austin_fender/poster.jpg"
-							alt="Austin Fender (2008)"
-							ratio="16 / 9"
-							video
-							onclick={(e) => extrasGallery?.open(1, e.currentTarget)} />
-					</div>
-				</details>
 			</Reveal>
 		</div>
 
@@ -564,16 +560,12 @@
 						A parody short film for KSMS about life in the midwest. Just a fun one with
 						Kevin and a handful of KSMS regulars.
 					</p>
-				</Reveal>
-				<Reveal variant="up" delay={120}>
-					<div class="inline-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2010-03-20_a_midwestside_story/poster.jpg"
-							alt="A MidWestSide Story (2010)"
-							ratio="16 / 9"
-							video
-							onclick={(e) => extrasGallery?.open(10, e.currentTarget)} />
-					</div>
+					<PlayFilm
+						label="Play the short"
+						title="A MidWestSide Story (2010)"
+						meta="2010"
+						color="#ff3a3a"
+						onclick={(e) => extrasGallery?.open(10, e.currentTarget)} />
 				</Reveal>
 			</div>
 
@@ -664,14 +656,12 @@
 				</div>
 
 				<Reveal variant="up" delay={180}>
-					<div class="inline-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip/poster.jpg"
-							alt="KSMS live broadcast · basketball vs SM-NW (2011) — broadcast opener"
-							ratio="16 / 9"
-							video
-							onclick={(e) => extrasGallery?.open(5, e.currentTarget)} />
-					</div>
+					<PlayFilm
+						label="Play the broadcast opener"
+						title="KSMS live broadcast · basketball vs SM-NW (2011)"
+						meta="2011 · live"
+						color="#ff3a3a"
+						onclick={(e) => extrasGallery?.open(5, e.currentTarget)} />
 				</Reveal>
 
 				<Reveal variant="up" delay={150}>
@@ -803,6 +793,27 @@
 	.yard-sale,
 	.ksms-block {
 		margin: 5rem 0;
+	}
+	/* The play trigger ends the copy; without this it sits flush against the
+	   stills eyebrow below and the two read as one clump. `:global` because the
+	   child is a `Reveal` root, which doesn't carry this component's scope. */
+	.yard-sale > :global(.reveal:first-child) {
+		margin-bottom: clamp(2rem, 4vw, 3.25rem);
+	}
+	.first-submission {
+		--play-film-offset: 0;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem 1.1rem;
+		margin-top: 1.75rem;
+	}
+	.fs-eyebrow {
+		font-family: var(--font-mono);
+		font-size: 0.65rem;
+		letter-spacing: 0.28em;
+		text-transform: uppercase;
+		opacity: 0.55;
 	}
 	.sub {
 		font-size: clamp(1.5rem, 2.6vw, 2.1rem);
@@ -1015,95 +1026,5 @@
 	.inline-video {
 		max-width: 880px;
 		margin: 2rem auto 0;
-	}
-	.extra-video {
-		max-width: 880px;
-		margin: 1.5rem auto 0;
-	}
-	.extra-video summary {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		font-family: var(--font-mono);
-		font-size: 0.78rem;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-		padding: 0.5rem 1rem;
-		border: 1px solid rgba(255, 184, 77, 0.4);
-		border-radius: 999px;
-		cursor: pointer;
-		list-style: none;
-		color: #ffb84d;
-	}
-	.extra-video[open] summary {
-		margin-bottom: 1rem;
-	}
-	.extra-video summary::-webkit-details-marker {
-		display: none;
-	}
-	.extra-video summary {
-		transition: background 200ms ease;
-	}
-	.extra-video summary:hover {
-		transition-duration: 0s;
-		background: rgba(255, 184, 77, 0.12);
-	}
-	.extra-video summary::after {
-		content: '▾';
-		display: inline-block;
-		transition: transform 250ms ease;
-	}
-	.extra-video[open] summary::after {
-		transform: rotate(180deg);
-	}
-
-	.gal-eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		text-transform: uppercase;
-		color: #ffb84d;
-		margin-bottom: 0.75rem;
-	}
-
-	.block-party-videos {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 1rem;
-		margin: 2.5rem 0;
-	}
-	@media (max-width: 900px) {
-		.block-party-videos {
-			grid-template-columns: 1fr;
-		}
-	}
-	.bp-video-card {
-		display: flex;
-		flex-direction: column;
-		gap: 0.4rem;
-	}
-	.bp-video-eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.65rem;
-		letter-spacing: 0.32em;
-		color: #ff3a3a;
-	}
-
-	.midwestside {
-		margin: 4rem 0;
-	}
-	.midwestside p {
-		max-width: 56rem;
-		line-height: 1.6;
-		margin-bottom: 1rem;
-	}
-
-	.last-film {
-		margin: 5rem 0 0;
-	}
-	.last-film p {
-		max-width: 56rem;
-		line-height: 1.6;
-		margin-bottom: 1rem;
 	}
 </style>

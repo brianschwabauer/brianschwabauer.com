@@ -6,8 +6,10 @@
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
+	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+	import { cut } from '$lib/cut.svelte';
 
 	const variousImages: GalleryItem[] = [
 		{
@@ -327,6 +329,11 @@
 							The shoot was an excuse to learn face tracking and HUD compositing. The
 							script was an excuse for the shoot.
 						</p>
+						<PlayFilm
+							title="Facebook in Real Life (2012)"
+							meta="2012"
+							color="#7a4dff"
+							onclick={(e) => gallery?.open(1, e.currentTarget)} />
 					</div>
 					<div class="fb-card">
 						<LazyMedia
@@ -345,16 +352,6 @@
 							</div>
 						</div>
 					</div>
-				</div>
-			</Reveal>
-			<Reveal variant="up" delay={120}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2012-04-27_facebook/poster.jpg"
-						alt="Facebook in Real Life (2012)"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -437,6 +434,12 @@
 						all the photos into a single hollywood-style movie trailer with intense music
 						and explosions — your friends as the cast. We shipped a working prototype.
 					</p>
+					<PlayFilm
+						label="Play the promo"
+						title="PickVid (2014) — promo video / demo"
+						meta="2014"
+						color="#7a4dff"
+						onclick={(e) => gallery?.open(5, e.currentTarget)} />
 				</Reveal>
 
 				<Reveal variant="up" delay={100}>
@@ -451,16 +454,6 @@
 							alt="PickVid logo animation"
 							ratio="16 / 9"
 							onclick={(e) => gallery?.open(4, e.currentTarget)} />
-					</div>
-				</Reveal>
-				<Reveal variant="up" delay={130}>
-					<div class="inline-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video/poster.jpg"
-							alt="PickVid (2014) — promo video / demo"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(5, e.currentTarget)} />
 					</div>
 				</Reveal>
 			</div>
@@ -480,6 +473,12 @@
 					Flash couldn't really do 3D in 2013, so I faked depth with scaled 2D sprites and
 					crossfade swaps of the bus model from different angles. Clunky, but believable.
 				</p>
+				<PlayFilm
+					label="Play the gameplay"
+					title="Bear Bus Bash (2013) — full gameplay recording"
+					meta="2013 · full run"
+					color="#7a4dff"
+					onclick={(e) => gallery?.open(9, e.currentTarget)} />
 			</Reveal>
 
 			<Reveal variant="up" delay={100}>
@@ -501,92 +500,66 @@
 						onclick={(e) => gallery?.open(8, e.currentTarget)} />
 				</div>
 			</Reveal>
-			<Reveal variant="up" delay={140}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording/poster.jpg"
-						alt="Bear Bus Bash (2013) — full gameplay recording"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(9, e.currentTarget)} />
-				</div>
-			</Reveal>
 		</div>
 
-		<!-- Fugue is a side project, not one of the films this section is
-		     about. No marker: the section already has one, and advertising
-		     this absence would cost more attention than it saves. -->
-		<DirectorCut marker={false}>
-			<div class="fugue">
-				<Reveal>
-					<h3 class="sub">Fugue — my first 48-hour film (2014)</h3>
-					<p>
-						Before Split Life there was <strong>Fugue</strong>
-						, my first crack at
-						<strong>SATO 48</strong>
-						— the region's 48-hour film race. You're handed a genre, a prop, and a line of dialogue
-						at kickoff, then get 48 sleepless hours to write, shoot, score, and cut a finished
-						short. It's the film that taught me how much you can actually pull off in two days
-						— and set up the swing I took the next year.
-					</p>
-				</Reveal>
-				<Reveal variant="up" delay={100}>
-					<div class="inline-video">
+		<!-- The two SATO 48 films, side by side: same race, one year apart, and
+		     the pairing is the point — Fugue is the swing that set up Split
+		     Life. Fugue is a side project rather than one of the films this
+		     section is about, so it stays director's-cut only; when it's absent
+		     Split Life takes the full row rather than leaving a hole. -->
+		<div class="sato-pair" class:solo={!cut.director}>
+			{#if cut.director}
+				<div class="sato-col">
+					<Reveal>
+						<p class="micro">Director's cut</p>
+						<h3 class="sub">Fugue — my first 48-hour film (2014)</h3>
+						<p>
+							Before Split Life there was <strong>Fugue</strong>
+							, my first crack at
+							<strong>SATO 48</strong>
+							— the region's 48-hour film race. You're handed a genre, a prop, and a line
+							of dialogue at kickoff, then get 48 sleepless hours to write, shoot, score,
+							and cut a finished short. It's the film that taught me how much you can
+							actually pull off in two days — and set up the swing I took the next year.
+						</p>
+					</Reveal>
+					<Reveal variant="up" delay={100}>
 						<LazyMedia
 							src="https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/poster.jpg"
 							alt="Fugue (2014) — 48-hour film"
 							ratio="16 / 9"
 							video
 							onclick={(e) => gallery?.open(17, e.currentTarget)} />
-					</div>
-				</Reveal>
-			</div>
-		</DirectorCut>
-
-		<div class="split-life">
-			<Reveal>
-				<h3 class="sub">Split Life — a 48-hour film, in stereo (2015)</h3>
-				<p>
-					The next year, back at SATO 48, I wanted to do something nobody had done before.
-					So I made a film with
-					<strong>
-						two oner-shot perspectives, shown side-by-side at the same time, in real time
-					</strong>
-					. One: the protagonist leaves her house. Two: a man hidden outside breaks in while
-					she's gone. She comes back. He gets stuck. They turn out to know each other. It ends.
-				</p>
-			</Reveal>
-
-			<Reveal variant="up" delay={100}>
-				<div class="split-row">
-					<div class="split-stage">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48-film_snapshot_1.avif"
-							alt="Split Life — perspective A"
-							ratio="16 / 9"
-							onclick={(e) => gallery?.open(10, e.currentTarget)} />
-						<div class="split-tag a">PERSPECTIVE A · LEFT</div>
-					</div>
-					<div class="split-stage">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48-film_snapshot_2.avif"
-							alt="Split Life — perspective B"
-							ratio="16 / 9"
-							onclick={(e) => gallery?.open(11, e.currentTarget)} />
-						<div class="split-tag b">PERSPECTIVE B · RIGHT</div>
-					</div>
+					</Reveal>
 				</div>
-			</Reveal>
-			<Reveal variant="up" delay={130}>
-				<div class="inline-video">
+			{/if}
+
+			<div class="sato-col">
+				<Reveal>
+					<h3 class="sub">Split Life — a 48-hour film, in stereo (2015)</h3>
+					<p>
+						The next year, back at SATO 48, I wanted to do something nobody had done
+						before. So I made a film with
+						<strong>
+							two oner-shot perspectives, shown side-by-side at the same time, in real
+							time
+						</strong>
+						. One: the protagonist leaves her house. Two: a man hidden outside breaks in while
+						she's gone. She comes back. He gets stuck. They turn out to know each other. It
+						ends.
+					</p>
+				</Reveal>
+				<!-- No stills: the poster already IS the split screen, so a pair of
+				     stillframes above it only said the same thing twice. -->
+				<Reveal variant="up" delay={100}>
 					<LazyMedia
 						src="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48/poster.jpg"
 						alt="Split Life (2015) — 48-hour dual-perspective oner"
 						ratio="16 / 9"
 						video
 						onclick={(e) => gallery?.open(12, e.currentTarget)} />
-				</div>
-			</Reveal>
+				</Reveal>
+			</div>
 		</div>
 
 		<Reveal variant="up">
@@ -850,8 +823,6 @@
 	.node-block,
 	.pickvid,
 	.bear-bus,
-	.fugue,
-	.split-life,
 	.more-projects,
 	.bassless {
 		margin: 5rem 0;
@@ -1013,37 +984,46 @@
 		}
 	}
 
-	.split-row {
+	.sato-pair {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.5rem;
-		margin: 2rem 0;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-rows: auto auto;
+		align-items: start;
+		gap: clamp(1.5rem, 4vw, 3.5rem);
+		margin: 5rem 0;
 	}
-	@media (max-width: 640px) {
-		.split-row {
-			grid-template-columns: 1fr;
-		}
+	/* Theatrical cut: Fugue isn't rendered, so the row is one film wide. */
+	.sato-pair.solo {
+		grid-template-columns: minmax(0, 1fr);
+		max-width: 56rem;
 	}
-	.split-stage {
-		position: relative;
+	/* Subgrid so both columns share the copy row: whichever film has the taller
+	   block sets the height, and the two players start on the same line rather
+	   than stepping down wherever the prose happens to end. */
+	.sato-col {
+		display: grid;
+		grid-row: span 2;
+		grid-template-rows: subgrid;
+		align-content: start;
+		gap: 1.5rem;
 	}
-	.split-tag {
-		position: absolute;
-		bottom: 0.6rem;
-		left: 0.6rem;
+	.sato-col p {
+		line-height: 1.65;
+	}
+	/* Matches DirectorCut's own marker — this column is gated by hand, since the
+	   component's wrapper div would hold the grid column open when collapsed. */
+	.micro {
 		font-family: var(--font-mono);
-		font-size: 0.65rem;
-		letter-spacing: 0.2em;
-		padding: 0.2rem 0.6rem;
-		border-radius: 4px;
-		background: rgba(0, 0, 0, 0.7);
-		color: #fff;
+		font-size: 0.6rem;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		opacity: 0.4;
+		margin: 0 0 0.7rem;
 	}
-	.split-tag.a {
-		border-left: 2px solid #00f2c3;
-	}
-	.split-tag.b {
-		border-left: 2px solid #ff5fb3;
+	@media (max-width: 860px) {
+		.sato-pair {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 
 	.film-quad {
@@ -1086,10 +1066,6 @@
 		line-height: 1.5;
 		opacity: 0.85;
 		margin: 0 0 0.4rem;
-	}
-	.inline-video {
-		max-width: 880px;
-		margin: 2rem auto 0;
 	}
 	.oneup-bts {
 		margin: 2.5rem 0;

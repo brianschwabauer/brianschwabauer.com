@@ -3,6 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
+	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import ViewfinderFrame from '../primitives/ViewfinderFrame.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
@@ -386,16 +387,10 @@
 							<h4 class="film-title">{film.title}</h4>
 							<p class="film-blurb">{film.blurb}</p>
 							{#if signedIn && FILM_BASE_INDEX >= 0}
-								<button
-									type="button"
-									class="film-play"
-									onclick={(e) => gallery?.open(FILM_BASE_INDEX + i, e.currentTarget)}
-									aria-label="Play {film.title}">
-									<svg viewBox="0 0 24 24" aria-hidden="true">
-										<polygon points="8,5 19,12 8,19" fill="currentColor" />
-									</svg>
-									<span>Play film</span>
-								</button>
+								<PlayFilm
+									title={film.title}
+									color="#ff9c4a"
+									onclick={(e) => gallery?.open(FILM_BASE_INDEX + i, e.currentTarget)} />
 							{/if}
 						</li>
 					</Reveal>
@@ -725,37 +720,6 @@
 		line-height: 1.5;
 		opacity: 0.82;
 		margin: 0;
-	}
-	.film-play {
-		margin-top: 1rem;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		appearance: none;
-		background: rgba(255, 156, 74, 0.1);
-		color: var(--tape-accent);
-		border: 1px solid rgba(255, 156, 74, 0.4);
-		padding: 0.4rem 0.9rem;
-		border-radius: 999px;
-		font-family: var(--font-mono);
-		font-size: 0.75rem;
-		letter-spacing: 0.16em;
-		text-transform: uppercase;
-		cursor: pointer;
-		transition:
-			background 200ms ease,
-			color 200ms ease,
-			border-color 200ms ease;
-	}
-	.film-play:hover {
-		transition-duration: 0s;
-		background: var(--tape-accent);
-		color: #1a120a;
-		border-color: var(--tape-accent);
-	}
-	.film-play svg {
-		width: 12px;
-		height: 12px;
 	}
 
 	.prose p {

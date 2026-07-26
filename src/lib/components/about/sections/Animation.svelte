@@ -5,6 +5,7 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
+	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { Comparison } from '@delightstack/components/display';
 	import PinScrub from '../primitives/PinScrub.svelte';
 	import PinDrift from '../primitives/PinDrift.svelte';
@@ -279,6 +280,12 @@
 						planes flying through the clouds. Every second has 3–4 VFX layers. It took an
 						obscene amount of time.
 					</p>
+					<PlayFilm
+						label="Play the short"
+						title="Calamity (2009) — full stop-motion short"
+						meta="2009 · stop-motion"
+						color="#6c63ff"
+						onclick={(e) => gallery?.open(3, e.currentTarget)} />
 				</Reveal>
 				<Reveal variant="right" delay={120}>
 					<LazyMedia
@@ -318,17 +325,6 @@
 						onclick={(e) => gallery?.open(2, e.currentTarget)} />
 				</div>
 			</Reveal>
-
-			<Reveal variant="up" delay={200}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2009-12-25_calamity/poster.jpg"
-						alt="Calamity (2009) — full stop-motion short"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(3, e.currentTarget)} />
-				</div>
-			</Reveal>
 		</div>
 
 		<div class="exposure">
@@ -350,6 +346,12 @@
 						went into the post-production. I modeled the camera robot from scratch in 3D, animated
 						the transformation, tracked it to live footage, integrated lighting, added smoke.
 					</p>
+					<PlayFilm
+						label="Play the short"
+						title="Exposure (2011) — the camera-robot short"
+						meta="2011"
+						color="#6c63ff"
+						onclick={(e) => gallery?.open(4, e.currentTarget)} />
 				</Reveal>
 			</div>
 
@@ -401,17 +403,6 @@
 					{/snippet}
 				</PinScrub>
 			</div>
-
-			<Reveal variant="up" delay={130}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2011-03-01_exposure/poster.jpg"
-						alt="Exposure (2011) — the camera-robot short"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(4, e.currentTarget)} />
-				</div>
-			</Reveal>
 
 			<Reveal variant="up" delay={100}>
 				<div class="exposure-grid">
@@ -468,6 +459,11 @@
 					<p class="aside">
 						This is, embarrassingly, still one of the funnier things I've ever made.
 					</p>
+					<PlayFilm
+						title="XYZ News — iPrez (2011)"
+						meta="2011"
+						color="#6c63ff"
+						onclick={(e) => gallery?.open(9, e.currentTarget)} />
 				</Reveal>
 				<Reveal variant="right" delay={100}>
 					<LazyMedia
@@ -500,29 +496,13 @@
 				</div>
 			</Reveal>
 
-			<Reveal variant="up" delay={140}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2011-08-28_xyz_news-iprez/poster.jpg"
-						alt="XYZ News — iPrez (2011)"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(9, e.currentTarget)} />
-				</div>
-			</Reveal>
-
 			<Reveal variant="up" delay={170}>
-				<details class="extra-video">
-					<summary>Also watch — XYZ News Special Report (2011)</summary>
-					<div class="inline-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2011-03-18_xyz_news_special_report/poster.jpg"
-							alt="XYZ News Special Report (2011)"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(10, e.currentTarget)} />
-					</div>
-				</details>
+				<PlayFilm
+					label="Also watch — XYZ News Special Report"
+					title="XYZ News Special Report (2011)"
+					meta="2011"
+					color="#6c63ff"
+					onclick={(e) => gallery?.open(10, e.currentTarget)} />
 			</Reveal>
 		</div>
 	</div>
@@ -816,50 +796,5 @@
 	.prose p {
 		line-height: 1.65;
 		margin-bottom: 1rem;
-	}
-
-	.inline-video {
-		max-width: 880px;
-		margin: 2rem auto 0;
-	}
-	.extra-video {
-		max-width: 880px;
-		margin: 1.5rem auto 0;
-	}
-	.extra-video summary {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		font-family: var(--font-mono);
-		font-size: 0.78rem;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-		padding: 0.5rem 1rem;
-		border: 1px solid rgba(108, 99, 255, 0.4);
-		border-radius: 999px;
-		cursor: pointer;
-		list-style: none;
-		color: #6c63ff;
-	}
-	.extra-video[open] summary {
-		margin-bottom: 1rem;
-	}
-	.extra-video summary::-webkit-details-marker {
-		display: none;
-	}
-	.extra-video summary {
-		transition: background 200ms ease;
-	}
-	.extra-video summary:hover {
-		transition-duration: 0s;
-		background: rgba(108, 99, 255, 0.12);
-	}
-	.extra-video summary::after {
-		content: '▾';
-		display: inline-block;
-		transition: transform 250ms ease;
-	}
-	.extra-video[open] summary::after {
-		transform: rotate(180deg);
 	}
 </style>

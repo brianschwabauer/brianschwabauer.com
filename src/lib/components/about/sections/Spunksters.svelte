@@ -4,6 +4,7 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import SnapStrip from '../primitives/SnapStrip.svelte';
+	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -165,6 +166,12 @@
 					watching a live video feed of Kevin hosting from inside, so the host appeared on a
 					twenty-foot tall projection like a giant.
 				</p>
+				<PlayFilm
+					label="Play the show"
+					title="The Spunksters (2013) — the live awards show"
+					meta="2013 · live"
+					color="#ffd934"
+					onclick={(e) => gallery?.open(1, e.currentTarget)} />
 			</Reveal>
 		</div>
 
@@ -175,16 +182,6 @@
 					alt="The Spunksters logo animation"
 					ratio="16 / 9"
 					onclick={(e) => gallery?.open(0, e.currentTarget)} />
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters/poster.jpg"
-						alt="The Spunksters (2013) — the live awards show"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(1, e.currentTarget)} />
-				</div>
 			</Reveal>
 		</div>
 
@@ -261,14 +258,12 @@
 					to the song, and called it done. It got cheers from a backyard. It belongs
 					there.
 				</p>
-				<div class="bubbly-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2013-06-22_bubbly_bros/poster.jpg"
-						alt="Bubbly Bros (2013) — photo music video"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(3, e.currentTarget)} />
-				</div>
+				<PlayFilm
+					label="Play the video"
+					title="Bubbly Bros (2013) — photo music video"
+					meta="2013"
+					color="#ffd934"
+					onclick={(e) => gallery?.open(3, e.currentTarget)} />
 			</Reveal>
 		</div>
 
@@ -282,6 +277,12 @@
 					doesn't. The trailer ends with a gag where the words "in 3D" break the letterbox
 					bars. It still kills me.
 				</p>
+				<PlayFilm
+					label="Play the trailer"
+					title="Power Rangers 360 III — fake trailer (2013)"
+					meta="2013 · in 3D"
+					color="#ffd934"
+					onclick={(e) => gallery?.open(6, e.currentTarget)} />
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="trailer-pair">
@@ -295,16 +296,6 @@
 						alt="Kevin visits Zordon's grave"
 						ratio="16 / 9"
 						onclick={(e) => gallery?.open(5, e.currentTarget)} />
-				</div>
-			</Reveal>
-			<Reveal variant="up" delay={140}>
-				<div class="inline-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2013-06-22_power_rangers_iii_trailer/poster.jpg"
-						alt="Power Rangers 360 III — fake trailer (2013)"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(6, e.currentTarget)} />
 				</div>
 			</Reveal>
 		</div>
@@ -570,13 +561,5 @@
 		font-size: 1rem;
 		color: #ffd934;
 		margin-top: 0.3rem;
-	}
-
-	.inline-video {
-		max-width: 880px;
-		margin: 2rem auto 0;
-	}
-	.bubbly-video {
-		margin-top: 1.2rem;
 	}
 </style>

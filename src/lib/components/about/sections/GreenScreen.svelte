@@ -5,6 +5,7 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import DirectorCut from '../primitives/DirectorCut.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
+	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -365,6 +366,12 @@
 						eating animated faces. It was my first real taste of programming creating
 						something on screen. I never forgot it.
 					</p>
+					<PlayFilm
+						label="Play the short"
+						title="Pac-Attack (2008) — full short"
+						meta="2008"
+						color="#22ff90"
+						onclick={(e) => gallery?.open(5, e.currentTarget)} />
 				</Reveal>
 
 				<Reveal variant="right" delay={100}>
@@ -386,17 +393,6 @@
 					</div>
 				</Reveal>
 			</div>
-
-			<Reveal variant="up" delay={200}>
-				<div class="pac-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack/poster.jpg"
-						alt="Pac-Attack (2008) — full short"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(5, e.currentTarget)} />
-				</div>
-			</Reveal>
 		</div>
 
 		<Reveal variant="up" delay={100}>
@@ -455,47 +451,51 @@
 				</Reveal>
 			</div>
 
-			<div class="nuisance-block">
+			<!-- Copy and player side by side, and the second one mirrored: two
+			     identical text-then-video stacks in a row read as a template,
+			     and the alternation keeps the eye moving across the page
+			     instead of straight down one gutter. -->
+			<div class="spot-block">
 				<Reveal variant="up">
-					<h3 class="sub">Nuisance-B-Gone</h3>
-					<p>
-						Once I learned After Effects had a "rotoscope" capability, I had to test it.
-						Cut out a chair before it vanishes. Cut out a shoe. Stay locked-off on a
-						tripod and let the trick do the work. We turned the test into a fake
-						infomercial.
-					</p>
-				</Reveal>
-				<Reveal variant="up" delay={150}>
-					<div class="inline-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone/poster.jpg"
-							alt="Nuisance-B-Gone — the fake infomercial"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(6, e.currentTarget)} />
+					<div class="spot-copy">
+						<h3 class="sub">Nuisance-B-Gone</h3>
+						<p>
+							Once I learned After Effects had a "rotoscope" capability, I had to test it.
+							Cut out a chair before it vanishes. Cut out a shoe. Stay locked-off on a
+							tripod and let the trick do the work. We turned the test into a fake
+							infomercial.
+						</p>
 					</div>
+				</Reveal>
+				<Reveal variant="right" delay={150}>
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone/poster.jpg"
+						alt="Nuisance-B-Gone — the fake infomercial"
+						ratio="16 / 9"
+						video
+						onclick={(e) => gallery?.open(6, e.currentTarget)} />
 				</Reveal>
 			</div>
 
-			<div class="sideline-block">
+			<div class="spot-block mirrored">
 				<Reveal variant="up">
-					<h3 class="sub">Sideline Huddler</h3>
-					<p>
-						My sister Amanda "invented" a warm blanket with a waterproof shell for outdoor
-						sports — basically a Snuggie you could take outside, before Snuggies existed.
-						We made her a fake commercial that put her into rain, snow, and fire via green
-						screen.
-					</p>
-				</Reveal>
-				<Reveal variant="up" delay={100}>
-					<div class="inline-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2009-02-13_sideline_huddler/poster.jpg"
-							alt="Sideline Huddler — Amanda's invention commercial"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(7, e.currentTarget)} />
+					<div class="spot-copy">
+						<h3 class="sub">Sideline Huddler</h3>
+						<p>
+							My sister Amanda "invented" a warm blanket with a waterproof shell for
+							outdoor sports — basically a Snuggie you could take outside, before Snuggies
+							existed. We made her a fake commercial that put her into rain, snow, and
+							fire via green screen.
+						</p>
 					</div>
+				</Reveal>
+				<Reveal variant="left" delay={100}>
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2009-02-13_sideline_huddler/poster.jpg"
+						alt="Sideline Huddler — Amanda's invention commercial"
+						ratio="16 / 9"
+						video
+						onclick={(e) => gallery?.open(7, e.currentTarget)} />
 				</Reveal>
 			</div>
 
@@ -655,19 +655,43 @@
 		letter-spacing: 0.04em;
 	}
 	.xyz-block,
-	.ae-block,
-	.nuisance-block,
-	.sideline-block {
+	.ae-block {
 		margin: 4rem 0;
+	}
+	.spot-block {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+		align-items: center;
+		gap: clamp(1.5rem, 4vw, 3.5rem);
+		margin: 4rem 0;
+	}
+	/* Video first in the visual order, copy second — swapped with `order` so the
+	   reading order (and the tab order) still runs title → film. `:global`
+	   because these grid items are `Reveal` roots, which never carry this
+	   component's scoping class. */
+	.spot-block.mirrored {
+		grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+	}
+	.spot-block.mirrored > :global(.reveal:first-child) {
+		order: 2;
+	}
+	.spot-copy p {
+		margin-bottom: 0;
+	}
+	@media (max-width: 820px) {
+		.spot-block {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.spot-block.mirrored {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.spot-block.mirrored > :global(.reveal:first-child) {
+			order: 0;
+		}
 	}
 	.pac-block {
 		margin: 0;
 	}
-	.inline-video {
-		max-width: 880px;
-		margin: 2rem auto 0;
-	}
-
 	.pac-grid {
 		display: grid;
 		grid-template-columns: 1.1fr 1fr;
@@ -763,12 +787,6 @@
 		color: #22ff90;
 		font-size: 1.6rem;
 		font-weight: 700;
-	}
-	.pac-video {
-		margin-top: 2.5rem;
-		max-width: 800px;
-		margin-left: auto;
-		margin-right: auto;
 	}
 
 	.prose p {

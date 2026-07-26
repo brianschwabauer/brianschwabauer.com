@@ -243,91 +243,86 @@
 		     stay in both cuts. -->
 		<DirectorCut scenes={4}>
 			<div class="track">
+				<span class="track-num" aria-hidden="true">01</span>
 				<Reveal>
-					<div class="track-head">
-						<span class="track-num" aria-hidden="true">01</span>
+					<div class="track-copy">
 						<h3 class="sub">
 							Flashlight <span class="dot">·</span>
 							2007
 						</h3>
+						<p>
+							Our first original song, written and recorded with Kevin. A guy goes slowly
+							insane searching for a flashlight he can't find. The music video has way
+							more shots, way more quick cuts, and starts to actually feel like a music
+							video.
+						</p>
 					</div>
-					<p class="track-copy">
-						Our first original song, written and recorded with Kevin. A guy goes slowly
-						insane searching for a flashlight he can't find. The music video has way more
-						shots, way more quick cuts, and starts to actually feel like a music video.
-					</p>
 				</Reveal>
-				<Reveal variant="up" delay={160}>
-					<div class="track-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/poster.jpg"
-							alt="Flashlight (2007) — music video"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(2, e.currentTarget)} />
-					</div>
+				<Reveal variant="right" delay={160}>
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/poster.jpg"
+						alt="Flashlight (2007) — music video"
+						ratio="16 / 9"
+						video
+						onclick={(e) => gallery?.open(2, e.currentTarget)} />
 				</Reveal>
 			</div>
 
 			<div class="track">
+				<span class="track-num" aria-hidden="true">02</span>
 				<Reveal>
-					<div class="track-head">
-						<span class="track-num" aria-hidden="true">02</span>
+					<div class="track-copy">
 						<h3 class="sub">
 							Do Da Flava G <span class="dot">·</span>
 							2010
 						</h3>
+						<p>
+							We wrote a rap song for a friend, made him "into a rapper", filmed my whole
+							family doing a goofy family dance to it — grandparents included — and shot
+							the music video. It placed in a local film festival. I think second.
+						</p>
+						<p>
+							I also built a whole Flash website for the fake artist. There was a game on
+							the site: press a number on the keyboard and the animated Flava G character
+							would do that dance. We wrote four songs for him. We only ever shot a music
+							video for one.
+						</p>
 					</div>
-					<p class="track-copy">
-						We wrote a rap song for a friend, made him "into a rapper", filmed my whole
-						family doing a goofy family dance to it — grandparents included — and shot the
-						music video. It placed in a local film festival. I think second.
-					</p>
-					<p class="track-copy">
-						I also built a whole Flash website for the fake artist. There was a game on
-						the site: press a number on the keyboard and the animated Flava G character
-						would do that dance. We wrote four songs for him. We only ever shot a music
-						video for one.
-					</p>
 				</Reveal>
-				<Reveal variant="up" delay={160}>
-					<div class="track-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/poster.jpg"
-							alt="Do Da Flava G (2010) — music video"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(3, e.currentTarget)} />
-					</div>
+				<Reveal variant="right" delay={160}>
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/poster.jpg"
+						alt="Do Da Flava G (2010) — music video"
+						ratio="16 / 9"
+						video
+						onclick={(e) => gallery?.open(3, e.currentTarget)} />
 				</Reveal>
 			</div>
 
 			<div class="track">
+				<span class="track-num" aria-hidden="true">03</span>
 				<Reveal>
-					<div class="track-head">
-						<span class="track-num" aria-hidden="true">03</span>
+					<div class="track-copy">
 						<h3 class="sub">
 							You Derive Me Crazy <span class="dot">·</span>
 							2010
 						</h3>
+						<p>
+							AP Calculus had just wrapped, so my teacher let us be creative. We wrote a
+							parody — set to Britney Spears' "You Drive Me Crazy" — with lyrics full of
+							calc puns. Shot it in class, used greenscreen to put the whole class into
+							virtual sets, and turned in the most absurd math project the school had
+							ever seen.
+						</p>
 					</div>
-					<p class="track-copy">
-						AP Calculus had just wrapped, so my teacher let us be creative. We wrote a
-						parody — set to Britney Spears' "You Drive Me Crazy" — with lyrics full of
-						calc puns. Shot it in class, used greenscreen to put the whole class into
-						virtual sets, and turned in the most absurd math project the school had ever
-						seen.
-					</p>
 				</Reveal>
-				<Reveal variant="up" delay={160}>
-					<div class="track-video">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/poster.jpg"
-							alt="You Derive Me Crazy (2010) — calculus parody music video"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(4, e.currentTarget)} />
-					</div>
+				<Reveal variant="right" delay={160}>
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/poster.jpg"
+						alt="You Derive Me Crazy (2010) — calculus parody music video"
+						ratio="16 / 9"
+						video
+						onclick={(e) => gallery?.open(4, e.currentTarget)} />
 				</Reveal>
 			</div>
 
@@ -525,18 +520,22 @@
 		}
 	}
 
+	/* Numeral, copy, film — the numeral in its own column so 01 → 02 → 03 line
+	   up down the page, and the film beside the copy rather than under it. */
 	.track {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.1fr);
+		align-items: start;
+		column-gap: clamp(1rem, 3vw, 2.5rem);
 		margin: 4.5rem 0;
 	}
-	/* Numeral and title share a baseline row, so 01 → 02 → 03 line up down the
-	   page while the galleries below still bleed to the full viewport. */
-	.track-head {
-		display: flex;
-		align-items: baseline;
-		gap: clamp(0.9rem, 2vw, 1.4rem);
-		margin-bottom: 0.75rem;
-	}
+	/* The numeral pins itself under the header while its track scrolls by, so
+	   you always know which song you're reading. It has to be a direct child of
+	   the track — inside a Reveal it would only have the Reveal's own height to
+	   travel through. */
 	.track-num {
+		position: sticky;
+		top: calc(80px + 1.5rem);
 		font-family: var(--font-mono);
 		font-size: clamp(2.6rem, 5vw, 4rem);
 		font-weight: 900;
@@ -544,11 +543,24 @@
 		-webkit-text-stroke: 2px #ff7ad0;
 		letter-spacing: -0.02em;
 		line-height: 1;
-		flex: 0 0 auto;
 	}
 	.track-copy {
-		max-width: 46rem;
 		line-height: 1.65;
+	}
+	.track-copy p {
+		margin-bottom: 1rem;
+	}
+	.track-copy p:last-child {
+		margin-bottom: 0;
+	}
+	@media (max-width: 900px) {
+		.track {
+			grid-template-columns: auto minmax(0, 1fr);
+			row-gap: 1.5rem;
+		}
+		.track > :global(.reveal:last-child) {
+			grid-column: 2;
+		}
 	}
 	.sub {
 		font-size: clamp(1.5rem, 2.8vw, 2.2rem);
@@ -568,11 +580,6 @@
 			grid-template-columns: 1fr;
 		}
 	}
-	.track-video {
-		margin-top: 1.2rem;
-		max-width: 820px;
-	}
-
 	.prose p {
 		line-height: 1.65;
 		margin-bottom: 1rem;
