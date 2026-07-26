@@ -9,13 +9,23 @@
 	 * keeps a line's journey top-to-bottom at ~11s everywhere.
 	 */
 	const ROLL_RATE = 0.09;
+	/**
+	 * How long the credits can sit off screen before the reader has lost their
+	 * place and the roll is better off starting over. Under this, scrolling away
+	 * and back is treated as a glance, and the roll picks up mid-sentence.
+	 */
+	const RESTART_AFTER_MS = 15_000;
 
 	let reduced = $state(false);
-	let paused = $state(false);
+	// Held until the section is actually on screen, so the credits open on their
+	// first frame for the reader who scrolls all the way down — not somewhere in
+	// the middle of the list because the page happened to load a minute ago.
+	let paused = $state(true);
 
 	let stage_el = $state<HTMLElement | null>(null);
 	let screen_el = $state<HTMLElement | null>(null);
 	let block_el = $state<HTMLElement | null>(null);
+	let roll_el = $state<HTMLElement | null>(null);
 
 	let block_height = $state(0);
 	let screen_height = $state(0);
@@ -25,13 +35,16 @@
 		block_height && screen_height ? block_height / (screen_height * ROLL_RATE) : 0,
 	);
 	/**
-	 * A negative delay starts the loop mid-cycle instead of at the top of the
-	 * list: the tail of the credits is already sliding out and the heading is
-	 * about to rise into frame from the bottom edge of the screen.
+	 * The lead-in: the roll opens pushed a full screen down, so the house lights
+	 * come up on an empty screen with the heading just below the bottom edge, and
+	 * the credits play in from nothing. Only once the list has run all the way
+	 * through does the loop take over — the second copy is already right behind
+	 * the first, so the hand-off is invisible.
+	 *
+	 * At the roll's own speed, crossing one screen height takes 1/ROLL_RATE
+	 * seconds by definition.
 	 */
-	const delay = $derived(
-		duration ? -duration * ((block_height - screen_height) / block_height) : 0,
-	);
+	const intro = $derived(duration ? 1 / ROLL_RATE : 0);
 
 	$effect(() => {
 		const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -62,14 +75,41 @@
 		return () => ro.disconnect();
 	});
 
-	// Parked while the section is off screen. It starts unpaused on purpose: if
-	// IntersectionObserver never reports (or isn't there at all), a running roll
-	// is the safe failure, not a frozen one.
+	/**
+	 * Rewind to the first frame — an empty screen with the heading about to rise
+	 * into it. The roll is a pair of CSS animations, so this reaches for the
+	 * animation objects rather than re-rendering the list: zeroing both puts the
+	 * lead-in back at its start and parks the loop back inside its delay.
+	 */
+	const rewind = () => {
+		for (const a of roll_el?.getAnimations?.() ?? []) a.currentTime = 0;
+	};
+
+	// Parked while the section is off screen, and rewound if it was off screen
+	// long enough that the reader has lost the thread.
 	$effect(() => {
-		if (!stage_el || typeof IntersectionObserver === 'undefined') return;
-		const io = new IntersectionObserver(([entry]) => (paused = !entry.isIntersecting), {
-			threshold: 0.25,
-		});
+		if (!stage_el) return;
+		// If IntersectionObserver isn't there at all, a running roll is the safe
+		// failure, not a frozen one.
+		if (typeof IntersectionObserver === 'undefined') {
+			paused = false;
+			return;
+		}
+		let started = false;
+		let left_at = 0;
+		const io = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) {
+					if (!started || performance.now() - left_at > RESTART_AFTER_MS) rewind();
+					started = true;
+					paused = false;
+				} else {
+					if (started) left_at = performance.now();
+					paused = true;
+				}
+			},
+			{ threshold: 0.25 },
+		);
 		io.observe(stage_el);
 		return () => io.disconnect();
 	});
@@ -186,11 +226,13 @@
 
 				<div bind:this={screen_el} class="screen">
 					<div
+						bind:this={roll_el}
 						class="roll"
 						class:paused
 						class:ready={duration > 0}
-						style:animation-duration="{duration}s"
-						style:animation-delay="{delay}s">
+						style:--dur="{duration}s"
+						style:--intro="{intro}s"
+						style:--lead="{screen_height}px">
 						<div bind:this={block_el} class="loop">{@render list()}</div>
 						<div class="loop" aria-hidden="true" inert>{@render list()}</div>
 					</div>
@@ -341,14 +383,28 @@
 		width: 100%;
 		animation: none;
 	}
+	/*
+	 * Two animations, played back to back at the same speed. `lead-in` walks the
+	 * list up from a screen below, so the credits open on an empty screen; `roll`
+	 * then takes over at the exact translate the lead-in finished on and loops
+	 * from there. `roll` fills *forwards* only, so it contributes nothing during
+	 * its delay and the lead-in owns those first seconds uncontested.
+	 */
 	.roll.ready {
-		animation-name: roll;
-		animation-timing-function: linear;
-		animation-iteration-count: infinite;
-		animation-fill-mode: both;
+		animation:
+			lead-in var(--intro) linear both,
+			roll var(--dur) linear var(--intro) infinite forwards;
 	}
 	.roll.paused {
 		animation-play-state: paused;
+	}
+	@keyframes lead-in {
+		from {
+			translate: 0 var(--lead);
+		}
+		to {
+			translate: 0 0;
+		}
 	}
 	/*
 	 * Two identical copies, and the roll travels exactly one copy per cycle — so
