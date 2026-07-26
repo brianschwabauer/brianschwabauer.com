@@ -77,6 +77,25 @@
 		},
 	];
 
+	const flashlightImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_plays_guitar.avif',
+			width: 352,
+			height: 240,
+			caption: 'Flashlight (2007) — Brian plays guitar',
+			alt: 'Flashlight (2007) — Brian plays guitar',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif',
+			width: 352,
+			height: 240,
+			caption: 'Flashlight — summoning a guitar via reversed footage',
+			alt: 'Flashlight — summoning a guitar via reversed footage',
+		},
+	];
+
 	const calcImages: GalleryItem[] = [
 		{
 			type: 'image',
@@ -128,25 +147,14 @@
 		},
 	];
 
-	// Standalone image thumbnails + inline video poster thumbnails, combined into one
-	// lightbox-only Gallery. Order matches document order: 2 Flashlight images, then 3 videos.
+	// One roll for all three songs, in the order the tracks are numbered. Three
+	// separate galleries of the same kind of thing, one per song, read as three
+	// piles rather than one body of work.
+	const trackImages: GalleryItem[] = [...flashlightImages, ...flavaImages, ...calcImages];
+
+	// The inline video posters, in document order: Flashlight, Do Da Flava G,
+	// You Derive Me Crazy.
 	const sectionExtras: GalleryItem[] = [
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_plays_guitar.avif',
-			width: 352,
-			height: 240,
-			caption: 'Brian plays guitar',
-			alt: 'Brian plays guitar',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif',
-			width: 352,
-			height: 240,
-			caption: 'Summoning a guitar via reversed footage',
-			alt: 'Summoning a guitar via reversed footage',
-		},
 		{
 			type: 'video',
 			src: 'https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/master.m3u8',
@@ -227,21 +235,9 @@
 			</Reveal>
 		</div>
 
-		<Reveal variant="up" delay={120}>
-			<div class="gallery-bleed">
-				<PeekGallery key="music-videos-flava" items={flavaImages} peek={6} size="2" />
-			</div>
-		</Reveal>
-
-		<Reveal variant="up" delay={120}>
-			<div class="gallery-bleed">
-				<PeekGallery key="music-videos-calc" items={calcImages} peek={6} size="1" />
-			</div>
-		</Reveal>
-
-		<!-- The three songs and the stills behind them. The photo sets above
-		     stay in both cuts. -->
-		<DirectorCut scenes={4}>
+		<!-- The three songs themselves. The stills roll below stays in both
+		     cuts, so the theatrical reader still gets the photos. -->
+		<DirectorCut scenes={3}>
 			<div class="track">
 				<span class="track-num" aria-hidden="true">01</span>
 				<Reveal>
@@ -264,7 +260,7 @@
 						alt="Flashlight (2007) — music video"
 						ratio="16 / 9"
 						video
-						onclick={(e) => gallery?.open(2, e.currentTarget)} />
+						onclick={(e) => gallery?.open(0, e.currentTarget)} />
 				</Reveal>
 			</div>
 
@@ -295,7 +291,7 @@
 						alt="Do Da Flava G (2010) — music video"
 						ratio="16 / 9"
 						video
-						onclick={(e) => gallery?.open(3, e.currentTarget)} />
+						onclick={(e) => gallery?.open(1, e.currentTarget)} />
 				</Reveal>
 			</div>
 
@@ -311,8 +307,8 @@
 							AP Calculus had just wrapped, so my teacher let us be creative. We wrote a
 							parody — set to Britney Spears' "You Drive Me Crazy" — with lyrics full of
 							calc puns. Shot it in class, used greenscreen to put the whole class into
-							virtual sets, and turned in the most absurd math project the school had
-							ever seen.
+							virtual sets, and turned in the most absurd math project the school had ever
+							seen.
 						</p>
 					</div>
 				</Reveal>
@@ -322,25 +318,19 @@
 						alt="You Derive Me Crazy (2010) — calculus parody music video"
 						ratio="16 / 9"
 						video
-						onclick={(e) => gallery?.open(4, e.currentTarget)} />
+						onclick={(e) => gallery?.open(2, e.currentTarget)} />
 				</Reveal>
 			</div>
-
-			<Reveal variant="up" delay={120}>
-				<div class="paired">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_plays_guitar.avif"
-						alt="Brian plays guitar"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(0, e.currentTarget)} />
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight-brian_summons_guitar_reversed_footage_visual_effect.avif"
-						alt="Summoning a guitar via reversed footage"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(1, e.currentTarget)} />
-				</div>
-			</Reveal>
 		</DirectorCut>
+
+		<Reveal variant="up" delay={120}>
+			<div class="roll-eyebrow bleed-head">
+				ALL THREE SHOOTS · {trackImages.length} STILLS
+			</div>
+			<div class="gallery-bleed">
+				<PeekGallery key="music-videos-stills" items={trackImages} peek={8} size="2" />
+			</div>
+		</Reveal>
 
 		<Reveal>
 			<div class="prose">
@@ -570,15 +560,12 @@
 	.dot {
 		color: #ff7ad0;
 	}
-	.paired {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.6rem;
-	}
-	@media (max-width: 640px) {
-		.paired {
-			grid-template-columns: 1fr;
-		}
+	.roll-eyebrow {
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.32em;
+		color: #ff7ad0;
+		margin: 0 0 0.7rem;
 	}
 	.prose p {
 		line-height: 1.65;

@@ -458,142 +458,7 @@
 
 			<!-- The three things I built around the broadcast rather than for it.
 			     The station itself, and the shows, stay in both cuts. -->
-
-			<div class="live-broadcast">
-				<Reveal>
-					<h4 class="lb-title">
-						<span class="rec-pulse"></span>
-						LIVE · The KSMS sports broadcast rig
-					</h4>
-					<p>
-						Probably my favorite KSMS memory. We brought live broadcasts to our sports
-						events — before YouTube had livestreams. I wired a row of cameras into an
-						analog video switcher, ran that into an analog-to-digital converter, and
-						pushed the output through some random live streaming service.
-					</p>
-				</Reveal>
-
-				<Reveal variant="up" delay={120}>
-					<div class="rig-diagram">
-						<div class="rig-node">
-							<div class="rig-icon" aria-hidden="true">📷</div>
-							<div class="rig-label">Cameras</div>
-							<div class="rig-sub">2–3 of them</div>
-						</div>
-						<div class="rig-arrow">→</div>
-						<div class="rig-node">
-							<div class="rig-icon" aria-hidden="true">🎚️</div>
-							<div class="rig-label">Analog switcher</div>
-							<div class="rig-sub">push button to cut</div>
-						</div>
-						<div class="rig-arrow">→</div>
-						<div class="rig-node">
-							<div class="rig-icon" aria-hidden="true">📼</div>
-							<div class="rig-label">Tape decks</div>
-							<div class="rig-sub">poor man's instant replay</div>
-						</div>
-						<div class="rig-arrow">→</div>
-						<div class="rig-node">
-							<div class="rig-icon" aria-hidden="true">💻</div>
-							<div class="rig-label">A/D → laptop</div>
-							<div class="rig-sub">→ random streaming service</div>
-						</div>
-					</div>
-				</Reveal>
-
-				<p class="aside">
-					The tape decks were our "instant replay" rig. Each camera also fed a tape deck
-					that recorded its input to a DV tape. When something happened we wanted to
-					replay, we'd rewind, hit play on the deck, and switch the live broadcast to that
-					input. Sometimes it worked. When it worked, it felt like magic.
-				</p>
-			</div>
-
-			<div class="block-party">
-				<Reveal class="bleed-head">
-					<h4 class="lb-title">KSMS Block Party — the senior-year finale</h4>
-					<p>
-						A live, SNL-style variety show in our school auditorium. Months of
-						preparation. A full live audience. Multi-camera coverage. Pre-recorded
-						sketches. Stand-up. Improv. A live band. A custom motion-graphics package.
-						Everything KSMS had taught us, in one night.
-					</p>
-				</Reveal>
-
-				<Reveal variant="up" delay={180}>
-					<div class="block-party-videos">
-						<div class="bp-video-card">
-							<div class="bp-video-eyebrow">FULL SHOW</div>
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party/poster.jpg"
-								alt="KSMS Block Party (2011) — full live show"
-								ratio="16 / 9"
-								video
-								onclick={(e) => extrasGallery?.open(7, e.currentTarget)} />
-						</div>
-						<div class="bp-video-card">
-							<div class="bp-video-eyebrow">TRAILER</div>
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2011-04-15_block_party_trailer/poster.jpg"
-								alt="Block Party trailer (2011)"
-								ratio="16 / 9"
-								video
-								onclick={(e) => extrasGallery?.open(8, e.currentTarget)} />
-						</div>
-						<div class="bp-video-card">
-							<div class="bp-video-eyebrow">PROMO</div>
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2011-04-14_this_is_ksms_basketball_shot/poster.jpg"
-								alt="This is KSMS — trick-shot promo (2011)"
-								ratio="16 / 9"
-								video
-								onclick={(e) => extrasGallery?.open(9, e.currentTarget)} />
-						</div>
-					</div>
-				</Reveal>
-			</div>
-
-			<div class="midwestside">
-				<Reveal>
-					<h4 class="lb-title">A MidWestSide Story (2010)</h4>
-					<p>
-						A parody short film for KSMS about life in the midwest. Just a fun one with
-						Kevin and a handful of KSMS regulars.
-					</p>
-					<PlayFilm
-						label="Play the short"
-						title="A MidWestSide Story (2010)"
-						meta="2010"
-						color="#ff3a3a"
-						onclick={(e) => extrasGallery?.open(10, e.currentTarget)} />
-				</Reveal>
-			</div>
-
-			<Reveal variant="up" delay={150}>
-				<PeekGallery
-					key="festivals-live-broadcast"
-					items={liveBroadcastImages}
-					peek={6}
-					size="2" />
-			</Reveal>
-
-			<Reveal variant="up" delay={120}>
-				<div class="gal-eyebrow bleed-head">
-					THE BLOCK PARTY · {blockPartyImages.length} PHOTOS
-				</div>
-				<div class="gallery-bleed">
-					<PeekGallery
-						key="festivals-block-party"
-						items={blockPartyImages}
-						peek={6}
-						size="2" />
-				</div>
-			</Reveal>
-
-			<!-- The KSMS archive: the three things I built around the broadcast,
-			     the control-room stills, and the block-party photo sets. The shows
-			     themselves play in both cuts. -->
-			<DirectorCut scenes={7}>
+			<DirectorCut scenes={3}>
 				<div class="control-room">
 					<Reveal variant="up" delay={80}>
 						<div class="cr-card">
@@ -654,6 +519,60 @@
 						</div>
 					</Reveal>
 				</div>
+			</DirectorCut>
+
+			<div class="live-broadcast">
+				<Reveal>
+					<h4 class="lb-title">
+						<span class="rec-pulse"></span>
+						LIVE · The KSMS sports broadcast rig
+					</h4>
+					<p>
+						Probably my favorite KSMS memory. We brought live broadcasts to our sports
+						events — before YouTube had livestreams. I wired a row of cameras into an
+						analog video switcher, ran that into an analog-to-digital converter, and
+						pushed the output through some random live streaming service.
+					</p>
+				</Reveal>
+
+				<Reveal variant="up" delay={120}>
+					<div class="rig-diagram">
+						<div class="rig-node">
+							<div class="rig-icon" aria-hidden="true">📷</div>
+							<div class="rig-label">Cameras</div>
+							<div class="rig-sub">2–3 of them</div>
+						</div>
+						<div class="rig-arrow">→</div>
+						<div class="rig-node">
+							<div class="rig-icon" aria-hidden="true">🎚️</div>
+							<div class="rig-label">Analog switcher</div>
+							<div class="rig-sub">push button to cut</div>
+						</div>
+						<div class="rig-arrow">→</div>
+						<div class="rig-node">
+							<div class="rig-icon" aria-hidden="true">📼</div>
+							<div class="rig-label">Tape decks</div>
+							<div class="rig-sub">poor man's instant replay</div>
+						</div>
+						<div class="rig-arrow">→</div>
+						<div class="rig-node">
+							<div class="rig-icon" aria-hidden="true">💻</div>
+							<div class="rig-label">A/D → laptop</div>
+							<div class="rig-sub">→ random streaming service</div>
+						</div>
+					</div>
+				</Reveal>
+
+				<Reveal variant="up" delay={150}>
+					<div class="gal-eyebrow">
+						FROM THE BOOTH · {liveBroadcastImages.length} STILLS
+					</div>
+					<PeekGallery
+						key="festivals-live-broadcast"
+						items={liveBroadcastImages}
+						peek={6}
+						size="2" />
+				</Reveal>
 
 				<Reveal variant="up" delay={180}>
 					<PlayFilm
@@ -662,6 +581,38 @@
 						meta="2011 · live"
 						color="#ff3a3a"
 						onclick={(e) => extrasGallery?.open(5, e.currentTarget)} />
+				</Reveal>
+
+				<p class="aside">
+					The tape decks were our "instant replay" rig. Each camera also fed a tape deck
+					that recorded its input to a DV tape. When something happened we wanted to
+					replay, we'd rewind, hit play on the deck, and switch the live broadcast to that
+					input. Sometimes it worked. When it worked, it felt like magic.
+				</p>
+			</div>
+
+			<div class="block-party">
+				<Reveal class="bleed-head">
+					<h4 class="lb-title">KSMS Block Party — the senior-year finale</h4>
+					<p>
+						A live, SNL-style variety show in our school auditorium. Months of
+						preparation. A full live audience. Multi-camera coverage. Pre-recorded
+						sketches. Stand-up. Improv. A live band. A custom motion-graphics package.
+						Everything KSMS had taught us, in one night.
+					</p>
+				</Reveal>
+
+				<Reveal variant="up" delay={120}>
+					<div class="gal-eyebrow bleed-head">
+						THE BLOCK PARTY · {blockPartyImages.length} PHOTOS
+					</div>
+					<div class="gallery-bleed">
+						<PeekGallery
+							key="festivals-block-party"
+							items={blockPartyImages}
+							peek={6}
+							size="2" />
+					</div>
 				</Reveal>
 
 				<Reveal variant="up" delay={150}>
@@ -681,7 +632,55 @@
 							onclick={(e) => extrasGallery?.open(6, e.currentTarget)} />
 					</div>
 				</Reveal>
-			</DirectorCut>
+
+				<Reveal variant="up" delay={180}>
+					<div class="block-party-videos">
+						<div class="bp-video-card">
+							<div class="bp-video-eyebrow">FULL SHOW</div>
+							<LazyMedia
+								src="https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party/poster.jpg"
+								alt="KSMS Block Party (2011) — full live show"
+								ratio="16 / 9"
+								video
+								onclick={(e) => extrasGallery?.open(7, e.currentTarget)} />
+						</div>
+						<div class="bp-video-card">
+							<div class="bp-video-eyebrow">TRAILER</div>
+							<LazyMedia
+								src="https://cdn.brianschwabauer.com/media/2011-04-15_block_party_trailer/poster.jpg"
+								alt="Block Party trailer (2011)"
+								ratio="16 / 9"
+								video
+								onclick={(e) => extrasGallery?.open(8, e.currentTarget)} />
+						</div>
+						<div class="bp-video-card">
+							<div class="bp-video-eyebrow">PROMO</div>
+							<LazyMedia
+								src="https://cdn.brianschwabauer.com/media/2011-04-14_this_is_ksms_basketball_shot/poster.jpg"
+								alt="This is KSMS — trick-shot promo (2011)"
+								ratio="16 / 9"
+								video
+								onclick={(e) => extrasGallery?.open(9, e.currentTarget)} />
+						</div>
+					</div>
+				</Reveal>
+			</div>
+
+			<div class="midwestside">
+				<Reveal>
+					<h4 class="lb-title">A MidWestSide Story (2010)</h4>
+					<p>
+						A parody short film for KSMS about life in the midwest. Just a fun one with
+						Kevin and a handful of KSMS regulars.
+					</p>
+					<PlayFilm
+						label="Play the short"
+						title="A MidWestSide Story (2010)"
+						meta="2010"
+						color="#ff3a3a"
+						onclick={(e) => extrasGallery?.open(10, e.currentTarget)} />
+				</Reveal>
+			</div>
 		</div>
 
 		<div class="last-film">
@@ -983,6 +982,15 @@
 		border-radius: 0 8px 8px 0;
 		font-style: italic;
 		margin: 1.5rem 0;
+	}
+
+	.gal-eyebrow {
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.32em;
+		text-transform: uppercase;
+		color: #ffb84d;
+		margin-bottom: 0.75rem;
 	}
 
 	.block-party {

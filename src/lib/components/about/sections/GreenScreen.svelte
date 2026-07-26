@@ -92,7 +92,7 @@
 		},
 	];
 
-	const vfxImages: GalleryItem[] = [
+	const aeTests: GalleryItem[] = [
 		{
 			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2008-03-09_clone_brian_test.avif',
@@ -152,30 +152,34 @@
 		},
 	];
 
-	const nuisanceImages: GalleryItem[] = [
+	// The Nuisance-B-Gone stills are the rotoscope entry in the same run of
+	// tests, so they live at the end of the VFX set rather than in a gallery of
+	// their own — captions name the film, since the surrounding tiles don't.
+	const vfxImages: GalleryItem[] = [
+		...aeTests,
 		{
 			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone-brian_explains_the_product.avif',
 			width: 480,
 			height: 320,
-			caption: 'The pitch',
-			alt: 'The pitch',
+			caption: 'Rotoscope test — the Nuisance-B-Gone pitch',
+			alt: 'Rotoscope test — the Nuisance-B-Gone pitch',
 		},
 		{
 			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone-product_makes_chair_disappear_visual_effect.avif',
 			width: 480,
 			height: 320,
-			caption: 'Chair, gone',
-			alt: 'Chair, gone',
+			caption: 'Cleanplate rotoscope — chair, gone',
+			alt: 'Cleanplate rotoscope — chair, gone',
 		},
 		{
 			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone-product_makes_shoe_disappear_visual_effect.avif',
 			width: 480,
 			height: 320,
-			caption: 'Shoe, gone',
-			alt: 'Shoe, gone',
+			caption: 'Cleanplate rotoscope — shoe, gone',
+			alt: 'Cleanplate rotoscope — shoe, gone',
 		},
 	];
 
@@ -393,19 +397,9 @@
 					</div>
 				</Reveal>
 			</div>
-		</div>
 
-		<Reveal variant="up" delay={100}>
-			<PeekGallery key="green-screen-vfx" items={vfxImages} peek={6} size="0" />
-		</Reveal>
-
-		<Reveal variant="up" delay={100}>
-			<PeekGallery key="green-screen-nuisance" items={nuisanceImages} peek={6} size="2" />
-		</Reveal>
-
-		<!-- Everything past the trick itself: how it was built, and the three
-		     films that came out of learning After Effects. -->
-		<DirectorCut scenes={5}>
+			<!-- How the trick actually worked, beside the film it produced — the
+			     three steps only read as steps next to the Pac-Attack copy. -->
 			<Reveal variant="up" delay={150}>
 				<div class="pac-flow">
 					<div class="pac-step">
@@ -439,18 +433,24 @@
 					</div>
 				</div>
 			</Reveal>
+		</div>
 
-			<div class="ae-block">
-				<Reveal variant="up">
-					<h3 class="sub">Discovering After Effects</h3>
-					<p>
-						Our editor couldn't take us further. So I picked up After Effects and started
-						running tests — every VFX artist's rite of passage. Clone yourself. Build a
-						lightsaber. Get hit by a car. Animate a logo.
-					</p>
-				</Reveal>
-			</div>
+		<div class="ae-block">
+			<Reveal variant="up">
+				<h3 class="sub">Discovering After Effects</h3>
+				<p>
+					Our editor couldn't take us further. So I picked up After Effects and started
+					running tests — every VFX artist's rite of passage. Clone yourself. Build a
+					lightsaber. Get hit by a car. Animate a logo.
+				</p>
+			</Reveal>
+			<Reveal variant="up" delay={100}>
+				<PeekGallery key="green-screen-vfx" items={vfxImages} peek={6} size="0" />
+			</Reveal>
+		</div>
 
+		<!-- The two films those tests turned into, and why we never planned. -->
+		<DirectorCut scenes={3}>
 			<!-- Copy and player side by side, and the second one mirrored: two
 			     identical text-then-video stacks in a row read as a template,
 			     and the alternation keeps the eye moving across the page
@@ -657,6 +657,11 @@
 	.xyz-block,
 	.ae-block {
 		margin: 4rem 0;
+	}
+	/* The gallery is the bulk of the block — it needs to sit off the copy rather
+	   than butt against it. `:global` because the child is a `Reveal` root. */
+	.ae-block > :global(.reveal + .reveal) {
+		margin-top: 1.5rem;
 	}
 	.spot-block {
 		display: grid;

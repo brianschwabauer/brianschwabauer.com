@@ -438,6 +438,22 @@
 						label="Try the original 360 viewer" />
 				</div>
 			</Reveal>
+
+			<!-- How the viewer actually steers the audience. No marker: the section
+			     already has one, and this only makes sense beside the player. -->
+			<DirectorCut marker={false}>
+				<Reveal>
+					<div class="prose">
+						<p>
+							A 360 video is only half the problem. You also have to <em>guide</em>
+							the viewer. At certain timecodes I disable the keyboard, smoothly animate the
+							camera to a target azimuth + FOV (with easing), then release control back to the
+							user. I also added a CSS letterbox overlay to force a 2.35 aspect ratio across
+							the whole webpage — surprisingly fiddly in 2014.
+						</p>
+					</div>
+				</Reveal>
+			</DirectorCut>
 		</div>
 
 		<!-- PickVid is a side project, not one of the films this section is
@@ -569,16 +585,49 @@
 						ends.
 					</p>
 				</Reveal>
-				<!-- No stills: the poster already IS the split screen, so a pair of
-				     stillframes above it only said the same thing twice. -->
-				<Reveal variant="up" delay={100}>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48/poster.jpg"
-						alt="Split Life (2015) — 48-hour dual-perspective oner"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(12, e.currentTarget)} />
-				</Reveal>
+				<!-- Player and its production notes share the column's second subgrid
+				     row, so the notes hang off this film without adding a third row that
+				     Fugue's column would have to leave empty. -->
+				<div class="sato-film">
+					<!-- No stills: the poster already IS the split screen, so a pair of
+					     stillframes above it only said the same thing twice. -->
+					<Reveal variant="up" delay={100}>
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48/poster.jpg"
+							alt="Split Life (2015) — 48-hour dual-perspective oner"
+							ratio="16 / 9"
+							video
+							onclick={(e) => gallery?.open(12, e.currentTarget)} />
+					</Reveal>
+
+					<!-- How the two halves were synchronised. No marker: the section
+					     already has one, and it only reads under this film. -->
+					<DirectorCut marker={false}>
+						<Reveal>
+							<div class="prose">
+								<p>
+									To make the two shots line up frame-perfect over multiple minutes, I
+									built a master spreadsheet of every event in the film with exact
+									timecodes. I then recorded my own voice giving every cue ("3, 2, 1, open
+									the door") at those exact timecodes, and blasted that audio through the
+									house during filming so every actor and operator knew exactly what
+									should be happening.
+								</p>
+								<p>
+									The actors had to be at exact locations at exact times. Plus a handful
+									of hidden cuts I had to fix in VFX. Plus I scored the music myself, late
+									at night, on the deadline. Plus all the cue audio had to be replaced in
+									post.
+								</p>
+								<p>
+									The story is okay. The lighting is okay. The script is okay. But I did
+									the thing I set out to do, which was: invent a new kind of edit. I'm
+									still proud of that.
+								</p>
+							</div>
+						</Reveal>
+					</DirectorCut>
+				</div>
 			</div>
 		</div>
 
@@ -604,44 +653,8 @@
 			</div>
 		</Reveal>
 
-		<!-- The college appendix: the class-project reel, NODE's behind-the-
-		     scenes and production notes, how Split Life was synchronised, and
-		     the other films from these years. -->
-		<DirectorCut scenes={9}>
-			<Reveal>
-				<div class="prose">
-					<p>
-						A 360 video is only half the problem. You also have to <em>guide</em>
-						the viewer. At certain timecodes I disable the keyboard, smoothly animate the camera
-						to a target azimuth + FOV (with easing), then release control back to the user.
-						I also added a CSS letterbox overlay to force a 2.35 aspect ratio across the whole
-						webpage — surprisingly fiddly in 2014.
-					</p>
-				</div>
-			</Reveal>
-
-			<Reveal>
-				<div class="prose">
-					<p>
-						To make the two shots line up frame-perfect over multiple minutes, I built a
-						master spreadsheet of every event in the film with exact timecodes. I then
-						recorded my own voice giving every cue ("3, 2, 1, open the door") at those
-						exact timecodes, and blasted that audio through the house during filming so
-						every actor and operator knew exactly what should be happening.
-					</p>
-					<p>
-						The actors had to be at exact locations at exact times. Plus a handful of
-						hidden cuts I had to fix in VFX. Plus I scored the music myself, late at
-						night, on the deadline. Plus all the cue audio had to be replaced in post.
-					</p>
-					<p>
-						The story is okay. The lighting is okay. The script is okay. But I did the
-						thing I set out to do, which was: invent a new kind of edit. I'm still proud
-						of that.
-					</p>
-				</div>
-			</Reveal>
-
+		<!-- The other films from these years. -->
+		<DirectorCut scenes={4}>
 			<div class="more-projects">
 				<Reveal>
 					<h3 class="sub-small">Other films from these years:</h3>
@@ -1034,6 +1047,17 @@
 	}
 	.sato-col p {
 		line-height: 1.65;
+	}
+	.sato-film {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+	/* The theatrical cut still renders DirectorCut's wrapper (it has to outlive
+	   the swap to serve as the scroll anchor) with nothing inside it. Take it out
+	   of the flow entirely, or it claims a gap under the player. */
+	.sato-film > :global(.director-cut:empty) {
+		display: none;
 	}
 	/* Matches DirectorCut's own marker — this column is gated by hand, since the
 	   component's wrapper div would hold the grid column open when collapsed. */
