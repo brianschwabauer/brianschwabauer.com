@@ -202,12 +202,17 @@
 	class="wall-shell">
 	<div class="container">
 		<Reveal>
-			<div class="eyebrow">2015–2018</div>
-			<h2 class="title">The wall of shipped screens</h2>
-			<p class="standfirst">
-				Between client work and product experiments, a lot of pixels shipped. These are
-				full-height captures — no scaling down, no cropping. Click any of them to inspect.
-			</p>
+			<div class="intro">
+				<div class="head">
+					<div class="eyebrow">2015–18</div>
+					<h2 class="title">The wall of shipped screens</h2>
+				</div>
+				<p class="standfirst">
+					Between client work and product experiments, a lot of pixels shipped. These are
+					full-height captures — no scaling down, no cropping. Click any of them to
+					inspect.
+				</p>
+			</div>
 		</Reveal>
 	</div>
 
@@ -330,8 +335,25 @@
 		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
 		line-height: 1.6;
 		max-width: 44rem;
-		margin: 0 0 clamp(2.5rem, 6vw, 4rem);
+		margin: 0;
 		color: rgba(232, 242, 246, 0.85);
+	}
+	/* Title left, standfirst right, sitting on the same baseline. On a wide
+	   monitor the old stacked intro left the entire right half of the fold empty
+	   while the text ran to a 44rem measure on the left. */
+	.intro {
+		display: grid;
+		gap: 1rem clamp(2rem, 5vw, 4.5rem);
+		margin-bottom: clamp(2.5rem, 6vw, 4rem);
+	}
+	@media (min-width: 900px) {
+		.intro {
+			grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+			align-items: end;
+		}
+		.standfirst {
+			padding-bottom: 0.5rem;
+		}
 	}
 
 	.stage {
