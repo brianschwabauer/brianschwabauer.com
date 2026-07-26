@@ -58,7 +58,7 @@
 		{ id: 'what-makes-us-human', year: '2015', label: 'Senior Thesis' },
 		{ id: 'freelancer', year: '2016', label: 'Freelancer' },
 		{ id: 'entrepreneurship', year: '2017', label: 'Entrepreneurship' },
-		{ id: 'shipped-wall', year: '2015–18', label: 'The Wall of Shipped Screens' },
+		{ id: 'shipped-wall', year: '2015–18', label: 'The Shipped Wall' },
 		{ id: 'showandtour', year: '2019', label: 'Show&Tour' },
 		{ id: 'side-projects', year: 'Today', label: 'Side Projects' },
 		{ id: 'what-im-up-to', year: 'Now', label: 'Which Brings Us to Now' },

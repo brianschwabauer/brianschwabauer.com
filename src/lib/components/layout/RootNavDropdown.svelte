@@ -360,7 +360,15 @@
 		padding: 0 0.95rem 0 0.95rem;
 		max-width: min(60vw, 22rem);
 	}
+	/* The bar is fixed furniture, so it must not resize as you scroll past it.
+	   The year gets a slot wide enough for a four-digit year and is forbidden
+	   from wrapping — a range like "2015–18" used to break across two lines and
+	   push the whole pill taller than it is everywhere else. */
 	.trigger .year {
+		flex-shrink: 0;
+		min-width: 4ch;
+		text-align: right;
+		white-space: nowrap;
 		font-weight: 800;
 		color: #00f2c3;
 		font-variant-numeric: tabular-nums;

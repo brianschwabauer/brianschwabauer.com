@@ -196,8 +196,8 @@
 
 <SectionShell
 	id="shipped-wall"
-	year="2015–2018"
-	label="The Wall of Shipped Screens"
+	year="2015–18"
+	label="The Shipped Wall"
 	theme="wall"
 	class="wall-shell">
 	<div class="container">
