@@ -359,7 +359,9 @@
 		font-weight: 900;
 		line-height: 1;
 		letter-spacing: -0.03em;
-		margin: 0 0 1.4rem;
+		/* Less the descender room added to `.grow`, so the words sit where they
+		   always did relative to the copy below. */
+		margin: 0 0 calc(1.4rem - 0.15em);
 		flex-wrap: wrap;
 	}
 	.grow {
@@ -368,6 +370,15 @@
 		background-clip: text;
 		color: transparent;
 		text-shadow: 0 0 60px rgba(255, 217, 52, 0.15);
+		/*
+		 * A clipped background paints nothing outside the element's box, and
+		 * Merriweather's descender drops ~12px below a 96px box at line-height 1
+		 * — so the y in "Hunky" and the p in "Spunky's" were being rendered with
+		 * no gradient behind them, which on transparent text means not rendered
+		 * at all. Extend the paint area past the baseline; the title's own bottom
+		 * margin gives the space back so the gap to the copy doesn't grow.
+		 */
+		padding-bottom: 0.15em;
 	}
 	.lede {
 		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
