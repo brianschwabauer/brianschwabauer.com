@@ -294,18 +294,22 @@
 
 		<div class="lockup">
 			<Reveal>
-				<div class="eyebrow">MISSOURI STATE UNIVERSITY · ELECTRONIC ARTS</div>
-				<h2 class="title">
-					Four years of <span class="grad">"go make something."</span>
-				</h2>
-				<p class="lede">
-					I majored in <strong>Electronic Arts</strong>
-					— a multidisciplinary major covering video production, audio production, animation,
-					and interactive design — with a minor in
-					<strong>Computer Science</strong>
-					. Pretty much the perfect match for a kid who'd been combining all of those things
-					in his basement since he was eleven.
-				</p>
+				<div class="intro">
+					<div class="head">
+						<div class="eyebrow">MISSOURI STATE UNIVERSITY · ELECTRONIC ARTS</div>
+						<h2 class="title">
+							Four years of <span class="grad">"go make something."</span>
+						</h2>
+					</div>
+					<p class="lede">
+						I majored in <strong>Electronic Arts</strong>
+						— a multidisciplinary major covering video production, audio production, animation,
+						and interactive design — with a minor in
+						<strong>Computer Science</strong>
+						. Pretty much the perfect match for a kid who'd been combining all of those things
+						in his basement since he was eleven.
+					</p>
+				</div>
 			</Reveal>
 		</div>
 
@@ -782,6 +786,9 @@
 	}
 	.grad {
 		color: oklch(from #ff5fb3 0.82 calc(c * 0.9) h);
+		/* The quotation is a unit — it starts its own line rather than being
+		   broken across one wherever it happens to run out of room. */
+		display: block;
 	}
 	.lede {
 		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
@@ -790,6 +797,32 @@
 	}
 	.lede strong {
 		color: #7a4dff;
+	}
+	/* Title and lede side by side rather than stacked — the third section in a
+	   row to open with the same left-column block starts to read as a template
+	   rather than as a chapter. */
+	.intro {
+		display: grid;
+		gap: 1.25rem clamp(2rem, 5vw, 4.5rem);
+	}
+	@media (min-width: 900px) {
+		.intro {
+			grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+			align-items: end;
+		}
+		/*
+		 * Set smaller in the split layout than it would be full-bleed, because it
+		 * has a column rather than the page to run in. At 5rem the quotation was
+		 * 782px against a 612px column, so it broke as `…of "go / make /
+		 * something."` — a one-word line in the middle of a heading. 3.75rem
+		 * lands it at ~597px: two lines, the lead-in and then the quote whole.
+		 */
+		.title {
+			font-size: clamp(2.2rem, 4.2vw, 3.75rem);
+		}
+		.lede {
+			padding-bottom: 0.6rem;
+		}
 	}
 
 	.strip {
