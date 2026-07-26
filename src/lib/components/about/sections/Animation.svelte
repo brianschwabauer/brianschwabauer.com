@@ -233,7 +233,14 @@
 <SectionShell id="animation" year="2010" label="Animation & VFX" theme="vfx">
 	<div class="container">
 		<Reveal>
-			<YearMark year="2010" subtitle="Animation & Special Effects" color="#6c63ff" />
+			<!-- The one year that earns the misregistration: this is the compositing
+			     and VFX chapter, so the numerals arrive out of register and line up
+			     as the year fills. -->
+			<YearMark
+				year="2010"
+				subtitle="Animation & Special Effects"
+				color="#6c63ff"
+				fringe />
 		</Reveal>
 
 		<div class="lockup">
