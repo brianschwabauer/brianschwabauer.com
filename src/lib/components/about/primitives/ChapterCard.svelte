@@ -8,6 +8,7 @@
 	// no `data-section` and never appear in the nav.
 	import PinScrub from './PinScrub.svelte';
 	import ViewfinderFrame from './ViewfinderFrame.svelte';
+	import FilmGate from './FilmGate.svelte';
 
 	let { act }: { act: 1 | 2 | 3 } = $props();
 
@@ -45,17 +46,6 @@
 	/** Progress at which the countdown gives way to the title card. */
 	const COUNT_END = 0.8;
 	const STEP = COUNT_END / NUMERALS.length;
-	/** The one numeral that gets a frame of dust on the print. */
-	const DUSTY = 5;
-	// Fixed, not random: the server and the client have to agree.
-	const SPECKS = [
-		[18, 24, 2],
-		[71, 12, 1],
-		[44, 63, 2],
-		[86, 47, 1],
-		[29, 81, 1],
-		[62, 35, 2],
-	];
 
 	function countdownAt(p: number) {
 		const i = Math.min(NUMERALS.length - 1, Math.max(0, Math.floor(p / STEP)));
@@ -108,28 +98,23 @@
 		{@const { numeral, local } = countdownAt(p)}
 		{@const done = p >= COUNT_END}
 		<ViewfinderFrame timecode={timecodeAt(p)}>
-			<div class="leader-stage">
-				{#if !done}
-					<div class="countdown" style:--wipe="{local * 360}deg">
-						<div class="ring"></div>
-						<div class="wipe"></div>
-						<div class="crosshair v"></div>
-						<div class="crosshair h"></div>
-						<div class="numeral">{numeral}</div>
-						{#if numeral === DUSTY}
-							<div class="dust" aria-hidden="true">
-								{#each SPECKS as [x, y, r] (x)}
-									<span style:left="{x}%" style:top="{y}%" style:--r="{r}px"></span>
-								{/each}
-							</div>
-						{/if}
+			<FilmGate>
+				<div class="leader-stage">
+					{#if !done}
+						<div class="countdown" style:--wipe="{local * 360}deg">
+							<div class="ring"></div>
+							<div class="wipe"></div>
+							<div class="crosshair v"></div>
+							<div class="crosshair h"></div>
+							<div class="numeral">{numeral}</div>
+						</div>
+					{/if}
+					{@render titleCard(done)}
+					<!-- The splice: one blown-out frame where the leader hands over. -->
+					<div class="splice" class:on={p >= 0.795 && p <= 0.815} aria-hidden="true">
 					</div>
-				{/if}
-				{@render titleCard(done)}
-				<div class="grain" aria-hidden="true"></div>
-				<!-- The splice: one blown-out frame where the leader hands over. -->
-				<div class="splice" class:on={p >= 0.795 && p <= 0.815} aria-hidden="true"></div>
-			</div>
+				</div>
+			</FilmGate>
 		</ViewfinderFrame>
 	{:else if act === 2}
 		{@const shut = Math.min(1, Math.max(0, (p - 0.46) / 0.04))}
@@ -205,6 +190,10 @@
 	.chapter {
 		position: relative;
 		width: 100%;
+		/* The floating root nav sits over the top of the viewport; an act break
+		   fills its frame edge to edge, so it has to start below the bar instead
+		   of running its picture underneath it. */
+		--nav-gutter: 68px;
 		/* Same skip-when-far-away treatment as SectionShell, sized for the pin. */
 		content-visibility: auto;
 		contain-intrinsic-size: 1px 200vh;
@@ -213,6 +202,8 @@
 	.act-2 :global(.pin-inner),
 	.act-3 :global(.pin-inner) {
 		background: #05050a;
+		top: var(--nav-gutter);
+		height: calc(100svh - var(--nav-gutter));
 	}
 	.act-3 :global(.pin-inner) {
 		background: #0b0d12;
@@ -221,7 +212,7 @@
 	   width, so without this the whole leader collapses to zero. */
 	.act-1 :global(.viewfinder) {
 		width: 100%;
-		height: 100svh;
+		height: 100%;
 	}
 
 	/* ── Shared title card ──────────────────────────────────────────────── */
@@ -292,7 +283,7 @@
 		display: grid;
 		place-items: center;
 		width: 100%;
-		height: 100svh;
+		height: 100%;
 		color: #fff;
 	}
 	.countdown {
@@ -342,33 +333,6 @@
 		font-variant-numeric: tabular-nums;
 		text-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
 	}
-	.dust span {
-		position: absolute;
-		width: var(--r);
-		height: var(--r);
-		background: rgba(255, 255, 255, 0.85);
-		border-radius: 50%;
-	}
-	/* Old stock never sits perfectly still. */
-	.grain {
-		position: absolute;
-		inset: 0;
-		background: #fff;
-		opacity: 0;
-		pointer-events: none;
-		animation: flicker 220ms steps(2) infinite;
-	}
-	@keyframes flicker {
-		0% {
-			opacity: 0.02;
-		}
-		50% {
-			opacity: 0.06;
-		}
-		100% {
-			opacity: 0.03;
-		}
-	}
 
 	/* ── Act 2 · the slate ──────────────────────────────────────────────── */
 	.slate-stage {
@@ -377,7 +341,7 @@
 		place-content: center;
 		justify-items: center;
 		width: 100%;
-		height: 100svh;
+		height: 100%;
 		padding: clamp(1rem, 4vw, 2.5rem);
 		color: #fff;
 	}
@@ -454,7 +418,7 @@
 		place-content: center;
 		justify-items: center;
 		width: 100%;
-		height: 100svh;
+		height: 100%;
 		padding: clamp(1rem, 4vw, 2.5rem);
 		color: #fff;
 	}
@@ -555,7 +519,6 @@
 		.chapter {
 			contain-intrinsic-size: 1px 100svh;
 		}
-		.grain,
 		.title-card {
 			animation: none;
 			transition: none;
