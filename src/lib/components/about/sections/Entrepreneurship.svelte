@@ -443,12 +443,26 @@
 		color: #00d6ff;
 		margin-bottom: 0.75rem;
 	}
+	/* Slate rule: the kicker runs into a hairline that carries the eye across the
+	   measure instead of stopping dead. It uses the width the stacked kicker left
+	   empty, and gives this chapter an opening that isn't the same three moves
+	   every other one makes. */
 	.eyebrow {
+		display: flex;
+		align-items: center;
+		gap: 0.9rem;
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
 		letter-spacing: 0.32em;
 		color: #00d6ff;
 		margin-bottom: 1rem;
+	}
+	.eyebrow::after {
+		content: '';
+		flex: 1;
+		height: 1px;
+		background: currentColor;
+		opacity: 0.3;
 	}
 	.title {
 		font-size: clamp(2.4rem, 7vw, 5rem);
