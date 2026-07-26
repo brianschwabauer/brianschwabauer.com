@@ -245,7 +245,6 @@
 
 		<div class="lockup">
 			<Reveal>
-				<div class="eyebrow">EFFECTS BAY ONLINE</div>
 				<h2 class="title">
 					Software gives you
 					<br />
@@ -523,13 +522,6 @@
 	}
 	.lockup {
 		margin-bottom: 4rem;
-	}
-	.eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #6c63ff;
-		margin-bottom: 1rem;
 	}
 	.title {
 		font-size: clamp(2.4rem, 7vw, 5rem);

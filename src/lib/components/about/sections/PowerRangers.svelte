@@ -249,7 +249,6 @@
 
 		<div class="lockup">
 			<Reveal>
-				<div class="eyebrow">PROJECT 02 · A FULL-LENGTH FILM, ALMOST</div>
 				<h2 class="title">
 					<span class="word w1">&ldquo;FEATURE LENGTH&rdquo;</span>
 					<span class="word w2">FILMS</span>
@@ -423,13 +422,6 @@
 	.lockup {
 		text-align: center;
 		margin-bottom: 4rem;
-	}
-	.eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		letter-spacing: 0.4em;
-		opacity: 0.75;
-		margin-bottom: 1rem;
 	}
 	.title {
 		/* One line, phone to desktop — the clamp below is sized so the longest
