@@ -295,12 +295,11 @@
 		<div class="lockup">
 			<Reveal>
 				<div class="intro">
-					<div class="head">
-						<div class="eyebrow">MISSOURI STATE UNIVERSITY · ELECTRONIC ARTS</div>
-						<h2 class="title">
-							Four years of <span class="grad">"go make something."</span>
-						</h2>
-					</div>
+					<!-- No kicker: the year mark immediately above already reads
+					     "Missouri State · Electronic Arts". -->
+					<h2 class="title">
+						Four years of <span class="grad">"go make something."</span>
+					</h2>
 					<p class="lede">
 						I majored in <strong>Electronic Arts</strong>
 						— a multidisciplinary major covering video production, audio production, animation,
@@ -770,13 +769,6 @@
 	.lockup {
 		margin-bottom: 4rem;
 	}
-	.eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		letter-spacing: 0.32em;
-		color: #7a4dff;
-		margin-bottom: 1rem;
-	}
 	.title {
 		font-size: clamp(2.4rem, 7vw, 5rem);
 		font-weight: 900;
@@ -807,21 +799,33 @@
 	}
 	@media (min-width: 900px) {
 		.intro {
+			/*
+			 * Set smaller in the split layout than it would be full-bleed, because
+			 * the heading has a column rather than the page to run in. At 5rem the
+			 * quotation was 782px against a 612px column, so it broke as `…of "go /
+			 * make / something."` — a one-word line in the middle of a heading.
+			 * 3.75rem lands it at ~597px: two lines, the lead-in and then the quote
+			 * whole. Held in a variable because the optical alignment below needs
+			 * to know it.
+			 */
+			--title-fs: clamp(2.2rem, 4.2vw, 3.75rem);
+
 			grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-			align-items: end;
+			align-items: start;
+		}
+		.title {
+			font-size: var(--title-fs);
 		}
 		/*
-		 * Set smaller in the split layout than it would be full-bleed, because it
-		 * has a column rather than the page to run in. At 5rem the quotation was
-		 * 782px against a 612px column, so it broke as `…of "go / make /
-		 * something."` — a one-word line in the middle of a heading. 3.75rem
-		 * lands it at ~597px: two lines, the lead-in and then the quote whole.
+		 * Line the two columns up by their *ink*, not their boxes. Equal box tops
+		 * leave them 11px apart: Merriweather's natural line box is 1.257em, so a
+		 * heading at line-height 1 has negative half-leading and its caps start
+		 * ~0.133em above the box, while the copy at 1.6 starts ~0.156em below its
+		 * own. Take the difference off the copy — expressed in ems of each side's
+		 * type, so it holds as both clamps move.
 		 */
-		.title {
-			font-size: clamp(2.2rem, 4.2vw, 3.75rem);
-		}
 		.lede {
-			padding-bottom: 0.6rem;
+			margin-top: calc(-0.133 * var(--title-fs) - 0.156em);
 		}
 	}
 
