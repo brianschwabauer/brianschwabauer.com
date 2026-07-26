@@ -7,6 +7,7 @@
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import { Comparison } from '@delightstack/components/display';
 	import PinScrub from '../primitives/PinScrub.svelte';
+	import PinDrift from '../primitives/PinDrift.svelte';
 	import ScrubVideo from '../primitives/ScrubVideo.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
@@ -354,7 +355,43 @@
 
 			<div class="transformer-stage">
 				<PinScrub height="280vh">
-					{#snippet children({ progress })}
+					{#snippet children({ progress, scrolled })}
+						<!-- The short is called Exposure and it is defeated by overexposing it,
+						     so the gauge is an aperture ring: the standard engraved stops, in
+						     order, cycling forever the way a real ring does. Only marks a lens
+						     actually carries — a made-up f/13.5 would read as a number line
+						     dressed up as a lens. -->
+						{@const F_STOPS = [
+							'1.2',
+							'1.4',
+							'2',
+							'2.8',
+							'4',
+							'5.6',
+							'8',
+							'11',
+							'16',
+							'22',
+						]}
+						<!-- The ring climbs at exactly the scroll's rate. The transform
+						     itself is scrubbed, not scrolled, so without it the page reads as
+						     frozen for the best part of two screens while the robot unfolds.
+						     Left only — the year scrubber owns the right edge.
+
+						     Two minor ticks split each stop into thirds, the way the detents
+						     between engraved stops actually fall. They also carry most of the
+						     motion: three times the moving edges of the numbers alone. -->
+						{#snippet rung({ k }: { k: number })}
+							<i class="tick major"></i>
+							<span class="stop">
+								f/{F_STOPS[k % F_STOPS.length]}
+							</span>
+							{#each [30, 60] as offset (offset)}
+								<i class="tick" style:top="{offset}px"></i>
+							{/each}
+						{/snippet}
+						<div class="gauge"><PinDrift {scrolled} period={90} mark={rung} /></div>
+
 						<ScrubVideo
 							src="https://cdn.brianschwabauer.com/media/2011-03-01_exposure-animated_on_transparent_background_camera_robot_transforms_from_camera_to_robot.webm"
 							reverseSrc="https://cdn.brianschwabauer.com/media/2011-03-01_exposure-animated_on_transparent_background_camera_robot_transforms_from_camera_to_robot-reverse.webm"
@@ -635,6 +672,61 @@
 			margin-bottom: -50px;
 		}
 	}
+	.gauge {
+		position: absolute;
+		inset-block: 0;
+		left: 2rem;
+		width: 3.5rem;
+		mask-image: linear-gradient(180deg, transparent, #000 22% 78%, transparent);
+
+		/* A fixed hairline for the ticks to slide against — travel is only as
+		   readable as the still thing it can be measured against. */
+		&::before {
+			content: '';
+			position: absolute;
+			inset-block: 0;
+			left: 0;
+			width: 1px;
+			background: rgba(108, 99, 255, 0.2);
+		}
+	}
+	.tick {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 0.65rem;
+		height: 1px;
+		background: rgba(108, 99, 255, 0.5);
+
+		&.major {
+			width: 1.75rem;
+			height: 2px;
+			background: rgba(108, 99, 255, 0.9);
+		}
+	}
+	.stop {
+		position: absolute;
+		left: 0.35rem;
+		top: 0.45rem;
+		font-family: var(--font-mono);
+		font-size: 0.64rem;
+		letter-spacing: 0.1em;
+		font-variant-numeric: tabular-nums;
+		color: rgba(108, 99, 255, 0.78);
+		white-space: nowrap;
+	}
+	@media (max-width: 768px) {
+		.gauge {
+			left: 0;
+			/* Still has to clear the major tick, the widest thing left once the stops
+			   go. */
+			width: 2rem;
+		}
+		.stop {
+			display: none;
+		}
+	}
+
 	.transformer-stage :global(.transformer-video) {
 		width: 100vw;
 		height: 100svh;

@@ -6,7 +6,7 @@
 		height = '300vh',
 		class: klass = '',
 	}: {
-		children: Snippet<[{ progress: number }]>;
+		children: Snippet<[{ progress: number; scrolled: number }]>;
 		height?: string;
 		class?: string;
 	} = $props();
@@ -14,6 +14,11 @@
 	let outer = $state<HTMLElement | null>(null);
 	let inner = $state<HTMLElement | null>(null);
 	let progress = $state(0);
+	// How far the page has scrolled *into* the pin, in px. `progress` is the same
+	// number normalised, but a drift layer that has to move 1:1 with the scroll
+	// needs the raw pixels — a normalised value would tie its speed to the pin's
+	// length instead of to the reader's actual scrolling.
+	let scrolled = $state(0);
 
 	$effect(() => {
 		if (!outer) return;
@@ -25,6 +30,7 @@
 			const vh = inner?.offsetHeight || window.innerHeight || 1;
 			const total = rect.height - vh;
 			const traversed = -rect.top;
+			scrolled = Math.max(0, Math.min(total, traversed));
 			progress = Math.max(0, Math.min(1, traversed / Math.max(1, total)));
 		};
 		// Only track scroll while the pin is anywhere near the viewport.
@@ -61,7 +67,7 @@
 
 <div bind:this={outer} class="pin-outer {klass}" style:height>
 	<div bind:this={inner} class="pin-inner">
-		{@render children({ progress })}
+		{@render children({ progress, scrolled })}
 	</div>
 </div>
 

@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import SectionShell from '../primitives/SectionShell.svelte';
 	import PinScrub from '../primitives/PinScrub.svelte';
+	import PinDrift from '../primitives/PinDrift.svelte';
 
 	const currentYear = new Date().getFullYear();
 	const START_YEAR = 2006;
@@ -40,6 +41,29 @@
 	const packRight = (p: number) => PACK_MAX - (PACK_MAX - PACK_MIN) * p;
 	// Reels spin backwards while rewinding; several full turns over the scrub.
 	const spin = (p: number) => -p * 1440;
+
+	// Tape counter for the rail. It travels 1:1 with the scroll so the wheel still
+	// feels like it is moving the page, and the counter running down as it climbs
+	// is the reason it's there: it reads as tape being wound off rather than as a
+	// decorative treadmill.
+	//
+	// Minutes:seconds:frames, not hours-first. A leading field that never moves
+	// makes the whole reading look frozen no matter how fast the rest of it spins,
+	// so the counter carries no field slower than the scroll can visibly change —
+	// and the step is sized to turn the minutes over within a screenful of rungs.
+	const FPS = 24;
+	const TC_SPAN = 60 * 60 * FPS; // one hour; the counter is MM:SS:FF, so it wraps there
+	const TC_START = 59 * 60 * FPS; // 59:00:00 — a full tape, about to be wound off
+	const TC_STEP = 163; // frames counted off per rung (~6.8s)
+	const pad = (n: number) => String(n).padStart(2, '0');
+	const timecode = (k: number) => {
+		const f = (((TC_START - k * TC_STEP) % TC_SPAN) + TC_SPAN) % TC_SPAN;
+		return [
+			pad(Math.floor(f / (FPS * 60)) % 60),
+			pad(Math.floor(f / FPS) % 60),
+			pad(f % FPS),
+		].join(':');
+	};
 </script>
 
 <SectionShell id="rewind" year={String(currentYear)} label="Rewind" theme="rewind">
@@ -49,10 +73,29 @@
 	</div>
 
 	<PinScrub height="260vh" class="rewind-pin">
-		{#snippet children({ progress })}
+		{#snippet children({ progress, scrolled })}
 			{@const p = reduced ? 1 : progress}
 			{@const yearFloat = yearFloatAt(p)}
 			{@const done = p >= 0.995}
+			<!-- A tape counter up the left flank, climbing at exactly the scroll's own
+			     rate. The scene in the middle is pinned; this is what keeps the scroll
+			     feeling like scrolling. Left only — the year scrubber owns the right
+			     edge on every section, and a second gauge beside it just reads as
+			     clutter competing with the nav.
+
+			     A major tick and a reading every rung, with minor ticks quartering the
+			     gap. The minors carry most of the motion — four times as many moving
+			     edges as the readings alone, which is what makes the travel legible
+			     without having to shout. -->
+			{#snippet rung({ k }: { k: number })}
+				<i class="tick major"></i>
+				<span class="tc">{timecode(k)}</span>
+				{#each [24, 48, 72] as offset (offset)}
+					<i class="tick" style:top="{offset}px"></i>
+				{/each}
+			{/snippet}
+			<div class="rail"><PinDrift {scrolled} period={96} mark={rung} /></div>
+
 			<div class="scene">
 				<div class="intro">
 					<div class="eyebrow">
@@ -183,6 +226,71 @@
 			rgba(5, 5, 10, 0.65) 75%,
 			#050a10 100%
 		);
+	}
+
+	/* The counter sits in the far periphery: wide enough to register as motion, dim
+	   enough that the year flight keeps the middle of the screen. */
+	.rail {
+		position: absolute;
+		inset-block: 0;
+		left: 2rem;
+		/* Wide enough for a full reading plus its inset — the ladder clips its
+		   overflow, so a rail even a few px short lops a digit off the end. */
+		width: 4.5rem;
+		mask-image: linear-gradient(180deg, transparent, #000 20% 80%, transparent);
+
+		/* A fixed hairline for the ticks to slide against. Nothing about it moves —
+		   that is the point: travel is only as readable as the still thing it can be
+		   measured against, and without it the ticks are just drifting in space. */
+		&::before {
+			content: '';
+			position: absolute;
+			inset-block: 0;
+			left: 0;
+			width: 1px;
+			background: rgba(255, 156, 74, 0.16);
+		}
+	}
+	/* Ticks hang off the rail's outer edge and the numbers sit inboard of them, so
+	   the pair reads as one fixed gauge the tape runs past rather than as a floating
+	   column of numbers. */
+	.tick {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 0.7rem;
+		height: 1px;
+		background: rgba(255, 156, 74, 0.45);
+
+		&.major {
+			width: 1.9rem;
+			height: 2px;
+			background: rgba(255, 156, 74, 0.85);
+		}
+	}
+	.tc {
+		position: absolute;
+		left: 0.4rem;
+		top: 0.5rem;
+		font-family: var(--font-mono);
+		font-size: 0.66rem;
+		letter-spacing: 0.1em;
+		font-variant-numeric: tabular-nums;
+		color: rgba(255, 156, 74, 0.72);
+		white-space: nowrap;
+	}
+	/* No width to spare beside the years here — the rail sheds the readings and
+	   carries the motion on ticks alone rather than colliding with the scene. */
+	@media (max-width: 768px) {
+		.rail {
+			left: 0;
+			/* Still has to clear the major tick, the widest thing left once the
+			   readings go. */
+			width: 2.25rem;
+		}
+		.tc {
+			display: none;
+		}
 	}
 
 	.scene {

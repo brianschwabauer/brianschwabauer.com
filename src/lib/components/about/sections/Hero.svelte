@@ -32,13 +32,14 @@
 	const SCROLL_EXTRA = 50;
 	const DRAIN_REACH = 1 + SCROLL_EXTRA / STAR_COUNT;
 
-	// Hero content (badge, headline, copy, CTA) parallax: as you scroll into
-	// the pin each item drifts up and fades — staggered, and each at its own
-	// rate so the column gently separates rather than leaving as a block.
-	const FRAG_LIFT = 250; // px the first item travels up before it is gone
-	const FRAG_LIFT_STEP = 0; // each item below travels a little less (parallax)
-	const FRAG_STAGGER = 0.14; // scroll-progress offset between items
-	const FRAG_SPAN = 2; // scroll-progress each item takes to depart
+	// Hero content (badge, headline, copy, CTA) departure. The column travels up at
+	// exactly the scroll's own rate — 1px scrolled, 1px up — so the pin never reads
+	// as the page having seized up while the starfield plays. It leaves as one rigid
+	// block: any per-item rate is a different claim about how fast you are
+	// scrolling, and two of those on screen at once is what makes a pin feel stuck.
+	// The stagger lives entirely in the fade, which costs nothing in believability.
+	const FADE_STAGGER = 0.12; // scroll-progress offset between items
+	const FADE_SPAN = 0.5; // scroll-progress each item takes to fade out
 
 	// the warp tunnel in px of translateZ. Z_NEAR stays well inside the
 	// `perspective` distance so a tile never reaches the projection
@@ -188,6 +189,7 @@
 	let warpRef: HTMLDivElement | undefined;
 	// the BEFORE content is conditionally rendered, so this ref is reassigned
 	let beforeRef = $state<HTMLDivElement>();
+	let cueRef = $state<HTMLButtonElement>();
 
 	// ---- the warp loop ------------------------------------------------------
 	// One rAF loop owns the field. It advances every tile's warp position,
@@ -238,20 +240,29 @@
 			s.drift = fresh.drift;
 		}
 
-		// the hero's badge, headline, copy and CTA drift up and fade as you
-		// scroll into the pin — each on its own stagger and at its own rate, so
-		// the column gently parallaxes apart rather than leaving as a block
-		function applyContentParallax(p: number) {
+		// the hero's badge, headline, copy and CTA ride up out of the pin at the
+		// scroll's own rate and fade off in reading order. The lift goes on the
+		// column itself — one transform, and it is the same number for every item
+		// by definition, so there is nowhere for the rates to drift apart.
+		function applyContentDeparture(p: number) {
+			if (beforeRef) {
+				beforeRef.style.transform = `translate3d(0, ${(-p * pinDist).toFixed(1)}px, 0)`;
+			}
 			const items = beforeRef?.children;
 			if (!items) return;
 			for (let k = 0; k < items.length; k++) {
 				const el = items[k] as HTMLElement | undefined;
 				if (!el) continue;
-				const local = Math.min(1, Math.max(0, (p - k * FRAG_STAGGER) / FRAG_SPAN));
-				const e = local * local * (3 - 2 * local); // smoothstep
-				const lift = -e * (FRAG_LIFT - k * FRAG_LIFT_STEP);
-				el.style.transform = `translate3d(0, ${lift.toFixed(1)}px, 0) scale(${(1 - e * 0.04).toFixed(3)})`;
-				el.style.opacity = (1 - e).toFixed(3);
+				const local = Math.min(1, Math.max(0, (p - k * FADE_STAGGER) / FADE_SPAN));
+				el.style.opacity = (1 - local * local * (3 - 2 * local)).toFixed(3); // smoothstep
+			}
+			// The cue is anchored to the bottom of the sticky frame, so it is the one
+			// thing that cannot travel with the column — fade it instead, or it sits
+			// there conspicuously nailed in place while everything else leaves.
+			if (cueRef) {
+				const fade = Math.max(0, 1 - p * 3);
+				cueRef.style.setProperty('--cue-fade', fade.toFixed(3));
+				cueRef.style.setProperty('--cue-hit', fade < 0.05 ? 'none' : 'auto');
 			}
 		}
 
@@ -357,8 +368,8 @@
 				}
 			}
 
-			// the headline, badge, copy and button parallax with the scroll
-			applyContentParallax(progress);
+			// the headline, badge, copy and button ride up with the scroll
+			applyContentDeparture(progress);
 
 			raf = heroVisible ? requestAnimationFrame(tick) : 0;
 		}
@@ -742,6 +753,7 @@
 		{/if}
 
 		<button
+			bind:this={cueRef}
 			class="scroll-cue"
 			class:hidden={phase === 'boom'}
 			type="button"
@@ -1449,9 +1461,16 @@
 		text-transform: uppercase;
 		z-index: 2;
 		padding: 0.4rem 0.6rem;
+		/* Both driven by the scroll loop. They go through custom properties rather
+		   than being set inline so `.hidden` still wins on the boom — an inline
+		   opacity would outrank it and leave the cue sitting through the explosion.
+		   Opacity is deliberately not transitioned here: it tracks the scroll frame
+		   by frame, and easing it would just reintroduce the lag this whole
+		   departure is meant to remove. */
+		opacity: var(--cue-fade, 1);
+		pointer-events: var(--cue-hit, auto);
 		transition:
 			color 200ms ease,
-			opacity 380ms ease,
 			transform 380ms ease;
 	}
 	.scroll-cue:hover {
@@ -1462,6 +1481,10 @@
 		opacity: 0;
 		transform: translate(-50%, 30px);
 		pointer-events: none;
+		transition:
+			color 200ms ease,
+			opacity 380ms ease,
+			transform 380ms ease;
 	}
 	.cue-arrow {
 		display: inline-flex;
