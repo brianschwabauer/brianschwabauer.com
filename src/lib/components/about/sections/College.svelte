@@ -7,7 +7,7 @@
 	import DirectorCut from '../primitives/DirectorCut.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import PlayFilm from '../primitives/PlayFilm.svelte';
-	import { type GalleryItem } from '@delightstack/components/media';
+	import { Gallery, type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 	import { cut } from '$lib/cut.svelte';
 
@@ -62,30 +62,48 @@
 		},
 	];
 
-	const nodeBTSImages: GalleryItem[] = [
+	// The finished frame first, then the rig that made it — the whole NODE
+	// production in one slider, sitting where the still frame used to.
+	const nodeImages: GalleryItem[] = [
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2014-03-18_art_300_project-node-360_short_film_panorama_equirectangular.avif',
+			width: 2048,
+			height: 1024,
+			caption: 'The stitched equirectangular panorama',
+			alt: 'NODE — equirectangular panorama still',
+		},
 		{
 			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_01-four_go_pro_mount.avif',
 			width: 2048,
 			height: 1536,
+			caption: 'The rig — four GoPros on a toothpaste box',
+			alt: 'NODE behind the scenes — the four-GoPro mount',
 		},
 		{
 			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_03_four_gopro_mount_in_car.avif',
 			width: 2048,
 			height: 1536,
+			caption: 'The rig riding in the car',
+			alt: 'NODE behind the scenes — the four-GoPro mount in a car',
 		},
 		{
 			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_04.avif',
 			width: 2048,
 			height: 1536,
+			caption: 'On location',
+			alt: 'NODE behind the scenes — on location',
 		},
 		{
 			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_05-all_actors.avif',
 			width: 2048,
 			height: 1536,
+			caption: 'The cast',
+			alt: 'NODE behind the scenes — the whole cast',
 		},
 	];
 
@@ -359,10 +377,8 @@
 		<div class="node-block">
 			<Reveal>
 				<div class="node-head">
-					<h3 class="sub">
-						<span class="lab-tag">EXPERIMENTAL</span>
-						NODE — a 360° short film, in 2014
-					</h3>
+					<span class="lab-tag">EXPERIMENTAL</span>
+					<h3 class="sub">NODE — a 360° short film, in 2014</h3>
 					<p>
 						"Make something cool and impressive," our ART 300 professor said. So my group
 						made a
@@ -401,11 +417,14 @@
 							</li>
 						</ol>
 					</div>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2014-03-18_art_300_project-node-360_short_film_panorama_equirectangular.avif"
-						alt="NODE — equirectangular panorama still"
-						ratio="2 / 1"
-						onclick={(e) => gallery?.open(2, e.currentTarget)} />
+					<div class="node-gallery">
+						<Gallery
+							items={nodeImages}
+							display="slider"
+							aspect_ratio="16 / 10"
+							radius="2"
+							meta_display_fullscreen="always" />
+					</div>
 				</div>
 			</Reveal>
 
@@ -413,6 +432,7 @@
 				<div class="node-viewer">
 					<ArchiveFrame
 						src="https://cdn.brianschwabauer.com/site/node/index.html"
+						host="brianschwabauer.com/node"
 						title="NODE — the WebGL 360 player I built (2014)"
 						ratio="16 / 10"
 						label="Try the original 360 viewer" />
@@ -517,10 +537,10 @@
 							Before Split Life there was <strong>Fugue</strong>
 							, my first crack at
 							<strong>SATO 48</strong>
-							— the region's 48-hour film race. You're handed a genre, a prop, and a line
-							of dialogue at kickoff, then get 48 sleepless hours to write, shoot, score,
-							and cut a finished short. It's the film that taught me how much you can
-							actually pull off in two days — and set up the swing I took the next year.
+							— the region's 48-hour film race. You're handed a genre, a prop, and a line of
+							dialogue at kickoff, then get 48 sleepless hours to write, shoot, score, and cut
+							a finished short. It's the film that taught me how much you can actually pull
+							off in two days — and set up the swing I took the next year.
 						</p>
 					</Reveal>
 					<Reveal variant="up" delay={100}>
@@ -572,12 +592,6 @@
 					MED 365 silent film · chase scene · complexity edit · ART 230 stop-motion · ART
 					300 disturbance · MED 465 One Up
 				</div>
-			</div>
-		</Reveal>
-
-		<Reveal variant="up" delay={100}>
-			<div class="node-bts">
-				<PeekGallery key="college-node-bts" items={nodeBTSImages} peek={6} size="2" />
 			</div>
 		</Reveal>
 
@@ -906,7 +920,11 @@
 		margin-top: 0.2rem;
 	}
 
+	/* Above the title, not beside it: it labels the whole project, so it reads
+	   as a kicker rather than as another word in the headline. */
 	.lab-tag {
+		display: inline-block;
+		margin-bottom: 0.55rem;
 		font-family: var(--font-mono);
 		font-size: 0.65rem;
 		letter-spacing: 0.2em;
@@ -952,8 +970,15 @@
 	.rig-steps li {
 		margin-bottom: 0.4rem;
 	}
-	.node-bts {
-		margin: 2rem 0;
+	/* A grid item's default `min-width: auto` lets the carousel's own content
+	   set the column's floor and push the layout wider than its track. */
+	.node-gallery {
+		min-width: 0;
+		/* The slider's inline controls are absolutely positioned at `top: 100%`,
+		   so they hang below the gallery box without adding to its height and
+		   would otherwise land on top of whatever follows. Reserve their row —
+		   3.5rem is the height the component gives them. */
+		padding-bottom: 3.5rem;
 	}
 	.node-viewer {
 		margin: 2rem 0;
