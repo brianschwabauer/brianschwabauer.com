@@ -450,10 +450,7 @@
 	.word {
 		display: inline-block;
 		font-size: clamp(1.4rem, 6.6vw, 5rem);
-		background: linear-gradient(180deg, #ffd934 0%, #ffcc33 50%, #ffaa00 100%);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
+		color: oklch(from #ffcc33 0.82 calc(c * 0.9) h);
 		text-shadow: 0 0 60px rgba(255, 217, 52, 0.15);
 		transform-origin: center;
 	}

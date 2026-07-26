@@ -831,10 +831,7 @@
 		margin: 0 0 1rem;
 	}
 	.ksms-grad {
-		background: linear-gradient(90deg, #ff3a3a, #ffb84d);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
+		color: oklch(from #ff5a2a 0.82 calc(c * 0.9) h);
 	}
 	.lede {
 		font-size: clamp(1.05rem, 1.5vw, 1.2rem);

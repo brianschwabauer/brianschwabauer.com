@@ -396,10 +396,7 @@
 		margin: 0 0 1rem;
 	}
 	.grad {
-		background: linear-gradient(90deg, #ffb84d, #ff6688, #ffd934);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
+		color: oklch(from #ff6688 0.82 calc(c * 0.9) h);
 	}
 	.lede {
 		font-size: clamp(1.05rem, 1.5vw, 1.2rem);

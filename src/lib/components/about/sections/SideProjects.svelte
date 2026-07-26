@@ -176,10 +176,7 @@
 		margin: 0 0 1rem;
 	}
 	.grad {
-		background: linear-gradient(90deg, #a78bfa, #ff8b8b, #ffd66e);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
+		color: oklch(from #ff8b8b 0.82 calc(c * 0.9) h);
 	}
 
 	.grid {

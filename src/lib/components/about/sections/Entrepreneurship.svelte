@@ -472,10 +472,7 @@
 		transform: skewY(-3deg);
 	}
 	.grad {
-		background: linear-gradient(90deg, #00d6ff, #00f2c3, #ff6688);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
+		color: oklch(from #00f2c3 0.82 calc(c * 0.9) h);
 	}
 	.lede {
 		font-size: clamp(1.05rem, 1.5vw, 1.2rem);

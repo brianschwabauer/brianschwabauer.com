@@ -583,10 +583,7 @@
 		margin: 0 0 1.6rem;
 	}
 	.grad {
-		background: linear-gradient(135deg, #00f2c3, #6c63ff);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
+		color: oklch(from #00f2c3 0.84 calc(c * 0.86) h);
 	}
 
 	.lockup {
@@ -646,7 +643,7 @@
 		align-items: center;
 		gap: 0.55rem;
 		padding: 0.85rem 1.35rem;
-		background: linear-gradient(135deg, #00f2c3, #00d6ff);
+		background: #00e0b6;
 		color: #052028;
 		font-weight: 800;
 		border-radius: 999px;
@@ -654,7 +651,7 @@
 		transition:
 			transform 200ms ease,
 			box-shadow 200ms ease;
-		box-shadow: 0 10px 30px rgba(0, 242, 195, 0.3);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
 	}
 	.cta-primary:hover {
 		transition-duration: 0s;

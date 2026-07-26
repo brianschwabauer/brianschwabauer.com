@@ -539,10 +539,7 @@
 		margin: 0 0 1rem;
 	}
 	.grad {
-		background: linear-gradient(90deg, #6c63ff, #00f2c3, #00c8ff);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
+		color: oklch(from #00f2c3 0.82 calc(c * 0.9) h);
 	}
 	.lede {
 		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
