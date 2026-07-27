@@ -13,25 +13,24 @@
 
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 
-	const earlyFilms: Array<{
+	// Every one of these is unlisted — the whole vault only exists for signed-in
+	// visitors. Signed out, the films are not rendered, listed, or counted at all.
+	const privateFilms: Array<{
 		slug: string;
 		title: string;
 		date: string;
-		private: boolean;
 		blurb: string;
 	}> = [
 		{
 			slug: REDACTED,
 			title: 'Quanesha',
 			date: '2006-08-10',
-			private: true,
 			blurb: 'No script. No actors. Just two kids and a pile of stuffed animals.',
 		},
 		{
 			slug: REDACTED,
 			title: 'Bobby McQueen',
 			date: '2006-08-30',
-			private: true,
 			blurb:
 				'A third friend joins. The plot? Mostly Turbana, a guy in a comically large turban.',
 		},
@@ -39,7 +38,6 @@
 			slug: REDACTED,
 			title: 'The Fight Scene',
 			date: '2006-10-21',
-			private: true,
 			blurb:
 				'We tried to act in slow motion so we could "speed it up" later. It does not work.',
 		},
@@ -47,7 +45,6 @@
 			slug: REDACTED,
 			title: 'Super Swatter 3001',
 			date: '2006-12-22',
-			private: true,
 			blurb:
 				'A class assignment "invention" — a 3-headed fly swatter — sold via fake infomercial.',
 		},
@@ -55,14 +52,12 @@
 			slug: REDACTED,
 			title: 'Noggin Saver',
 			date: '2007-01-05',
-			private: true,
 			blurb: "Kevin's invention: a device that stops chairs from tipping over.",
 		},
 		{
 			slug: REDACTED,
 			title: 'Ninja Men',
 			date: '2007-09-09',
-			private: true,
 			blurb:
 				'A year later. Pre-cut apple + toothpick = a karate-chop split that holds up.',
 		},
@@ -70,14 +65,12 @@
 			slug: REDACTED,
 			title: 'Spatula Story',
 			date: '2007-09-06',
-			private: true,
 			blurb: "A quest. For a spatula. Don't ask.",
 		},
 		{
 			slug: REDACTED,
 			title: 'Rush for an Idea',
 			date: '2008-02-23',
-			private: true,
 			blurb:
 				'Our first film with a real script. Greenscreen, a soundtrack, multiple takes.',
 		},
@@ -85,7 +78,6 @@
 			slug: REDACTED,
 			title: '02.29.08',
 			date: '2008-02-29',
-			private: true,
 			blurb:
 				'Newspaper contest: a 29-second short for leap day. Got 2nd place — and taught us quick cuts.',
 		},
@@ -138,7 +130,7 @@
 	const sectionMedia = $derived<GalleryItem[]>([
 		...baseImages,
 		...(signedIn
-			? earlyFilms.map((film) => ({
+			? privateFilms.map((film) => ({
 					type: 'video' as const,
 					src: `https://cdn.brianschwabauer.com/media/${film.slug}/master.m3u8`,
 					poster: `https://cdn.brianschwabauer.com/media/${film.slug}/poster.jpg`,
@@ -288,9 +280,9 @@
 		</div>
 
 		<!-- One fold for the whole back half of the toy-camera years: two
-		     scenes and the process they taught. The vault below always closes
-		     the section. -->
-		<DeletedScenes scenes={3 + earlyFilms.length}>
+		     scenes and the process they taught. The vault below closes the
+		     section for signed-in visitors only, so it isn't counted otherwise. -->
+		<DeletedScenes scenes={3 + (signedIn ? privateFilms.length : 0)}>
 			<Reveal variant="up">
 				<div class="karate">
 					<div class="karate-text">
@@ -363,39 +355,38 @@
 				</div>
 			</Reveal>
 
-			<Reveal variant="up">
-				<h3 class="vault-heading">
-					<span class="vault-line"></span>
-					The vault — every short, in order
-				</h3>
-				<p class="vault-sub">
-					These are bad. Some of them are wonderful-bad. They are <em>
-						where every other section of this page came from.
-					</em>
-				</p>
-			</Reveal>
+			{#if signedIn}
+				<Reveal variant="up">
+					<h3 class="vault-heading">
+						<span class="vault-line"></span>
+						The vault — every short, in order
+					</h3>
+					<p class="vault-sub">
+						These are bad. Some of them are wonderful-bad. They are <em>
+							where every other section of this page came from.
+						</em>
+					</p>
+				</Reveal>
 
-			<ul class="films">
-				{#each earlyFilms as film, i}
-					<Reveal variant="up" delay={50 + (i % 3) * 80}>
-						<li class="film">
-							<div class="film-head">
-								<span class="film-index">№ {String(i + 1).padStart(2, '0')}</span>
-								<span class="film-date">{film.date}</span>
-								{#if film.private}<span class="film-tag">private</span>{/if}
-							</div>
-							<h4 class="film-title">{film.title}</h4>
-							<p class="film-blurb">{film.blurb}</p>
-							{#if signedIn && FILM_BASE_INDEX >= 0}
+				<ul class="films">
+					{#each privateFilms as film, i}
+						<Reveal variant="up" delay={50 + (i % 3) * 80}>
+							<li class="film">
+								<div class="film-head">
+									<span class="film-index">№ {String(i + 1).padStart(2, '0')}</span>
+									<span class="film-date">{film.date}</span>
+								</div>
+								<h4 class="film-title">{film.title}</h4>
+								<p class="film-blurb">{film.blurb}</p>
 								<PlayFilm
 									title={film.title}
 									color="#ff9c4a"
 									onclick={(e) => gallery?.open(FILM_BASE_INDEX + i, e.currentTarget)} />
-							{/if}
-						</li>
-					</Reveal>
-				{/each}
-			</ul>
+							</li>
+						</Reveal>
+					{/each}
+				</ul>
+			{/if}
 		</DeletedScenes>
 	</div>
 
@@ -702,13 +693,6 @@
 	.film-index {
 		color: var(--tape-accent);
 		font-weight: 700;
-	}
-	.film-tag {
-		margin-left: auto;
-		padding: 0.05rem 0.5rem;
-		border: 1px solid rgba(245, 230, 207, 0.3);
-		border-radius: 999px;
-		font-size: 0.55rem;
 	}
 	.film-title {
 		font-size: 1.2rem;
