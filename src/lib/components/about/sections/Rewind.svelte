@@ -72,7 +72,10 @@
 		<div class="vignette"></div>
 	</div>
 
-	<PinScrub height="260vh" class="rewind-pin">
+	<!-- Short enough to feel like a flick rather than a commitment. The heavy
+	     easing is unchanged, so the first and last years still linger — the
+	     shorter pin only makes the middle ones whip past harder. -->
+	<PinScrub height="180vh" class="rewind-pin">
 		{#snippet children({ progress, scrolled })}
 			{@const p = reduced ? 1 : progress}
 			{@const yearFloat = yearFloatAt(p)}
@@ -96,20 +99,39 @@
 			{/snippet}
 			<div class="rail"><PinDrift {scrolled} period={96} mark={rung} /></div>
 
+			<!-- The room changes colour as the tape runs back: cool indigo at today,
+			     warm sepia at 2006. It lives inside the pin because the pinned inner
+			     is exactly the viewport the reader is watching while they scrub, and
+			     one opacity on one layer is the cheapest thing that can composite. -->
+			<div class="warm" style:opacity={p} aria-hidden="true"></div>
+
 			<div class="scene">
 				<div class="intro">
+					<!-- Two transport modes on the same deck: the rewind ends its own
+					     gesture here, so the leader that follows reads as the tape
+					     playing rather than as a second countdown. -->
 					<div class="eyebrow">
-						<span class="rew-icon" class:running={p > 0.01 && !done} aria-hidden="true">
-							◄◄
+						<span class="mode" class:off={done}>
+							<span class="rew-icon" class:running={p > 0.01 && !done} aria-hidden="true">
+								◄◄
+							</span>
+							Rewind the tape
 						</span>
-						Rewind the tape
+						<span class="mode" class:off={!done}>
+							&#9209; REWOUND TO {START_YEAR} · &#9654; PLAY
+						</span>
 					</div>
 					<h2 class="title">Where it all started.</h2>
 					<p class="lede">
-						That's today. But none of it started with a company. It started with a miniDV
-						camera, a bedroom wall painted green, and a friend named Kevin.
+						Twenty years of startups, apps, and videos. But it didn't start with any of
+						that. It started with a miniDV camera, a bedroom wall painted green, and a
+						friend named Kevin.
 						<strong>Keep scrolling to rewind twenty years.</strong>
 					</p>
+					<!-- A diegetic skip for anyone who came for "what does he do now".
+					     The pin holds it on screen for the whole scrub, so it can stay
+					     quiet and still never be missed. -->
+					<a class="ff" href="#now">&#9654;&#9654; Fast-forward to now</a>
 				</div>
 
 				<div class="cassette" class:done>
@@ -127,10 +149,12 @@
 						<!-- label -->
 						<rect x="28" y="20" width="284" height="52" rx="8" class="label" />
 						<text x="170" y="42" class="label-text" text-anchor="middle">
-							HUNKY SPUNKY PRODUCTIONS
+							EVERYTHING I'VE MADE
 						</text>
+						<!-- The tape is the body of work, not the life — which is why it
+						     starts in 2006 and not at birth. -->
 						<text x="170" y="60" class="label-sub" text-anchor="middle">
-							TAPE 01 · {START_YEAR}–{currentYear}
+							TAPE 01 · {START_YEAR}–TODAY
 						</text>
 						<!-- tape window -->
 						<rect x="58" y="88" width="224" height="84" rx="12" class="window" />
@@ -189,11 +213,12 @@
 </SectionShell>
 
 <style>
+	/* Today's end of the tape: cool, blue, present tense. The warm layer inside
+	   the pin takes it the rest of the way to 2006. */
 	:global([data-theme='rewind']) {
 		background:
-			radial-gradient(circle at 50% 0%, rgba(108, 99, 255, 0.18), transparent 55%),
-			radial-gradient(circle at 50% 100%, rgba(255, 156, 74, 0.1), transparent 60%),
-			linear-gradient(180deg, #050a10, #0a0a12 50%, #100a06);
+			radial-gradient(circle at 50% 0%, rgba(108, 99, 255, 0.28), transparent 58%),
+			linear-gradient(180deg, #05070f, #0a0f2a 50%, #060812);
 		color: #fff;
 	}
 	/* The pinned scene provides its own vertical rhythm — the shell's default
@@ -216,6 +241,17 @@
 		);
 		mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
 		opacity: 0.6;
+	}
+	/* 2006, fully rewound: amber, sepia, a warmer room. Opaque enough at p=1 that
+	   the cool base is gone rather than tinted — the change has to be something
+	   you watch happen, not something you'd have to A/B. */
+	.warm {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background:
+			radial-gradient(circle at 50% 12%, rgba(255, 156, 74, 0.22), transparent 60%),
+			linear-gradient(180deg, #140b04, #3a2008 52%, #180d05);
 	}
 	.vignette {
 		position: absolute;
@@ -304,16 +340,28 @@
 		gap: clamp(1rem, 2.5vh, 2rem);
 		text-align: center;
 	}
+	/* Both readouts share one grid cell so the swap is a crossfade in place and
+	   the block below it never shifts. */
 	.eyebrow {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.6rem;
+		display: inline-grid;
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
 		letter-spacing: 0.32em;
 		text-transform: uppercase;
 		color: rgba(255, 255, 255, 0.6);
 		margin-bottom: 0.9rem;
+	}
+	.mode {
+		grid-area: 1 / 1;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6rem;
+		white-space: nowrap;
+		transition: opacity 260ms ease;
+	}
+	.mode.off {
+		opacity: 0;
 	}
 	.rew-icon {
 		color: #ff9c4a;
@@ -348,6 +396,44 @@
 	.lede strong {
 		color: #ff9c4a;
 		font-weight: 600;
+	}
+
+	/* Quiet, but not hidden. It has to read as a control at a glance — pill,
+	   hairline, mono label — while staying obviously subordinate to the story it
+	   is offering to skip, so it sits at ~75% of the section's amber and only
+	   comes to full strength on hover or focus. */
+	.ff {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: 1.6rem;
+		padding: 0.6rem 1.15rem;
+		border-radius: 999px;
+		border: 1px solid oklch(from #ff9c4a l c h / 0.32);
+		color: oklch(from #ff9c4a l c h / 0.75);
+		background: oklch(from #ff9c4a l c h / 0.05);
+		font-family: var(--font-mono);
+		font-size: 0.76rem;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		text-decoration: none;
+		transition:
+			color 240ms ease,
+			border-color 240ms ease,
+			background 240ms ease,
+			translate 200ms ease;
+	}
+	.ff:hover {
+		transition-duration: 0s;
+		color: #ff9c4a;
+		border-color: oklch(from #ff9c4a l c h / 0.7);
+		background: oklch(from #ff9c4a l c h / 0.12);
+		translate: 0 -2px;
+	}
+	.ff:focus-visible {
+		outline: 2px solid #ff9c4a;
+		outline-offset: 3px;
+		color: #ff9c4a;
 	}
 
 	.cassette {
@@ -448,6 +534,10 @@
 	@media (prefers-reduced-motion: reduce) {
 		.rew-icon.running {
 			animation: none;
+		}
+		.ff:hover {
+			transition-duration: 0s;
+			translate: none;
 		}
 	}
 </style>

@@ -41,8 +41,11 @@
 		}[act],
 	);
 
-	// ── Act 1: the countdown ────────────────────────────────────────────────
-	const NUMERALS = [8, 7, 6, 5, 4, 3, 2];
+	// ── Act 1: the leader ───────────────────────────────────────────────────
+	// Four numerals, not seven: after the rewind the reader has just watched one
+	// count already, and this one is the tape *starting* rather than a second
+	// countdown. The COUNT_END/STEP math sizes itself to the array.
+	const NUMERALS = [5, 4, 3, 2];
 	/** Progress at which the countdown gives way to the title card. */
 	const COUNT_END = 0.8;
 	const STEP = COUNT_END / NUMERALS.length;
@@ -55,9 +58,9 @@
 		};
 	}
 
-	/** Timecode that runs *backwards* — we're still rewinding into the past. */
+	/** Timecode counting up from zero: the tape is playing now, not rewinding. */
 	function timecodeAt(p: number) {
-		const frames = Math.max(0, Math.round((1 - p) * 8 * 30));
+		const frames = Math.max(0, Math.round(p * 8 * 30));
 		const ss = String(Math.floor(frames / 30)).padStart(2, '0');
 		const ff = String(frames % 30).padStart(2, '0');
 		return `00:00:${ss}:${ff}`;
@@ -97,7 +100,7 @@
 	{#if act === 1}
 		{@const { numeral, local } = countdownAt(p)}
 		{@const done = p >= COUNT_END}
-		<ViewfinderFrame timecode={timecodeAt(p)}>
+		<ViewfinderFrame timecode={timecodeAt(p)} mode="▶ PLAY">
 			<FilmGate>
 				<div class="leader-stage">
 					{#if !done}
@@ -179,7 +182,7 @@
 {/snippet}
 
 <section id="act-{act}" class="chapter act-{act}">
-	<PinScrub height={act === 1 ? '200vh' : '150vh'}>
+	<PinScrub height="150vh">
 		{#snippet children({ progress })}
 			{@render scene(progress)}
 		{/snippet}
@@ -196,7 +199,7 @@
 		--nav-gutter: 68px;
 		/* Same skip-when-far-away treatment as SectionShell, sized for the pin. */
 		content-visibility: auto;
-		contain-intrinsic-size: 1px 200vh;
+		contain-intrinsic-size: 1px 150vh;
 	}
 	.act-1 :global(.pin-inner),
 	.act-2 :global(.pin-inner),
