@@ -5,6 +5,7 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+	import BokehField from '../primitives/BokehField.svelte';
 
 	const dashboardMockupsImages: GalleryItem[] = [
 		{
@@ -192,16 +193,21 @@
 </script>
 
 <SectionShell id="showandtour" year="2019" label="Show&Tour" theme="snt">
-	<div class="snt-bg" aria-hidden="true"></div>
+	<!-- The field runs the whole section, behind the lockup, the features and all
+	     three galleries. Its mask is gentler than the NOW section's: there is copy
+	     from top to bottom here, so the discs thin toward the middle column rather
+	     than clearing one hole in the centre. -->
+	<BokehField
+		mask="linear-gradient(90deg, #000, rgba(0, 0, 0, 0.32) 30%, rgba(0, 0, 0, 0.32) 70%, #000)" />
 
 	<div class="container">
 		<Reveal>
-			<YearMark year="2019 → today" subtitle="What I'm building now" color="#00f2c3" />
+			<YearMark year="2019" color="#00f2c3" />
 		</Reveal>
 
 		<div class="lockup">
 			<Reveal>
-				<div class="eyebrow">CURRENT FOCUS · CO-FOUNDER</div>
+				<div class="eyebrow">CO-FOUNDER</div>
 				<h2 class="title">
 					<span class="snt-mark">
 						<img
@@ -217,9 +223,13 @@
 					photographers — beautiful property websites, branded delivery pages, smart invoicing,
 					and a workflow built around how photographers actually work.
 				</p>
+				<!-- The origin, told from 2019. Every present-tense claim about
+				     Show&Tour — full-time, the user count, the roadmap — belongs to
+				     the NOW section, so this chapter never has to say "still". -->
 				<p class="lede">
-					This is my full-time job now. We have thousands of users. I'm incredibly proud
-					of what we've built.
+					Everything else on this page was practice for this. A decade of shipping other
+					people's projects, a string of products that almost worked — and then the one
+					that stuck.
 				</p>
 				<div class="cta-row">
 					<a
@@ -324,22 +334,15 @@
 </SectionShell>
 
 <style>
+	/* The teal and violet corner glows that used to sit here are gone with the
+	   grid — the depth now comes from the bokeh, which is a real photographic
+	   effect rather than a light source with nothing making it. This section owns
+	   the `snt` theme for the page; the NOW section shares it and does not
+	   redeclare it, so there is one definition rather than two globals racing on
+	   source order. */
 	:global([data-theme='snt']) {
-		background:
-			radial-gradient(circle at 20% 20%, rgba(0, 242, 195, 0.1), transparent 50%),
-			radial-gradient(circle at 80% 80%, rgba(108, 99, 255, 0.08), transparent 50%),
-			linear-gradient(180deg, #050a0c, #08161a 50%, #050a10);
+		background: linear-gradient(180deg, #050a0c, #08161a 60%, #050a10);
 		color: #e8faf6;
-	}
-	.snt-bg {
-		position: absolute;
-		inset: 0;
-		background-image:
-			linear-gradient(rgba(0, 242, 195, 0.04) 1px, transparent 1px),
-			linear-gradient(90deg, rgba(0, 242, 195, 0.04) 1px, transparent 1px);
-		background-size: 60px 60px;
-		mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
-		pointer-events: none;
 	}
 	.container {
 		max-width: 80rem;

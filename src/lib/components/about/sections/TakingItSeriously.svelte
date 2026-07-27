@@ -171,17 +171,16 @@
 
 		<Reveal>
 			<div class="prose">
-					<p>
-						Looking back: iWeb → Dreamweaver → Flash + ActionScript. The blog was a
-						hand-rolled mess. The video player was a custom embed. The "CMS" was me, in
-						Dreamweaver, on my home PC, FTP-ing pages up to shared hosting. There were no
-						frameworks. No git. No package manager. I knew none of those words.
-					</p>
-					<p>
-						But the loop felt the same as it does now: write something, refresh the
-						browser, see it on the screen. That feedback loop is the whole reason I do
-						this.
-					</p>
+				<p>
+					Looking back: iWeb → Dreamweaver → Flash + ActionScript. The blog was a
+					hand-rolled mess. The video player was a custom embed. The "CMS" was me, in
+					Dreamweaver, on my home PC, FTP-ing pages up to shared hosting. There were no
+					frameworks. No git. No package manager. I knew none of those words.
+				</p>
+				<p>
+					But the loop felt the same as it does now: write something, refresh the browser,
+					see it on the screen. That feedback loop is the whole reason I do this.
+				</p>
 			</div>
 		</Reveal>
 	</div>
