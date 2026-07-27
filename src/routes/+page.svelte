@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Hero from '$lib/components/about/sections/Hero.svelte';
-	import WhatImUpTo from '$lib/components/about/sections/WhatImUpTo.svelte';
 	import Rewind from '$lib/components/about/sections/Rewind.svelte';
 	import HumbleBeginnings from '$lib/components/about/sections/HumbleBeginnings.svelte';
 	import GreenScreen from '$lib/components/about/sections/GreenScreen.svelte';
@@ -16,7 +15,7 @@
 	import Entrepreneurship from '$lib/components/about/sections/Entrepreneurship.svelte';
 	import ShippedWall from '$lib/components/about/sections/ShippedWall.svelte';
 	import ShowAndTour from '$lib/components/about/sections/ShowAndTour.svelte';
-	import SideProjects from '$lib/components/about/sections/SideProjects.svelte';
+	import Now from '$lib/components/about/sections/Now.svelte';
 	import Creed from '$lib/components/about/sections/Creed.svelte';
 	import TheEnd from '$lib/components/about/sections/TheEnd.svelte';
 	import Credits from '$lib/components/about/sections/Credits.svelte';
@@ -45,8 +44,7 @@
 		{ id: 'entrepreneurship', year: '2017', label: 'Entrepreneurship' },
 		{ id: 'shipped-wall', year: '2015–18', label: 'The Shipped Wall' },
 		{ id: 'showandtour', year: '2019', label: 'Show&Tour' },
-		{ id: 'side-projects', year: 'Today', label: 'Side Projects' },
-		{ id: 'what-im-up-to', year: 'Now', label: 'Which Brings Us to Now' },
+		{ id: 'now', year: 'Now', label: 'Now' },
 		{ id: 'creed', year: 'Always', label: 'The Creed' },
 		{ id: 'credits', year: 'Fin', label: 'Credits' },
 	];
@@ -99,8 +97,7 @@
 		years={[2020, 2021, 2022, 2023, 2024, 2025]}
 		color="#00f2c3"
 		caption="Building Show&Tour" />
-	<SideProjects />
-	<WhatImUpTo />
+	<Now />
 	<Creed />
 	<TheEnd />
 	<Credits />
