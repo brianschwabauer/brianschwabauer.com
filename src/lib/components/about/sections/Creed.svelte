@@ -768,8 +768,10 @@
 		<div class="coda">
 			<Reveal>
 				<div class="coda-line" aria-hidden="true"></div>
+				<!-- The second sentence is the hero's lede, word for word. The bookend
+				     is the point — the page opens and closes on the same claim. -->
 				<p class="coda-text">
-					That's the whole page. That's the whole plan. I live to create. I work to
+					Twenty years in, and the plan hasn't changed. I live to create. I work to
 					delight.
 				</p>
 				<p class="coda-sign">— Brian</p>
