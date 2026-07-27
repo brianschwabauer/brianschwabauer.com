@@ -268,8 +268,7 @@
 			</Reveal>
 
 			<!-- A plain grid, and a project is allowed to break out of it. Adding the
-			     next side project is adding one <article>; the trailing card widens on
-			     its own when the count is odd, so the row never ends ragged. -->
+			     next side project is adding one <article>. -->
 			<div class="grid">
 				<Reveal variant="up">
 					<article class="card">
@@ -563,17 +562,20 @@
 		color: rgba(255, 255, 255, 0.8);
 		margin: 0 0 2rem;
 	}
-	/* One panel ruled into cells: the 1px gap shows the container through, which
-	   draws every divider without giving any cell a border of its own. */
+	/* One panel ruled into cells. The rules are box-shadows rather than a 1px
+	   grid gap showing the container through: eleven packages never fill the last
+	   row evenly, and with the gap trick the leftover cell showed up as a bright
+	   rectangle. Shadows take no layout space, the container clips the outermost
+	   ones, and an empty cell simply stays empty. */
 	.packages {
+		--rule: rgba(0, 242, 195, 0.16);
 		list-style: none;
 		margin: 0 0 1.8rem;
 		padding: 0;
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-		gap: 1px;
-		background: rgba(0, 242, 195, 0.16);
-		border: 1px solid rgba(0, 242, 195, 0.16);
+		background: #071417;
+		border: 1px solid var(--rule);
 		border-radius: 10px;
 		overflow: hidden;
 	}
@@ -582,7 +584,9 @@
 		flex-direction: column;
 		gap: 0.2rem;
 		padding: 0.8rem 1rem;
-		background: #071417;
+		box-shadow:
+			-1px 0 0 var(--rule),
+			0 -1px 0 var(--rule);
 		transition: background 250ms ease;
 	}
 	.pkg:hover {
@@ -590,6 +594,10 @@
 		background: #0a2027;
 	}
 	.pkg code {
+		/* The global `code` rule dresses inline code as a chip; in here that would
+		   be a box inside a cell inside a panel. */
+		background: none;
+		padding: 0;
 		display: flex;
 		flex-wrap: wrap;
 		align-items: baseline;
@@ -645,7 +653,6 @@
 		margin-bottom: 2.5rem;
 	}
 	.card {
-		height: 100%;
 		display: flex;
 		flex-direction: column;
 		gap: 0.7rem;
@@ -718,7 +725,6 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 0.6rem;
-		margin-top: auto;
 		padding-top: 0.4rem;
 	}
 	.shots.three {
@@ -754,31 +760,20 @@
 		box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
 	}
 
+	/* Cards take their own height rather than stretching to the tallest in the
+	   row: these carry very different amounts of artwork, and forcing them level
+	   left a card's worth of empty space above the shorter one's screenshots. A
+	   ragged last row is also the honest shape of a list that only grows. */
 	.grid {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1.5rem;
-		align-items: stretch;
-	}
-	/* An odd number of standard cards would otherwise leave the last one stranded
-	   beside a hole; let it take the width instead. Adding a fourth project turns
-	   this off by itself. */
-	.grid > :global(:last-child:nth-child(odd)) {
-		grid-column: 1 / -1;
+		align-items: start;
 	}
 	@media (max-width: 900px) {
 		.grid {
 			grid-template-columns: 1fr;
 		}
-	}
-	/* Reveal wraps each card in a div, so the stretch has to be passed down for
-	   the cards in a row to end level with each other. */
-	.grid > :global(*) {
-		display: flex;
-		flex-direction: column;
-	}
-	.grid > :global(*) > :global(*) {
-		flex: 1;
 	}
 
 	.terminal {
