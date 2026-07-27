@@ -6,7 +6,6 @@
 	import ArchiveTabs from '../primitives/ArchiveTabs.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
-	import FlipText from '../primitives/FlipText.svelte';
 
 	const tapnotionShots = [
 		'2017-01-01_tapnotion_app_screenshot_home_page-scores.avif',
@@ -16,10 +15,6 @@
 		'2017-01-01_tapnotion_app_screenshot_milestone-start.avif',
 		'2017-01-01_tapnotion_app_screenshot_question-multiple_choice-answer_revealed.avif',
 	].map((src) => ({ src: `https://cdn.brianschwabauer.com/media/${src}` }));
-
-	/** Clicking the board spells out a sentence, a word per click, then wraps back
-	 * to SCRMBLD. Only characters in the split-flap alphabet. */
-	const flapEggs = ['HELLO', 'YOU', 'FOUND', 'THE', 'EASTER', 'EGG :)'];
 
 	const towerImages: GalleryItem[] = [
 		{
@@ -95,39 +90,6 @@
 			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_engagement_grower-fresh_content_addon_animation_for_website.gif',
 		},
 	];
-	const markableImages: GalleryItem[] = [
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_app-home_page_screenshot.avif',
-			width: 1907,
-			height: 979,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_app-settings_popup_screenshot.avif',
-			width: 1532,
-			height: 1222,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-close_up_on_navigation.avif',
-			width: 2048,
-			height: 1536,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-shallow_depth_of_field_year_view.avif',
-			width: 2048,
-			height: 1536,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-title_page_close_up.avif',
-			width: 2048,
-			height: 1536,
-		},
-	];
-
 	// Standalone clickable LazyMedias in document order:
 	// 0: Tower BTS camera shot, 1: Tower demo on tablet shot,
 	// 2..7: 6 tapnotion phone mockups
@@ -348,66 +310,6 @@
 					]} />
 			</Reveal>
 		</div>
-
-		<div class="card project markable">
-			<div class="card-head">
-				<Reveal>
-					<div class="year-tag">2024+</div>
-					<h3 class="sub">
-						<a href="https://markable.page" target="_blank" rel="noopener">
-							markable.page
-						</a>
-						— a PDF planner builder for e-ink tablets
-					</h3>
-					<p>
-						A planner builder that generates highly customizable PDFs with internal links,
-						designed for devices like the reMarkable. Originally called "Remarkably
-						Organized". Open-sourced.
-						<strong>200+ stars on GitHub.</strong>
-						Built with Svelte.
-					</p>
-					<p>
-						<a
-							href="https://github.com/brianschwabauer/remarkably-organized"
-							target="_blank"
-							rel="noopener">
-							github.com/brianschwabauer/remarkably-organized
-						</a>
-					</p>
-				</Reveal>
-			</div>
-			<Reveal variant="up" delay={100}>
-				<LightboxGallery
-					key="entrepreneurship-markable"
-					items={markableImages}
-					display="masonry-row"
-					size="2" />
-			</Reveal>
-		</div>
-
-		<div class="card project scrmbld">
-			<div class="card-head">
-				<Reveal>
-					<div class="year-tag">2024+</div>
-					<h3 class="sub">
-						<a href="https://scrmbld.app" target="_blank" rel="noopener">scrmbld.app</a>
-						— a daily word game in split-flap style
-					</h3>
-					<p>
-						You're given 8 letters. One is a decoy. Unscramble the other 7 into the day's
-						word. Letters animate on like a split-flap display — I spent a stupid amount
-						of time hand-crafting the look and feel of that animation. Made for fun, not
-						for money.
-					</p>
-				</Reveal>
-			</div>
-
-			<Reveal variant="up" delay={100}>
-				<div class="splitflap">
-					<FlipText word="SCRMBLD" eggWords={flapEggs} />
-				</div>
-			</Reveal>
-		</div>
 	</div>
 
 	<LightboxGallery bind:this={gallery} key="entrepreneurship" items={sectionExtras} />
@@ -522,11 +424,6 @@
 		align-items: baseline;
 		gap: 0.4rem;
 	}
-	.sub a {
-		color: #00d6ff;
-		text-decoration: underline;
-		text-underline-offset: 4px;
-	}
 	.loc {
 		font-family: var(--font-mono);
 		font-size: 0.65rem;
@@ -544,15 +441,6 @@
 		line-height: 1.6;
 		margin-bottom: 1rem;
 	}
-	.card strong {
-		color: #00f2c3;
-	}
-	.card a {
-		color: #00d6ff;
-		text-decoration: underline;
-		text-underline-offset: 4px;
-	}
-
 	.archive-lead {
 		margin: 0 0 0.9rem;
 		line-height: 1.6;
@@ -586,19 +474,5 @@
 	.phone-mini:hover {
 		transition-duration: 0s;
 		transform: rotate(0deg) translateY(-4px);
-	}
-
-	/* The board is 11.34em wide at any size, so dividing the container width by that
-	   makes it span the card exactly. */
-	.splitflap {
-		container-type: inline-size;
-		display: flex;
-		justify-content: center;
-		/* The frame overhangs the flaps by 0.12em, so leave a little room beside it */
-		padding: 2.5rem 1rem 1.75rem;
-		--flip-size: calc(100cqi / 11.34);
-	}
-	.splitflap :global(.flip-text) {
-		box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
 	}
 </style>
