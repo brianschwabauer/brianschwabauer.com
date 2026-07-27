@@ -1,8 +1,5 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
-	import { seedCut, hydrateCut } from '$lib/cut.svelte';
 	import Hero from '$lib/components/about/sections/Hero.svelte';
-	import TicketBooth from '$lib/components/about/sections/TicketBooth.svelte';
 	import WhatImUpTo from '$lib/components/about/sections/WhatImUpTo.svelte';
 	import Rewind from '$lib/components/about/sections/Rewind.svelte';
 	import HumbleBeginnings from '$lib/components/about/sections/HumbleBeginnings.svelte';
@@ -32,20 +29,8 @@
 	let { data } = $props();
 	const signedIn = $derived(Boolean(data.signedIn));
 
-	// Seed the theatrical/director cut from `?cut=`. Server and client see the
-	// same URL, so the hydrated tree matches the SSR markup exactly. The stored
-	// preference is applied a beat later, in `$effect.pre` — after hydration has
-	// claimed the server's DOM, but still before the browser paints, so a
-	// returning director's-cut visitor never sees a theatrical frame.
-	seedCut(untrack(() => data.cut));
-	$effect.pre(() => {
-		const from_url = data.cut;
-		untrack(() => hydrateCut(from_url));
-	});
-
 	const stops = [
 		{ id: 'hero', year: 'Start', label: 'Delivering Delight' },
-		{ id: 'ticket-booth', year: 'Lobby', label: 'Choose Your Cut' },
 		{ id: 'humble-beginnings', year: '2006', label: 'Humble Beginnings' },
 		{ id: 'green-screen', year: '2007', label: 'Green Screen' },
 		{ id: 'power-rangers', year: '2008', label: 'Feature Length' },
@@ -84,7 +69,6 @@
 	<YearScrubber {stops} />
 
 	<Hero isMobile={data.isMobile} />
-	<TicketBooth />
 	<Rewind />
 	<ChapterCard act={1} />
 	<HumbleBeginnings {signedIn} />

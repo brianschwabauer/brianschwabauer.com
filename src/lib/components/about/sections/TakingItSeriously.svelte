@@ -3,7 +3,6 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import DirectorCut from '../primitives/DirectorCut.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -171,8 +170,7 @@
 			items={sectionExtras} />
 
 		<Reveal>
-			<DirectorCut>
-				<div class="prose">
+			<div class="prose">
 					<p>
 						Looking back: iWeb → Dreamweaver → Flash + ActionScript. The blog was a
 						hand-rolled mess. The video player was a custom embed. The "CMS" was me, in
@@ -184,8 +182,7 @@
 						browser, see it on the screen. That feedback loop is the whole reason I do
 						this.
 					</p>
-				</div>
-			</DirectorCut>
+			</div>
 		</Reveal>
 	</div>
 </SectionShell>

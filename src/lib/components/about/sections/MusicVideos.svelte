@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
@@ -235,9 +235,9 @@
 			</Reveal>
 		</div>
 
-		<!-- The three songs themselves. The stills roll below stays in both
-		     cuts, so the theatrical reader still gets the photos. -->
-		<DirectorCut scenes={3}>
+		<!-- The three songs themselves. The stills roll below is always
+		     there, so a reader who never opens this still gets the photos. -->
+		<DeletedScenes scenes={3}>
 			<div class="track">
 				<span class="track-num" aria-hidden="true">01</span>
 				<Reveal>
@@ -321,7 +321,7 @@
 						onclick={(e) => gallery?.open(2, e.currentTarget)} />
 				</Reveal>
 			</div>
-		</DirectorCut>
+		</DeletedScenes>
 
 		<Reveal variant="up" delay={120}>
 			<div class="roll-eyebrow bleed-head">

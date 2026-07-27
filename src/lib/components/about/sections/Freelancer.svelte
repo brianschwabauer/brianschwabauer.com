@@ -2,7 +2,7 @@
 	import SectionShell from '../primitives/SectionShell.svelte';
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
-	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveTabs from '../primitives/ArchiveTabs.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
@@ -230,7 +230,7 @@
 			</Reveal>
 
 			<Reveal variant="up" delay={100}>
-				<DirectorCut scenes={reel.length + 1}>
+				<DeletedScenes scenes={reel.length + 1}>
 					<div class="reel-grid">
 						{#each reel as item, i}
 							<figure class="reel-card" style:--i={i}>
@@ -300,7 +300,7 @@
 							</ul>
 						</Reveal>
 					</div>
-				</DirectorCut>
+				</DeletedScenes>
 			</Reveal>
 
 			<div class="weddings">

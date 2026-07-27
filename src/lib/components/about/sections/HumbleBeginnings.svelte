@@ -5,7 +5,7 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import ViewfinderFrame from '../primitives/ViewfinderFrame.svelte';
-	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -288,9 +288,9 @@
 		</div>
 
 		<!-- One fold for the whole back half of the toy-camera years: two
-		     scenes and the process they taught. The vault below closes the
-		     section in both cuts. -->
-		<DirectorCut scenes={3 + earlyFilms.length}>
+		     scenes and the process they taught. The vault below always closes
+		     the section. -->
+		<DeletedScenes scenes={3 + earlyFilms.length}>
 			<Reveal variant="up">
 				<div class="karate">
 					<div class="karate-text">
@@ -396,7 +396,7 @@
 					</Reveal>
 				{/each}
 			</ul>
-		</DirectorCut>
+		</DeletedScenes>
 	</div>
 
 	<LightboxGallery

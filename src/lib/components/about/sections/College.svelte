@@ -4,12 +4,11 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
-	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { Gallery, type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
-	import { cut } from '$lib/cut.svelte';
 
 	const variousImages: GalleryItem[] = [
 		{
@@ -439,61 +438,55 @@
 				</div>
 			</Reveal>
 
-			<!-- How the viewer actually steers the audience. No marker: the section
-			     already has one, and this only makes sense beside the player. -->
-			<DirectorCut marker={false}>
-				<Reveal>
-					<div class="prose">
-						<p>
-							A 360 video is only half the problem. You also have to <em>guide</em>
-							the viewer. At certain timecodes I disable the keyboard, smoothly animate the
-							camera to a target azimuth + FOV (with easing), then release control back to the
-							user. I also added a CSS letterbox overlay to force a 2.35 aspect ratio across
-							the whole webpage — surprisingly fiddly in 2014.
-						</p>
-					</div>
-				</Reveal>
-			</DirectorCut>
+			<!-- How the viewer actually steers the audience. -->
+			<Reveal>
+				<div class="prose">
+					<p>
+						A 360 video is only half the problem. You also have to <em>guide</em>
+						the viewer. At certain timecodes I disable the keyboard, smoothly animate the camera
+						to a target azimuth + FOV (with easing), then release control back to the user.
+						I also added a CSS letterbox overlay to force a 2.35 aspect ratio across the whole
+						webpage — surprisingly fiddly in 2014.
+					</p>
+				</div>
+			</Reveal>
 		</div>
 
-		<!-- PickVid is a side project, not one of the films this section is
-		     about. No marker: the section already has one, and advertising
-		     this absence would cost more attention than it saves. -->
-		<DirectorCut marker={false}>
-			<div class="pickvid">
-				<Reveal>
-					<h3 class="sub">PickVid (2014) — a tiny social app</h3>
-					<p>
-						Another group project in the same class. Idea: a group of friends downloads
-						the app and gets a prompt ("take a sad selfie", "take a picture of something
-						funny"). Everyone uploads their photo to a shared S3 bucket. The app stitches
-						all the photos into a single hollywood-style movie trailer with intense music
-						and explosions — your friends as the cast. We shipped a working prototype.
-					</p>
-					<PlayFilm
-						label="Play the promo"
-						title="PickVid (2014) — promo video / demo"
-						meta="2014"
-						color="#7a4dff"
-						onclick={(e) => gallery?.open(5, e.currentTarget)} />
-				</Reveal>
+		<!-- PickVid is a side project rather than one of the films this section is
+		     about, so it sits after them. -->
+		<div class="pickvid">
+			<Reveal>
+				<h3 class="sub">PickVid (2014) — a tiny social app</h3>
+				<p>
+					Another group project in the same class. Idea: a group of friends downloads the
+					app and gets a prompt ("take a sad selfie", "take a picture of something
+					funny"). Everyone uploads their photo to a shared S3 bucket. The app stitches
+					all the photos into a single hollywood-style movie trailer with intense music
+					and explosions — your friends as the cast. We shipped a working prototype.
+				</p>
+				<PlayFilm
+					label="Play the promo"
+					title="PickVid (2014) — promo video / demo"
+					meta="2014"
+					color="#7a4dff"
+					onclick={(e) => gallery?.open(5, e.currentTarget)} />
+			</Reveal>
 
-				<Reveal variant="up" delay={100}>
-					<div class="pickvid-grid">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-demo_on_phone.avif"
-							alt="PickVid demo on a phone"
-							ratio="9 / 16"
-							onclick={(e) => gallery?.open(3, e.currentTarget)} />
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-logo_animation.avif"
-							alt="PickVid logo animation"
-							ratio="16 / 9"
-							onclick={(e) => gallery?.open(4, e.currentTarget)} />
-					</div>
-				</Reveal>
-			</div>
-		</DirectorCut>
+			<Reveal variant="up" delay={100}>
+				<div class="pickvid-grid">
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-demo_on_phone.avif"
+						alt="PickVid demo on a phone"
+						ratio="9 / 16"
+						onclick={(e) => gallery?.open(3, e.currentTarget)} />
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-logo_animation.avif"
+						alt="PickVid logo animation"
+						ratio="16 / 9"
+						onclick={(e) => gallery?.open(4, e.currentTarget)} />
+				</div>
+			</Reveal>
+		</div>
 
 		<div class="bear-bus">
 			<Reveal>
@@ -540,35 +533,30 @@
 
 		<!-- The two SATO 48 films, side by side: same race, one year apart, and
 		     the pairing is the point — Fugue is the swing that set up Split
-		     Life. Fugue is a side project rather than one of the films this
-		     section is about, so it stays director's-cut only; when it's absent
-		     Split Life takes the full row rather than leaving a hole. -->
-		<div class="sato-pair" class:solo={!cut.director}>
-			{#if cut.director}
-				<div class="sato-col">
-					<Reveal>
-						<p class="micro">Director's cut</p>
-						<h3 class="sub">Fugue — my first 48-hour film (2014)</h3>
-						<p>
-							Before Split Life there was <strong>Fugue</strong>
-							, my first crack at
-							<strong>SATO 48</strong>
-							— the region's 48-hour film race. You're handed a genre, a prop, and a line of
-							dialogue at kickoff, then get 48 sleepless hours to write, shoot, score, and cut
-							a finished short. It's the film that taught me how much you can actually pull
-							off in two days — and set up the swing I took the next year.
-						</p>
-					</Reveal>
-					<Reveal variant="up" delay={100}>
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/poster.jpg"
-							alt="Fugue (2014) — 48-hour film"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(17, e.currentTarget)} />
-					</Reveal>
-				</div>
-			{/if}
+		     Life. -->
+		<div class="sato-pair">
+			<div class="sato-col">
+				<Reveal>
+					<h3 class="sub">Fugue — my first 48-hour film (2014)</h3>
+					<p>
+						Before Split Life there was <strong>Fugue</strong>
+						, my first crack at
+						<strong>SATO 48</strong>
+						— the region's 48-hour film race. You're handed a genre, a prop, and a line of dialogue
+						at kickoff, then get 48 sleepless hours to write, shoot, score, and cut a finished
+						short. It's the film that taught me how much you can actually pull off in two days
+						— and set up the swing I took the next year.
+					</p>
+				</Reveal>
+				<Reveal variant="up" delay={100}>
+					<LazyMedia
+						src="https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/poster.jpg"
+						alt="Fugue (2014) — 48-hour film"
+						ratio="16 / 9"
+						video
+						onclick={(e) => gallery?.open(17, e.currentTarget)} />
+				</Reveal>
+			</div>
 
 			<div class="sato-col">
 				<Reveal>
@@ -600,33 +588,28 @@
 							onclick={(e) => gallery?.open(12, e.currentTarget)} />
 					</Reveal>
 
-					<!-- How the two halves were synchronised. No marker: the section
-					     already has one, and it only reads under this film. -->
-					<DirectorCut marker={false}>
-						<Reveal>
-							<div class="prose">
-								<p>
-									To make the two shots line up frame-perfect over multiple minutes, I
-									built a master spreadsheet of every event in the film with exact
-									timecodes. I then recorded my own voice giving every cue ("3, 2, 1, open
-									the door") at those exact timecodes, and blasted that audio through the
-									house during filming so every actor and operator knew exactly what
-									should be happening.
-								</p>
-								<p>
-									The actors had to be at exact locations at exact times. Plus a handful
-									of hidden cuts I had to fix in VFX. Plus I scored the music myself, late
-									at night, on the deadline. Plus all the cue audio had to be replaced in
-									post.
-								</p>
-								<p>
-									The story is okay. The lighting is okay. The script is okay. But I did
-									the thing I set out to do, which was: invent a new kind of edit. I'm
-									still proud of that.
-								</p>
-							</div>
-						</Reveal>
-					</DirectorCut>
+					<!-- How the two halves were synchronised. -->
+					<Reveal>
+						<div class="prose">
+							<p>
+								To make the two shots line up frame-perfect over multiple minutes, I built
+								a master spreadsheet of every event in the film with exact timecodes. I
+								then recorded my own voice giving every cue ("3, 2, 1, open the door") at
+								those exact timecodes, and blasted that audio through the house during
+								filming so every actor and operator knew exactly what should be happening.
+							</p>
+							<p>
+								The actors had to be at exact locations at exact times. Plus a handful of
+								hidden cuts I had to fix in VFX. Plus I scored the music myself, late at
+								night, on the deadline. Plus all the cue audio had to be replaced in post.
+							</p>
+							<p>
+								The story is okay. The lighting is okay. The script is okay. But I did the
+								thing I set out to do, which was: invent a new kind of edit. I'm still
+								proud of that.
+							</p>
+						</div>
+					</Reveal>
 				</div>
 			</div>
 		</div>
@@ -654,7 +637,7 @@
 		</Reveal>
 
 		<!-- The other films from these years. -->
-		<DirectorCut scenes={4}>
+		<DeletedScenes scenes={4}>
 			<div class="more-projects">
 				<Reveal>
 					<h3 class="sub-small">Other films from these years:</h3>
@@ -726,7 +709,7 @@
 					</div>
 				</Reveal>
 			</div>
-		</DirectorCut>
+		</DeletedScenes>
 
 		<div class="bassless">
 			<Reveal>
@@ -1030,11 +1013,6 @@
 		gap: clamp(1.5rem, 4vw, 3.5rem);
 		margin: 5rem 0;
 	}
-	/* Theatrical cut: Fugue isn't rendered, so the row is one film wide. */
-	.sato-pair.solo {
-		grid-template-columns: minmax(0, 1fr);
-		max-width: 56rem;
-	}
 	/* Subgrid so both columns share the copy row: whichever film has the taller
 	   block sets the height, and the two players start on the same line rather
 	   than stepping down wherever the prose happens to end. */
@@ -1052,22 +1030,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
-	}
-	/* The theatrical cut still renders DirectorCut's wrapper (it has to outlive
-	   the swap to serve as the scroll anchor) with nothing inside it. Take it out
-	   of the flow entirely, or it claims a gap under the player. */
-	.sato-film > :global(.director-cut:empty) {
-		display: none;
-	}
-	/* Matches DirectorCut's own marker — this column is gated by hand, since the
-	   component's wrapper div would hold the grid column open when collapsed. */
-	.micro {
-		font-family: var(--font-mono);
-		font-size: 0.6rem;
-		letter-spacing: 0.22em;
-		text-transform: uppercase;
-		opacity: 0.4;
-		margin: 0 0 0.7rem;
 	}
 	@media (max-width: 860px) {
 		.sato-pair {

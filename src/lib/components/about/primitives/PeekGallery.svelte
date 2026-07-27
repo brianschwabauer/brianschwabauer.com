@@ -1,20 +1,17 @@
 <script lang="ts">
-	// A gallery that shows a taste of itself and lets the reader ask for the
-	// rest — without leaving the theatrical cut.
+	// A gallery that shows a taste of itself and lets the reader ask for the rest.
 	//
-	// The theatrical cut renders `peek` thumbnails and darkens the last one into
-	// a "+N more" tile. Clicking it expands the grid in place; clicking any other
-	// thumbnail opens the lightbox on the *full* set. The director's cut just
-	// shows everything from the start. Either way the whole item array is mounted
-	// in a headless `LightboxGallery`, so `?media=` deep links always resolve and
-	// the carousel can page through every photo.
+	// It renders `peek` thumbnails and darkens the last one into a "+N more"
+	// tile. Clicking it expands the grid in place; clicking any other thumbnail
+	// opens the lightbox on the *full* set. Either way the whole item array is
+	// mounted in a headless `LightboxGallery`, so `?media=` deep links always
+	// resolve and the carousel can page through every photo.
 	import {
 		Gallery,
 		type GalleryItem,
 		type GalleryDisplay,
 	} from '@delightstack/components/media';
 	import LightboxGallery from './LightboxGallery.svelte';
-	import { cut } from '$lib/cut.svelte';
 
 	let {
 		key,
@@ -40,7 +37,7 @@
 	const WORTH_HIDING = 3;
 
 	const visible = $derived(
-		cut.director || expanded || items.length <= peek + WORTH_HIDING ? items.length : peek,
+		expanded || items.length <= peek + WORTH_HIDING ? items.length : peek,
 	);
 	const hidden = $derived(items.length - visible);
 	// A quoted string, because it lands in `content:` on the overlay.

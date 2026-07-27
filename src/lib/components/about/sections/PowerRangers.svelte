@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
@@ -354,7 +354,7 @@
 
 			<!-- The second film's archive: both photo sets, the premiere pair, and
 			     what two months of shooting actually taught us. -->
-			<DirectorCut scenes={4}>
+			<DeletedScenes scenes={4}>
 				<div class="premiere-2">
 					<Reveal variant="left">
 						<LazyMedia
@@ -388,7 +388,7 @@
 						</p>
 					</div>
 				</Reveal>
-			</DirectorCut>
+			</DeletedScenes>
 		</div>
 	</div>
 

@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
@@ -450,7 +450,7 @@
 		</div>
 
 		<!-- The two films those tests turned into, and why we never planned. -->
-		<DirectorCut scenes={3}>
+		<DeletedScenes scenes={3}>
 			<!-- Copy and player side by side, and the second one mirrored: two
 			     identical text-then-video stacks in a row read as a template,
 			     and the alternation keeps the eye moving across the page
@@ -514,7 +514,7 @@
 					</p>
 				</div>
 			</Reveal>
-		</DirectorCut>
+		</DeletedScenes>
 	</div>
 
 	<LightboxGallery

@@ -2,7 +2,7 @@
 	import SectionShell from '../primitives/SectionShell.svelte';
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
-	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
@@ -457,8 +457,8 @@
 			</Reveal>
 
 			<!-- The three things I built around the broadcast rather than for it.
-			     The station itself, and the shows, stay in both cuts. -->
-			<DirectorCut scenes={3}>
+			     The station itself, and the shows, are always shown. -->
+			<DeletedScenes scenes={3}>
 				<div class="control-room">
 					<Reveal variant="up" delay={80}>
 						<div class="cr-card">
@@ -519,7 +519,7 @@
 						</div>
 					</Reveal>
 				</div>
-			</DirectorCut>
+			</DeletedScenes>
 
 			<div class="live-broadcast">
 				<Reveal>

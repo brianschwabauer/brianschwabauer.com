@@ -2,7 +2,6 @@
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
 	import { scrollToSection, setSectionHash } from '$lib/sectionNav';
-	import { cut, setCut } from '$lib/cut.svelte';
 
 	let {
 		stops,
@@ -10,7 +9,6 @@
 		stops: Array<{ id: string; year: string; label: string }>;
 	} = $props();
 
-	let chip_el = $state<HTMLButtonElement>();
 	let track_el = $state<HTMLElement>();
 
 	let activeId = $state(stops[0]?.id ?? '');
@@ -234,17 +232,6 @@
 </script>
 
 <aside class="year-scrubber" aria-label="Page navigation">
-	<!-- Which edit of the page you're watching, and the fastest way to swap it.
-	     Deliberately quiet: it's a status readout first, a control second. -->
-	<button
-		bind:this={chip_el}
-		type="button"
-		class="cut-chip"
-		aria-label="Switch to the {cut.director ? 'theatrical' : "director's"} cut"
-		onclick={() => setCut(cut.director ? 'theatrical' : 'director', chip_el)}>
-		{cut.director ? "Director's cut" : 'Theatrical'}
-	</button>
-
 	<!-- Press anywhere on the rail and drag to run the page through the timeline;
 	     a plain click still jumps to one stop. -->
 	<div bind:this={track_el} class="track" class:dragging>
@@ -307,49 +294,6 @@
 	.track.dragging,
 	.track.dragging button {
 		cursor: grabbing;
-	}
-
-	.cut-chip {
-		all: unset;
-		position: relative;
-		pointer-events: auto;
-		cursor: pointer;
-		padding: 0.28rem 0.6rem;
-		font-family: var(--font-mono);
-		font-size: 0.6rem;
-		letter-spacing: 0.16em;
-		text-transform: uppercase;
-		white-space: nowrap;
-		color: #fff;
-		border: 1px solid currentColor;
-		border-radius: 999px;
-		opacity: 0.5;
-		text-shadow:
-			0 1px 3px rgba(0, 0, 0, 0.9),
-			0 0 12px rgba(0, 0, 0, 0.7);
-		transition:
-			opacity 250ms ease,
-			background-color 250ms ease;
-	}
-	/* The pill is under 24px tall; grow the target without growing the pill. */
-	.cut-chip::before {
-		content: '';
-		position: absolute;
-		inset: -5px -2px;
-	}
-	.cut-chip:hover {
-		transition-duration: 0s;
-		opacity: 1;
-		background-color: rgba(255, 255, 255, 0.1);
-	}
-	.cut-chip:focus-visible {
-		opacity: 1;
-		outline: 2px solid currentColor;
-		outline-offset: 3px;
-	}
-	.cut-chip:active {
-		transition-duration: 0s;
-		scale: 0.96;
 	}
 
 	/* top / height / right come from `measureRail` — dot centre to dot centre. */
@@ -517,16 +461,9 @@
 		color: #fff;
 	}
 	/* On mobile the rail crowds the section content — section jumping is
-	   handled by the bottom nav dropdown there instead. The cut chip stays: it's
-	   the only always-available switch, so it moves to sit above that bar. */
+	   handled by the bottom nav dropdown there instead. */
 	@media (max-width: 768px) {
 		.year-scrubber {
-			top: auto;
-			bottom: 66px;
-			right: 0.75rem;
-			transform: none;
-		}
-		.track {
 			display: none;
 		}
 	}

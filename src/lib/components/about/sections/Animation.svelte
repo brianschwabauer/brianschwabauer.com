@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import DirectorCut from '../primitives/DirectorCut.svelte';
+	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { Comparison } from '@delightstack/components/display';
@@ -417,8 +417,8 @@
 			</Reveal>
 
 			<!-- How Exposure was actually made: every VFX and BTS frame, and the
-			     tricks behind the shoot. The film itself plays in both cuts. -->
-			<DirectorCut scenes={exposureImages.length + 1}>
+			     tricks behind the shoot. The film itself always plays. -->
+			<DeletedScenes scenes={exposureImages.length + 1}>
 				<Reveal>
 					<div class="prose">
 						<p>
@@ -439,7 +439,7 @@
 						</p>
 					</div>
 				</Reveal>
-			</DirectorCut>
+			</DeletedScenes>
 		</div>
 
 		<div class="iprez">

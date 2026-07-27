@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { untrack, type Snippet } from 'svelte';
-	import { cut } from '$lib/cut.svelte';
+	import type { Snippet } from 'svelte';
 
 	let {
 		id,
@@ -51,21 +50,6 @@
 		});
 		ro.observe(el);
 		return () => ro.disconnect();
-	});
-
-	// Switching the theatrical/director cut changes almost every section's height
-	// at once. A height remembered from the *other* cut is worse than no memory:
-	// skipped sections keep standing in at a size they no longer have, so the
-	// page carries screen-long phantom gaps and every hash jump lands nowhere
-	// until the reader has scrolled past to force a re-measure. Drop the stamp
-	// and let the observer re-record from scratch.
-	$effect(() => {
-		const active_cut = cut.value;
-		untrack(() => {
-			if (!active_cut) return;
-			stamped = 0;
-			if (el) el.style.containIntrinsicSize = '';
-		});
 	});
 </script>
 
