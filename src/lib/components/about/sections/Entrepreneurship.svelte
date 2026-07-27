@@ -6,6 +6,7 @@
 	import ArchiveTabs from '../primitives/ArchiveTabs.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+	import FlipText from '../primitives/FlipText.svelte';
 
 	const tapnotionShots = [
 		'2017-01-01_tapnotion_app_screenshot_home_page-scores.avif',
@@ -16,7 +17,9 @@
 		'2017-01-01_tapnotion_app_screenshot_question-multiple_choice-answer_revealed.avif',
 	].map((src) => ({ src: `https://cdn.brianschwabauer.com/media/${src}` }));
 
-	const scrambledLetters = ['S', 'C', 'R', 'M', 'B', 'L', 'D'];
+	/** Clicking the board spells out a sentence, a word per click, then wraps back
+	 * to SCRMBLD. Only characters in the split-flap alphabet. */
+	const flapEggs = ['HELLO', 'YOU', 'FOUND', 'THE', 'EASTER', 'EGG :)'];
 
 	const towerImages: GalleryItem[] = [
 		{
@@ -349,7 +352,7 @@
 		<div class="card project markable">
 			<div class="card-head">
 				<Reveal>
-					<div class="year-tag">2024</div>
+					<div class="year-tag">2024+</div>
 					<h3 class="sub">
 						<a href="https://markable.page" target="_blank" rel="noopener">
 							markable.page
@@ -387,7 +390,7 @@
 				<Reveal>
 					<div class="year-tag">2024+</div>
 					<h3 class="sub">
-						<a href="https://scrmbld.app" target="_blank" rel="noopener">SCRMBLD</a>
+						<a href="https://scrmbld.app" target="_blank" rel="noopener">scrmbld.app</a>
 						— a daily word game in split-flap style
 					</h3>
 					<p>
@@ -401,16 +404,8 @@
 
 			<Reveal variant="up" delay={100}>
 				<div class="splitflap">
-					{#each scrambledLetters as letter, i}
-						<div class="flap" style:--delay="{i * 100}ms">
-							<div class="flap-inner">
-								<span class="flap-top">{letter}</span>
-								<span class="flap-bottom">{letter}</span>
-							</div>
-						</div>
-					{/each}
+					<FlipText word="SCRMBLD" eggWords={flapEggs} />
 				</div>
-				<div class="splitflap-tag">scrmbld.app · daily</div>
 			</Reveal>
 		</div>
 	</div>
@@ -593,75 +588,17 @@
 		transform: rotate(0deg) translateY(-4px);
 	}
 
+	/* The board is 11.34em wide at any size, so dividing the container width by that
+	   makes it span the card exactly. */
 	.splitflap {
+		container-type: inline-size;
 		display: flex;
 		justify-content: center;
-		gap: 0.4rem;
-		padding: 2rem 0 1rem;
-		font-family: var(--font-mono);
+		/* The frame overhangs the flaps by 0.12em, so leave a little room beside it */
+		padding: 2.5rem 1rem 1.75rem;
+		--flip-size: calc(100cqi / 11.34);
 	}
-	.flap {
-		position: relative;
-		width: clamp(40px, 7vw, 70px);
-		aspect-ratio: 1;
-		background: #1a1a1a;
-		border-radius: 6px;
-		overflow: hidden;
-		perspective: 600px;
-		box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
-		animation: flap 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-		animation-delay: var(--delay);
-	}
-	.flap-inner {
-		position: relative;
-		width: 100%;
-		height: 100%;
-	}
-	.flap-top,
-	.flap-bottom {
-		position: absolute;
-		width: 100%;
-		height: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: clamp(1.5rem, 3vw, 2.4rem);
-		font-weight: 800;
-		color: #fff;
-		background: #2a2a2a;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-	}
-	.flap-top {
-		top: 0;
-		align-items: flex-end;
-		padding-bottom: 4%;
-		border-bottom: 1px solid #000;
-	}
-	.flap-bottom {
-		bottom: 0;
-		align-items: flex-start;
-		padding-top: 4%;
-	}
-	@keyframes flap {
-		0%,
-		20% {
-			transform: rotateX(0);
-		}
-		30% {
-			transform: rotateX(-30deg);
-		}
-		40% {
-			transform: rotateX(0);
-		}
-		100% {
-			transform: rotateX(0);
-		}
-	}
-	.splitflap-tag {
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		letter-spacing: 0.32em;
-		text-align: center;
-		opacity: 0.7;
+	.splitflap :global(.flip-text) {
+		box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
 	}
 </style>
