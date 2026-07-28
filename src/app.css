@@ -165,29 +165,6 @@ button {
 	background: none;
 }
 
-input:not([type='range']),
-textarea,
-select {
-	font-family: inherit;
-	font-size: inherit;
-	color: inherit;
-	background-color: var(--color-surface);
-	border: 1px solid var(--color-border);
-	border-radius: var(--radius-md);
-	padding: var(--space-2) var(--space-2);
-	transition:
-		border-color var(--duration-fast),
-		box-shadow var(--duration-fast);
-}
-
-input:not([type='range']):focus,
-textarea:focus,
-select:focus {
-	outline: none;
-	border-color: var(--color-action);
-	box-shadow: 0 0 0 3px var(--color-action-bg);
-}
-
 /* Utility Classes */
 .container {
 	width: 100%;

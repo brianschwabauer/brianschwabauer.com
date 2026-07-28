@@ -1,5 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { ripple } from '@delightstack/utilities';
+	import { Button } from '@delightstack/components/actions';
+	import { Form, Input } from '@delightstack/components/form';
+	import { Expand } from '@delightstack/components/display';
+	import { Callout } from '@delightstack/components/feedback';
 	import { STARFIELD_IMAGES } from '../starfield-images';
 	import HeroMascot from './HeroMascot.svelte';
 	import HeroExplosion from './HeroExplosion.svelte';
@@ -521,35 +526,64 @@
 	}
 
 	// ---- contact form ------------------------------------------------------
-	let name = $state('');
-	let email = $state('');
-	let message = $state('');
-	let formState = $state<'idle' | 'sending' | 'sent' | 'error'>('idle');
+	// One record so <Form> has a single data object to validate and submit over.
+	let contact = $state({ name: '', email: '', message: '' });
+	let sent = $state(false);
+	// Network/server failures only — per-field problems render under their own
+	// field via each Input's `parse`.
 	let formError = $state('');
 
-	async function submitContact(e: SubmitEvent) {
-		e.preventDefault();
-		if (formState === 'sending') return;
-		if (!name.trim() || !email.trim() || !message.trim()) {
-			formError = 'Please fill in every field.';
-			formState = 'error';
-			return;
+	/** Field validators run by <Form> on blur and again for every field on submit. */
+	function requireText(what: string) {
+		return (value: unknown) => {
+			const text = typeof value === 'string' ? value.trim() : '';
+			if (!text) throw new Error(`${what} isn't optional.`);
+			return text;
+		};
+	}
+
+	function parseEmail(value: unknown) {
+		const text = typeof value === 'string' ? value.trim() : '';
+		if (!text) throw new Error(`An email isn't optional — it's how I get back to you.`);
+		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
+			throw new Error('That address is missing something. Check the @ and the domain.');
 		}
-		formState = 'sending';
+		return text;
+	}
+
+	/** SvelteKit's `error()` responds with `{ message }` — unwrap it so the
+	 *  Callout shows the sentence and not the raw JSON. */
+	async function readError(res: Response) {
+		const txt = await res.text().catch(() => '');
+		try {
+			const parsed = JSON.parse(txt);
+			if (parsed && typeof parsed.message === 'string') return parsed.message;
+		} catch {
+			// not JSON — fall through to the raw body
+		}
+		return txt || `Send failed (${res.status})`;
+	}
+
+	/**
+	 * <Form> awaits this promise, which drives the submit <Button>'s spinner.
+	 * Failures are caught rather than rethrown — an escaping rejection would
+	 * surface as an unhandled one, and the message already lands in the Callout.
+	 */
+	async function submitContact() {
 		formError = '';
 		try {
 			const res = await fetch('/api/contact', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name, email, message }),
+				body: JSON.stringify({
+					name: contact.name.trim(),
+					email: contact.email.trim(),
+					message: contact.message.trim(),
+				}),
 			});
-			if (!res.ok) {
-				const txt = await res.text().catch(() => '');
-				throw new Error(txt || `Send failed (${res.status})`);
-			}
-			formState = 'sent';
+			if (!res.ok) throw new Error(await readError(res));
+			sent = true;
 		} catch (err) {
-			formState = 'error';
 			formError = err instanceof Error ? err.message : 'Send failed';
 		}
 	}
@@ -648,7 +682,8 @@
 						onclick={startDestruction}
 						disabled={phase !== 'idle'}
 						aria-label={phase === 'idle' ? "Don't push this button" : 'Boom in progress'}
-						style:--scale={buttonScale}>
+						style:--scale={buttonScale}
+						{@attach ripple({ enabled: phase === 'idle', zIndex: 1, opacity: 0.14 })}>
 						<span class="boom-btn-skin"></span>
 						<span class="boom-btn-label" aria-live="polite">
 							{#key buttonLabel}
@@ -677,12 +712,8 @@
 					Let me know your name/email and I'll get back to you.
 				</p>
 
-				<form
-					class="contact-form"
-					onsubmit={submitContact}
-					class:sent={formState === 'sent'}
-					class:err={formState === 'error'}>
-					{#if formState === 'sent'}
+				<div class="contact-form">
+					{#if sent}
 						<div class="form-success">
 							<svg viewBox="0 0 24 24" aria-hidden="true" class="success-check">
 								<path
@@ -694,61 +725,65 @@
 									stroke-linejoin="round" />
 							</svg>
 							<h3>Message received.</h3>
-							<p>Thanks, {name || 'friend'}. I'll be in touch soon.</p>
+							<p>Thanks, {contact.name.trim() || 'friend'}. I'll be in touch soon.</p>
 						</div>
 					{:else}
-						<label class="field">
-							<span>Your name</span>
-							<input
-								type="text"
-								bind:value={name}
-								required
-								maxlength="100"
-								autocomplete="name"
+						<Form data={contact} onsubmit={submitContact}>
+							<Input
+								name="name"
+								label="Your name"
+								label_display="pinned"
+								bind:value={contact.name}
+								maxlength={100}
+								filled
 								placeholder="Johnny Appleseed"
-								disabled={formState === 'sending'} />
-						</label>
-						<label class="field">
-							<span>Email</span>
-							<input
+								parse={requireText('A name')} />
+							<Input
+								name="email"
 								type="email"
-								bind:value={email}
-								required
-								maxlength="200"
-								autocomplete="email"
+								label="Email"
+								label_display="pinned"
+								bind:value={contact.email}
+								maxlength={200}
+								filled
 								placeholder="johnny@example.com"
-								disabled={formState === 'sending'} />
-						</label>
-						<label class="field">
-							<span>Message</span>
-							<textarea
-								bind:value={message}
-								required
-								maxlength="5000"
-								rows="4"
+								parse={parseEmail} />
+							<Input
+								name="message"
+								type="textarea"
+								label="Message"
+								label_display="pinned"
+								rows={4}
+								bind:value={contact.message}
+								maxlength={5000}
+								show_counter
+								filled
 								placeholder="Tell me about your idea, the dream, or just say hi."
-								disabled={formState === 'sending'}>
-							</textarea>
-						</label>
+								parse={requireText('A message')} />
 
-						{#if formError}
-							<div class="form-error" role="alert">{formError}</div>
-						{/if}
+							<Expand show={!!formError}>
+								<Callout error dense>{formError}</Callout>
+							</Expand>
 
-						<button class="send-btn" type="submit" disabled={formState === 'sending'}>
-							{formState === 'sending' ? 'Sending…' : 'Send it'}
-							<svg viewBox="0 0 24 24" aria-hidden="true">
-								<path
-									d="M5 12h14M13 6l6 6-6 6"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round" />
-							</svg>
-						</button>
+							<Button accent full_width size="2" type="submit">
+								{#snippet children({ isLoading, isLoadingSuccess })}
+									{isLoading ? 'Sending…' : isLoadingSuccess ? 'Sent' : 'Send it'}
+									{#if !isLoading && !isLoadingSuccess}
+										<svg class="send-arrow" viewBox="0 0 24 24" aria-hidden="true">
+											<path
+												d="M5 12h14M13 6l6 6-6 6"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												stroke-linejoin="round" />
+										</svg>
+									{/if}
+								{/snippet}
+							</Button>
+						</Form>
 					{/if}
-				</form>
+				</div>
 			</div>
 		{/if}
 
@@ -1050,9 +1085,16 @@
 		   mascot rises from behind the button rather than from the bottom
 		   of the entire hero section. */
 		isolation: isolate;
+		/* gives the button's :active z-translate something to recede into —
+		   same trick delightstack's <Button> wrapper uses. */
+		perspective: 100px;
 	}
 	.boom-btn {
 		--scale: 1;
+		/* Same corner treatment as a delightstack <Button>: a modest radius,
+		   doubled and drawn as a superellipse where corner-shape is supported
+		   (unsupported browsers keep the plain radius). */
+		--_radius: var(--action-radius, var(--radius-lg));
 		position: relative;
 		z-index: 5;
 		display: inline-flex;
@@ -1072,7 +1114,11 @@
 		width: min(280px, 80vw);
 		height: 56px;
 		padding: 0 1.4rem;
-		border-radius: 999px;
+		border-radius: var(--_radius);
+		@supports (corner-shape: squircle) {
+			corner-shape: squircle;
+			border-radius: calc(var(--_radius) * var(--squircle-ratio, 2));
+		}
 		cursor: pointer;
 		/* other feedback (squish, label swap) covers the press — no tap flash */
 		-webkit-tap-highlight-color: transparent;
@@ -1080,8 +1126,20 @@
 		transform: scale(var(--scale));
 		transition:
 			transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
-			color 220ms ease;
+			color 220ms ease,
+			translate 140ms ease-out,
+			scale 140ms ease-out;
 		will-change: transform;
+	}
+	/* The press: a small squash plus a drop and a recede along z (against the
+	   stage's perspective), so the button sinks under the cursor. `translate`
+	   and `scale` are their own properties, so they compose with the
+	   scale/wobble transforms above instead of fighting them — and unlike the
+	   hover colour, the press is *animated* both ways (140ms down, 140ms back)
+	   so it reads as physical rather than as a jump. */
+	.boom-btn:active:not(:disabled) {
+		translate: 0px 1px clamp(-10px, calc(0.2em - 12px), -2px);
+		scale: 0.97;
 	}
 	.boom-btn:disabled {
 		cursor: default;
@@ -1089,12 +1147,13 @@
 	.boom-btn-skin {
 		position: absolute;
 		inset: 0;
-		border-radius: 999px;
+		border-radius: inherit;
+		@supports (corner-shape: squircle) {
+			corner-shape: inherit;
+		}
 		background-color: rgb(255 255 255 / 0.8);
 		backdrop-filter: blur(10px);
-		transition:
-			background 320ms ease,
-			box-shadow 320ms ease;
+		transition: background-color 300ms ease;
 	}
 	.boom-btn-label {
 		position: relative;
@@ -1143,13 +1202,11 @@
 		}
 	}
 
+	/* Instant on hover-in, fades back out over the skin's own 300ms — no glow,
+	   just the colour change, the way a delightstack <Button> behaves. */
 	.boom-btn:hover:not(:disabled) .boom-btn-skin {
 		transition-duration: 0s;
-		transition: none;
 		background-color: white;
-		box-shadow:
-			0 20px 50px rgba(0, 242, 195, 0.35),
-			0 6px 22px rgba(108, 99, 255, 0.3);
 	}
 	.boom-btn.warn {
 		color: #052028;
@@ -1157,7 +1214,10 @@
 	.boom-btn.pre-press {
 		animation: none;
 		transform: scale(calc(var(--scale) * 0.88)) translateY(2px);
-		transition: transform 120ms ease-out;
+		transition:
+			transform 120ms ease-out,
+			translate 140ms ease-out,
+			scale 140ms ease-out;
 	}
 
 	/* wobble between pumps — overlap/follow-through */
@@ -1309,9 +1369,6 @@
 	}
 
 	.contact-form {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
 		width: 100%;
 		text-align: left;
 		background: rgba(255, 255, 255, 0.04);
@@ -1320,87 +1377,49 @@
 		padding: 1.4rem;
 		backdrop-filter: blur(10px);
 		box-shadow: 0 18px 60px rgba(0, 0, 0, 0.4);
-	}
-	.field {
-		display: flex;
-		flex-direction: column;
-		gap: 0.4rem;
-	}
-	.field span {
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.6);
-	}
-	.field input,
-	.field textarea {
-		font: inherit;
-		font-size: 1rem;
-		color: #fff;
-		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 10px;
-		padding: 0.75rem 0.95rem;
-		transition:
-			border-color 200ms ease,
-			background 200ms ease,
-			box-shadow 200ms ease;
-		resize: vertical;
-	}
-	.field input:focus,
-	.field textarea:focus {
-		outline: none;
-		border-color: #00f2c3;
-		background: rgba(0, 242, 195, 0.06);
-		box-shadow: 0 0 0 4px rgba(0, 242, 195, 0.12);
-	}
-	.field input::placeholder,
-	.field textarea::placeholder {
-		color: rgba(255, 255, 255, 0.32);
-	}
 
-	.send-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.55rem;
-		padding: 0.95rem 1.5rem;
-		background: linear-gradient(135deg, #00f2c3, #00d6ff);
-		color: #052028;
-		border: none;
-		border-radius: 999px;
+		/* The delightstack form controls read the global design tokens, and this
+		   card is a dark glass panel sitting on the hero regardless of the page
+		   theme — so re-point the tokens here rather than restyling the
+		   components. The teal is the same brand accent the hero already uses. */
+		--color-surface: rgba(255, 255, 255, 0.06);
+		--color-bg-active: rgba(255, 255, 255, 0.1);
+		--color-border: rgba(255, 255, 255, 0.14);
+		--color-border-active: rgba(255, 255, 255, 0.3);
+		--color-text: #fff;
+		--color-text-muted: rgba(255, 255, 255, 0.55);
+		--color-action: #00f2c3;
+		--color-action-active: #00d6ff;
+		--color-action-text: #052028;
+		--color-action-text-active: #052028;
+		--color-accent: #00f2c3;
+		--color-accent-active: #00d6ff;
+		--color-accent-text: #052028;
+		--color-accent-text-active: #052028;
+		--color-error: #ff7a5f;
+	}
+	/* The hero's body copy is the serif face; the send button wants the brand
+	   sans at the same weight the rest of the hero's UI uses. <Button> sets
+	   neither family nor weight, so both inherit from here. */
+	.contact-form :global(.button) {
 		font-family: var(--font-sans);
 		font-weight: 800;
-		font-size: 1.2rem;
-		cursor: pointer;
-		box-shadow: 0 10px 30px rgba(0, 242, 195, 0.3);
-		transition:
-			transform 200ms ease,
-			box-shadow 200ms ease,
-			opacity 200ms ease;
+		margin-top: 0.5rem;
 	}
-	.send-btn:hover:not(:disabled) {
-		transition-duration: 0s;
-		transform: translateY(-2px);
+	.contact-form :global(.form) {
+		gap: 0rem;
 	}
-	.send-btn:disabled {
-		opacity: 0.6;
-		cursor: progress;
+	.contact-form :global(.callout) {
+		margin: 1rem 0;
 	}
-	.send-btn svg {
+	.contact-form :global(.input:not(:first-child)) {
+		margin-top: 1.5rem;
+	}
+	.send-arrow {
 		width: 16px;
 		height: 16px;
 	}
 
-	.form-error {
-		color: #ffb1a1;
-		background: rgba(255, 90, 60, 0.12);
-		border: 1px solid rgba(255, 90, 60, 0.35);
-		border-radius: 10px;
-		padding: 0.6rem 0.85rem;
-		font-size: 0.9rem;
-	}
 	.form-success {
 		text-align: center;
 		padding: 1rem 0.4rem;

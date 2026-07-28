@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Button } from '@delightstack/components/actions';
+	import { Form, Input } from '@delightstack/components/form';
+	import { Expand } from '@delightstack/components/display';
+	import { Callout } from '@delightstack/components/feedback';
 
 	// ---- rotating headline -------------------------------------------------
 	// The headline cycles every few seconds — gives the page a little life
@@ -22,22 +25,21 @@
 	});
 
 	// ---- form state --------------------------------------------------------
-	// `submitting` mirrors the in-flight network request — the delightstack
-	// <Button> tracks its own loading via the onclick promise, but we still
-	// need this to disable the inputs while the request is in the air.
-	let name = $state('');
-	let email = $state('');
-	let message = $state('');
+	// One record, because <Form> validates and submits over a single data
+	// object — the fields still bind individually so the vibe meter and the
+	// greeting can read them directly.
+	let fields = $state({ name: '', email: '', message: '' });
 	let formState = $state<'idle' | 'sent'>('idle');
-	let submitting = $state(false);
+	// Network/server failures only — field-level problems render under their
+	// own field via each Input's `parse`.
 	let formError = $state('');
 
 	// Sassy meter that reacts to message length — gives writing a little
 	// dopamine without being annoying. Tiers are deliberately wide so the
 	// label doesn't flicker character-by-character.
 	const vibe = $derived.by(() => {
-		const len = message.trim().length;
-		if (len === 0) return { label: 'Awaiting your words…', tone: 'idle' as const };
+		const len = fields.message.trim().length;
+		if (len === 0) return { label: '', tone: 'idle' as const };
 		if (len < 20)
 			return {
 				label: 'Brief and to the point. I like it.',
@@ -59,49 +61,74 @@
 	});
 
 	/**
-	 * Submit handler used by both the form's onsubmit (Enter-to-send from a
-	 * field) and the <Button>'s onclick. Throwing on failure lets <Button>'s
-	 * onclick-promise tracker reset its spinner without flashing the success
-	 * checkmark.
+	 * Field validators. <Form> runs each Input's `parse` on blur and again for
+	 * every field on submit, so a thrown message lands under the field it
+	 * belongs to instead of in one catch-all banner.
+	 */
+	function requireText(what: string) {
+		return (value: unknown) => {
+			const text = typeof value === 'string' ? value.trim() : '';
+			if (!text) throw new Error(`${what} isn't optional.`);
+			return text;
+		};
+	}
+
+	function parseEmail(value: unknown) {
+		const text = typeof value === 'string' ? value.trim() : '';
+		if (!text) throw new Error(`An email isn't optional — it's how I write back.`);
+		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
+			throw new Error('That address is missing something. Check the @ and the domain.');
+		}
+		return text;
+	}
+
+	/** SvelteKit's `error()` responds with `{ message }` — unwrap it so the
+	 *  Callout shows the sentence and not the raw JSON. */
+	async function readError(res: Response) {
+		const txt = await res.text().catch(() => '');
+		try {
+			const parsed = JSON.parse(txt);
+			if (parsed && typeof parsed.message === 'string') return parsed.message;
+		} catch {
+			// not JSON — fall through to the raw body
+		}
+		return txt || `Send failed (${res.status})`;
+	}
+
+	/**
+	 * Runs only once every field validates. <Form> awaits the returned promise,
+	 * which is what drives the submit <Button>'s spinner — so failures are
+	 * caught here rather than rethrown (an escaping rejection would surface as
+	 * an unhandled one, and the message is already shown in the Callout).
 	 */
 	async function submit() {
-		if (submitting) return;
-		if (!name.trim() || !email.trim() || !message.trim()) {
-			formError = 'Name, email, and message — none of them optional.';
-			throw new Error(formError);
-		}
-		submitting = true;
 		formError = '';
 		try {
 			const res = await fetch('/api/contact', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name, email, message }),
+				body: JSON.stringify({
+					name: fields.name.trim(),
+					email: fields.email.trim(),
+					message: fields.message.trim(),
+				}),
 			});
-			if (!res.ok) {
-				const txt = await res.text().catch(() => '');
-				throw new Error(txt || `Send failed (${res.status})`);
-			}
+			if (!res.ok) throw new Error(await readError(res));
 			formState = 'sent';
 		} catch (err) {
 			formError = err instanceof Error ? err.message : 'Send failed';
-			throw err;
-		} finally {
-			submitting = false;
 		}
 	}
 
 	function resetForm() {
-		name = '';
-		email = '';
-		message = '';
+		fields = { name: '', email: '', message: '' };
 		formError = '';
 		formState = 'idle';
 	}
 
 	// First-name greeting on the success screen — feels personal without
 	// echoing the whole submitted string back at them.
-	const firstName = $derived(name.trim().split(/\s+/)[0] || 'friend');
+	const firstName = $derived(fields.name.trim().split(/\s+/)[0] || 'friend');
 
 	// Tiny Easter egg: focus the name field on mount so they can just start
 	// typing. Skipped on touch devices where it would yank up the keyboard
@@ -164,97 +191,76 @@
 			<Button outline pill onclick={resetForm}>Send another</Button>
 		</div>
 	{:else}
-		<form
-			class="card form"
-			onsubmit={(e) => {
-				e.preventDefault();
-				// Form-level submit is just the Enter-key path; <Button> handles
-				// its own loading state via the onclick promise. Swallow throws
-				// here so unhandled-rejection warnings don't fire — the error is
-				// already surfaced in formError.
-				submit().catch(() => {});
-			}}
-			novalidate>
-			<div class="field-row">
-				<label class="field">
-					<span class="field-label">Your name</span>
-					<input
-						type="text"
-						name="name"
-						bind:value={name}
-						required
-						maxlength="100"
-						autocomplete="name"
-						placeholder="Johnny Appleseed"
-						disabled={submitting} />
-				</label>
-				<label class="field">
-					<span class="field-label">Email</span>
-					<input
-						type="email"
-						name="email"
-						bind:value={email}
-						required
-						maxlength="200"
-						autocomplete="email"
-						placeholder="johnny@example.com"
-						disabled={submitting} />
-				</label>
-			</div>
+		<div class="card">
+			<Form data={fields} onsubmit={submit}>
+				<div class="field-row">
+					<div class="field">
+						<Input
+							name="name"
+							label="Your name"
+							label_display="pinned"
+							bind:value={fields.name}
+							maxlength={100}
+							filled
+							placeholder="Johnny Appleseed"
+							parse={requireText('A name')} />
+					</div>
+					<div class="field">
+						<Input
+							name="email"
+							type="email"
+							label="Email"
+							label_display="pinned"
+							bind:value={fields.email}
+							maxlength={200}
+							filled
+							placeholder="johnny@example.com"
+							parse={parseEmail} />
+					</div>
+				</div>
 
-			<label class="field message-field">
-				<span class="field-label">
-					Your message
-					<span class="vibe" data-tone={vibe.tone}>{vibe.label}</span>
-				</span>
-				<textarea
-					bind:value={message}
-					required
-					maxlength="5000"
-					rows="7"
-					placeholder="Tell me about your idea, the dream, or just say hi."
-					disabled={submitting}>
-				</textarea>
-				<span class="char-count" class:near={message.length > 4500}>
-					{message.length} / 5000
-				</span>
-			</label>
+				<!-- The vibe meter rides in the Input's own footer (via `description`),
+				     opposite the character counter; `data-tone` colours it. -->
+				<div class="field message-field" data-tone={vibe.tone}>
+					<Input
+						name="message"
+						type="textarea"
+						label="Your message"
+						label_display="pinned"
+						rows={7}
+						bind:value={fields.message}
+						maxlength={5000}
+						show_counter
+						filled
+						description={vibe.label}
+						placeholder="Tell me about your idea, the dream, or just say hi."
+						parse={requireText('A message')} />
+				</div>
 
-			{#if formError}
-				<div class="form-error" role="alert">{formError}</div>
-			{/if}
+				<Expand show={!!formError}>
+					<Callout error dense>{formError}</Callout>
+				</Expand>
 
-			<div class="actions">
-				<Button
-					accent
-					fullWidth
-					size="2"
-					disabled={!name.trim() || !message.trim() || !email.trim()}
-					onclick={submit}>
-					{#snippet children({ isLoading, isLoadingSuccess })}
-						{isLoading ? 'Sending…' : isLoadingSuccess ? 'Sent' : 'Send it'}
-						{#if !isLoading && !isLoadingSuccess}
-							<svg class="send-arrow" viewBox="0 0 24 24" aria-hidden="true">
-								<path
-									d="M5 12h14M13 6l6 6-6 6"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round" />
-							</svg>
-						{/if}
-					{/snippet}
-				</Button>
-				<p class="fine-print">
-					No tracking, no list, no spam. Promise written in actual code:
-					<a href="https://github.com/brianschwabauer" target="_blank" rel="noopener">
-						read the source
-					</a>
-					.
-				</p>
-			</div>
-		</form>
+				<div class="actions">
+					<Button accent full_width size="2" type="submit">
+						{#snippet children({ isLoading, isLoadingSuccess })}
+							{isLoading ? 'Sending…' : isLoadingSuccess ? 'Sent' : 'Send it'}
+							{#if !isLoading && !isLoadingSuccess}
+								<svg class="send-arrow" viewBox="0 0 24 24" aria-hidden="true">
+									<path
+										d="M5 12h14M13 6l6 6-6 6"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round" />
+								</svg>
+							{/if}
+						{/snippet}
+					</Button>
+				</div>
+			</Form>
+		</div>
 	{/if}
 </div>
 
@@ -328,6 +334,12 @@
 		border-radius: var(--radius-xl);
 		padding: var(--space-5);
 		box-shadow: var(--shadow-lg);
+		:global(> .form) {
+			gap: 1.5rem 1rem;
+		}
+		:global(.form > .expand) {
+			margin: -1rem 0;
+		}
 	}
 	@media (min-width: 640px) {
 		.card {
@@ -336,10 +348,11 @@
 	}
 
 	/* ---- fields --------------------------------------------------------- */
+	/* <Form> is a flex column with a 1rem gap, so the rows below only own
+	   their internal spacing — no margins between them. */
 	.field-row {
 		display: grid;
 		gap: var(--space-3);
-		margin-bottom: var(--space-3);
 	}
 	@media (min-width: 560px) {
 		.field-row {
@@ -352,94 +365,28 @@
 		flex-direction: column;
 		gap: 0.4rem;
 		position: relative;
+		/* delightstack's `filled` Input paints --color-surface — which is also
+		   the card behind it. Point it at the page background instead so each
+		   field still reads as a well recessed into the card. */
+		--color-surface: var(--color-bg);
 	}
-	.field-label {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: var(--space-2);
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-		color: var(--color-text-muted);
-	}
-	.field input,
-	.field textarea {
-		font: inherit;
-		font-size: 1rem;
-		color: var(--color-text);
-		background: var(--color-bg);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-md);
-		padding: 0.8rem 0.95rem;
-		width: 100%;
-		transition:
-			border-color 180ms ease,
-			background-color 180ms ease,
-			box-shadow 180ms ease;
-	}
-	.field textarea {
-		resize: vertical;
-		min-height: 9rem;
-		line-height: 1.55;
-	}
-	.field input::placeholder,
-	.field textarea::placeholder {
-		color: var(--color-text-muted);
-	}
-	.field input:focus,
-	.field textarea:focus {
-		outline: none;
-		border-color: var(--color-action);
-		background: var(--color-surface);
-		box-shadow: 0 0 0 4px var(--color-action-bg);
-	}
-	.field input:disabled,
-	.field textarea:disabled {
-		opacity: 0.65;
-		cursor: progress;
-	}
-
-	.message-field {
-		margin-bottom: var(--space-3);
-	}
-	.char-count {
-		position: absolute;
-		right: 0.7rem;
-		bottom: 0.55rem;
-		font-family: var(--font-mono);
-		font-size: 0.68rem;
-		color: var(--color-text-muted);
-		background: color-mix(in srgb, var(--color-bg) 88%, transparent);
-		padding: 0.1rem 0.4rem;
-		border-radius: 999px;
-		pointer-events: none;
-		font-variant-numeric: tabular-nums;
-	}
-	.char-count.near {
-		color: var(--color-warning);
-	}
-
-	.vibe {
+	/* The vibe meter is the message Input's `description`, so it's styled through
+	   the component's own footer slot rather than as an element of ours. */
+	.message-field :global(.description) {
 		font-family: var(--font-sans);
-		font-size: 0.72rem;
 		font-weight: 600;
-		letter-spacing: 0;
-		text-transform: none;
-		color: var(--color-text-muted);
 		transition: color 200ms ease;
 	}
-	.vibe[data-tone='short'] {
-		color: var(--color-action);
+	.message-field[data-tone='short'] :global(.description) {
+		color: var(--color-text);
 	}
-	.vibe[data-tone='good'] {
-		color: var(--color-success);
+	.message-field[data-tone='good'] :global(.description) {
+		color: var(--color-text);
 	}
-	.vibe[data-tone='long'] {
+	.message-field[data-tone='long'] :global(.description) {
 		color: #d97706; /* amber-600, readable against both themes */
 	}
-	.vibe[data-tone='warn'] {
+	.message-field[data-tone='warn'] :global(.description) {
 		color: var(--color-error);
 	}
 
@@ -454,34 +401,6 @@
 	.send-arrow {
 		width: 16px;
 		height: 16px;
-	}
-
-	.fine-print {
-		font-size: 0.7rem;
-		color: var(--color-text-muted);
-		text-align: center;
-		margin: 0;
-		max-width: 28rem;
-		text-wrap: balance;
-	}
-	.fine-print a {
-		color: var(--color-action);
-		text-decoration: none;
-		border-bottom: 1px dotted color-mix(in srgb, var(--color-action) 50%, transparent);
-	}
-	.fine-print a:hover {
-		transition-duration: 0s;
-		border-bottom-color: var(--color-action);
-	}
-
-	.form-error {
-		color: var(--color-error);
-		background: color-mix(in srgb, var(--color-error) 8%, transparent);
-		border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
-		border-radius: var(--radius-md);
-		padding: 0.7rem 0.95rem;
-		font-size: 0.9rem;
-		margin-bottom: var(--space-3);
 	}
 
 	/* ---- success card --------------------------------------------------- */
