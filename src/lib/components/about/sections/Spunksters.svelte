@@ -7,6 +7,7 @@
 	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+	import BokehField from '../primitives/BokehField.svelte';
 
 	const spunkstersImages: GalleryItem[] = [
 		{
@@ -141,9 +142,20 @@
 </script>
 
 <SectionShell id="spunksters" year="2013" label="The Spunksters" theme="spunksters">
+	<!--
+	  The same lens the Show&Tour sections use, running gold instead of teal —
+	  which is what the show's own logo does: a trophy with the room thrown out of
+	  focus behind it. The flashes are the thing that makes it an awards show
+	  rather than a warm background.
+	-->
+	<BokehField
+		tints={['255, 199, 46', '255, 132, 18']}
+		flashes
+		mask="linear-gradient(90deg, #000, rgba(0, 0, 0, 0.28) 26%, rgba(0, 0, 0, 0.28) 74%, #000)" />
+
 	<div class="container">
 		<Reveal>
-			<YearMark year="2013" subtitle="End of an era" color="#ffd934" />
+			<YearMark year="2013" subtitle="End of an era" color="#ffd934" treatment="foil" />
 		</Reveal>
 
 		<div class="lockup">
@@ -176,6 +188,18 @@
 		</div>
 
 		<div class="logo-stage">
+			<!--
+			  The beams are anchored to the top corners of the logo card, not to the
+			  section. Floating in the middle of the background they had no source —
+			  a searchlight is only a searchlight if you can see the thing it is
+			  standing on, and the trophy card is the thing. They sweep up and out
+			  from behind it, which is also the only direction two lights either
+			  side of a marquee could sweep.
+			-->
+			<div class="lights" aria-hidden="true">
+				<span class="beam left"></span>
+				<span class="beam right"></span>
+			</div>
 			<Reveal variant="up">
 				<LazyMedia
 					src="https://cdn.brianschwabauer.com/media/2013-06-22_the_spunksters-logo_animation.avif"
@@ -320,16 +344,131 @@
 </SectionShell>
 
 <style>
+	/*
+	 * A lit room, not a dark one. The previous stops were effectively black with
+	 * a 6%-opacity gold wash over the top, which gave the gold bokeh nothing to
+	 * be *in* — the discs were the only colour on screen, so they read as
+	 * decoration rather than as light. Taking the base up into a real amber puts
+	 * the whole section under the same stage lighting the trophy is under.
+	 */
 	:global([data-theme='spunksters']) {
 		background:
-			radial-gradient(ellipse at top, rgba(255, 217, 52, 0.06), transparent 50%),
-			linear-gradient(180deg, #0a0708, #14110a 50%, #06050a);
+			radial-gradient(
+				ellipse 120% 75% at 50% 0%,
+				oklch(0.46 0.12 80 / 0.5),
+				transparent 62%
+			),
+			radial-gradient(
+				ellipse 90% 60% at 18% 100%,
+				oklch(0.36 0.1 48 / 0.45),
+				transparent 66%
+			),
+			linear-gradient(
+				180deg,
+				oklch(0.23 0.058 74),
+				oklch(0.29 0.078 68) 48%,
+				oklch(0.17 0.05 62)
+			);
 		color: #fff5d6;
 	}
+	/*
+	 * Searchlights. Anchored to the bottom of the first screenful and swinging
+	 * from there, so the beams read as standing in the parking lot pointed at the
+	 * sky rather than as two diagonal stripes laid over the section.
+	 *
+	 * The two never share a period and neither period is a round number, so they
+	 * cross at a different point every pass instead of settling into a rhythm —
+	 * a pair of lights in step looks mechanised, and this was forty friends in a
+	 * backyard.
+	 */
+	/*
+	 * The lamps sit at the card's top corners and throw upward, so the box is
+	 * pinned to the card's top edge and everything inside it grows out of the
+	 * two corners. No `overflow: hidden` — the whole point is that the beams
+	 * leave the card and carry on up the page.
+	 */
+	.lights {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		height: 0;
+		pointer-events: none;
+	}
+	.beam {
+		position: absolute;
+		/* Origin at the corner itself; the beam extends up and away from it. */
+		bottom: 0;
+		width: 170px;
+		/* Tall enough to clear the "2013" sitting above the card and carry on past
+		   it. The lamps are on the ground pointing at the sky; a beam that stops
+		   partway up the page reads as a shape rather than as light going
+		   somewhere. */
+		height: 132vh;
+		transform-origin: 50% 100%;
+		/* Brightest at the source and thinning as it climbs — a beam is only
+		   visible in the haze it is passing through, and there is less of that the
+		   higher it gets. It now survives well past the year rather than being
+		   gone before it. */
+		background: linear-gradient(
+			0deg,
+			rgba(255, 214, 120, 0.17),
+			rgba(255, 205, 100, 0.08) 45%,
+			rgba(255, 200, 90, 0.03) 74%,
+			transparent 94%
+		);
+		/* Narrow at the lamp, wide at the top — the spread is what makes it a
+		   beam and not a bar. */
+		clip-path: polygon(44% 100%, 56% 100%, 100% 0%, 0% 0%);
+		filter: blur(26px);
+	}
+	/* Centred on each corner — half the beam's width outside the card, half
+	   inside, so the source is the corner rather than a point near it. */
+	.beam.left {
+		left: -85px;
+		animation: sweep-left 19s ease-in-out infinite alternate;
+	}
+	.beam.right {
+		right: -85px;
+		animation: sweep-right 23.5s ease-in-out infinite alternate;
+	}
+	/* Both sweep outward from the card and never cross back over it: lights
+	   mounted either side of a marquee point away from the marquee. */
+	@keyframes sweep-left {
+		from {
+			rotate: -34deg;
+		}
+		to {
+			rotate: -6deg;
+		}
+	}
+	@keyframes sweep-right {
+		from {
+			rotate: 29deg;
+		}
+		to {
+			rotate: 4deg;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.beam {
+			animation: none;
+		}
+		.beam.left {
+			rotate: -22deg;
+		}
+		.beam.right {
+			rotate: 17deg;
+		}
+	}
+
 	.container {
 		max-width: 80rem;
 		margin: 0 auto;
 		padding: 0 clamp(1rem, 3vw, 2rem);
+		/* Above the bokeh and the beams. */
+		position: relative;
+		z-index: 1;
 	}
 	.lockup {
 		text-align: center;
@@ -384,6 +523,13 @@
 	.logo-stage {
 		max-width: 800px;
 		margin: 3rem auto 4rem;
+		/* Anchors the beams to this card's corners. */
+		position: relative;
+	}
+	/* The card itself sits over its own lamps. */
+	.logo-stage > :global(.reveal) {
+		position: relative;
+		z-index: 1;
 	}
 
 	.sms-block {

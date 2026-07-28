@@ -239,9 +239,67 @@
 
 	let reelGallery = $state<ReturnType<typeof LightboxGallery>>();
 	let extrasGallery = $state<ReturnType<typeof LightboxGallery>>();
+
+	/**
+	 * Red, blue, black, yellow, pink — the order they were always introduced in.
+	 * Black is lifted well off actual black: on this background the real costume
+	 * colour is a gap in the row rather than a member of it.
+	 */
+	const RANGERS = ['#ff3a3a', '#3f7dff', '#6a6a80', '#ffcc33', '#ff6fc4'];
+
+	let scope_el = $state<HTMLElement | null>(null);
+	/**
+	 * 0 before the crop, 1 once it has fully closed, ramping between. The bars are
+	 * driven by this rather than by an enter/leave flag so the crop *arrives* — a
+	 * projectionist racking the masking in, not two divs appearing.
+	 */
+	let closed = $state(0);
+
+	$effect(() => {
+		if (!scope_el) return;
+		const section = scope_el.closest('section');
+		const year = section?.querySelector('.year-mark');
+		if (!section || !year) return;
+		const measure = () => {
+			const vh = window.innerHeight || 1;
+			/*
+			 * The crop is timed off the year mark, not off the section's arrival.
+			 * Tying it to how much of the section covered the viewport meant the
+			 * bars were already closing while the section was still sliding in —
+			 * so the reader met the crop before they had met the chapter. Running
+			 * it over the year's last 30% of travel instead means the frame
+			 * finishes closing exactly as "2008" reaches the top of the screen,
+			 * which is a beat *after* you have arrived rather than during.
+			 */
+			const y = year.getBoundingClientRect().top;
+			const arriving = (vh * 0.3 - y) / (vh * 0.3);
+			// …and opens back up as the section's bottom edge leaves.
+			const leaving = section.getBoundingClientRect().bottom / (vh * 0.6);
+			closed = Math.max(0, Math.min(1, Math.min(arriving, leaving)));
+		};
+		measure();
+		window.addEventListener('scroll', measure, { passive: true });
+		window.addEventListener('resize', measure);
+		return () => {
+			window.removeEventListener('scroll', measure);
+			window.removeEventListener('resize', measure);
+		};
+	});
 </script>
 
 <SectionShell id="power-rangers" year="2008" label="Feature Length" theme="ranger">
+	<!--
+	  The chapter where two kids decided the next one would be a *feature*, so the
+	  section puts on the one thing that says feature before a single frame plays:
+	  it goes wide. The bars close in as you enter and open again as you leave —
+	  and being fixed to the viewport rather than to the section, they crop the
+	  page itself, which is what a scope print does to the room you're sitting in.
+	-->
+	<div bind:this={scope_el} class="scope" aria-hidden="true" style:--closed={closed}>
+		<span class="bar top"></span>
+		<span class="bar bottom"></span>
+	</div>
+
 	<div class="container">
 		<Reveal>
 			<YearMark year="2008" subtitle="Feature Length" color="#ffcc33" />
@@ -410,6 +468,71 @@
 			radial-gradient(ellipse at 80% 90%, rgba(80, 160, 255, 0.32), transparent 60%),
 			linear-gradient(180deg, #0a0710 0%, #100612 50%, #06080f 100%);
 		color: #f4ecff;
+	}
+
+	/*
+	 * The scope crop.
+	 *
+	 * These are `sticky`, not `fixed`, and that is not a stylistic choice:
+	 * `SectionShell` sets `content-visibility: auto`, which applies paint
+	 * containment at all times, and a paint-contained element is a containing
+	 * block for fixed descendants — so `position: fixed` here would have pinned
+	 * the bars to the section and quietly done nothing. Sticky inside a
+	 * full-height absolute wrapper gives the behaviour that was actually wanted:
+	 * pinned to the top and bottom of the *viewport*, for exactly as long as this
+	 * section is the thing on screen.
+	 */
+	.scope {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		pointer-events: none;
+		z-index: 2;
+	}
+	.bar {
+		display: block;
+		width: 100%;
+		background: #000;
+		/* Fades up with the crop, so at rest there is no hairline rule sitting
+		   across the top of the section waiting for something to happen. */
+		--edge: rgba(255, 204, 51, calc(var(--closed, 0) * 0.34));
+		/*
+		 * The crop only exists if you can see its edge. On a section this dark,
+		 * black bars over a near-black background were geometrically correct and
+		 * completely invisible — what actually reads as masking coming in is the
+		 * bright line where the mask meets the picture, so that line is the
+		 * effect and the black is just what's behind it.
+		 */
+		box-shadow: 0 0 22px 4px rgba(0, 0, 0, 0.95);
+		/*
+		 * 2.39:1 worth of crop, which is what "we're making a feature" meant to
+		 * two kids who had only ever seen one in a cinema. Capped at 14vh so a
+		 * phone in portrait — where the maths wants to eat two thirds of the
+		 * screen — gets the gesture rather than the geometry.
+		 */
+		height: calc(var(--closed, 0) * clamp(0px, (100svh - 41.84svw) / 2, 14svh));
+		/* Short, and linear: the height already follows a scroll ramp, so this is
+		   only smoothing the gaps between scroll events. Anything longer lags
+		   behind the wheel and the crop stops feeling attached to it. */
+		transition: height 120ms linear;
+	}
+	.bar.top {
+		position: sticky;
+		top: 0;
+		border-bottom: 1px solid var(--edge);
+	}
+	.bar.bottom {
+		position: sticky;
+		bottom: 0;
+		border-top: 1px solid var(--edge);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.bar {
+			transition: none;
+		}
 	}
 
 	.container {

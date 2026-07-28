@@ -262,6 +262,14 @@
 
 <SectionShell id="green-screen" year="2007" label="Green Screen" theme="green">
 	<div class="bg-grid" aria-hidden="true"></div>
+	<!--
+	  Spill. A green screen lights the whole room green whether you want it to or
+	  not — it comes off the cloth, wraps the edges of everything in front of it,
+	  and turns up in your footage as a rim you spend the evening trying to
+	  remove. Here it leans in from both sides, breathing slightly, because a
+	  bedsheet on a wall never hung still either.
+	-->
+	<div class="spill" aria-hidden="true"></div>
 	<div class="container">
 		<Reveal>
 			<YearMark year="2007" subtitle="Early Technical Tests" color="#22ff90" />
@@ -537,6 +545,40 @@
 			radial-gradient(ellipse at top, rgba(34, 255, 144, 0.06), transparent 50%),
 			linear-gradient(180deg, #04130a 0%, #0a1f12 50%, #04140b 100%);
 		color: #d8ffe6;
+	}
+	.spill {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background:
+			radial-gradient(
+				ellipse 34% 60% at -6% 34%,
+				rgba(34, 255, 144, 0.16),
+				transparent 70%
+			),
+			radial-gradient(
+				ellipse 30% 52% at 106% 66%,
+				rgba(34, 255, 144, 0.13),
+				transparent 70%
+			);
+		mix-blend-mode: screen;
+		animation: spill-breathe 13s ease-in-out infinite alternate;
+	}
+	@keyframes spill-breathe {
+		from {
+			opacity: 0.75;
+			scale: 1 1;
+		}
+		to {
+			opacity: 1;
+			/* Only the vertical — the cloth sags and lifts, it doesn't zoom. */
+			scale: 1 1.06;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.spill {
+			animation: none;
+		}
 	}
 	.bg-grid {
 		position: absolute;

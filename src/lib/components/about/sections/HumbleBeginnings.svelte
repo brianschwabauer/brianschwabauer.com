@@ -418,8 +418,21 @@
 		position: relative;
 		color: var(--tape-ink, #f5e6cf);
 	}
+	/* Warmed up out of near-black — the colour of tungsten light on a camcorder
+	   tape rather than the black the tape starts on. */
 	:global([data-theme='tape']) {
-		background: linear-gradient(180deg, #06060a, #160e07 30%, #1a120a 70%, #0a0709);
+		background:
+			radial-gradient(
+				ellipse 115% 65% at 50% 0%,
+				oklch(0.46 0.095 62 / 0.4),
+				transparent 62%
+			),
+			linear-gradient(
+				180deg,
+				oklch(0.22 0.042 58),
+				oklch(0.29 0.068 56) 45%,
+				oklch(0.19 0.04 48)
+			);
 		color: var(--tape-ink);
 	}
 	.grain {

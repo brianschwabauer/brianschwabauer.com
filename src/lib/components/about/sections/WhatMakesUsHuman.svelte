@@ -442,16 +442,45 @@
 		},
 	];
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
+
+	/*
+	 * The scan. It was already here — an 80px band blurred by 8px, sweeping the
+	 * top 120vh of the section on an 8s loop — and it read as a soft smear
+	 * because of two things: it had no hard edge anywhere in it, and it passed
+	 * over nothing. A beam is only legible if it has a defined core, and it only
+	 * means anything if it finds something.
+	 *
+	 * So: a bright 2px core inside the same wide falloff (which reads far
+	 * sharper at the same overall brightness, rather than needing more of it),
+	 * and a layer of vitals underneath that exists *only* where the beam is
+	 * crossing. A film called What Makes Us Human, being measured for an answer.
+	 */
 </script>
 
 <SectionShell id="what-makes-us-human" year="2015" label="Senior Thesis" theme="thesis">
+	<!--
+	  The beam and what it finds are two elements moving on identical, opposite
+	  keyframes: the band travels down, and the vitals inside it travel up by
+	  exactly as much, which leaves the vitals standing still while the band's
+	  window slides over them. Both are `translate`, so both stay on the
+	  compositor, and being one animation each they can't drift out of sync the
+	  way a mask-position sweep would.
+
+	  The whole apparatus is pinned to the viewport rather than laid over the
+	  section. Sweeping the section end to end sounds more thorough and is worse:
+	  this section is several screens tall, so the beam spent most of its cycle
+	  somewhere you weren't looking. Pinned, it is always crossing the screenful
+	  you are actually on — which is what "make it more prominent" needed.
+	-->
 	<div class="scan" aria-hidden="true">
-		<div class="scan-line"></div>
+		<div class="band">
+			<div class="core"></div>
+		</div>
 	</div>
 
 	<div class="container">
 		<Reveal>
-			<YearMark year="2015" subtitle="Senior Thesis" color="#00f2c3" />
+			<YearMark year="2015" subtitle="Senior Thesis" color="#00f2c3" treatment="clone" />
 		</Reveal>
 
 		<div class="lockup">
@@ -645,33 +674,76 @@
 		color: #e8f7fa;
 	}
 	.scan {
-		position: absolute;
-		inset: 0;
+		--band-h: 260px;
+		/* One screenful of travel, and the loop restarts as soon as it lands. */
+		--travel: 100svh;
+		--dur: 7s;
+		position: sticky;
+		top: 0;
+		height: 100svh;
+		/* Back out of flow, so the copy sits over the beam instead of a screen
+		   below it. */
+		margin-bottom: -100svh;
 		overflow: hidden;
 		pointer-events: none;
-		opacity: 0.35;
 	}
-	.scan-line {
+	/*
+	 * The beam's soft body. Wide and dim, exactly as before — what changed is
+	 * that it now has a hard core running through it (`.core`) and something
+	 * inside it to light up. A gradient with no hard edge anywhere reads as fog;
+	 * one bright line inside the same fog reads as a beam.
+	 */
+	.band {
 		position: absolute;
 		top: 0;
 		left: 0;
 		right: 0;
-		height: 80px;
+		height: var(--band-h);
+		overflow: hidden;
 		background: linear-gradient(
 			180deg,
 			transparent 0%,
-			rgba(0, 242, 195, 0.3) 50%,
+			rgba(0, 242, 195, 0.07) 34%,
+			rgba(0, 242, 195, 0.16) 50%,
+			rgba(0, 242, 195, 0.07) 66%,
 			transparent 100%
 		);
-		filter: blur(8px);
-		animation: scan 8s linear infinite;
+		animation: scan-band var(--dur) linear infinite;
 	}
-	@keyframes scan {
+	.core {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		right: 0;
+		height: 2px;
+		translate: 0 -1px;
+		background: linear-gradient(
+			90deg,
+			transparent,
+			rgba(140, 255, 232, 0.85) 18%,
+			rgba(190, 255, 244, 0.95) 50%,
+			rgba(140, 255, 232, 0.85) 82%,
+			transparent
+		);
+		box-shadow: 0 0 14px rgba(0, 242, 195, 0.55);
+	}
+	/* Top of the screen to the bottom, then straight back to the top. `--travel`
+	   is one viewport, because the whole apparatus is pinned to one. */
+	@keyframes scan-band {
 		from {
-			transform: translateY(-80px);
+			translate: 0 calc(var(--band-h) * -1);
 		}
 		to {
-			transform: translateY(120vh);
+			translate: 0 var(--travel);
+		}
+	}
+	/* A beam sweeping the page is exactly the kind of large ambient motion
+	   reduced motion is asking us to drop. Leave the band parked mid-screen so
+	   the section keeps its instrument, without the sweep. */
+	@media (prefers-reduced-motion: reduce) {
+		.band {
+			animation: none;
+			translate: 0 22vh;
 		}
 	}
 

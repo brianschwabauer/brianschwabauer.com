@@ -738,16 +738,29 @@
 </SectionShell>
 
 <style>
+	/* The violet was there already but only as a 10%-opacity hint over black. It
+	   is now the actual colour of the room. */
 	:global([data-theme='college']) {
 		background:
-			radial-gradient(ellipse at top, rgba(122, 77, 255, 0.1), transparent 50%),
-			linear-gradient(180deg, #080414, #0d0a1a 50%, #050410);
+			radial-gradient(
+				ellipse 115% 70% at 50% 0%,
+				oklch(0.38 0.13 292 / 0.5),
+				transparent 62%
+			),
+			linear-gradient(
+				180deg,
+				oklch(0.19 0.075 288),
+				oklch(0.245 0.1 285) 50%,
+				oklch(0.155 0.07 292)
+			);
 		color: #ece8ff;
 	}
 	.container {
 		max-width: 80rem;
 		margin: 0 auto;
 		padding: 0 clamp(1rem, 3vw, 2rem);
+		position: relative;
+		z-index: 1;
 	}
 	.lockup {
 		margin-bottom: 4rem;

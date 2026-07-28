@@ -140,9 +140,40 @@
 		},
 	];
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
+
+	const STAMPS = [
+		{ label: 'PAID', kind: 'paid', x: 3, y: 9, rot: -13, scale: 1.1 },
+		{ label: 'SENT', kind: 'sent', x: 79, y: 5, rot: 8, scale: 0.85 },
+		{ label: 'PAID', kind: 'paid', x: 84, y: 24, rot: -6, scale: 0.95 },
+		{ label: 'OVERDUE', kind: 'overdue', x: 1, y: 34, rot: 17, scale: 1 },
+		{ label: 'PAID', kind: 'paid', x: 72, y: 44, rot: -19, scale: 0.8 },
+		{ label: 'SENT', kind: 'sent', x: 6, y: 55, rot: 5, scale: 1.05 },
+		{ label: 'PAID', kind: 'paid', x: 82, y: 63, rot: 11, scale: 0.9 },
+		{ label: 'PAID', kind: 'paid', x: 2, y: 74, rot: -8, scale: 0.88 },
+		{ label: 'OVERDUE', kind: 'overdue', x: 74, y: 82, rot: -14, scale: 0.92 },
+		{ label: 'SENT', kind: 'sent', x: 8, y: 91, rot: 12, scale: 1 },
+	];
 </script>
 
 <SectionShell id="freelancer" year="2016" label="Freelancer" theme="hustle">
+	<!--
+	  The year of invoices. Rubber stamps at the angles a hand actually leaves
+	  them — never square, never all the same rotation, and PAID outnumbering the
+	  other two, which is the honest ratio and also the happier one.
+	-->
+	<div class="stamps" aria-hidden="true">
+		{#each STAMPS as s, i (i)}
+			<span
+				class="stamp {s.kind}"
+				style:left="{s.x}%"
+				style:top="{s.y}%"
+				style:rotate="{s.rot}deg"
+				style:--scale={s.scale}>
+				{s.label}
+			</span>
+		{/each}
+	</div>
+
 	<div class="container">
 		<Reveal>
 			<YearMark
@@ -367,16 +398,69 @@
 </SectionShell>
 
 <style>
+	/* Lamp-lit rather than lights-out: a desk at the end of a long day, not an
+	   empty room. The wash sits top-right where a desk lamp would be. */
 	:global([data-theme='hustle']) {
 		background:
-			radial-gradient(ellipse at top right, rgba(255, 184, 77, 0.08), transparent 50%),
-			linear-gradient(180deg, #0a0805, #14100a 50%, #06050a);
+			radial-gradient(
+				ellipse 110% 70% at 78% 0%,
+				oklch(0.52 0.115 68 / 0.45),
+				transparent 62%
+			),
+			linear-gradient(
+				180deg,
+				oklch(0.24 0.05 66),
+				oklch(0.3 0.072 62) 52%,
+				oklch(0.2 0.045 54)
+			);
 		color: #faf2e2;
 	}
+	.stamps {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		/* Out of the way of the middle column, where the copy lives. */
+		mask-image: linear-gradient(
+			90deg,
+			#000,
+			rgba(0, 0, 0, 0.15) 30%,
+			rgba(0, 0, 0, 0.15) 70%,
+			#000
+		);
+	}
+	.stamp {
+		position: absolute;
+		font-family: var(--font-mono);
+		font-weight: 800;
+		font-size: clamp(0.8rem, 1.6vw, 1.25rem);
+		letter-spacing: 0.2em;
+		padding: 0.35em 0.7em;
+		border: 3px solid currentColor;
+		border-radius: 4px;
+		scale: var(--scale);
+		white-space: nowrap;
+		/* Rubber never lays down evenly — the ink is thin enough to see the paper
+		   through it, and the box is heavier than the letters. */
+		opacity: 0.16;
+	}
+	.paid {
+		color: #6bd68a;
+	}
+	.sent {
+		color: #ffb84d;
+	}
+	.overdue {
+		color: #ff6b5e;
+		/* The one you actually looked at. */
+		opacity: 0.22;
+	}
+
 	.container {
 		max-width: 80rem;
 		margin: 0 auto;
 		padding: 0 clamp(1rem, 3vw, 2rem);
+		position: relative;
+		z-index: 1;
 	}
 	.lockup {
 		margin-bottom: 4rem;

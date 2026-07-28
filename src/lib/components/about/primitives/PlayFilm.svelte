@@ -22,27 +22,64 @@
 		/** Film title, used for the accessible name when the label is generic. */
 		title = '',
 		color = '#00e0ff',
+		/**
+		 * Which transport control this is. `play` opens a film; `forward` skips
+		 * ahead, and gets the deck's double-triangle instead of the single one.
+		 * `arrow` and `down` are for links that go somewhere rather than play
+		 * something — a site, or another section of this page.
+		 */
+		icon = 'play',
+		/**
+		 * Render as a link rather than a button. A control that navigates *is* a
+		 * link — it should be middle-clickable, copyable and focus-ordered like
+		 * one — and everything else about the treatment stays identical.
+		 */
+		href = '',
+		target = '',
+		rel = '',
 		onclick,
 	}: {
 		label?: string;
 		meta?: string;
 		title?: string;
 		color?: string;
-		onclick: (event: MouseEvent & { currentTarget: HTMLButtonElement }) => void;
+		icon?: 'play' | 'forward' | 'arrow' | 'down';
+		href?: string;
+		target?: string;
+		rel?: string;
+		onclick?: (event: MouseEvent & { currentTarget: HTMLElement }) => void;
 	} = $props();
+
+	/*
+	 * Transport icons lead, direction icons trail. A play triangle is the thing
+	 * you press and belongs in front of its label the way it does on a deck; an
+	 * arrow describes where the label takes you, and every convention on the web
+	 * puts that after the words. Same disc, same ripple, same press — only the
+	 * side changes.
+	 */
+	const trailing = $derived(icon === 'arrow' || icon === 'down');
 </script>
 
-<!-- The perspective lives on the wrapper, not the button: an element's own
-     `perspective` doesn't apply to its own transform, and the press depends on
-     a z-translate reading as depth. -->
-<span class="play-film-wrap" style:--accent={color}>
-	<button
-		type="button"
-		class="play-film"
-		aria-label={title ? `${label} — ${title}` : label}
-		{@attach ripple({ zIndex: 1 })}
-		{onclick}>
-		<span class="disc" aria-hidden="true">
+{#snippet disc()}
+	<span class="disc" aria-hidden="true">
+		{#if icon === 'arrow' || icon === 'down'}
+			<svg viewBox="0 0 24 24">
+				<path
+					d={icon === 'down' ? 'M12 4v16M6 14l6 6 6-6' : 'M5 12h14M13 6l6 6-6 6'}
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round" />
+			</svg>
+		{:else if icon === 'forward'}
+			<!-- The deck's fast-forward: two triangles, the second overlapping the
+			     first the way it does on every transport control ever printed. -->
+			<svg viewBox="0 0 24 24">
+				<polygon points="4,6 12,12 4,18" fill="currentColor" />
+				<polygon points="12,6 20,12 12,18" fill="currentColor" />
+			</svg>
+		{:else}
 			<!-- Centred on the triangle's centroid, not its bounding box: a
 			     right-pointing triangle carries its mass in the left third
 			     ((2·9 + 18) / 3 = 12, the viewBox centre), so these points put
@@ -50,12 +87,46 @@
 			<svg viewBox="0 0 24 24">
 				<polygon points="9,6 18,12 9,18" fill="currentColor" />
 			</svg>
-		</span>
-		<span class="label">{label}</span>
-		{#if meta}
-			<span class="meta">{meta}</span>
 		{/if}
-	</button>
+	</span>
+{/snippet}
+
+{#snippet face()}
+	{#if !trailing}{@render disc()}{/if}
+	<span class="label">{label}</span>
+	{#if meta}
+		<span class="meta">{meta}</span>
+	{/if}
+	{#if trailing}{@render disc()}{/if}
+{/snippet}
+
+<!-- The perspective lives on the wrapper, not the button: an element's own
+     `perspective` doesn't apply to its own transform, and the press depends on
+     a z-translate reading as depth. -->
+<span class="play-film-wrap" style:--accent={color}>
+	{#if href}
+		<a
+			{href}
+			target={target || undefined}
+			rel={rel || undefined}
+			class="play-film"
+			class:trailing
+			aria-label={title ? `${label} — ${title}` : label}
+			{@attach ripple({ zIndex: 1 })}
+			{onclick}>
+			{@render face()}
+		</a>
+	{:else}
+		<button
+			type="button"
+			class="play-film"
+			class:trailing
+			aria-label={title ? `${label} — ${title}` : label}
+			{@attach ripple({ zIndex: 1 })}
+			{onclick}>
+			{@render face()}
+		</button>
+	{/if}
 </span>
 
 <style>
@@ -91,11 +162,20 @@
 		text-transform: uppercase;
 		line-height: normal;
 		cursor: pointer;
+		/* The link variant inherits everything else from this rule; only the
+		   underline needs turning off. */
+		text-decoration: none;
 		transition:
 			background 300ms ease,
 			border-color 300ms ease,
 			color 300ms ease,
 			translate 200ms ease;
+
+		/* Mirror the padding when the disc trails, so the tight side stays with
+		   the disc and the roomy side stays with the words. */
+		&.trailing {
+			padding: 0.45rem 0.45rem 0.45rem 1.1rem;
+		}
 
 		@supports (corner-shape: squircle) {
 			corner-shape: squircle;

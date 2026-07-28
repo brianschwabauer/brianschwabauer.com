@@ -242,7 +242,7 @@
 				year="2010"
 				subtitle="Animation & Special Effects"
 				color="#6c63ff"
-				fringe />
+				treatment="fringe" />
 		</Reveal>
 
 		<div class="lockup">
@@ -530,6 +530,7 @@
 		color: #e8ecff;
 		overflow-x: clip;
 	}
+
 	.container {
 		max-width: 80rem;
 		margin: 0 auto;

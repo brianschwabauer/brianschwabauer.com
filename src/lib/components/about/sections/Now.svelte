@@ -3,8 +3,8 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import BokehField from '../primitives/BokehField.svelte';
 	import FlipText from '../primitives/FlipText.svelte';
+	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -123,12 +123,55 @@
 		height: number;
 		alt: string;
 	} | null;
+
+	/**
+	 * Motes rising through the light. Hand-placed across the width, with no two
+	 * periods matching, so the field never falls into step — the moment a handful
+	 * of drifting particles start moving together they stop reading as dust and
+	 * start reading as an animation.
+	 */
+	const MOTES = [
+		{ x: 4, size: 3, o: 0.5, sway: 26, dur: 27, delay: -3 },
+		{ x: 11, size: 2, o: 0.36, sway: -18, dur: 34, delay: -19 },
+		{ x: 18, size: 4, o: 0.44, sway: 32, dur: 22, delay: -11 },
+		{ x: 24, size: 2, o: 0.3, sway: -24, dur: 41, delay: -30 },
+		{ x: 31, size: 3, o: 0.48, sway: 14, dur: 29, delay: -7 },
+		{ x: 37, size: 5, o: 0.26, sway: -30, dur: 47, delay: -24 },
+		{ x: 44, size: 2, o: 0.42, sway: 22, dur: 25, delay: -16 },
+		{ x: 51, size: 3, o: 0.34, sway: -16, dur: 38, delay: -2 },
+		{ x: 57, size: 4, o: 0.4, sway: 28, dur: 31, delay: -35 },
+		{ x: 63, size: 2, o: 0.28, sway: -22, dur: 44, delay: -13 },
+		{ x: 70, size: 3, o: 0.46, sway: 18, dur: 24, delay: -27 },
+		{ x: 76, size: 5, o: 0.24, sway: -34, dur: 52, delay: -6 },
+		{ x: 82, size: 2, o: 0.38, sway: 20, dur: 33, delay: -21 },
+		{ x: 88, size: 3, o: 0.32, sway: -14, dur: 28, delay: -38 },
+		{ x: 94, size: 4, o: 0.44, sway: 30, dur: 36, delay: -9 },
+		{ x: 98, size: 2, o: 0.3, sway: -20, dur: 43, delay: -32 },
+	];
 </script>
 
-<SectionShell id="now" year="Now" label="Now" theme="snt">
-	<!-- Half the discs of the 2019 section: the same room six years later, not a
-	     repeat of the same shot. -->
-	<BokehField density={0.5} />
+<SectionShell id="now" year="Now" label="Now" theme="now">
+	<!--
+	  Not the bokeh field. That belongs to 2019 and to the awards show, and using
+	  it a third time made "now" read as a reprise of a chapter you'd already had.
+	  This is the present tense instead: a glow rising off the bottom edge with
+	  motes drifting up through it, the way dust moves in a room somebody is still
+	  working in. Nothing here has arrived anywhere — it is all still going.
+	-->
+	<div class="active" aria-hidden="true">
+		<span class="glow"></span>
+		{#each MOTES as m, i (i)}
+			<span
+				class="mote"
+				style:--x="{m.x}%"
+				style:--size="{m.size}px"
+				style:--o={m.o}
+				style:--sway="{m.sway}px"
+				style:--dur="{m.dur}s"
+				style:--delay="{m.delay}s">
+			</span>
+		{/each}
+	</div>
 
 	<div class="container">
 		<Reveal variant="up">
@@ -152,22 +195,13 @@
 					day.
 				</p>
 				<div class="ctas">
-					<a
-						class="cta-primary"
+					<PlayFilm
 						href="https://showandtour.com"
 						target="_blank"
-						rel="noopener">
-						Visit showandtour.com
-						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<path
-								d="M5 12h14M13 6l6 6-6 6"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round" />
-						</svg>
-					</a>
+						rel="noopener"
+						icon="arrow"
+						label="Visit showandtour.com"
+						color="#00f2c3" />
 				</div>
 			</Reveal>
 		</div>
@@ -428,18 +462,11 @@
 		<div class="bridge">
 			<Reveal variant="up">
 				<p>The projects keep changing. The way I build them doesn't.</p>
-				<a class="cta-ghost" href="#creed">
-					Why I build this way
-					<svg viewBox="0 0 24 24" aria-hidden="true">
-						<path
-							d="M12 4v16M6 14l6 6 6-6"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round" />
-					</svg>
-				</a>
+				<PlayFilm
+					href="#creed"
+					icon="down"
+					label="Why I build this way"
+					color="#00f2c3" />
 			</Reveal>
 		</div>
 	</div>
@@ -456,8 +483,118 @@
 </SectionShell>
 
 <style>
-	/* `[data-theme='snt']` is declared once, by ShowAndTour — this section shares
-	   the theme on purpose, and the continuity is the point. */
+	/*
+	 * NOW owns its own theme. It used to share `snt` with the Show&Tour chapter,
+	 * but Show&Tour has moved onto the brand palette (FOCUS blue), and this
+	 * section keeps the green — same room, later in the day, and the split lets
+	 * the two chapters read as different places.
+	 */
+	:global([data-theme='now']) {
+		background:
+			radial-gradient(
+				ellipse 110% 70% at 50% 0%,
+				oklch(0.42 0.1 197 / 0.55),
+				transparent 62%
+			),
+			radial-gradient(
+				ellipse 95% 60% at 82% 100%,
+				oklch(0.38 0.09 212 / 0.45),
+				transparent 66%
+			),
+			linear-gradient(
+				180deg,
+				oklch(0.22 0.052 200),
+				oklch(0.28 0.072 196) 55%,
+				oklch(0.18 0.048 214)
+			);
+		color: #e8faf6;
+	}
+
+	/* Pinned, so the room stays around you for the whole chapter rather than
+	   scrolling past as a panel. */
+	.active {
+		position: sticky;
+		top: 0;
+		height: 100svh;
+		margin-bottom: -100svh;
+		overflow: clip;
+		pointer-events: none;
+	}
+	/*
+	 * Light coming up off the bottom edge. Warm at its base and cooling into the
+	 * section's teal as it rises — the two ends of a working day in one gradient,
+	 * and the only warm note anywhere in the Show&Tour chapters.
+	 */
+	.glow {
+		position: absolute;
+		inset: auto 0 0;
+		height: 62%;
+		background:
+			radial-gradient(
+				ellipse 70% 100% at 50% 100%,
+				rgba(0, 242, 195, 0.13),
+				transparent 72%
+			),
+			radial-gradient(
+				ellipse 42% 80% at 22% 100%,
+				rgba(255, 168, 92, 0.09),
+				transparent 70%
+			);
+		animation: breathe 19s ease-in-out infinite alternate;
+	}
+	@keyframes breathe {
+		from {
+			opacity: 0.72;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+	.mote {
+		position: absolute;
+		left: var(--x);
+		bottom: 0;
+		width: var(--size);
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background: #7ff5dd;
+		box-shadow: 0 0 6px rgba(0, 242, 195, 0.5);
+		opacity: 0;
+		animation: rise var(--dur) linear var(--delay) infinite;
+	}
+	/*
+	 * `svh` rather than percentages: a percentage translate resolves against the
+	 * mote's own 3px box, so the whole field would have travelled nine pixels.
+	 */
+	@keyframes rise {
+		0% {
+			translate: 0 0;
+			opacity: 0;
+		}
+		9% {
+			opacity: var(--o);
+		}
+		50% {
+			translate: var(--sway) -52svh;
+		}
+		86% {
+			opacity: var(--o);
+		}
+		100% {
+			translate: 0 -104svh;
+			opacity: 0;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.glow {
+			animation: none;
+		}
+		/* Dust that isn't moving is not dust. */
+		.mote {
+			display: none;
+		}
+	}
+
 	.container {
 		max-width: 80rem;
 		margin: 0 auto;
@@ -500,30 +637,6 @@
 		flex-wrap: wrap;
 		gap: 0.75rem;
 		margin-top: 1.8rem;
-	}
-	.cta-primary {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.55rem;
-		padding: 0.85rem 1.35rem;
-		background: #00e0b6;
-		color: #052028;
-		font-weight: 800;
-		border-radius: 999px;
-		text-decoration: none;
-		transition:
-			transform 200ms ease,
-			box-shadow 200ms ease;
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-	}
-	.cta-primary:hover {
-		transition-duration: 0s;
-		transform: translateY(-2px);
-		box-shadow: 0 14px 40px rgba(0, 242, 195, 0.45);
-	}
-	.cta-primary svg {
-		width: 16px;
-		height: 16px;
 	}
 
 	/* ── delightstack ───────────────────────────────────────────────────── */
@@ -870,31 +983,5 @@
 		color: rgba(255, 255, 255, 0.72);
 		text-wrap: balance;
 		margin: 0 0 2rem;
-	}
-	.cta-ghost {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.55rem;
-		padding: 0.85rem 1.35rem;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.18);
-		color: #fff;
-		border-radius: 999px;
-		text-decoration: none;
-		font-weight: 600;
-		transition:
-			background 200ms ease,
-			border-color 200ms ease,
-			transform 200ms ease;
-	}
-	.cta-ghost:hover {
-		transition-duration: 0s;
-		background: rgba(255, 255, 255, 0.1);
-		border-color: rgba(0, 242, 195, 0.45);
-		transform: translateY(-2px);
-	}
-	.cta-ghost svg {
-		width: 16px;
-		height: 16px;
 	}
 </style>

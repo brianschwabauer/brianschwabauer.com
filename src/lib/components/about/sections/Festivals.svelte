@@ -720,8 +720,20 @@
 </SectionShell>
 
 <style>
+	/* The house lights on a festival stage, not the black between screenings. */
 	:global([data-theme='broadcast']) {
-		background: linear-gradient(180deg, #0c0808 0%, #160c0c 50%, #0a0606 100%);
+		background:
+			radial-gradient(
+				ellipse 112% 68% at 50% 0%,
+				oklch(0.4 0.115 30 / 0.45),
+				transparent 62%
+			),
+			linear-gradient(
+				180deg,
+				oklch(0.185 0.058 26),
+				oklch(0.235 0.085 22) 50%,
+				oklch(0.15 0.052 18)
+			);
 		color: #fdebe5;
 	}
 	.container {

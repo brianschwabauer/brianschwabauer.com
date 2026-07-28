@@ -157,6 +157,54 @@
 </script>
 
 <SectionShell id="entrepreneurship" year="2017" label="Entrepreneurship" theme="entr">
+	<!--
+	  The board, after somebody has half-wiped it. Boxes and arrows with no labels
+	  in them — a diagram you can read the *shape* of but not the content of,
+	  which is exactly what the year looked like from inside it. The smears are
+	  what makes it a whiteboard rather than a flowchart: nothing here came off
+	  cleanly.
+	-->
+	<svg
+		class="board"
+		viewBox="0 0 1200 800"
+		preserveAspectRatio="xMidYMid meet"
+		aria-hidden="true">
+		<defs>
+			<!-- The eraser, as a mask rather than a blend: white keeps, black
+			     removes, and the blur on the strokes is what turns "wiped" into
+			     "smeared". A blend mode can't subtract in CSS — only a mask can. -->
+			<mask id="board-wipe">
+				<rect width="1200" height="800" fill="#fff" />
+				<g class="wipe">
+					<path d="M40 300 C 300 210, 620 330, 1160 220" />
+					<path d="M60 520 C 340 430, 700 560, 1180 470" />
+					<path d="M20 700 C 380 620, 760 730, 1190 660" />
+				</g>
+			</mask>
+		</defs>
+		<g class="ink" mask="url(#board-wipe)">
+			<rect x="88" y="96" width="190" height="92" rx="6" />
+			<rect x="430" y="70" width="150" height="80" rx="6" />
+			<rect x="760" y="140" width="210" height="98" rx="6" />
+			<rect x="180" y="380" width="170" height="86" rx="6" />
+			<rect x="560" y="430" width="230" height="104" rx="6" />
+			<rect x="880" y="580" width="160" height="80" rx="6" />
+			<circle cx="380" cy="250" r="46" />
+			<circle cx="1010" cy="380" r="34" />
+			<path d="M278 142 C 340 142, 360 110, 430 110" />
+			<path d="M580 110 C 660 110, 690 170, 760 180" />
+			<path d="M380 296 C 380 340, 300 350, 265 380" />
+			<path d="M350 420 C 450 420, 470 450, 560 470" />
+			<path d="M790 500 C 850 510, 850 560, 880 600" />
+			<path d="M866 238 C 900 290, 980 300, 1008 346" />
+			<!-- Arrowheads, drawn as two strokes because that is how a marker draws
+			     one — you never lift and fill a triangle. -->
+			<path d="M420 108 l-14 -7 M420 112 l-14 8" />
+			<path d="M756 178 l-13 -9 M754 182 l-11 10" />
+			<path d="M556 468 l-14 -6 M556 472 l-13 9" />
+		</g>
+	</svg>
+
 	<div class="container">
 		<Reveal>
 			<YearMark year="2017" subtitle="Entrepreneurship" color="#00d6ff" />
@@ -323,10 +371,62 @@
 			linear-gradient(180deg, #050a14, #07101f 50%, #050810);
 		color: #e0f1fa;
 	}
+	/*
+	 * Drawn at its own proportions rather than stretched to the section's.
+	 * `slice` on a section several screens tall crops to a sliver of the board
+	 * and magnifies it, which turned a diagram into two enormous arcs; `meet`
+	 * keeps the whole board legible as a board. It occupies the top of the
+	 * section — a whiteboard is a thing on a wall, not a texture over everything.
+	 */
+	.board {
+		position: absolute;
+		top: 3%;
+		left: 0;
+		width: 100%;
+		height: auto;
+		pointer-events: none;
+		/* Pulled right back. At 0.4 the diagram was legible enough that you read
+		   the boxes instead of the copy in front of them — a background you can
+		   follow is a competing subject. This is the level where you notice there
+		   is *something* on the wall and then stop looking at it. */
+		opacity: 0.16;
+		/* And kept out of the middle column entirely. */
+		mask-image: linear-gradient(
+			90deg,
+			#000,
+			rgba(0, 0, 0, 0.25) 28%,
+			rgba(0, 0, 0, 0.25) 72%,
+			#000
+		);
+	}
+	.ink {
+		fill: none;
+		stroke: #00d6ff;
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		opacity: 0.3;
+	}
+	/*
+	 * The eraser strokes, inside the mask. Black removes; the blur is what stops
+	 * the result reading as three clean stripes and makes it a smear instead.
+	 * Not quite opaque, so the ink survives faintly even where the cloth went —
+	 * a board nobody has cleaned properly since the first meeting.
+	 */
+	.wipe {
+		fill: none;
+		stroke: rgba(0, 0, 0, 0.88);
+		stroke-width: 110;
+		stroke-linecap: round;
+		filter: blur(26px);
+	}
+
 	.container {
 		max-width: 80rem;
 		margin: 0 auto;
 		padding: 0 clamp(1rem, 3vw, 2rem);
+		position: relative;
+		z-index: 1;
 	}
 
 	.lockup {

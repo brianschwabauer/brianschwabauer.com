@@ -3,6 +3,7 @@
 	import SectionShell from '../primitives/SectionShell.svelte';
 	import PinScrub from '../primitives/PinScrub.svelte';
 	import PinDrift from '../primitives/PinDrift.svelte';
+	import PlayFilm from '../primitives/PlayFilm.svelte';
 
 	const currentYear = new Date().getFullYear();
 	const START_YEAR = 2006;
@@ -131,7 +132,11 @@
 					<!-- A diegetic skip for anyone who came for "what does he do now".
 					     The pin holds it on screen for the whole scrub, so it can stay
 					     quiet and still never be missed. -->
-					<a class="ff" href="#now">&#9654;&#9654; Fast-forward to now</a>
+					<PlayFilm
+						href="#now"
+						icon="forward"
+						label="Fast-forward to now"
+						color="#ff9c4a" />
 				</div>
 
 				<div class="cassette" class:done>
@@ -398,42 +403,11 @@
 		font-weight: 600;
 	}
 
-	/* Quiet, but not hidden. It has to read as a control at a glance — pill,
-	   hairline, mono label — while staying obviously subordinate to the story it
-	   is offering to skip, so it sits at ~75% of the section's amber and only
-	   comes to full strength on hover or focus. */
-	.ff {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		margin-top: 1.6rem;
-		padding: 0.6rem 1.15rem;
-		border-radius: 999px;
-		border: 1px solid oklch(from #ff9c4a l c h / 0.32);
-		color: oklch(from #ff9c4a l c h / 0.75);
-		background: oklch(from #ff9c4a l c h / 0.05);
-		font-family: var(--font-mono);
-		font-size: 0.76rem;
-		letter-spacing: 0.2em;
-		text-transform: uppercase;
-		text-decoration: none;
-		transition:
-			color 240ms ease,
-			border-color 240ms ease,
-			background 240ms ease,
-			translate 200ms ease;
-	}
-	.ff:hover {
-		transition-duration: 0s;
-		color: #ff9c4a;
-		border-color: oklch(from #ff9c4a l c h / 0.7);
-		background: oklch(from #ff9c4a l c h / 0.12);
-		translate: 0 -2px;
-	}
-	.ff:focus-visible {
-		outline: 2px solid #ff9c4a;
-		outline-offset: 3px;
-		color: #ff9c4a;
+	/* The skip is a `PlayFilm` in link form now, so it carries the same squircle,
+	   ripple and 3D press as every other transport control on the page. All this
+	   section still owns is where it sits. */
+	.intro :global(.play-film-wrap) {
+		--play-film-offset: 1.6rem;
 	}
 
 	.cassette {
@@ -534,10 +508,6 @@
 	@media (prefers-reduced-motion: reduce) {
 		.rew-icon.running {
 			animation: none;
-		}
-		.ff:hover {
-			transition-duration: 0s;
-			translate: none;
 		}
 	}
 </style>

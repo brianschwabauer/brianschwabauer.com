@@ -8,6 +8,73 @@
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
+	/*
+	 * Standing waves, drifting.
+	 *
+	 * The two louder ideas that came before this — forty equaliser bars bouncing
+	 * on a loop, then a full oscillogram you scrubbed with the scroll — both read
+	 * as a *component* sitting on the section rather than as its background. This
+	 * is the quiet version of the same thought: a few sine waves at different
+	 * frequencies, sliding past each other at different speeds, which is what
+	 * sound actually is and what an oscilloscope shows you when nothing much is
+	 * happening.
+	 *
+	 * Nothing here reacts to the reader, and that is the point — it should be
+	 * something you notice second, after the copy.
+	 */
+	const WAVES = [
+		{ amp: 34, freq: 4, phase: 0, y: 130, width: 2, opacity: 0.85, dur: 34, back: false },
+		{
+			amp: 21,
+			freq: 6,
+			phase: 1.1,
+			y: 196,
+			width: 1.5,
+			opacity: 0.6,
+			dur: 47,
+			back: true,
+		},
+		{
+			amp: 46,
+			freq: 2,
+			phase: 2.4,
+			y: 268,
+			width: 2.5,
+			opacity: 0.5,
+			dur: 61,
+			back: false,
+		},
+		{
+			amp: 15,
+			freq: 8,
+			phase: 0.6,
+			y: 172,
+			width: 1.2,
+			opacity: 0.45,
+			dur: 26,
+			back: true,
+		},
+	];
+
+	/*
+	 * Two sines summed rather than one: a single sine is a textbook diagram, and
+	 * adding its second harmonic at a third of the amplitude gives the lopsided,
+	 * slightly-peaked shape a real signal has.
+	 *
+	 * The path spans 2400 units and every `freq` is even, so exactly half of it is
+	 * a whole number of cycles — which is what lets the drift translate by half
+	 * the path width and loop with no seam.
+	 */
+	const WIDTH = 2400;
+	const path_for = (amp: number, freq: number, phase: number, y: number) => {
+		let d = '';
+		for (let x = 0; x <= WIDTH; x += 15) {
+			const t = (x / WIDTH) * Math.PI * 2 * freq;
+			const v = Math.sin(t + phase) * amp + Math.sin(t * 2 + phase * 1.7) * amp * 0.32;
+			d += `${x === 0 ? 'M' : 'L'}${x} ${(y + v).toFixed(1)}`;
+		}
+		return d;
+	};
 	const flavaImages: GalleryItem[] = [
 		{
 			type: 'image',
@@ -188,10 +255,22 @@
 </script>
 
 <SectionShell id="music-videos" year="2009" label="Music Videos" theme="audio">
-	<div class="eq" aria-hidden="true">
-		{#each Array(40) as _, i}
-			<span style:--i={i}></span>
-		{/each}
+	<!--
+	  Pinned to the viewport so the waves are behind the whole chapter rather than
+	  behind one screenful of it, and drawn at twice the width so each one can
+	  slide a full half of itself and land exactly where it started.
+	-->
+	<div class="waves" aria-hidden="true">
+		<svg viewBox="0 0 {WIDTH} 400" preserveAspectRatio="none">
+			{#each WAVES as w, i (i)}
+				<path
+					class:back={w.back}
+					d={path_for(w.amp, w.freq, w.phase, w.y)}
+					stroke-width={w.width}
+					style:opacity={w.opacity}
+					style:--dur="{w.dur}s" />
+			{/each}
+		</svg>
 	</div>
 
 	<div class="container">
@@ -361,42 +440,57 @@
 			linear-gradient(180deg, #0c0316, #16071f 50%, #08041a);
 		color: #ffe9f6;
 	}
-	.eq {
-		position: absolute;
-		bottom: 6%;
-		left: 0;
-		right: 0;
-		display: flex;
-		justify-content: center;
-		align-items: flex-end;
-		gap: 4px;
-		height: 200px;
+	.waves {
+		position: sticky;
+		top: 0;
+		height: 100svh;
+		/* Back out of flow — the copy sits over the waves, not a screen below. */
+		margin-bottom: -100svh;
 		pointer-events: none;
-		opacity: 0.15;
+		display: grid;
+		align-content: center;
+		overflow: clip;
+		opacity: 0.3;
+		/* No start and no finish — a slice out of something already playing. */
+		mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
 	}
-	.eq span {
-		display: block;
-		width: 8px;
-		background: linear-gradient(180deg, #ff7ad0, #00c8ff);
-		border-radius: 4px 4px 0 0;
-		animation: eq 1.8s ease-in-out infinite;
-		animation-delay: calc(var(--i) * 60ms);
-		height: 20%;
-		transform-origin: bottom;
+	.waves svg {
+		/* Twice the viewport, so half of it is always off to the right waiting to
+		   slide in and the loop never shows an end. */
+		width: 200%;
+		height: clamp(180px, 30vh, 340px);
+		overflow: visible;
 	}
-	@keyframes eq {
-		0%,
-		100% {
-			transform: scaleY(0.3);
+	.waves path {
+		fill: none;
+		stroke: #ff7ad0;
+		stroke-linecap: round;
+		animation: drift var(--dur) linear infinite;
+	}
+	/* Half the waves run the other way. Two lines crossing at different speeds is
+	   the whole illusion — all of them sliding together is a moving image. */
+	.waves .back {
+		stroke: #4fd8ff;
+		animation-name: drift-back;
+	}
+	@keyframes drift {
+		to {
+			/* Exactly half the path, which is a whole number of cycles, so the wave
+			   arrives back on top of itself. */
+			translate: -50% 0;
 		}
-		25% {
-			transform: scaleY(1);
+	}
+	@keyframes drift-back {
+		from {
+			translate: -50% 0;
 		}
-		50% {
-			transform: scaleY(0.6);
+		to {
+			translate: 0 0;
 		}
-		75% {
-			transform: scaleY(0.9);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.waves path {
+			animation: none;
 		}
 	}
 
