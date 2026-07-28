@@ -19,6 +19,54 @@
 		return () => mq.removeEventListener('change', onChange);
 	});
 
+	// The pin opens on a present-day beat before the rewind starts. The first
+	// slice of the scrub belongs to the bio; the rest is remapped to 0→1 and fed
+	// to the rewind untouched, so the tape keeps exactly the pacing it had.
+	const BIO_FRAC = 0.28;
+	const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
+	// Quart ease-out — the deck arrives early and settles, so it is already
+	// assembled by the time the bio has left rather than racing it off-screen.
+	const fadeFrom = (t: number, start: number) =>
+		1 - Math.pow(1 - clamp01((t - start) / (1 - start)), 4);
+	// Cubic ease-out on the year's descent: it clears the cassette band early and
+	// then settles, so it is already parked when the deck finishes fading in.
+	const easeOut = (t: number) => 1 - Math.pow(1 - clamp01(t), 3);
+
+	// The deck holds its layout the whole time it is invisible, which at the start
+	// of the pin opens a void between the bio and the year. The year is lifted
+	// across that void by transform and eased back to exactly 0 — measured from
+	// the real layout rather than a guessed vh, and measured with offsetTop /
+	// offsetHeight, which stay honest while everything on screen is transformed.
+	let sceneEl = $state<HTMLElement | null>(null);
+	let deckEl = $state<HTMLElement | null>(null);
+	let stageEl = $state<HTMLElement | null>(null);
+	let bioEl = $state<HTMLElement | null>(null);
+	let yearLift = $state(0);
+
+	$effect(() => {
+		if (!sceneEl || !deckEl || !stageEl || !bioEl) return;
+		const measure = () => {
+			const sceneTop = sceneEl!.offsetTop;
+			const deckTop = sceneTop + deckEl!.offsetTop;
+			const stageTop = sceneTop + stageEl!.offsetTop;
+			// Whatever the scene's own flex gap currently resolves to.
+			const gap = stageTop - deckTop - deckEl!.offsetHeight;
+			const bioBottom = bioEl!.offsetTop + bioEl!.offsetHeight;
+			yearLift = Math.max(
+				0,
+				// Swallow the deck whole, unless the viewport is short enough that
+				// doing so would slide the year up behind the bio.
+				Math.min(stageTop - deckTop, stageTop - bioBottom - gap),
+			);
+		};
+		measure();
+		if (typeof ResizeObserver === 'undefined') return;
+		const ro = new ResizeObserver(measure);
+		ro.observe(sceneEl);
+		ro.observe(bioEl);
+		return () => ro.disconnect();
+	});
+
 	// Heavy ease-in-out: the first and last years linger long enough to actually
 	// read (they're the ones that matter), while the middle years whip past as
 	// pure motion — leaning into the time-travel blur rather than fighting it.
@@ -73,14 +121,18 @@
 		<div class="vignette"></div>
 	</div>
 
-	<!-- Short enough to feel like a flick rather than a commitment. The heavy
-	     easing is unchanged, so the first and last years still linger — the
-	     shorter pin only makes the middle ones whip past harder. -->
-	<PinScrub height="180vh" class="rewind-pin">
+	<!-- 250vh, of which the first BIO_FRAC is the bio. What is left over is the
+	     same 180vh the rewind had before, so the scrub still feels like a flick
+	     rather than a commitment. -->
+	<PinScrub height="250vh" class="rewind-pin">
 		{#snippet children({ progress, scrolled })}
-			{@const p = reduced ? 1 : progress}
+			{@const bioP = reduced ? 1 : clamp01(progress / BIO_FRAC)}
+			{@const p = reduced ? 1 : clamp01((progress - BIO_FRAC) / (1 - BIO_FRAC))}
 			{@const yearFloat = yearFloatAt(p)}
 			{@const done = p >= 0.995}
+			{@const introIn = reduced ? 1 : fadeFrom(bioP, 0.3)}
+			{@const cassetteIn = reduced ? 1 : fadeFrom(bioP, 0.42)}
+			{@const yearDrop = reduced ? 0 : yearLift * (1 - easeOut(bioP))}
 			<!-- A tape counter up the left flank, climbing at exactly the scroll's own
 			     rate. The scene in the middle is pinned; this is what keeps the scroll
 			     feeling like scrolling. Left only — the year scrubber owns the right
@@ -106,93 +158,136 @@
 			     one opacity on one layer is the cheapest thing that can composite. -->
 			<div class="warm" style:opacity={p} aria-hidden="true"></div>
 
-			<div class="scene">
-				<div class="intro">
-					<!-- Two transport modes on the same deck: the rewind ends its own
+			<!-- The present-day beat the tape is about to run back from. It travels
+			     on `scrolled`, not on `progress` — tied to the reader's own scrolling
+			     it leaves like ordinary page content, where anything normalised to
+			     the pin would read as a scrubbed layer being dragged off. -->
+			<div
+				bind:this={bioEl}
+				class="bio"
+				class:offstage={!reduced && bioP >= 1}
+				style:transform={reduced ? 'none' : `translateY(${-scrolled}px)`}>
+				<span>
+					<i aria-hidden="true">&#9654;</i>
+					Playing · today
+				</span>
+				<p>
+					Today I'm the founder of Show&amp;Tour, building software from Kansas City,
+					where I live with my wife and our four kids. Twenty years of startups, apps, and
+					videos got me here — but it didn't start with any of that.
+				</p>
+			</div>
+
+			<div bind:this={sceneEl} class="scene">
+				<!-- A wrapper purely so the pair can be measured as one block; it
+				     repeats the scene's own column and gap, so nothing about the
+				     resting layout changes. -->
+				<div bind:this={deckEl} class="deck">
+					<div
+						class="intro"
+						class:offstage={introIn < 0.02}
+						style:opacity={introIn}
+						style:transform={introIn >= 1
+							? 'none'
+							: `translateY(${(1 - introIn) * 14}px)`}>
+						<!-- Two transport modes on the same deck: the rewind ends its own
 					     gesture here, so the leader that follows reads as the tape
 					     playing rather than as a second countdown. -->
-					<div class="eyebrow">
-						<span class="mode" class:off={done}>
-							<span class="rew-icon" class:running={p > 0.01 && !done} aria-hidden="true">
-								◄◄
+						<div class="eyebrow">
+							<span class="mode" class:off={done}>
+								<span
+									class="rew-icon"
+									class:running={p > 0.01 && !done}
+									aria-hidden="true">
+									◄◄
+								</span>
+								Rewind the tape
 							</span>
-							Rewind the tape
-						</span>
-						<span class="mode" class:off={!done}>
-							&#9209; REWOUND TO {START_YEAR} · &#9654; PLAY
-						</span>
-					</div>
-					<h2 class="title">Where it all started.</h2>
-					<p class="lede">
-						Twenty years of startups, apps, and videos. But it didn't start with any of
-						that. It started with a miniDV camera, a bedroom wall painted green, and a
-						friend named Kevin.
-						<strong>Keep scrolling to rewind twenty years.</strong>
-					</p>
-					<!-- A diegetic skip for anyone who came for "what does he do now".
+							<span class="mode" class:off={!done}>
+								&#9209; REWOUND TO {START_YEAR} · &#9654; PLAY
+							</span>
+						</div>
+						<h2 class="title">Where it all started.</h2>
+						<p class="lede">
+							It started with a miniDV camera, a bedroom wall painted green, and a friend
+							named Kevin.
+							<strong>Keep scrolling to rewind twenty years.</strong>
+						</p>
+						<!-- A diegetic skip for anyone who came for "what does he do now".
 					     The pin holds it on screen for the whole scrub, so it can stay
 					     quiet and still never be missed. -->
-					<PlayFilm
-						href="#now"
-						icon="forward"
-						label="Fast-forward to now"
-						color="#ff9c4a" />
-				</div>
+						<PlayFilm
+							href="#now"
+							icon="forward"
+							label="Fast-forward to now"
+							color="#ff9c4a" />
+					</div>
 
-				<div class="cassette" class:done>
-					<svg
-						viewBox="0 0 340 210"
-						role="img"
-						aria-label="A cassette tape rewinding from {currentYear} back to {START_YEAR} as you scroll">
-						<!-- shell -->
-						<rect x="4" y="4" width="332" height="202" rx="16" class="shell" />
-						<!-- corner screws -->
-						<circle cx="22" cy="22" r="3" class="screw" />
-						<circle cx="318" cy="22" r="3" class="screw" />
-						<circle cx="22" cy="188" r="3" class="screw" />
-						<circle cx="318" cy="188" r="3" class="screw" />
-						<!-- label -->
-						<rect x="28" y="20" width="284" height="52" rx="8" class="label" />
-						<text x="170" y="42" class="label-text" text-anchor="middle">
-							EVERYTHING I'VE MADE
-						</text>
-						<!-- The tape is the body of work, not the life — which is why it
+					<div
+						class="cassette"
+						class:done
+						class:offstage={cassetteIn < 0.02}
+						style:opacity={cassetteIn}
+						style:transform={cassetteIn >= 1
+							? 'none'
+							: `translateY(${(1 - cassetteIn) * 18}px)`}>
+						<svg
+							viewBox="0 0 340 210"
+							role="img"
+							aria-label="A cassette tape rewinding from {currentYear} back to {START_YEAR} as you scroll">
+							<!-- shell -->
+							<rect x="4" y="4" width="332" height="202" rx="16" class="shell" />
+							<!-- corner screws -->
+							<circle cx="22" cy="22" r="3" class="screw" />
+							<circle cx="318" cy="22" r="3" class="screw" />
+							<circle cx="22" cy="188" r="3" class="screw" />
+							<circle cx="318" cy="188" r="3" class="screw" />
+							<!-- label -->
+							<rect x="28" y="20" width="284" height="52" rx="8" class="label" />
+							<text x="170" y="42" class="label-text" text-anchor="middle">
+								EVERYTHING I'VE MADE
+							</text>
+							<!-- The tape is the body of work, not the life — which is why it
 						     starts in 2006 and not at birth. -->
-						<text x="170" y="60" class="label-sub" text-anchor="middle">
-							TAPE 01 · {START_YEAR}–TODAY
-						</text>
-						<!-- tape window -->
-						<rect x="58" y="88" width="224" height="84" rx="12" class="window" />
-						<!-- tape packs -->
-						<circle cx="112" cy="130" r={packLeft(p)} class="pack" />
-						<circle cx="228" cy="130" r={packRight(p)} class="pack" />
-						<!-- tape path across the head -->
-						<path
-							d="M 112 {130 + packLeft(p)} L 145 168 L 195 168 L 228 {130 + packRight(p)}"
-							class="tape" />
-						<!-- hubs + spokes, spinning with scroll -->
-						{#each [112, 228] as cx (cx)}
-							<g transform="rotate({spin(p)} {cx} 130)">
-								<circle {cx} cy="130" r="11" class="hub" />
-								{#each [0, 60, 120, 180, 240, 300] as a (a)}
-									<line
-										x1={cx + 5 * Math.cos((a * Math.PI) / 180)}
-										y1={130 + 5 * Math.sin((a * Math.PI) / 180)}
-										x2={cx + 10.5 * Math.cos((a * Math.PI) / 180)}
-										y2={130 + 10.5 * Math.sin((a * Math.PI) / 180)}
-										class="spoke" />
-								{/each}
-							</g>
-						{/each}
-					</svg>
+							<text x="170" y="60" class="label-sub" text-anchor="middle">
+								TAPE 01 · {START_YEAR}–TODAY
+							</text>
+							<!-- tape window -->
+							<rect x="58" y="88" width="224" height="84" rx="12" class="window" />
+							<!-- tape packs -->
+							<circle cx="112" cy="130" r={packLeft(p)} class="pack" />
+							<circle cx="228" cy="130" r={packRight(p)} class="pack" />
+							<!-- tape path across the head -->
+							<path
+								d="M 112 {130 + packLeft(p)} L 145 168 L 195 168 L 228 {130 +
+									packRight(p)}"
+								class="tape" />
+							<!-- hubs + spokes, spinning with scroll -->
+							{#each [112, 228] as cx (cx)}
+								<g transform="rotate({spin(p)} {cx} 130)">
+									<circle {cx} cy="130" r="11" class="hub" />
+									{#each [0, 60, 120, 180, 240, 300] as a (a)}
+										<line
+											x1={cx + 5 * Math.cos((a * Math.PI) / 180)}
+											y1={130 + 5 * Math.sin((a * Math.PI) / 180)}
+											x2={cx + 10.5 * Math.cos((a * Math.PI) / 180)}
+											y2={130 + 10.5 * Math.sin((a * Math.PI) / 180)}
+											class="spoke" />
+									{/each}
+								</g>
+							{/each}
+						</svg>
+					</div>
 				</div>
 
 				<!-- Years fly past the camera as the tape rewinds: the year being
 				     left behind blows up toward the viewer and fades, while the
 				     next one back approaches from the distance. -->
 				<div
+					bind:this={stageEl}
 					class="year-stage"
 					class:done
+					style:transform={yearDrop <= 0.5 ? 'none' : `translateY(${-yearDrop}px)`}
 					role="img"
 					aria-label="Rewinding to {Math.round(yearFloat)}">
 					{#each YEARS as y (y)}
@@ -334,6 +429,55 @@
 		}
 	}
 
+	/* Phase A. An overlay rather than a scene member so the deck underneath keeps
+	   its layout while it is still invisible — nothing reflows when it fades in.
+	   Sits high enough in the frame that it has cleared the top well inside the
+	   bio's share of the scrub. */
+	.bio {
+		position: absolute;
+		top: clamp(4rem, 14vh, 8rem);
+		left: 0;
+		right: 0;
+		z-index: 2;
+		width: min(42rem, 88%);
+		margin-inline: auto;
+		text-align: center;
+		will-change: transform;
+		/* Nothing in here is interactive, and it passes straight over the skip
+		   button on its way out. */
+		pointer-events: none;
+
+		span {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.55rem;
+			font-family: var(--font-mono);
+			font-size: 0.72rem;
+			letter-spacing: 0.32em;
+			text-transform: uppercase;
+			color: rgba(255, 255, 255, 0.6);
+		}
+		i {
+			font-style: normal;
+			color: #ff9c4a;
+			opacity: 0.6;
+		}
+		p {
+			font-size: clamp(1rem, 1.5vw, 1.15rem);
+			line-height: 1.65;
+			color: rgba(255, 255, 255, 0.74);
+			text-wrap: pretty;
+			margin: 0.95rem 0 0;
+		}
+	}
+	/* Gone means gone — out of the a11y tree and out of the way, not merely
+	   translated past the edge of a clipped box. */
+	.bio.offstage,
+	.intro.offstage,
+	.cassette.offstage {
+		visibility: hidden;
+	}
+
 	.scene {
 		position: relative;
 		z-index: 1;
@@ -344,6 +488,15 @@
 		align-items: center;
 		gap: clamp(1rem, 2.5vh, 2rem);
 		text-align: center;
+	}
+	/* A measuring handle, not a layout change: same column, same gap, same
+	   centring the scene already gave these two on its own. */
+	.deck {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: clamp(1rem, 2.5vh, 2rem);
 	}
 	/* Both readouts share one grid cell so the swap is a crossfade in place and
 	   the block below it never shifts. */
@@ -508,6 +661,20 @@
 	@media (prefers-reduced-motion: reduce) {
 		.rew-icon.running {
 			animation: none;
+		}
+		/* The pin has collapsed to one static scene, so the bio has nothing left to
+		   scroll away from — it becomes an ordinary block stacked above it. */
+		:global(.rewind-pin .pin-inner) {
+			flex-direction: column;
+			height: auto;
+			overflow: visible;
+			padding-block: clamp(3rem, 9vh, 6rem);
+			gap: clamp(2rem, 6vh, 3.5rem);
+		}
+		.bio {
+			position: static;
+			width: min(42rem, 100%);
+			will-change: auto;
 		}
 	}
 </style>
