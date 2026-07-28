@@ -167,10 +167,6 @@
 				class="bio"
 				class:offstage={!reduced && bioP >= 1}
 				style:transform={reduced ? 'none' : `translateY(${-scrolled}px)`}>
-				<span>
-					<i aria-hidden="true">&#9654;</i>
-					Playing · today
-				</span>
 				<p>
 					Today I'm the founder of Show&amp;Tour, building software from Kansas City,
 					where I live with my wife and our four kids. Twenty years of startups, apps, and
@@ -190,23 +186,6 @@
 						style:transform={introIn >= 1
 							? 'none'
 							: `translateY(${(1 - introIn) * 14}px)`}>
-						<!-- Two transport modes on the same deck: the rewind ends its own
-					     gesture here, so the leader that follows reads as the tape
-					     playing rather than as a second countdown. -->
-						<div class="eyebrow">
-							<span class="mode" class:off={done}>
-								<span
-									class="rew-icon"
-									class:running={p > 0.01 && !done}
-									aria-hidden="true">
-									◄◄
-								</span>
-								Rewind the tape
-							</span>
-							<span class="mode" class:off={!done}>
-								&#9209; REWOUND TO {START_YEAR} · &#9654; PLAY
-							</span>
-						</div>
 						<h2 class="title">Where it all started.</h2>
 						<p class="lede">
 							It started with a miniDV camera, a bedroom wall painted green, and a friend
@@ -435,7 +414,7 @@
 	   bio's share of the scrub. */
 	.bio {
 		position: absolute;
-		top: clamp(4rem, 14vh, 8rem);
+		top: clamp(4rem, 16vh, 10rem);
 		left: 0;
 		right: 0;
 		z-index: 2;
@@ -447,23 +426,8 @@
 		   button on its way out. */
 		pointer-events: none;
 
-		span {
-			display: inline-flex;
-			align-items: center;
-			gap: 0.55rem;
-			font-family: var(--font-mono);
-			font-size: 0.72rem;
-			letter-spacing: 0.32em;
-			text-transform: uppercase;
-			color: rgba(255, 255, 255, 0.6);
-		}
-		i {
-			font-style: normal;
-			color: #ff9c4a;
-			opacity: 0.6;
-		}
 		p {
-			font-size: clamp(1rem, 1.5vw, 1.15rem);
+			font-size: clamp(1.2rem, 1.5vw, 1.35rem);
 			line-height: 1.65;
 			color: rgba(255, 255, 255, 0.74);
 			text-wrap: pretty;
@@ -482,7 +446,7 @@
 		position: relative;
 		z-index: 1;
 		width: min(64rem, 100%);
-		padding: clamp(1rem, 3vw, 2rem);
+		padding: clamp(3rem, 4vw, 4rem) clamp(1rem, 3vw, 2rem) clamp(1rem, 3vw, 2rem);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -500,43 +464,6 @@
 	}
 	/* Both readouts share one grid cell so the swap is a crossfade in place and
 	   the block below it never shifts. */
-	.eyebrow {
-		display: inline-grid;
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.6);
-		margin-bottom: 0.9rem;
-	}
-	.mode {
-		grid-area: 1 / 1;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.6rem;
-		white-space: nowrap;
-		transition: opacity 260ms ease;
-	}
-	.mode.off {
-		opacity: 0;
-	}
-	.rew-icon {
-		color: #ff9c4a;
-		opacity: 0.6;
-	}
-	.rew-icon.running {
-		animation: rew-pulse 700ms ease-in-out infinite;
-	}
-	@keyframes rew-pulse {
-		0%,
-		100% {
-			opacity: 0.4;
-		}
-		50% {
-			opacity: 1;
-		}
-	}
 	.title {
 		font-size: clamp(2rem, 5vw, 3.4rem);
 		font-weight: 800;
