@@ -1296,17 +1296,9 @@
 		flex-direction: column;
 	}
 	.aftermath-h1 .line {
-		background: linear-gradient(95deg, #ffffff 10%, #ff9d40 60%, #ff5a3c 100%);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
 		padding-bottom: 0.12em;
 	}
 	.aftermath-h1 .line-2 {
-		background: linear-gradient(95deg, #ff9d40, #ff5a3c 80%);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
 		margin-top: -0.12em;
 	}
 	.aftermath-lede {
