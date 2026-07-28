@@ -342,15 +342,14 @@
 					</p>
 					<p>
 						With our new software, we could finally start doing "special effects". The
-						first one was speed manipulation. The second was greenscreen, which is its own
-						section below. Each project added a new tool to the toolbag. Each tool
-						combined with the others to unlock the next one. That stacking is the entire
-						story of this page, really.
+						first one was speed manipulation. The second was greenscreen. Each project
+						added a new tool to the toolbag. Each tool combined with the others to unlock
+						the next one. That stacking is the entire story of this page, really.
 					</p>
 					<p>
 						Around this time I noticed I had a real knack for the technical side. Kevin
-						was the better actor, so he started to act more. I started to film more. That
-						split has basically held to this day.
+						was the better actor, so he started to act more. I started to film more.
+						Together, we made an awesome team.
 					</p>
 				</div>
 			</Reveal>
@@ -359,7 +358,7 @@
 				<Reveal variant="up">
 					<h3 class="vault-heading">
 						<span class="vault-line"></span>
-						The vault — every short, in order
+						The vault
 					</h3>
 					<p class="vault-sub">
 						These are bad. Some of them are wonderful-bad. They are <em>
@@ -398,13 +397,6 @@
 </SectionShell>
 
 <style>
-	.lb-img {
-		display: block;
-		max-width: min(1400px, 92vw);
-		max-height: calc(95svh - 8rem);
-		object-fit: contain;
-		border-radius: 6px;
-	}
 	:global([data-theme='tape']) {
 		--tape-bg: #1a120a;
 		--tape-ink: #f5e6cf;
