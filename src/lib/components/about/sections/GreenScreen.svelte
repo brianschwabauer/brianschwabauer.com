@@ -49,49 +49,6 @@
 		};
 	});
 
-	const xyzImages: GalleryItem[] = [
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen.avif',
-			width: 352,
-			height: 240,
-			caption: 'Floating anchor — turns out you need a tripod',
-			alt: 'Floating anchor — turns out you need a tripod',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-brian_talks_while_floating_with_green_screen.avif',
-			width: 352,
-			height: 240,
-			caption: 'Same thumbs-up bug, different shot',
-			alt: 'Same thumbs-up bug, different shot',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_dances_in_front_of_green_screen_weather_report.avif',
-			width: 352,
-			height: 240,
-			caption: 'Kevin as weatherman #1',
-			alt: 'Kevin as weatherman #1',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_appears_using_green_screen_blanket_visual_effect.avif',
-			width: 352,
-			height: 240,
-			caption: 'Greenscreen blanket → vanishing trick',
-			alt: 'Greenscreen blanket → vanishing trick',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_makes_funny_expression_while_wearing_a_frisbee.avif',
-			width: 352,
-			height: 240,
-			caption: 'Kevin, also wearing a frisbee',
-			alt: 'Kevin, also wearing a frisbee',
-		},
-	];
-
 	const aeTests: GalleryItem[] = [
 		{
 			type: 'image',
@@ -122,9 +79,25 @@
 			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale-hit_by_car.avif',
 			width: 480,
 			height: 320,
-			caption: 'Same effect, in a real film a year later',
-			alt: 'Same effect, in a real film a year later',
+			caption: 'Hit-by-car test, in a real film a year later',
+			alt: 'Hit-by-car test, in a real film a year later',
 			favorite: true,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_dances_in_front_of_green_screen_weather_report.avif',
+			width: 352,
+			height: 240,
+			caption: 'Kevin as weatherman #1',
+			alt: 'Kevin as weatherman #1',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_appears_using_green_screen_blanket_visual_effect.avif',
+			width: 352,
+			height: 240,
+			caption: 'Greenscreen blanket → vanishing trick',
+			alt: 'Greenscreen blanket → vanishing trick',
 		},
 		{
 			type: 'image',
@@ -159,14 +132,6 @@
 		...aeTests,
 		{
 			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone-brian_explains_the_product.avif',
-			width: 480,
-			height: 320,
-			caption: 'Rotoscope test — the Nuisance-B-Gone pitch',
-			alt: 'Rotoscope test — the Nuisance-B-Gone pitch',
-		},
-		{
-			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone-product_makes_chair_disappear_visual_effect.avif',
 			width: 480,
 			height: 320,
@@ -191,7 +156,7 @@
 			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen_2.avif',
 			width: 352,
 			height: 240,
-			caption: 'XYZ News — the floating anchor bug',
+			caption: 'Floating anchor — turns out you need a tripod',
 			alt: 'Brian floating in front of XYZ News greenscreen',
 		},
 		{
@@ -283,9 +248,10 @@
 					<span class="key">painted neon green.</span>
 				</h2>
 				<p class="lede">
-					Suddenly the possibilities felt infinite. We didn't know how to use a chroma
-					key. We didn't know what "chroma key" was. We knew our editing software had a
-					button labeled "green screen". That was enough.
+					After painting a green screen on a bedroom wall, suddenly the possibilities felt
+					infinite. We didn't know how to use a chroma key. We didn't know what "chroma
+					key" was. We knew our editing software had a button labeled "green screen". That
+					was enough.
 				</p>
 				<p class="lede">
 					So we wrote up a fake news broadcast. <strong>XYZ News</strong>
@@ -311,20 +277,6 @@
 						class="key-img"
 						onclick={(e) => gallery?.open(0, e.currentTarget)} />
 				</div>
-			</Reveal>
-		</div>
-
-		<div class="xyz-block">
-			<Reveal variant="up">
-				<h3 class="sub">XYZ News, Episode I</h3>
-				<p>The funniest thing we'd ever made, by a country mile.</p>
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<LightboxGallery
-					key="green-screen-xyz"
-					items={xyzImages}
-					display="masonry-row"
-					size="2" />
 			</Reveal>
 		</div>
 
@@ -376,10 +328,10 @@
 					<p>
 						I also built a small Flash game to launch with the film — you played a pacman
 						eating animated faces. It was my first real taste of programming creating
-						something on screen. I never forgot it.
+						something on screen.
 					</p>
 					<PlayFilm
-						label="Play the short"
+						label="Watch the short"
 						title="Pac-Attack (2008) — full short"
 						meta="2008"
 						color="#22ff90"
@@ -447,13 +399,13 @@
 			<Reveal variant="up">
 				<h3 class="sub">Discovering After Effects</h3>
 				<p>
-					Our editor couldn't take us further. So I picked up After Effects and started
-					running tests — every VFX artist's rite of passage. Clone yourself. Build a
-					lightsaber. Get hit by a car. Animate a logo.
+					Our video editing software couldn't take us further. So I picked up Adobe After
+					Effects and started running tests — every VFX artist's rite of passage. Clone
+					yourself. Build a lightsaber. Get hit by a car. Animate a logo.
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
-				<PeekGallery key="green-screen-vfx" items={vfxImages} peek={6} size="0" />
+				<PeekGallery key="green-screen-vfx" items={vfxImages} size="00" />
 			</Reveal>
 		</div>
 
@@ -696,9 +648,11 @@
 		font-family: var(--font-mono);
 		letter-spacing: 0.04em;
 	}
-	.xyz-block,
 	.ae-block {
 		margin: 4rem 0;
+		p {
+			max-width: 600px;
+		}
 	}
 	/* The gallery is the bulk of the block — it needs to sit off the copy rather
 	   than butt against it. `:global` because the child is a `Reveal` root. */
