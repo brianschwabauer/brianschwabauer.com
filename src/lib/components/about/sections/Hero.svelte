@@ -574,7 +574,7 @@
 		class="hero"
 		id="hero"
 		data-section
-		data-section-label="Today"
+		data-section-label="Delivering Delight"
 		data-section-year={currentYear}
 		class:shake={phase === 'boom'}
 		data-phase={phase}>
