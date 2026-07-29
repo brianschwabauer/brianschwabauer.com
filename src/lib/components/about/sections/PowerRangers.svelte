@@ -314,8 +314,8 @@
 				<p class="lede">
 					We'd spent two summers on short films. We were ready for the big one — a
 					Hollywood feature-length movie. We didn't know how long a script needed to be,
-					so we wrote until we couldn't write anymore. We didn't want to invent characters
-					or world-building, so we borrowed an existing IP. We were thirteen.
+					so we wrote until we couldn't write anymore. It was too much work to invent
+					characters or world-building, so we "borrowed" an existing IP. We were thirteen.
 				</p>
 			</Reveal>
 		</div>
@@ -324,14 +324,15 @@
 			<Reveal>
 				<h3 class="sub">Power Rangers 360 (2007)</h3>
 				<p>
-					Thirty minutes. Our first "feature". The blue ranger goes rogue, joins the
-					villain Vino, fights the red ranger, dies in his arms. Our friends gave up their
-					summer to be in it.
+					Thirty minutes long. Our first "feature". The blue ranger goes rogue, joins the
+					villain Vino, fights the red ranger, and dies in his arms. Not the best film
+					ever, but we learned a valuable lesson about setting ambitious goals — even if
+					you have no chance of reaching them.
 				</p>
 				<p>
-					We held the premiere in my backyard. Bed sheets over the windows, a projector on
-					a borrowed light stand, sundown. The "screen" was 20 feet tall. It was the
-					biggest moment of either of our lives at that point.
+					We held the film premiere in my backyard after sundown. We put white bed sheets
+					over the windows to make a 20ft tall screen and a projector on a card table. It
+					was a pretty big deal&hellip; at the time.
 				</p>
 			</Reveal>
 			<Reveal variant="right" delay={100}>
@@ -370,17 +371,19 @@
 		</div>
 
 		<div class="pr2-block">
-			<Reveal>
+			<Reveal class="bleed-head">
 				<h3 class="sub">Power Rangers 360 II (2008)</h3>
 				<p>
-					We spent weeks writing. The script hit 60+ pages, printed into binders and
-					handed out to a cast that, by then, had grown to a small army of friends. The
-					result was 64 minutes long — counting the credits and a handful of scenes we
-					left way too long because we were chasing a runtime. Worth it.
+					It was the next summer and it was time for BIGGER and BETTER. So we spend weeks
+					writing a 60+ page script and made script binders that we gave to the whole cast
+					- which had grown to a small army of friends (anyone we could find that was
+					available).
 				</p>
 				<p>
-					Zordon, the rangers' leader, was played by Kevin's dog. We filmed him "talking"
-					via peanut butter and comped him into the scene with — what else — greenscreen.
+					It turns out, it's pretty hard to make a film 60+ minutes long in the heat of
+					summer - when everyone just wants to be at the pool. But we stuck through it. We
+					had to pad the film with some unnecessary scenes and a very long credits reel,
+					but we did it. We made a 64 min long film we could be proud of.
 				</p>
 			</Reveal>
 
@@ -392,7 +395,7 @@
 							key="power-rangers-pr2-bts"
 							items={pr2BTSImages}
 							peek={6}
-							size="2" />
+							size="0" />
 					</div>
 				</div>
 			</Reveal>
@@ -429,23 +432,6 @@
 							onclick={(e) => extrasGallery?.open(2, e.currentTarget)} />
 					</Reveal>
 				</div>
-
-				<Reveal>
-					<div class="prose">
-						<p>
-							Filming day after day in midwestern August heat is a different kind of work.
-							By week three, everyone is tired. Performances slip. Composition slips.
-							Patience slips. We learned to plan harder. We learned what call sheets were
-							for. We learned what an actual production day's energy looks like. None of
-							that is in a film school book — you can only learn it by doing it.
-						</p>
-						<p>
-							Looking back, neither of these movies is good. But I'm still proud of them.
-							They were the first time we tried something that should have been out of
-							reach, and finished it.
-						</p>
-					</div>
-				</Reveal>
 			</DeletedScenes>
 		</div>
 	</div>
