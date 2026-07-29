@@ -174,13 +174,8 @@
 	</div>
 
 	<div class="container">
-		<Reveal variant="up">
-			<!-- Closes the cassette metaphor Rewind opened, twenty years back. -->
-			<p class="playback">&#9205; Playback complete — you're all caught up.</p>
-		</Reveal>
-
 		<Reveal>
-			<YearMark year="NOW" subtitle="All of it, actively" color="#00f2c3" />
+			<YearMark year="NOW" color="#00f2c3" />
 		</Reveal>
 
 		<div class="snt">
@@ -208,7 +203,6 @@
 
 		<div class="toolkit">
 			<Reveal variant="up">
-				<div class="eyebrow">THE TOOLKIT</div>
 				<h3>delightstack</h3>
 				<p class="tagline">
 					A full-stack toolkit for building delightful apps on Cloudflare.
@@ -389,7 +383,6 @@
 
 				<Reveal variant="up" delay={180}>
 					<article class="card">
-						<div class="video-tag">VIDEO TOOL</div>
 						<h4>Video Curator</h4>
 						<p class="card-tagline">Intelligent curation for action-camera footage.</p>
 						<p>
@@ -462,11 +455,6 @@
 		<div class="bridge">
 			<Reveal variant="up">
 				<p>The projects keep changing. The way I build them doesn't.</p>
-				<PlayFilm
-					href="#creed"
-					icon="down"
-					label="Why I build this way"
-					color="#00f2c3" />
 			</Reveal>
 		</div>
 	</div>
@@ -973,11 +961,11 @@
 
 	/* ── The bridge into the Creed ──────────────────────────────────────── */
 	.bridge {
-		margin: clamp(5rem, 12vw, 9rem) 0 0;
+		margin: clamp(5rem, 14vw, 15rem) 0 0;
 		text-align: center;
 	}
 	.bridge p {
-		font-size: clamp(1.15rem, 2vw, 1.5rem);
+		font-size: clamp(1.15rem, 3vw, 2rem);
 		line-height: 1.5;
 		letter-spacing: 0.01em;
 		color: rgba(255, 255, 255, 0.72);
