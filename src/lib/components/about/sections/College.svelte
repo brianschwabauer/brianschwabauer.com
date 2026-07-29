@@ -358,16 +358,6 @@
 							alt="Facebook IRL — the zolly shot"
 							ratio="16 / 9"
 							onclick={(e) => gallery?.open(0, e.currentTarget)} />
-						<div class="fb-overlay">
-							<div class="fb-bubble">
-								<div class="fb-name">Brian Schwabauer · just now</div>
-								<div class="fb-status">
-									is feeling <em>infatuated</em>
-									.
-								</div>
-								<div class="fb-meta">142 reactions · 38 comments</div>
-							</div>
-						</div>
 					</div>
 				</div>
 			</Reveal>
@@ -620,10 +610,6 @@
 				<div class="gallery-bleed">
 					<PeekGallery key="college-various" items={variousImages} peek={6} size="1" />
 				</div>
-				<div class="strip-note">
-					MED 365 silent film · chase scene · complexity edit · ART 230 stop-motion · ART
-					300 disturbance · MED 465 One Up
-				</div>
 			</div>
 		</Reveal>
 
@@ -835,12 +821,6 @@
 		color: #7a4dff;
 		margin-bottom: 0.8rem;
 	}
-	.strip-note {
-		font-family: var(--font-mono);
-		font-size: 0.75rem;
-		opacity: 0.6;
-		margin-top: 0.6rem;
-	}
 
 	.fb-block,
 	.node-block,
@@ -882,51 +862,8 @@
 		margin-bottom: 1rem;
 		max-width: 36rem;
 	}
-	.fb-grid strong {
-		color: #ff5fb3;
-	}
 	.fb-card {
 		position: relative;
-	}
-	.fb-overlay {
-		position: absolute;
-		top: 12%;
-		left: 8%;
-		max-width: 70%;
-		font-family: 'Inter', sans-serif;
-		font-size: 0.85rem;
-		pointer-events: none;
-	}
-	.fb-bubble {
-		background: rgba(255, 255, 255, 0.96);
-		color: #1a1a1a;
-		padding: 0.6rem 0.9rem;
-		border-radius: 8px;
-		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-		animation: fbPop 800ms cubic-bezier(0.16, 1, 0.3, 1) both;
-	}
-	@keyframes fbPop {
-		from {
-			transform: scale(0.9) translateY(-10px);
-			opacity: 0;
-		}
-		to {
-			transform: none;
-			opacity: 1;
-		}
-	}
-	.fb-name {
-		font-weight: 700;
-		color: #1877f2;
-		font-size: 0.78rem;
-	}
-	.fb-status em {
-		color: #1877f2;
-	}
-	.fb-meta {
-		font-size: 0.7rem;
-		color: #666;
-		margin-top: 0.2rem;
 	}
 
 	/* Above the title, not beside it: it labels the whole project, so it reads
