@@ -212,7 +212,6 @@
 
 		<div class="lockup">
 			<Reveal>
-				<div class="eyebrow">FROM FREELANCER → FOUNDER</div>
 				<h2 class="title">
 					I stopped
 					<br />
@@ -234,10 +233,7 @@
 			<div class="card-head">
 				<Reveal>
 					<div class="year-tag">2016</div>
-					<h3 class="sub">
-						<span class="loc">[SA]</span>
-						Tower of the Americas — a kiosk companion app
-					</h3>
+					<h3 class="sub">Tower of the Americas — a kiosk companion app</h3>
 					<p>
 						The Tower of the Americas (in San Antonio) hired me to build an immersive
 						companion app. The idea: visitors get a tablet on a kiosk mount, point it
@@ -253,7 +249,6 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<div class="gal-eyebrow">FROM THE TOWER SHOOT · {towerImages.length} PHOTOS</div>
 				<div class="gallery-contained">
 					<LightboxGallery
 						key="entrepreneurship-tower"
@@ -337,23 +332,23 @@
 					<div class="year-tag">2017–2018</div>
 					<h3 class="sub">Wyoti — partnered WordPress agency</h3>
 					<p>
-						Spun out of the Engagement Grower work — we partnered with Wyoti to build
-						custom WordPress sites and plugins for clients. A solid bridge between
-						freelance and product.
+						Spun out of the Engagement Grower work — I partnered with Wyoti to build
+						custom WordPress sites and plugins for clients.
 					</p>
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<p class="archive-lead">Both companies' sites, archived in amber:</p>
 				<ArchiveTabs
 					tabs={[
 						{
 							title: 'Engagement Grower',
 							src: 'http://cdn.brianschwabauer.com/site/engagementgrower/index.html',
+							host: 'engagementgrower.com',
 						},
 						{
 							title: 'Wyoti',
 							src: 'https://cdn.brianschwabauer.com/site/wyoti/index.html',
+							host: 'wyoti.com',
 						},
 					]} />
 			</Reveal>
@@ -432,35 +427,6 @@
 	.lockup {
 		margin-bottom: 4rem;
 	}
-	.gal-eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		text-transform: uppercase;
-		color: #00d6ff;
-		margin-bottom: 0.75rem;
-	}
-	/* Slate rule: the kicker runs into a hairline that carries the eye across the
-	   measure instead of stopping dead. It uses the width the stacked kicker left
-	   empty, and gives this chapter an opening that isn't the same three moves
-	   every other one makes. */
-	.eyebrow {
-		display: flex;
-		align-items: center;
-		gap: 0.9rem;
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #00d6ff;
-		margin-bottom: 1rem;
-	}
-	.eyebrow::after {
-		content: '';
-		flex: 1;
-		height: 1px;
-		background: currentColor;
-		opacity: 0.3;
-	}
 	.title {
 		font-size: clamp(2.4rem, 7vw, 5rem);
 		font-weight: 900;
@@ -523,19 +489,6 @@
 		flex-wrap: wrap;
 		align-items: baseline;
 		gap: 0.4rem;
-	}
-	.loc {
-		font-family: var(--font-mono);
-		font-size: 0.65rem;
-		letter-spacing: 0.2em;
-		padding: 0.15rem 0.55rem;
-		background: #00d6ff;
-		color: #052a35;
-		font-weight: 800;
-		border-radius: 4px;
-		margin-right: 0.35rem;
-		display: inline-block;
-		transform: translateY(-3px);
 	}
 	.card p {
 		line-height: 1.6;
