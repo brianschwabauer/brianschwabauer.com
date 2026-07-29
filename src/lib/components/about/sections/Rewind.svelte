@@ -133,6 +133,14 @@
 			{@const introIn = reduced ? 1 : fadeFrom(bioP, 0.3)}
 			{@const cassetteIn = reduced ? 1 : fadeFrom(bioP, 0.42)}
 			{@const yearDrop = reduced ? 0 : yearLift * (1 - easeOut(bioP))}
+			<!-- The counter only earns its place once the tape is actually running:
+			     before that it is motion competing with the bio for a reader who has
+			     not been given anything to scrub yet. It arrives last, just ahead of
+			     the first year. -->
+			{@const railIn = reduced ? 1 : fadeFrom(bioP, 0.62)}
+			<!-- The bio leaves on a fade as well as a rise, so it is gone rather than
+			     merely higher by the time the title fades up underneath it. -->
+			{@const bioOut = reduced ? 1 : 1 - clamp01((bioP - 0.06) / 0.26)}
 			<!-- A tape counter up the left flank, climbing at exactly the scroll's own
 			     rate. The scene in the middle is pinned; this is what keeps the scroll
 			     feeling like scrolling. Left only — the year scrubber owns the right
@@ -150,7 +158,13 @@
 					<i class="tick" style:top="{offset}px"></i>
 				{/each}
 			{/snippet}
-			<div class="rail"><PinDrift {scrolled} period={96} mark={rung} /></div>
+			<div
+				class="rail"
+				class:offstage={railIn < 0.02}
+				style:opacity={railIn}
+				aria-hidden="true">
+				<PinDrift {scrolled} period={96} mark={rung} />
+			</div>
 
 			<!-- The room changes colour as the tape runs back: cool indigo at today,
 			     warm sepia at 2006. It lives inside the pin because the pinned inner
@@ -165,7 +179,8 @@
 			<div
 				bind:this={bioEl}
 				class="bio"
-				class:offstage={!reduced && bioP >= 1}
+				class:offstage={!reduced && bioOut < 0.02}
+				style:opacity={bioOut}
 				style:transform={reduced ? 'none' : `translateY(${-scrolled}px)`}>
 				<p>
 					Today I'm the founder of Show&amp;Tour, building software from Kansas City,
@@ -437,6 +452,7 @@
 	/* Gone means gone — out of the a11y tree and out of the way, not merely
 	   translated past the edge of a clipped box. */
 	.bio.offstage,
+	.rail.offstage,
 	.intro.offstage,
 	.cassette.offstage {
 		visibility: hidden;
