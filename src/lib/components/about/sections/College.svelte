@@ -4,61 +4,455 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
-	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import PlayFilm from '../primitives/PlayFilm.svelte';
-	import { Gallery, type GalleryItem } from '@delightstack/components/media';
+	import { Gallery, Video, type GalleryItem } from '@delightstack/components/media';
+	import { Button } from '@delightstack/components/actions';
+	import { Expand } from '@delightstack/components/display';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
-	const variousImages: GalleryItem[] = [
-		{
+	const CDN = 'https://cdn.brianschwabauer.com/media/';
+	function photo(
+		file: string,
+		width: number,
+		height: number,
+		caption?: string,
+	): GalleryItem {
+		return {
 			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2012-02-02_med_365-silent_film-character_looks_up_dramatically.avif',
-			width: 1080,
-			height: 608,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2012-02-02_med_365-silent_film-character_throws_ball_against_wall.avif',
-			width: 1080,
-			height: 608,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2012-04-12_med_365-chase_scene-character_hit_by_car.avif',
-			width: 1080,
-			height: 608,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2012-05-10_med_365-complexity-character_drunkily_stumbles_out_of_bar.avif',
-			width: 1080,
-			height: 608,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2012-12-06_art_230_final-stop_action_animation_of_two_people_on_steps.avif',
-			width: 480,
-			height: 204,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-04-10_art_300-project_3-disturbance-stillframe_of_character_walking_in_hand_drawn_scene.avif',
-			width: 1920,
-			height: 1080,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up-close_up_shots_on_two_guys_staring_eachother_down.avif',
-			width: 480,
-			height: 270,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up-quick_cuts_between_two_character_close_ups.avif',
-			width: 480,
-			height: 204,
-		},
+			src: `${CDN}${file}`,
+			width,
+			height,
+			...(caption ? { caption, alt: caption } : {}),
+		};
+	}
+
+	// Every set photo from the Katie Bauer's Breakup shoot, keyed by shoot day.
+	const KATIE_BAUER_BTS: GalleryItem[] = (
+		[
+			[
+				'2014-02-22',
+				[
+					['093913', 1536],
+					['095449', 1536],
+				],
+			],
+			[
+				'2014-03-21',
+				[
+					['120858', 1536],
+					['125906', 1536],
+					['133051', 1536],
+					['184420', 1536],
+					['200723', 1536],
+				],
+			],
+			[
+				'2014-03-22',
+				[
+					['121722', 1536],
+					['121746', 1536],
+					['124155', 1536],
+					['163203', 1536],
+					['192230', 1536],
+					['192756', 1536],
+				],
+			],
+			[
+				'2014-03-23',
+				[
+					['095102', 1536],
+					['111947', 1536],
+					['161416', 1536],
+					['171312', 1536],
+					['190043', 1536],
+					['202421', 1536],
+				],
+			],
+			[
+				'2014-03-28',
+				[
+					['140346', 1536],
+					['140431', 1536],
+					['140449', 1536],
+					['144028', 1536],
+					['151422', 1536],
+					['153144', 1536],
+					['153200', 1536],
+				],
+			],
+			[
+				'2014-03-29',
+				[
+					['131925', 1536],
+					['131941', 1536],
+					['172611', 1536],
+					['175106', 1536],
+					['182642', 1152],
+					['191231', 1536],
+				],
+			],
+			[
+				'2014-03-30',
+				[
+					['135911', 1536],
+					['135915', 1536],
+					['140832', 1536],
+					['141614', 1536],
+					['155731', 1536],
+					['155806', 1536],
+					['155814', 1536],
+				],
+			],
+		] as const
+	).flatMap(([day, times]) =>
+		times.map(([time, height]) =>
+			photo(
+				`${day}_med_562-katie_bauers_breakup_film-behind_the_scenes_set_photo_${time}.avif`,
+				2048,
+				height,
+				"Katie Bauer's Breakup — on set",
+			),
+		),
+	);
+
+	// One camera roll for the whole era: class-project stillframes, every set
+	// photo, and the college-years photos that don't appear anywhere else on the
+	// page. Roughly chronological.
+	const CAMERA_ROLL: GalleryItem[] = [
+		photo(
+			'2012-02-02_med_365-silent_film-character_looks_up_dramatically.avif',
+			1080,
+			608,
+			'MED 365 — silent film',
+		),
+		photo(
+			'2012-02-02_med_365-silent_film-character_throws_ball_against_wall.avif',
+			1080,
+			608,
+			'MED 365 — silent film',
+		),
+		photo(
+			'2012-04-12_med_365-chase_scene-character_hit_by_car.avif',
+			1080,
+			608,
+			'MED 365 — chase scene',
+		),
+		photo(
+			'2012-04-27_facebook_short_film-everyone_likes_a_post.avif',
+			480,
+			270,
+			'Facebook in Real Life — everyone "likes" a post',
+		),
+		photo(
+			'2012-05-10_med_365-complexity-character_drunkily_stumbles_out_of_bar.avif',
+			1080,
+			608,
+			'MED 365 — Complexity',
+		),
+		photo(
+			'2012-05-01_premier_studios_summer_internship-interns_group_photo.avif',
+			2048,
+			1375,
+			'Premier Studios internship — the interns',
+		),
+		photo(
+			'2012-06-24_premier_studios_summer_internship-target_video_shoot_behind_the_scenes_1.avif',
+			2048,
+			1536,
+			'Premier Studios internship — Target shoot',
+		),
+		photo(
+			'2012-06-24_premier_studios_summer_internship-target_video_shoot_behind_the_scenes_2.avif',
+			2048,
+			1536,
+			'Premier Studios internship — Target shoot',
+		),
+		photo(
+			'2012-06-24_premier_studios_summer_internship-target_video_shoot_behind_the_scenes_3.avif',
+			2048,
+			1536,
+			'Premier Studios internship — Target shoot',
+		),
+		photo(
+			'2012-07-12_premier_studios_summer_internship-green_screen_shoot_1.avif',
+			2048,
+			1536,
+			'Premier Studios internship — green screen shoot',
+		),
+		photo(
+			'2012-07-12_premier_studios_summer_internship-green_screen_shoot_2.avif',
+			2048,
+			1536,
+			'Premier Studios internship — green screen shoot',
+		),
+		photo(
+			'2012-08-01_premier_studios_summer_intership-flash_mob_shoot_group_photo.avif',
+			1950,
+			1309,
+			'Premier Studios internship — flash mob shoot',
+		),
+		photo(
+			'2012-11-09_live_life_green_festival_at_missouri_state_university-brian_holding_first_place_trophy.jpg',
+			960,
+			720,
+			'First place at the Live Life Green festival',
+		),
+		photo(
+			'2012-12-06_art_230_final-stop_action_animation_of_two_people_on_steps.avif',
+			480,
+			204,
+			'ART 230 final — stop motion',
+		),
+		photo(
+			'2013-09-17_video_shoot_behind_the_scenes-filming_dorm_talent_show.avif',
+			2048,
+			1536,
+			'Filming the dorm talent show',
+		),
+		photo(
+			'REDACTED',
+			448,
+			902,
+			'MED 290 — Flash animation ad',
+		),
+		photo(
+			'2013-10-29_ditch_the_pitch-short_film_snapshot-michael_in_silly_light_bulb_costume.jpg',
+			1920,
+			1080,
+			'Ditch the Pitch',
+		),
+		...KATIE_BAUER_BTS,
+		photo(
+			'2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_02.avif',
+			2048,
+			1536,
+			'NODE — behind the scenes',
+		),
+		photo(
+			'2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_06.avif',
+			2048,
+			1536,
+			'NODE — behind the scenes',
+		),
+		photo(
+			'2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_07.avif',
+			2048,
+			1536,
+			'NODE — behind the scenes',
+		),
+		photo(
+			'2014-04-10_art_300-project_3-behind_the_scenes-green_screen_1.avif',
+			480,
+			270,
+			'ART 300 — Disturbance, green screen',
+		),
+		photo(
+			'2014-04-10_art_300-project_3-behind_the_scenes-green_screen_2.avif',
+			480,
+			270,
+			'ART 300 — Disturbance, green screen',
+		),
+		photo(
+			'2014-04-10_art_300-project_3-behind_the_scenes-green_screen_3.avif',
+			480,
+			270,
+			'ART 300 — Disturbance, green screen',
+		),
+		photo(
+			'2014-04-10_art_300-project_3-disturbance-behind_the_scenes-green_screen_clip.avif',
+			1080,
+			608,
+			'ART 300 — Disturbance, green screen',
+		),
+		photo(
+			'2014-04-10_art_300-project_3-disturbance-stillframe_of_character_walking_in_hand_drawn_scene.avif',
+			1920,
+			1080,
+			'ART 300 — Disturbance, finished shot',
+		),
+		photo(
+			'2014-04-10_art_300-project_3-finished_vfx_shot_1.avif',
+			480,
+			270,
+			'ART 300 — Disturbance, finished VFX',
+		),
+		photo(
+			'2014-04-10_art_300-project_3-finished_vfx_shot_2.avif',
+			480,
+			270,
+			'ART 300 — Disturbance, finished VFX',
+		),
+		photo(
+			'2014-04-10_art_300-project_3-finished_vfx_shot_3.avif',
+			480,
+			270,
+			'ART 300 — Disturbance, finished VFX',
+		),
+		photo('2014-05-03_brian_filming_news_anchor.jpg', 960, 720, 'Filming a news anchor'),
+		photo(
+			'2014-05-08_video_shoot_behind_the_scenes-green_screen_shoot_at_dorm.avif',
+			2048,
+			1536,
+			'Green screen shoot at the dorm',
+		),
+		photo(
+			'2014-05-15_art_300_final_project-glimpse-zach_laying_on_ground_green_screen_visual_effect.avif',
+			480,
+			270,
+			'ART 300 final — Glimpse',
+		),
+		photo(
+			'2014-05-15_art_300_final_project-glimpse-zach_walking_through_virtual_scene_visual_effect.avif',
+			480,
+			270,
+			'ART 300 final — Glimpse',
+		),
+		photo(
+			'2014-05-15_art_300_final_project-power_trip-character_summons_toothbrush_visual_effect.avif',
+			480,
+			270,
+			'ART 300 final — Power Trip',
+		),
+		photo(
+			'2014-06-16_video_shoot_behind_the_scenes-green_screen_shoot_of_music_video_at_church.avif',
+			2048,
+			1536,
+			'Green screen music video shoot at church',
+		),
+		photo('2014-09-24_med_465-one_up-film_snapshot_1.jpg', 1920, 1080, 'One Up'),
+		photo(
+			'2014-09-24_med_465-one_up-close_up_shots_on_two_guys_staring_eachother_down.avif',
+			480,
+			270,
+			'One Up',
+		),
+		photo(
+			'2014-09-24_med_465-one_up-quick_cuts_between_two_character_close_ups.avif',
+			480,
+			204,
+			'One Up',
+		),
+		photo(
+			'2014-09-15_med_465-one_up-behind_the_scenes_set_photo_01.jpg',
+			2048,
+			1366,
+			'One Up — on set',
+		),
+		photo(
+			'2014-09-15_med_465-one_up-behind_the_scenes_set_photo_02.jpg',
+			2048,
+			1366,
+			'One Up — on set',
+		),
+		photo(
+			'2014-09-15_med_465-one_up-behind_the_scenes_set_photo_03.avif',
+			2048,
+			1366,
+			'One Up — on set',
+		),
+		photo(
+			'2014-09-15_med_465-one_up-behind_the_scenes_set_photo_04.jpg',
+			2048,
+			1366,
+			'One Up — on set',
+		),
+		photo(
+			'2014-09-15_med_465-one_up-behind_the_scenes_set_photo_05.jpg',
+			2048,
+			1366,
+			'One Up — on set',
+		),
+		photo(
+			'2014-09-15_med_465-one_up-behind_the_scenes_set_photo_06.jpg',
+			2048,
+			1366,
+			'One Up — on set',
+		),
+		photo(
+			'2014-09-15_med_465-one_up-behind_the_scenes_set_photo_07.jpg',
+			2048,
+			1366,
+			'One Up — on set',
+		),
+		photo(
+			'2014-09-15_med_465-one_up-behind_the_scenes_set_photo_08.jpg',
+			640,
+			640,
+			'One Up — on set',
+		),
+		photo(
+			'2014-10-01_cinematography_class_film_shoot-behind_the_scenes_photo_1.avif',
+			2048,
+			1536,
+			'Cinematography class shoot',
+		),
+		photo(
+			'2014-10-01_cinematography_class_film_shoot-behind_the_scenes_photo_2.avif',
+			2048,
+			1536,
+			'Cinematography class shoot',
+		),
+		photo(
+			'2014-11-01_med_465_film_shoot-behind_the_scenes.avif',
+			2048,
+			1365,
+			'MED 465 film shoot',
+		),
+		photo(
+			'2015-04-12_split_life-sato_48-behind_the_scenes-group_meetup.avif',
+			2048,
+			1152,
+			'Split Life — the 48-hour crew',
+		),
+		photo(
+			'2015-04-12_split_life-sato_48-behind_the_scenes-group-planning_session_around_kitchen_table.avif',
+			2048,
+			1152,
+			'Split Life — planning around the kitchen table',
+		),
+		photo(
+			'2015-04-12_split_life-sato_48-behind_the_scenes-excel_cheatsheet_for_filming_script.jpg',
+			1326,
+			676,
+			'Split Life — the master timecode spreadsheet',
+		),
+		photo(
+			'2015-04-12_split_life-sato_48-behind_the_scenes-film_poster.jpg',
+			1167,
+			1803,
+			'Split Life — poster',
+		),
+		photo(
+			'2015-04-14_kats_film_project-behind_the_scenes_set_photo_1.avif',
+			537,
+			508,
+			"On set for Kat's film",
+		),
+		photo(
+			'2015-04-14_kats_film_project-behind_the_scenes_set_photo_2.avif',
+			960,
+			720,
+			"On set for Kat's film",
+		),
+		photo(
+			'2015-04-22_legacy-behind_the_scenes-fog_lighting_test_in_house.jpg',
+			2048,
+			1152,
+			'Legacy — fog lighting test',
+		),
+		photo(
+			'2015-05-15_missouri_state_university_graduation-brian_and_jordan_hold_diploma.avif',
+			2048,
+			1365,
+			'Graduation day',
+		),
+		photo(
+			'2015-05-15_missouri_state_university_graduation-brian_and_jordan_selfie.avif',
+			1920,
+			825,
+			'Graduation day',
+		),
 	];
 
 	// The finished frame first, then the rig that made it — the whole NODE
@@ -103,41 +497,6 @@
 			height: 1536,
 			caption: 'The cast',
 			alt: 'NODE behind the scenes — the whole cast',
-		},
-	];
-
-	const oneUpBTSImages: GalleryItem[] = [
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_01.jpg',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_02.jpg',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_03.avif',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_04.jpg',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_05.jpg',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_06.jpg',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_07.jpg',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-09-15_med_465-one_up-behind_the_scenes_set_photo_08.jpg',
 		},
 	];
 
@@ -303,6 +662,7 @@
 		},
 	];
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
+	let split_life_notes = $state(false);
 </script>
 
 <SectionShell id="college" year="2012" label="College" theme="college">
@@ -442,84 +802,72 @@
 			</Reveal>
 		</div>
 
-		<!-- PickVid is a side project rather than one of the films this section is
-		     about, so it sits after them. -->
-		<div class="pickvid">
-			<Reveal>
-				<h3 class="sub">PickVid (2014) — a tiny social app</h3>
-				<p>
-					Another group project in the same class. Idea: a group of friends downloads the
-					app and gets a prompt ("take a sad selfie", "take a picture of something
-					funny"). Everyone uploads their photo to a shared S3 bucket. The app stitches
-					all the photos into a single hollywood-style movie trailer with intense music
-					and explosions — your friends as the cast. We shipped a working prototype.
-				</p>
-				<PlayFilm
-					label="Play the promo"
-					title="PickVid (2014) — promo video / demo"
-					meta="2014"
-					color="#7a4dff"
-					onclick={(e) => gallery?.open(5, e.currentTarget)} />
-			</Reveal>
+		<!-- The two side projects — a game and an app, not films — get matching
+		     app cards, stacked and held to the same contained width. -->
+		<Reveal>
+			<div class="side-projects">
+				<article class="app-card bear-bus">
+					<h3 class="sub">Bear Bus Bash — my first "finished" game</h3>
+					<p>
+						A Flash bus-driving game where you pick up MSU campus bus passengers, collect
+						coins, and dodge other cars. There are levels for each real MSU campus route,
+						three drivers with different stats, and a real scoring + achievements system.
+						A teammate hand-drew all the art. I did the programming, animation, and most
+						of the motion graphics.
+					</p>
+					<p>
+						Flash couldn't really do 3D in 2013, so I faked depth with scaled 2D sprites
+						and crossfade swaps of the bus model from different angles. Clunky, but
+						believable.
+					</p>
+					<PlayFilm
+						label="Play the gameplay"
+						title="Bear Bus Bash (2013) — full gameplay recording"
+						meta="2013 · full run"
+						color="#7a4dff"
+						onclick={(e) => gallery?.open(9, e.currentTarget)} />
+					<div class="bb-grid">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording-main_menu.avif"
+							alt="Bear Bus Bash — main menu"
+							ratio="4 / 3"
+							onclick={(e) => gallery?.open(6, e.currentTarget)} />
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording-gameplay_clip.avif"
+							alt="Bear Bus Bash — gameplay"
+							ratio="4 / 3"
+							onclick={(e) => gallery?.open(7, e.currentTarget)} />
+					</div>
+				</article>
 
-			<Reveal variant="up" delay={100}>
-				<div class="pickvid-grid">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-demo_on_phone.avif"
-						alt="PickVid demo on a phone"
-						ratio="9 / 16"
-						onclick={(e) => gallery?.open(3, e.currentTarget)} />
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-logo_animation.avif"
-						alt="PickVid logo animation"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(4, e.currentTarget)} />
-				</div>
-			</Reveal>
-		</div>
-
-		<div class="bear-bus">
-			<Reveal>
-				<h3 class="sub">Bear Bus Bash — my first "finished" game</h3>
-				<p>
-					A Flash bus-driving game where you pick up MSU campus bus passengers, collect
-					coins, and dodge other cars. There are levels for each real MSU campus route,
-					three drivers with different stats, and a real scoring + achievements system. A
-					teammate hand-drew all the art. I did the programming, animation, and most of
-					the motion graphics.
-				</p>
-				<p>
-					Flash couldn't really do 3D in 2013, so I faked depth with scaled 2D sprites and
-					crossfade swaps of the bus model from different angles. Clunky, but believable.
-				</p>
-				<PlayFilm
-					label="Play the gameplay"
-					title="Bear Bus Bash (2013) — full gameplay recording"
-					meta="2013 · full run"
-					color="#7a4dff"
-					onclick={(e) => gallery?.open(9, e.currentTarget)} />
-			</Reveal>
-
-			<Reveal variant="up" delay={100}>
-				<div class="bb-grid">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording-main_menu.avif"
-						alt="Bear Bus Bash — main menu"
-						ratio="4 / 3"
-						onclick={(e) => gallery?.open(6, e.currentTarget)} />
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording-gameplay_clip.avif"
-						alt="Bear Bus Bash — gameplay"
-						ratio="4 / 3"
-						onclick={(e) => gallery?.open(7, e.currentTarget)} />
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2013-12-02_bear_bus_bash_flash_game_screen_recording-victory_results_page.avif"
-						alt="Bear Bus Bash — victory"
-						ratio="4 / 3"
-						onclick={(e) => gallery?.open(8, e.currentTarget)} />
-				</div>
-			</Reveal>
-		</div>
+				<article class="app-card pickvid">
+					<div class="pickvid-grid">
+						<div>
+							<h3 class="sub">PickVid (2014) — a tiny social app</h3>
+							<p>
+								Another group project in the same class. Idea: a group of friends
+								downloads the app and gets a prompt ("take a sad selfie", "take a picture
+								of something funny"). Everyone uploads their photo to a shared S3 bucket.
+								The app stitches all the photos into a single hollywood-style movie
+								trailer with intense music and explosions — your friends as the cast. We
+								shipped a working prototype.
+							</p>
+							<PlayFilm
+								label="Play the promo"
+								title="PickVid (2014) — promo video / demo"
+								meta="2014"
+								color="#7a4dff"
+								onclick={(e) => gallery?.open(5, e.currentTarget)} />
+						</div>
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2014-05-12_pickvid_promo_video-demo_on_phone.avif"
+							alt="PickVid demo on a phone"
+							ratio="9 / 16"
+							onclick={(e) => gallery?.open(3, e.currentTarget)} />
+					</div>
+				</article>
+			</div>
+		</Reveal>
 
 		<!-- The two SATO 48 films, side by side: same race, one year apart, and
 		     the pairing is the point — Fugue is the swing that set up Split
@@ -539,12 +887,12 @@
 					</p>
 				</Reveal>
 				<Reveal variant="up" delay={100}>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/poster.jpg"
-						alt="Fugue (2014) — 48-hour film"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(17, e.currentTarget)} />
+					<Video
+						src="https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/master.m3u8"
+						poster="https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/poster.jpg"
+						title="Fugue (2014) — 48-hour film"
+						aspect_ratio="16 / 9"
+						preload="none" />
 				</Reveal>
 			</div>
 
@@ -562,25 +910,17 @@
 						she's gone. She comes back. He gets stuck. They turn out to know each other. It
 						ends.
 					</p>
-				</Reveal>
-				<!-- Player and its production notes share the column's second subgrid
-				     row, so the notes hang off this film without adding a third row that
-				     Fugue's column would have to leave empty. -->
-				<div class="sato-film">
-					<!-- No stills: the poster already IS the split screen, so a pair of
-					     stillframes above it only said the same thing twice. -->
-					<Reveal variant="up" delay={100}>
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48/poster.jpg"
-							alt="Split Life (2015) — 48-hour dual-perspective oner"
-							ratio="16 / 9"
-							video
-							onclick={(e) => gallery?.open(12, e.currentTarget)} />
-					</Reveal>
-
-					<!-- How the two halves were synchronised. -->
-					<Reveal>
-						<div class="closing">
+					<!-- The button collapses away as the notes expand — a one-way door,
+					     so no "Read less" state to manage. -->
+					<Expand show={!split_life_notes}>
+						<div>
+							<Button transparent size="1" onclick={() => (split_life_notes = true)}>
+								Read more
+							</Button>
+						</div>
+					</Expand>
+					<Expand bind:show={split_life_notes}>
+						<div class="split-notes">
 							<p>
 								To make the two shots line up frame-perfect over multiple minutes, I built
 								a master spreadsheet of every event in the film with exact timecodes. I
@@ -599,119 +939,107 @@
 								proud of that.
 							</p>
 						</div>
-					</Reveal>
-				</div>
+					</Expand>
+				</Reveal>
+				<!-- No stills: the poster already IS the split screen, so a pair of
+				     stillframes above it only said the same thing twice. -->
+				<Reveal variant="up" delay={100}>
+					<Video
+						src="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48/master.m3u8"
+						poster="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48/poster.jpg"
+						title="Split Life (2015) — 48-hour dual-perspective oner"
+						aspect_ratio="2534 / 1080"
+						preload="none" />
+				</Reveal>
 			</div>
 		</div>
 
 		<Reveal variant="up">
 			<div class="strip">
-				<div class="strip-eyebrow bleed-head">A WHIRLWIND OF CLASS PROJECTS</div>
-				<div class="gallery-bleed">
-					<PeekGallery key="college-various" items={variousImages} peek={6} size="1" />
+				<div class="strip-eyebrow bleed-head">
+					A WHIRLWIND OF CLASS PROJECTS — THE CAMERA ROLL
 				</div>
-			</div>
-		</Reveal>
-
-		<Reveal variant="up" delay={120}>
-			<div class="oneup-bts">
-				<div class="bts-eyebrow bleed-head">ONE UP — BTS</div>
 				<div class="gallery-bleed">
-					<PeekGallery key="college-oneup-bts" items={oneUpBTSImages} peek={6} size="1" />
+					<PeekGallery
+						key="college-camera-roll"
+						items={CAMERA_ROLL}
+						peek={18}
+						display="masonry"
+						size="0" />
 				</div>
 			</div>
 		</Reveal>
 
 		<!-- The other films from these years. -->
-		<DeletedScenes scenes={4}>
-			<div class="more-projects">
-				<Reveal>
-					<h3 class="sub-small">Other films from these years:</h3>
-				</Reveal>
-
-				<Reveal variant="up" delay={80}>
-					<div class="film-quad">
-						<article class="film-quad-card">
-							<h4>
-								Katie Bauer's Breakup <span class="film-year">2014</span>
-							</h4>
-							<p>
-								Directing-class group film. I script-supervised, edited, and did the VFX.
-								The character realizes she's inside a film and tries to escape it; boom
-								mic crashes the frame on purpose.
-							</p>
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2014-05-15_katie_bauers_breakup/poster.jpg"
-								alt="Katie Bauer's Breakup (2014)"
-								ratio="16 / 9"
-								video
-								onclick={(e) => gallery?.open(13, e.currentTarget)} />
-						</article>
-						<article class="film-quad-card">
-							<h4>
-								One Up <span class="film-year">2014</span>
-							</h4>
-							<p>
-								Cinematography-class short. Two guys try to one-up each other to land the
-								same job. Real lighting setups, real coverage.
-							</p>
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up/poster.jpg"
-								alt="One Up (2014)"
-								ratio="16 / 9"
-								video
-								onclick={(e) => gallery?.open(14, e.currentTarget)} />
-						</article>
-						<article class="film-quad-card">
-							<h4>
-								Nice to Meet You <span class="film-year">2014</span>
-							</h4>
-							<p>
-								Senior-thesis warmup, shot in Canon RAW on a 5D mkIV with Magic Lantern
-								firmware. The girl on the bench was on the phone the whole time.
-							</p>
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2014-09-02_nice_to_meet_you/poster.jpg"
-								alt="Nice to Meet You (2014)"
-								ratio="16 / 9"
-								video
-								onclick={(e) => gallery?.open(15, e.currentTarget)} />
-						</article>
-						<article class="film-quad-card">
-							<h4>
-								Legacy <span class="film-year">2015</span>
-							</h4>
-							<p>
-								A quiet 2-character short for my directing class. A husband obsessed with
-								his career, a wife who wants him home. Conversation as conflict.
-							</p>
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2015-04-22_legacy/poster.jpg"
-								alt="Legacy (2015)"
-								ratio="16 / 9"
-								video
-								onclick={(e) => gallery?.open(16, e.currentTarget)} />
-						</article>
-					</div>
-				</Reveal>
-			</div>
-		</DeletedScenes>
-
-		<div class="bassless">
+		<div class="more-projects">
 			<Reveal>
-				<h3 class="sub">Bassless Ideas (2015) — a senior-year band</h3>
-				<p>
-					Kevin came to Missouri State for grad school my senior year (he finished Baylor
-					a year early). We moved into a house and started writing music again. The result
-					was a band called <strong>Bassless Ideas</strong>
-					— two short EPs, a few ridiculous songs, a few serious ones. Still online, still occasionally
-					listened to.
-				</p>
-				<p>
-					<a href="https://basslessideas.com" target="_blank" rel="noopener">
-						basslessideas.com
-					</a>
-				</p>
+				<h3 class="sub-small">Other films from these years:</h3>
+			</Reveal>
+
+			<Reveal variant="up" delay={80}>
+				<div class="film-quad">
+					<article class="film-quad-card">
+						<h4>
+							Katie Bauer's Breakup <span class="film-year">2014</span>
+						</h4>
+						<p>
+							Directing-class group film. I script-supervised, edited, and did the VFX.
+							The character realizes she's inside a film and tries to escape it; boom mic
+							crashes the frame on purpose.
+						</p>
+						<Video
+							src="https://cdn.brianschwabauer.com/media/2014-05-15_katie_bauers_breakup/master.m3u8"
+							poster="https://cdn.brianschwabauer.com/media/2014-05-15_katie_bauers_breakup/poster.jpg"
+							title="Katie Bauer's Breakup (2014)"
+							aspect_ratio="16 / 9"
+							preload="none" />
+					</article>
+					<article class="film-quad-card">
+						<h4>
+							One Up <span class="film-year">2014</span>
+						</h4>
+						<p>
+							Cinematography-class short. Two guys try to one-up each other to land the
+							same job. Real lighting setups, real coverage.
+						</p>
+						<Video
+							src="https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up/master.m3u8"
+							poster="https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up/poster.jpg"
+							title="One Up (2014)"
+							aspect_ratio="16 / 9"
+							preload="none" />
+					</article>
+					<article class="film-quad-card">
+						<h4>
+							Nice to Meet You <span class="film-year">2014</span>
+						</h4>
+						<p>
+							Senior-thesis warmup, shot in Canon RAW on a 5D mkIV with Magic Lantern
+							firmware. The girl on the bench was on the phone the whole time.
+						</p>
+						<Video
+							src="https://cdn.brianschwabauer.com/media/2014-09-02_nice_to_meet_you/master.m3u8"
+							poster="https://cdn.brianschwabauer.com/media/2014-09-02_nice_to_meet_you/poster.jpg"
+							title="Nice to Meet You (2014)"
+							aspect_ratio="1920 / 818"
+							preload="none" />
+					</article>
+					<article class="film-quad-card">
+						<h4>
+							Legacy <span class="film-year">2015</span>
+						</h4>
+						<p>
+							A quiet 2-character short for my directing class. A husband obsessed with
+							his career, a wife who wants him home. Conversation as conflict.
+						</p>
+						<Video
+							src="https://cdn.brianschwabauer.com/media/2015-04-22_legacy/master.m3u8"
+							poster="https://cdn.brianschwabauer.com/media/2015-04-22_legacy/poster.jpg"
+							title="Legacy (2015)"
+							aspect_ratio="1920 / 818"
+							preload="none" />
+					</article>
+				</div>
 			</Reveal>
 		</div>
 	</div>
@@ -824,11 +1152,11 @@
 
 	.fb-block,
 	.node-block,
-	.pickvid,
-	.bear-bus,
-	.more-projects,
-	.bassless {
+	.more-projects {
 		margin: 5rem 0;
+	}
+	.side-projects {
+		margin: 5rem auto;
 	}
 	.sub {
 		font-size: clamp(1.5rem, 2.6vw, 2.1rem);
@@ -930,28 +1258,50 @@
 		margin: 2rem 0;
 	}
 
-	.pickvid-grid {
+	/* The two side-project app cards, stacked at one shared width — contained
+	   like the old PickVid card rather than stretched to the page. */
+	.side-projects {
 		display: grid;
-		grid-template-columns: 1fr 1.5fr;
-		gap: 1rem;
-		align-items: center;
-		max-width: 800px;
+		gap: clamp(1.25rem, 3vw, 2rem);
+		max-width: 52rem;
 	}
-	@media (max-width: 640px) {
-		.pickvid-grid {
-			grid-template-columns: 1fr;
-		}
+	/* Same surface as the film-quad cards. */
+	.app-card {
+		padding: clamp(1.4rem, 3vw, 2.25rem);
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(122, 77, 255, 0.2);
+		border-radius: 12px;
+		container-type: inline-size;
+	}
+	.app-card p {
+		line-height: 1.6;
+		max-width: 36rem;
+		margin-bottom: 1rem;
 	}
 
 	.bb-grid {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(2, 1fr);
 		gap: 0.8rem;
 		margin-top: 1.5rem;
 	}
-	@media (max-width: 768px) {
-		.bb-grid {
+
+	/* Copy left, phone right — the phone column stays phone-sized, scaling with
+	   the card (cqw) rather than the viewport. */
+	.pickvid-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) clamp(130px, 36cqw, 190px);
+		gap: clamp(1.25rem, 5cqw, 2rem);
+		align-items: center;
+	}
+	/* Too narrow for two columns: stack, phone centered under the copy. */
+	@container (max-width: 420px) {
+		.pickvid-grid {
 			grid-template-columns: 1fr;
+		}
+		.pickvid-grid > :global(:last-child) {
+			max-width: 200px;
+			margin-inline: auto;
 		}
 	}
 
@@ -976,10 +1326,13 @@
 	.sato-col p {
 		line-height: 1.65;
 	}
-	.sato-film {
-		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
+	/* The production notes live behind the Read More button; a little air above
+	   the paragraphs once they've expanded. */
+	.split-notes {
+		padding-top: 0.75rem;
+	}
+	.split-notes p {
+		margin-bottom: 1rem;
 	}
 	@media (max-width: 860px) {
 		.sato-pair {
@@ -1028,31 +1381,6 @@
 		opacity: 0.85;
 		margin: 0 0 0.4rem;
 	}
-	.oneup-bts {
-		margin: 2.5rem 0;
-	}
-	.bts-eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #7a4dff;
-		margin-bottom: 0.8rem;
-	}
-
-	.bassless p {
-		line-height: 1.6;
-		max-width: 36rem;
-		margin-bottom: 1rem;
-	}
-	.bassless strong {
-		color: #ff5fb3;
-	}
-	.bassless a {
-		color: #00f2c3;
-		text-decoration: underline;
-		text-underline-offset: 4px;
-	}
-
 	/* Closes the section in the same voice it opened in: the lede's type and
 	   the section's own ink, held to a reading measure. */
 	.closing {
