@@ -9,9 +9,16 @@
 	import HeroMascot from './HeroMascot.svelte';
 	import HeroExplosion from './HeroExplosion.svelte';
 
-	// `isMobile` comes from the server (User-Agent) so the seeded starfield is
-	// placed identically on server and client — see the anchor buffers below.
-	let { isMobile = false }: { isMobile?: boolean } = $props();
+	// Both of these come from the server, and for the same reason: the seeded
+	// starfield has to be built from identical inputs on the server and on the
+	// client or the field rebuilds itself somewhere else at hydration. `isMobile`
+	// (User-Agent) picks the anchor exclusion zone — see the buffers below —  and
+	// `seed` is rolled per request in +page.server.ts so every visit gets a
+	// different set of photos. A viewport check or a `Math.random()` here would
+	// each be a different number on the two sides; the load data is the one
+	// channel that is guaranteed to carry the same value across the boundary.
+	let { isMobile = false, seed = 0x5742_2026 }: { isMobile?: boolean; seed?: number } =
+		$props();
 
 	// ---- starfield ---------------------------------------------------------
 	// A 3D "warp" field of past-work thumbnails. A fixed seed renders the whole
@@ -27,6 +34,23 @@
 	// scrolling up flows tiles on and also draws drained tiles back in from
 	// deep space, so fresh work zooms toward you.
 	const STAR_COUNT = 24;
+
+	// ---- the easter egg -----------------------------------------------------
+	// Clicking anywhere in the field strikes another tile at that spot. The cap
+	// is what keeps a bored visitor from compositing three hundred images.
+	const MAX_STARS = STAR_COUNT + 36;
+	/** seconds a clicked tile takes to cross the tunnel — roughly a quarter of a
+	 *  seeded one's 15–28s, so the click reads as cause and the tile as effect */
+	const SPAWN_DRIFT = 4.5;
+	/** how long the tile takes to swell out of the clicked pixel */
+	const INTRO_MS = 300;
+	/** ease-out-back: overshoots 1 and settles, so the tile arrives with weight
+	 *  instead of easing politely into existence */
+	function easeOutBack(t: number) {
+		const c = 1.9;
+		const p = t - 1;
+		return 1 + (c + 1) * p * p * p + c * p * p;
+	}
 
 	// How long the down-scroll keeps the field stocked — extra tiles cycled
 	// through on top of STAR_COUNT. It stretches the drain: the field thins
@@ -52,14 +76,55 @@
 	const Z_FAR = -260;
 	const Z_NEAR = 320;
 
+	/**
+	 * THE ONE DEPTH THAT IS HONEST ABOUT WHERE IT IS.
+	 *
+	 * A tile's anchor is a percentage of the field, but what you SEE is that
+	 * anchor run through the perspective projection: the screen offset from the
+	 * vanishing point is the layout offset times p/(p − z). Deep in the tunnel
+	 * (z = −260, p = 448) that factor is 0.63, so a tile anchored under the
+	 * cursor paints a third of the way back toward the middle of the screen —
+	 * which is why a clicked tile used to appear to land somewhere other than
+	 * where it was clicked, and why the error grew toward the edges.
+	 *
+	 * At z = 0 the factor is exactly 1. Spawning there is the only depth at
+	 * which the anchor and the pixel are the same point, so a clicked tile is
+	 * struck exactly under the cursor and everything after that — swelling,
+	 * sweeping outward past the camera — radiates from that pixel.
+	 */
+	const U_SPAWN = -Z_FAR / (Z_NEAR - Z_FAR); // z(U_SPAWN) === 0
+
+	/**
+	 * THE TILE OWNS ITS SHAPE — THE IMAGE DOES NOT.
+	 *
+	 * `height: auto` asks the image for the box, and an image that has not
+	 * arrived has no answer: an <img> with no intrinsic size and a set width
+	 * lays out at HEIGHT ZERO. On a warm load that never shows, because the
+	 * images are in cache and have their dimensions before the first layout. On
+	 * a cold one — a fresh incognito window — the tiles are laid out flat and
+	 * then snap open to full height as each image's header lands, which is the
+	 * "some of them jump, always upward, only on a new session" this fixes. It
+	 * was never hydration; it just happens to land near it, because that is when
+	 * the network is busiest.
+	 *
+	 * So the box is declared up front and `object-fit: cover` fits the image to
+	 * it. The ratios are the three the pool is actually made of — a 502-image
+	 * library that is 4:3, 3:2 and 16:9 almost end to end (sampled: p25 1.47,
+	 * median 1.50, p75 1.78) — weighted the way the pool is, so most tiles get
+	 * the ratio their image already has and crop by nothing at all.
+	 */
+	const TILE_RATIOS = [4 / 3, 3 / 2, 3 / 2, 16 / 9] as const;
+
 	type Star = {
 		id: number;
 		src: string;
 		x: number; // % across the hero — the tile's anchor / direction from centre
 		y: number; // % down the hero
 		w: number; // width factor (~0.7–1.5)
+		ar: number; // the tile's own aspect ratio — see TILE_RATIOS
 		rot: number; // flat in-plane rotation (deg) — no 3D skew
 		drift: number; // seconds for one idle (unscrolled) pass through the tunnel
+		spawned?: boolean; // conjured by a click rather than seeded
 	};
 
 	// deterministic PRNG (mulberry32) — the seeded field must be byte-identical
@@ -152,6 +217,7 @@
 			x,
 			y,
 			w: 1.1 + rand() * 0.8,
+			ar: TILE_RATIOS[Math.floor(rand() * TILE_RATIOS.length)],
 			rot: (rand() - 0.5) * 22,
 			drift: 15 + rand() * 13,
 		};
@@ -178,7 +244,11 @@
 	// SSR-stable seed → an identical field on server and client. Each tile is
 	// placed against the ones already chosen so the opening field is spread,
 	// and seeded with a warp position so the field looks alive on first paint.
-	const seededRand = mulberry32(0x5742_2026);
+	// The seed itself changes per request, so the photos differ every visit.
+	// a one-time read by design — the seed is fixed for the page's lifetime, and
+	// the field is built from it exactly once, here
+	// svelte-ignore state_referenced_locally
+	const seededRand = mulberry32(seed);
 	const seededStars: Star[] = [];
 	const seededU: number[] = [];
 	for (let i = 0; i < STAR_COUNT; i++) {
@@ -189,6 +259,10 @@
 	// static fallback styles — shown as-is under reduced motion (no animation),
 	// and harmlessly overridden by the CSS idle drift / JS warp loop otherwise.
 	const seedStyles = seededStars.map((s, i) => starVisual(seededU[i], s.rot));
+
+	// set by the warp loop once it owns the field; the click handler below goes
+	// through it so a spawned tile lands in the loop's arrays and not beside them
+	let addStar: ((x: number, y: number) => void) | undefined;
 
 	let pinRef: HTMLDivElement | undefined;
 	let warpRef: HTMLDivElement | undefined;
@@ -203,10 +277,16 @@
 	onMount(() => {
 		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-		// per-tile warp position, and whether it has been swept out and parked
+		// per-tile warp position, and whether it has been swept out and parked.
+		// These grow with `stars` — a clicked tile pushes one entry onto each.
 		const u = seededU.slice();
 		const parked: boolean[] = Array.from({ length: STAR_COUNT }, () => false);
+		/** whether the loop paints this tile yet, or the CSS drift still does */
+		const owned: boolean[] = Array.from({ length: STAR_COUNT }, () => false);
+		/** when this tile's swell-in began, 0 once it is over */
+		const introAt: number[] = Array.from({ length: STAR_COUNT }, () => 0);
 
+		let synced = false;
 		let heroVisible = true;
 		let raf = 0;
 		let lastT = 0;
@@ -241,6 +321,7 @@
 			s.x = fresh.x;
 			s.y = fresh.y;
 			s.w = fresh.w;
+			s.ar = fresh.ar;
 			s.rot = fresh.rot;
 			s.drift = fresh.drift;
 		}
@@ -277,7 +358,7 @@
 			if (phase === 'boom' || phase === 'aftermath') {
 				const blasting = warpRef?.children;
 				if (blasting) {
-					for (let i = 0; i < STAR_COUNT; i++) {
+					for (let i = 0; i < blasting.length; i++) {
 						const el = blasting[i] as HTMLElement | undefined;
 						if (el) el.style.animation = '';
 					}
@@ -285,6 +366,22 @@
 				raf = 0;
 				return;
 			}
+
+			// SYNC TO THE PRE-HYDRATION CSS DRIFT — read only. This does not take
+			// the tiles over; it just tells the loop where the browser currently
+			// has them, so `owned` below can pick its moment.
+			if (!synced) {
+				synced = true;
+				const tiles = warpRef?.children;
+				for (let i = 0; tiles && i < stars.length; i++) {
+					const el = tiles[i] as HTMLElement | undefined;
+					if (!el) continue;
+					const prog = el.getAnimations()[0]?.effect?.getComputedTiming()?.progress;
+					if (typeof prog === 'number') u[i] = prog;
+				}
+				lastT = now;
+			}
+
 			const dt = Math.min(now - lastT, 50);
 			lastT = now;
 
@@ -299,12 +396,47 @@
 			// field thins linearly from full to empty across DRAIN_REACH of
 			// these, so a bigger SCROLL_EXTRA literally stretches the drain.
 			const progress = Math.max(0, (window.scrollY - pinTop) / pinDist);
-			const target = Math.max(0, STAR_COUNT * (1 - progress / DRAIN_REACH));
+			const target = Math.max(0, stars.length * (1 - progress / DRAIN_REACH));
 
 			// advance every live tile in lockstep: gentle idle drift + scroll
-			for (let i = 0; i < STAR_COUNT; i++) {
+			for (let i = 0; i < stars.length; i++) {
 				if (parked[i]) continue;
 				u[i] += dt / (stars[i].drift * 1000) + advance;
+
+				// TAKE THE TILE OVER FROM CSS WHERE THE SWAP CANNOT BE SEEN.
+				//
+				// Reading the CSS drift's position and repainting from it can
+				// never be exact: the value comes off the document timeline,
+				// which is pinned to the last rendering update, while the tile
+				// on screen is being drawn by the compositor a frame or more
+				// ahead of that. There is no DOM API that closes the gap — so
+				// stop trying to make the swap accurate and make it INVISIBLE
+				// instead.
+				//
+				// A tile at the far end of the tunnel is at opacity 0.03 on its
+				// way to 0, and a tile that has just wrapped is climbing out of
+				// 0. Claim it in that window and an error of a frame — half a
+				// pixel of depth — has nothing to show itself on. Every tile is
+				// claimed silently, one at a time, within a single drift cycle.
+				//
+				// Scrolling claims whatever is left at once: the field is
+				// sweeping at that point, which masks far more than this ever
+				// needed.
+				if (!owned[i]) {
+					// Coming up on the window, stop trusting our own integration
+					// and ask the browser where the tile really is. `dt` is capped
+					// at 50ms, so a run of janky frames leaves our count quietly
+					// behind the CSS drift's, and a claim made on a stale count is
+					// a claim made outside the window — the exact jump this is all
+					// for. Only the tiles near the end pay for the re-read.
+					if (u[i] >= 0.9) {
+						const el = warpRef?.children[i] as HTMLElement | undefined;
+						const prog = el?.getAnimations()[0]?.effect?.getComputedTiming()?.progress;
+						if (typeof prog === 'number') u[i] = prog;
+					}
+					if (u[i] >= 0.99 || advance > 0) owned[i] = true;
+				}
+
 				if (u[i] >= 1) {
 					if (down && activeCount > target) {
 						// the field is fuller than this point in the pin calls
@@ -347,28 +479,48 @@
 			// at rest at the very top the field is simply full — top up any
 			// stragglers, spread through the tunnel rather than bunched deep
 			if (window.scrollY <= pinTop + 4) {
-				for (let i = 0; i < STAR_COUNT; i++) {
+				for (let i = 0; i < stars.length; i++) {
 					if (parked[i]) {
 						parked[i] = false;
 						u[i] = Math.random();
 					}
 				}
-				activeCount = STAR_COUNT;
+				activeCount = stars.length;
 			}
 
 			const tiles = warpRef?.children;
 			if (tiles) {
-				for (let i = 0; i < STAR_COUNT; i++) {
+				for (let i = 0; i < stars.length; i++) {
 					const el = tiles[i] as HTMLElement | undefined;
 					if (!el) continue;
+					// still the browser's to paint — leave it entirely alone, an
+					// inline style it half-owns is worse than one it does not
+					if (!owned[i]) continue;
+					// an animation beats an inline style, so the CSS drift has to
+					// go the first time the loop paints a tile, or it fights the
+					// loop for the rest of that tile's life
+					if (el.style.animation !== 'none') el.style.animation = 'none';
 					if (parked[i]) {
 						el.style.visibility = 'hidden';
 						continue;
 					}
 					el.style.visibility = 'visible';
 					const v = starVisual(u[i], stars[i].rot);
-					el.style.transform = v.transform;
-					el.style.opacity = v.opacity;
+
+					// a clicked tile swells out of the pixel it was struck at.
+					// z is 0 at that moment, so this scale is honest screen-space
+					// scale about the cursor rather than something the projection
+					// will drag off somewhere else.
+					if (introAt[i]) {
+						const t = Math.min(1, (now - introAt[i]) / INTRO_MS);
+						const s = 0.3 + 0.7 * easeOutBack(t);
+						el.style.transform = `${v.transform} scale(${s.toFixed(3)})`;
+						el.style.opacity = (+v.opacity * Math.min(1, t / 0.28)).toFixed(3);
+						if (t >= 1) introAt[i] = 0;
+					} else {
+						el.style.transform = v.transform;
+						el.style.opacity = v.opacity;
+					}
 					el.style.filter = v.filter;
 				}
 			}
@@ -415,35 +567,96 @@
 			: undefined;
 		io?.observe(hero!);
 
-		// hand off from the pre-hydration CSS idle drift: read where each tile
-		// sits right now, then disable its CSS animation so the loop can take
-		// over without a jump
-		const handoff = warpRef?.children;
-		if (handoff) {
-			for (let i = 0; i < STAR_COUNT; i++) {
-				const el = handoff[i] as HTMLElement | undefined;
-				if (!el) continue;
-				// the CSS animation's current iteration progress IS the tile's
-				// warp position (delay and all) — pick it up exactly so there
-				// is no jump and the seeded spread is preserved
-				const prog = el.getAnimations()[0]?.effect?.getComputedTiming()?.progress;
-				if (typeof prog === 'number') u[i] = prog;
-				el.style.animation = 'none';
-				const v = starVisual(u[i], stars[i].rot);
-				el.style.transform = v.transform;
-				el.style.opacity = v.opacity;
-				el.style.filter = v.filter;
-			}
-		}
-
-		pump();
+		// The easter egg's hook into the loop. A clicked tile is not a special
+		// case anywhere downstream: it pushes one entry onto each of the loop's
+		// parallel arrays and is thereafter indistinguishable from a seeded one.
+		// It is given a much shorter drift, though — a tile that takes 20s to
+		// cross the tunnel reads as nothing having happened.
+		addStar = (x, y) => {
+			if (stars.length >= MAX_STARS) return;
+			const s = makeStar(Math.random, stars);
+			s.x = x;
+			s.y = y;
+			s.drift = SPAWN_DRIFT + Math.random() * 2.5;
+			s.spawned = true;
+			// keep every parallel array the same length as `stars`. It is born
+			// owned — the loop conjured it, so there is nothing to hand over —
+			// and it is born at the one depth whose anchor is its pixel.
+			seededU.push(U_SPAWN);
+			seedStyles.push({ ...starVisual(U_SPAWN, s.rot), opacity: '0' });
+			u.push(U_SPAWN);
+			parked.push(false);
+			owned.push(true);
+			introAt.push(performance.now());
+			activeCount++;
+			stars.push(s);
+			pump(); // in case the field had been let go idle
+		};
 
 		return () => {
+			addStar = undefined;
 			window.removeEventListener('scroll', onScroll);
 			window.removeEventListener('resize', measure);
 			io?.disconnect();
 			if (raf) cancelAnimationFrame(raf);
 		};
+	});
+
+	// ---- click to conjure ---------------------------------------------------
+	/**
+	 * THE EASTER EGG. Click anywhere in the hero that is not a control and a new
+	 * tile is struck at that exact pixel, swells out of it and flies at you. It
+	 * spawns at z = 0 — see U_SPAWN — because that is the only depth where the
+	 * anchor the tile is laid out at and the pixel the cursor is over are the
+	 * same point. There is no separate click ripple: at that depth the tile IS
+	 * the acknowledgement, arriving under the cursor on the frame you clicked.
+	 *
+	 * Bound imperatively rather than as an `onclick` on the section: the hero is
+	 * not a control and must not be described as one, and a bare handler on a
+	 * <section> is exactly the thing a11y lint is right to complain about. This
+	 * takes clicks that have already bubbled up from wherever they landed, so it
+	 * covers the whole hero — including the parts the centre column sits over —
+	 * without any element pretending to be interactive.
+	 */
+	onMount(() => {
+		const hero = document.getElementById('hero');
+		if (!hero) return;
+
+		function onClick(e: MouseEvent) {
+			// the demolition owns the stage once it starts — no conjuring over it
+			if (phase !== 'idle') return;
+			const t = e.target as HTMLElement | null;
+			if (t?.closest('a, button, input, textarea, select, label, [role="button"]'))
+				return;
+			// selecting the lede ends in a click, and double-clicking a word ends
+			// in two — neither is someone asking for a star
+			if (!window.getSelection()?.isCollapsed) return;
+			if (e.detail > 1) return;
+			if (!warpRef) return;
+
+			const r = warpRef.getBoundingClientRect();
+			const x = ((e.clientX - r.left) / r.width) * 100;
+			const y = ((e.clientY - r.top) / r.height) * 100;
+			if (x < 0 || x > 100 || y < 0 || y > 100) return;
+
+			if (addStar) {
+				addStar(x, y);
+				return;
+			}
+			// reduced motion: no warp loop to hand it to. Drop the tile in at the
+			// same depth and leave it there, the way the seeded field sits.
+			if (stars.length >= MAX_STARS) return;
+			const s = makeStar(Math.random, stars);
+			s.x = x;
+			s.y = y;
+			s.spawned = true;
+			seededU.push(U_SPAWN);
+			seedStyles.push(starVisual(U_SPAWN, s.rot));
+			stars.push(s);
+		}
+
+		hero.addEventListener('click', onClick);
+		return () => hero.removeEventListener('click', onClick);
 	});
 
 	const currentYear = new Date().getFullYear();
@@ -1042,6 +1255,7 @@
 				{#each stars as star, i (star.id)}
 					<img
 						class="star"
+						class:spawned={star.spawned}
 						src="https://cdn.brianschwabauer.com/media/{star.src}"
 						alt=""
 						loading={i < 8 ? 'eager' : 'lazy'}
@@ -1049,6 +1263,7 @@
 						style:--x="{star.x}%"
 						style:--y="{star.y}%"
 						style:--w={star.w}
+						style:--ar={star.ar}
 						style:--rot="{star.rot}deg"
 						style:--u0={seededU[i]}
 						style:--drift={star.drift}
@@ -1411,6 +1626,22 @@
 		inset: 0;
 		overflow: hidden;
 		z-index: 0;
+
+		/* THE TILE UNIT — every dimension in the field is struck off this, so
+		   the field keeps one set of proportions at every viewport width.
+
+		   The upper bound is `max(132px, 6.875vw)` rather than a flat 132px
+		   because 132px IS 6.875vw at 1920, which is the width the field was
+		   composed at. A flat cap froze the tiles at 132 device-independent px,
+		   so a 3840-wide viewport got the same tiles in twice the frame and the
+		   field read as gravel. Above 1920 the `vw` term takes over and the
+		   field scales with the screen; below it, `max()` holds the 132px cap
+		   and nothing about the existing look changes.
+
+		   The tunnel itself needs no such treatment: the perspective scale
+		   factor p/(p−z) is dimensionless, and every anchor is a percentage, so
+		   scaling this one length scales the whole field uniformly. */
+		--star-unit: clamp(62px, 9vw, max(132px, 6.875vw));
 	}
 	/* the 3D stage. perspective + a single centred vanishing point make every
 	   tile stream straight out from behind the headline; preserve-3d depth-
@@ -1428,16 +1659,24 @@
 		left: var(--x);
 		top: var(--y);
 		display: block;
-		width: calc(var(--w, 1) * clamp(62px, 9vw, 132px));
+		width: calc(var(--w, 1) * var(--star-unit));
 		/* a global `img { max-width: 100% }` would otherwise fight the
 		   explicit width as perspective scales the tile up */
 		max-width: none;
+		/* THE TILE DECLARES ITS OWN BOX — see TILE_RATIOS. `height: auto` would
+		   ask the image, and an image that has not arrived answers zero, so on a
+		   cold load every tile lays out flat and snaps open as its header lands.
+		   This way the box in the SSR HTML is the final box, and no image can
+		   ever move a tile by turning up. */
+		aspect-ratio: var(--ar, 1.5);
 		height: auto;
 		object-fit: cover;
-		border-radius: 7px;
+		/* radius and shadow are struck off the same unit as the width — a
+		   fixed 7px radius on a tile scaled 2× is a corner half as round */
+		border-radius: calc(var(--star-unit) * 0.053);
 		box-shadow:
-			0 0 34px rgba(0, 244, 195, 0.22),
-			0 10px 32px rgba(0, 0, 0, 0.5);
+			0 0 calc(var(--star-unit) * 0.258) rgba(0, 244, 195, 0.22),
+			0 calc(var(--star-unit) * 0.076) calc(var(--star-unit) * 0.242) rgba(0, 0, 0, 0.5);
 		transform: translate(-50%, -50%);
 		transform-origin: center;
 		will-change: transform, opacity;
@@ -1449,6 +1688,12 @@
 		   `animation: none`, and drives transform/opacity/filter itself. */
 		animation: star-warp-idle calc(var(--drift, 20) * 1s) linear infinite;
 		animation-delay: calc(var(--u0, 0) * var(--drift, 20) * -1s);
+	}
+	/* A clicked tile is the loop's from birth — it never rode the CSS drift, and
+	   letting the drift have it for the one frame between Svelte inserting the
+	   element and the next rAF would paint it full-size before it has swelled. */
+	.star.spawned {
+		animation: none;
 	}
 	/* the idle drift, kept in exact step with starVisual() in the script (same
 	   breakpoints, linear between) so the JS loop can take over mid-stream */
@@ -1478,7 +1723,9 @@
 	   display:none drops them out of compositing entirely. Anchors are
 	   still placed against all 24 so the visible 12 stay well-spread. */
 	@media (max-width: 767px) {
-		.star:nth-child(n + 13) {
+		/* `.spawned` is exempt: a tile the visitor asked for by tapping has to
+		   appear, and it is one at a time rather than a standing dozen. */
+		.star:nth-child(n + 13):not(.spawned) {
 			display: none;
 		}
 	}

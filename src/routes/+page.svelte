@@ -66,7 +66,7 @@
 <div class="root">
 	<YearScrubber {stops} />
 
-	<Hero isMobile={data.isMobile} />
+	<Hero isMobile={data.isMobile} seed={data.starSeed} />
 	<Rewind />
 	<ChapterCard act={1} />
 	<HumbleBeginnings {signedIn} />
