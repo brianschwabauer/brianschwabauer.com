@@ -3,7 +3,6 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
@@ -141,6 +140,24 @@
 			caption: 'More set life',
 			alt: 'More set life',
 		},
+		// The premiere is behind-the-scenes too — it's the night the shoot became
+		// a screening, which is the only reason any of the rest of it happened.
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif',
+			width: 1536,
+			height: 2048,
+			caption: 'Premiere night · the backyard projector setup',
+			alt: 'The PR360 II premiere projector setup',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg',
+			width: 1024,
+			height: 1536,
+			caption: 'Brian and Kevin at the PR360 II premiere',
+			alt: 'Brian and Kevin at the PR360 II premiere',
+		},
 	];
 
 	const pr2StillImages: GalleryItem[] = [
@@ -219,22 +236,6 @@
 			caption: 'Premiere · summer 2007 · backyard cinema · ~40 friends and family',
 			alt: 'The Power Rangers cast',
 		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif',
-			width: 1536,
-			height: 2048,
-			caption: 'PR360 II premiere · backyard projector setup',
-			alt: 'The PR360 II premiere projector setup',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg',
-			width: 1024,
-			height: 1536,
-			caption: 'Brian and Kevin at the PR360 II premiere',
-			alt: 'Brian and Kevin at the PR360 II premiere',
-		},
 	];
 
 	let reelGallery = $state<ReturnType<typeof LightboxGallery>>();
@@ -287,7 +288,7 @@
 	});
 </script>
 
-<SectionShell id="power-rangers" year="2008" label="Feature Length" theme="ranger">
+<SectionShell id="feature-length" year="2008" label="Feature Length" theme="ranger">
 	<!--
 	  The chapter where two kids decided the next one would be a *feature*, so the
 	  section puts on the one thing that says feature before a single frame plays:
@@ -370,80 +371,80 @@
 			<span></span>
 		</div>
 
+		<!--
+		  The second film gets the widest layout in the section, because the second
+		  film is the one there are two months of photographs of. The writing holds
+		  still in a narrow column on the left — a page from the script binder,
+		  pinned — while the footage scrolls past it.
+		-->
 		<div class="pr2-block">
-			<Reveal class="bleed-head">
-				<h3 class="sub">Power Rangers 360 II (2008)</h3>
-				<p>
-					It was the next summer and it was time for BIGGER and BETTER. So we spend weeks
-					writing a 60+ page script and made script binders that we gave to the whole cast
-					- which had grown to a small army of friends (anyone we could find that was
-					available).
-				</p>
-				<p>
-					It turns out, it's pretty hard to make a film 60+ minutes long in the heat of
-					summer - when everyone just wants to be at the pool. But we stuck through it. We
-					had to pad the film with some unnecessary scenes and a very long credits reel,
-					but we did it. We made a 64 min long film we could be proud of.
-				</p>
-			</Reveal>
+			<div class="pr2-copy">
+				<Reveal>
+					<h3 class="sub">Power Rangers 360 II (2008)</h3>
+					<p>
+						It was the next summer and it was time for BIGGER and BETTER. So we spend
+						weeks writing a 60+ page script and made script binders that we gave to the
+						whole cast - which had grown to a small army of friends (anyone we could find
+						that was available).
+					</p>
+					<p>
+						It turns out, it's pretty hard to make a film 60+ minutes long in the heat of
+						summer - when everyone just wants to be at the pool. But we stuck through it.
+						We had to pad the film with some unnecessary scenes and a very long credits
+						reel, but we did it. We made a 64 min long film we could be proud of.
+					</p>
 
-			<Reveal variant="up" delay={100}>
-				<div class="bts-strip">
-					<div class="bts-eyebrow bleed-head">BEHIND THE SCENES</div>
-					<div class="gallery-bleed">
-						<PeekGallery
-							key="power-rangers-pr2-bts"
-							items={pr2BTSImages}
-							peek={6}
-							size="0" />
+					<aside class="casting-note">
+						<div class="note-eyebrow">CASTING NOTE</div>
+						<p>
+							One of the &ldquo;characters&rdquo; in the film was Zordon, the rangers'
+							leader. We thought it would be funny if he was played by Kevin's dog. So
+							that's what we did. We filmed him &ldquo;talking&rdquo; via the ole'
+							peanut-butter-in-the-mouth trick, then used a green screen to comp him into
+							scenes with the rangers.
+						</p>
+					</aside>
+				</Reveal>
+			</div>
+
+			<div class="pr2-media">
+				<Reveal variant="up" delay={100}>
+					<div class="bts-strip">
+						<div class="bts-eyebrow">BEHIND THE SCENES</div>
+						<div class="gallery-contained">
+							<PeekGallery
+								key="feature-length-pr2-bts"
+								items={pr2BTSImages}
+								peek={6}
+								size="1" />
+						</div>
 					</div>
-				</div>
-			</Reveal>
+				</Reveal>
 
-			<Reveal variant="up" delay={150}>
-				<div class="bts-strip">
-					<div class="bts-eyebrow bleed-head">FROM THE FILM</div>
-					<div class="gallery-bleed">
-						<PeekGallery
-							key="power-rangers-pr2-stills"
-							items={pr2StillImages}
-							peek={6}
-							size="1" />
+				<Reveal variant="up" delay={150}>
+					<div class="bts-strip">
+						<div class="bts-eyebrow">FROM THE FILM</div>
+						<div class="gallery-contained">
+							<PeekGallery
+								key="feature-length-pr2-stills"
+								items={pr2StillImages}
+								peek={6}
+								size="1" />
+						</div>
 					</div>
-				</div>
-			</Reveal>
-
-			<!-- The second film's archive: both photo sets, the premiere pair, and
-			     what two months of shooting actually taught us. -->
-			<DeletedScenes scenes={4}>
-				<div class="premiere-2">
-					<Reveal variant="left">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif"
-							alt="The PR360 II premiere projector setup"
-							ratio="4 / 3"
-							onclick={(e) => extrasGallery?.open(1, e.currentTarget)} />
-					</Reveal>
-					<Reveal variant="right" delay={100}>
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg"
-							alt="Brian and Kevin at the PR360 II premiere"
-							ratio="4 / 3"
-							onclick={(e) => extrasGallery?.open(2, e.currentTarget)} />
-					</Reveal>
-				</div>
-			</DeletedScenes>
+				</Reveal>
+			</div>
 		</div>
 	</div>
 
 	<LightboxGallery
 		bind:this={reelGallery}
-		key="power-rangers-reel"
+		key="feature-length-reel"
 		items={pr1ReelImages} />
 
 	<LightboxGallery
 		bind:this={extrasGallery}
-		key="power-rangers-extras"
+		key="feature-length-extras"
 		items={sectionExtras} />
 </SectionShell>
 
@@ -651,16 +652,70 @@
 		margin-top: 0.2rem;
 	}
 
+	/* Full bleed, out of the 80rem container it is nested in. */
 	.pr2-block {
+		width: 100vw;
+		margin-inline: calc(50% - 50vw);
+		padding-inline: clamp(1rem, 3vw, 2rem);
+		box-sizing: border-box;
 		margin-bottom: 3rem;
+		display: grid;
+		/*
+		 * The prose column is capped at a readable measure rather than taking a
+		 * share of the width — on a wide monitor a 50% text column is a wall, and
+		 * the photographs are what deserve the extra pixels anyway.
+		 */
+		grid-template-columns: minmax(0, 31rem) minmax(0, 1fr);
+		gap: clamp(1.5rem, 4vw, 4rem);
+		align-items: start;
+	}
+	.pr2-copy {
+		position: sticky;
+		/*
+		 * Clear of the scope bar, which eats up to 14svh off the top of the
+		 * viewport while this section is on screen.
+		 */
+		top: max(6rem, 20vh);
 	}
 	.pr2-block p {
-		max-width: 56rem;
 		line-height: 1.6;
 	}
 
-	.bts-strip {
-		margin: 2rem 0;
+	/*
+	 * A note pinned to the script binder — a different voice from the section's
+	 * narration, so it gets a different surface rather than just italics.
+	 */
+	.casting-note {
+		margin-top: 1.6rem;
+		padding: 1rem 1.1rem;
+		border-left: 2px solid #ffd934;
+		border-radius: 0 6px 6px 0;
+		background: linear-gradient(
+			90deg,
+			oklch(from #ffd934 0.72 c h / 0.12),
+			oklch(from #ffd934 0.72 c h / 0.03)
+		);
+	}
+	.note-eyebrow {
+		font-family: var(--font-mono);
+		font-size: 0.66rem;
+		letter-spacing: 0.28em;
+		color: #ffd934;
+		margin-bottom: 0.5rem;
+	}
+	.casting-note p {
+		margin: 0;
+		font-size: 0.95rem;
+		opacity: 0.92;
+	}
+
+	.pr2-media {
+		display: flex;
+		flex-direction: column;
+		gap: 2.5rem;
+		/* The galleries carry their own @container context; without a min of 0 a
+		   masonry child's intrinsic width can blow the grid track out. */
+		min-width: 0;
 	}
 	.bts-eyebrow {
 		font-family: var(--font-mono);
@@ -670,15 +725,12 @@
 		margin-bottom: 0.8rem;
 	}
 
-	.premiere-2 {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1rem;
-		margin-top: 2rem;
-	}
-	@media (max-width: 640px) {
-		.premiere-2 {
-			grid-template-columns: 1fr;
+	@media (max-width: 900px) {
+		.pr2-block {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.pr2-copy {
+			position: static;
 		}
 	}
 </style>

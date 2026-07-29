@@ -25,7 +25,7 @@ Rewind
 ChapterCard act=1          ★ "The Film Kid" + film-leader countdown (§4)
 HumbleBeginnings
 GreenScreen
-PowerRangers
+FeatureLength
 TakingItSeriously
 MusicVideos
 Animation
@@ -56,7 +56,7 @@ Updated `stops` array (labels shown in the YearScrubber; ids may be renamed free
 { id: 'hero',                year: 'Start',      label: 'Delivering Delight' },
 { id: 'humble-beginnings',   year: '2006',       label: 'Humble Beginnings' },
 { id: 'green-screen',        year: '2007',       label: 'Green Screen' },
-{ id: 'power-rangers',       year: '2008',       label: 'Power Rangers' },
+{ id: 'feature-length',      year: '2008',       label: 'Feature Length' },
 { id: 'taking-it-seriously', year: '2009',       label: 'First Websites' },
 { id: 'music-videos',        year: '2009',       label: 'Music Videos' },
 { id: 'animation',           year: '2010',       label: 'Animation & VFX' },
@@ -163,7 +163,7 @@ Rules: (a) set pieces never fold (Rewind, robot scrub, greenscreen slider, Shipp
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | HumbleBeginnings                      | Intro prose + first 2 media (ViewfinderFrame ones)                                                    | Existing "longer story" GC content + remaining 4 media (scenes: 5)     |
 | GreenScreen                           | Intro prose + 3 media incl. the Pac-Attack still                                                      | "Why we never planned…" + remaining 6 media (scenes: 7)                |
-| PowerRangers                          | Prose + FilmReel + 1 media                                                                            | "Two months of filming" retro + remaining 3 (scenes: 4)                |
+| FeatureLength                         | Prose + FilmReel + 1 media                                                                            | "Two months of filming" retro + remaining 3 (scenes: 4)                |
 | TakingItSeriously                     | Prose + 2 media                                                                                       | Flash-era stack essay + remaining 3 (scenes: 4)                        |
 | MusicVideos                           | Prose + 2 media + **"An honest take on the music side" — PROMOTE to always-visible prose** (see §3.6) | Second GC + remaining 4 media (scenes: 5)                              |
 | Animation                             | Prose + robot ScrubVideo + greenscreen slider + 2 media                                               | "Show all the VFX + BTS shots" grid + "film-making tricks" (scenes: 8) |

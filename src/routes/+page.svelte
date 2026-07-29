@@ -3,7 +3,7 @@
 	import Rewind from '$lib/components/about/sections/Rewind.svelte';
 	import HumbleBeginnings from '$lib/components/about/sections/HumbleBeginnings.svelte';
 	import GreenScreen from '$lib/components/about/sections/GreenScreen.svelte';
-	import PowerRangers from '$lib/components/about/sections/PowerRangers.svelte';
+	import FeatureLength from '$lib/components/about/sections/FeatureLength.svelte';
 	import TakingItSeriously from '$lib/components/about/sections/TakingItSeriously.svelte';
 	import MusicVideos from '$lib/components/about/sections/MusicVideos.svelte';
 	import Animation from '$lib/components/about/sections/Animation.svelte';
@@ -32,7 +32,7 @@
 		{ id: 'hero', year: 'Start', label: 'Delivering Delight' },
 		{ id: 'humble-beginnings', year: '2006', label: 'Humble Beginnings' },
 		{ id: 'green-screen', year: '2007', label: 'Green Screen' },
-		{ id: 'power-rangers', year: '2008', label: 'Feature Length' },
+		{ id: 'feature-length', year: '2008', label: 'Feature Length' },
 		{ id: 'taking-it-seriously', year: '2009', label: 'First Websites' },
 		{ id: 'music-videos', year: '2009', label: 'Music Videos' },
 		{ id: 'animation', year: '2010', label: 'Animation & VFX' },
@@ -71,7 +71,7 @@
 	<ChapterCard act={1} />
 	<HumbleBeginnings {signedIn} />
 	<GreenScreen {signedIn} />
-	<PowerRangers />
+	<FeatureLength />
 	<TakingItSeriously />
 	<MusicVideos />
 	<Animation />

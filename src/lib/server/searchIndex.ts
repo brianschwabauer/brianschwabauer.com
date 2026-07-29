@@ -83,15 +83,15 @@ const HOME_SECTIONS: SearchEntry[] = [
 		),
 	},
 	{
-		id: 'home:power-rangers',
+		id: 'home:feature-length',
 		type: 'home',
-		title: 'Power Rangers',
+		title: 'Feature Length',
 		summary:
 			'Backyard fight choreography, costumes, and the Power Rangers fan film phase.',
 		body: '',
 		tags: ['Film', 'Fan Film', '2008'],
 		date: new Date('2008-01-01').getTime(),
-		url: '/#power-rangers',
+		url: '/#feature-length',
 		imageUrl: mediaUrl(
 			'2007-06-16_power_rangers_360-premiere-power_rangers_group_photo_1.jpg',
 		),
