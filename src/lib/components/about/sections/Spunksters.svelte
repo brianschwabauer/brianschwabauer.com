@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import SnapStrip from '../primitives/SnapStrip.svelte';
+	import DriftStrip from '../primitives/DriftStrip.svelte';
 	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
@@ -252,8 +252,9 @@
 				<div class="bts-eyebrow bleed-head">
 					BEHIND THE SCENES · {spunkstersImages.length} PHOTOS
 				</div>
-				<SnapStrip
+				<DriftStrip
 					items={spunkstersImages}
+					speed={90}
 					onitemclick={({ index, element }) => btsGallery?.open(index, element)} />
 			</div>
 		</Reveal>
@@ -292,7 +293,7 @@
 		</div>
 
 		<div class="prtrailer">
-			<Reveal variant="up">
+			<Reveal variant="left">
 				<h3 class="sub">A fake Power Rangers III trailer</h3>
 				<p>
 					For The Spunksters we also cut a fake trailer for a "Power Rangers III". An
@@ -308,19 +309,18 @@
 					color="#ffd934"
 					onclick={(e) => gallery?.open(6, e.currentTarget)} />
 			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<div class="trailer-pair">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2013-06-22_power_rangers_iii_trailer-logo_animation.avif"
-						alt="Power Rangers III logo animation"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(4, e.currentTarget)} />
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2013-06-22_power_rangers_iii_trailer-kevin_visits_zordons_grave.avif"
-						alt="Kevin visits Zordon's grave"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(5, e.currentTarget)} />
-				</div>
+			<!--
+			  One image, not two. The logo card is the title; the grave shot is a
+			  punchline that only lands after it, and side by side they argued for
+			  the same attention. It's still one click away — the lightbox opens on
+			  the logo with the rest of the section's stills behind it.
+			-->
+			<Reveal variant="right" delay={100}>
+				<LazyMedia
+					src="https://cdn.brianschwabauer.com/media/2013-06-22_power_rangers_iii_trailer-logo_animation.avif"
+					alt="Power Rangers III logo animation"
+					ratio="16 / 9"
+					onclick={(e) => gallery?.open(4, e.currentTarget)} />
 			</Reveal>
 		</div>
 
@@ -662,23 +662,24 @@
 		max-width: 36rem;
 	}
 
+	/* Copy left, one image right — the mirror of the Bubbly Bros block above it,
+	   so the two encores alternate sides instead of stacking the same way twice. */
 	.prtrailer {
+		display: grid;
+		grid-template-columns: 1.15fr 1fr;
+		gap: clamp(1.5rem, 4vw, 3rem);
+		align-items: center;
 		margin: 4rem 0;
 	}
-	.prtrailer p {
-		max-width: 56rem;
-		line-height: 1.6;
-		margin-bottom: 1.5rem;
-	}
-	.trailer-pair {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.8rem;
-	}
-	@media (max-width: 640px) {
-		.trailer-pair {
+	@media (max-width: 768px) {
+		.prtrailer {
 			grid-template-columns: 1fr;
 		}
+	}
+	.prtrailer p {
+		max-width: 40rem;
+		line-height: 1.6;
+		margin-bottom: 1.5rem;
 	}
 
 	.endcap {
