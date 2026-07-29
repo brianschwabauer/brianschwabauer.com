@@ -440,7 +440,7 @@
 
 			<!-- How the viewer actually steers the audience. -->
 			<Reveal>
-				<div class="prose">
+				<div class="closing">
 					<p>
 						A 360 video is only half the problem. You also have to <em>guide</em>
 						the viewer. At certain timecodes I disable the keyboard, smoothly animate the camera
@@ -590,7 +590,7 @@
 
 					<!-- How the two halves were synchronised. -->
 					<Reveal>
-						<div class="prose">
+						<div class="closing">
 							<p>
 								To make the two shots line up frame-perfect over multiple minutes, I built
 								a master spreadsheet of every event in the film with exact timecodes. I
@@ -1116,11 +1116,18 @@
 		text-underline-offset: 4px;
 	}
 
-	.prose p {
+	/* Closes the section in the same voice it opened in: the lede's type and
+	   the section's own ink, held to a reading measure. */
+	.closing {
+		max-width: 44rem;
+		margin-inline: auto;
+	}
+	.closing p {
+		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
 		line-height: 1.65;
 		margin-bottom: 1rem;
 	}
-	.prose em {
+	.closing em {
 		color: #ff5fb3;
 		font-style: italic;
 	}

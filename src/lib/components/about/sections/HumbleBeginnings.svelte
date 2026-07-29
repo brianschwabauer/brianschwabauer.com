@@ -5,7 +5,6 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import ViewfinderFrame from '../primitives/ViewfinderFrame.svelte';
-	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -95,6 +94,14 @@
 		},
 		{
 			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2006-08-10_quanesha-brian_puppets_stuffed_animal.avif',
+			width: 320,
+			height: 240,
+			caption: 'Quanesha — the leading actor, and the hand working him',
+			alt: 'A stuffed bear in a Santa hat propped up on a desk and puppeted by a hand',
+		},
+		{
+			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo.avif',
 			width: 352,
 			height: 240,
@@ -117,14 +124,6 @@
 			caption: 'Ninja Men — the karate-chop apple split',
 			alt: 'The karate-chop apple split',
 		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2008-02-25_02.29.08-editing_with_quick_shots.avif',
-			width: 352,
-			height: 240,
-			caption: '02.29.08 — editing with quick cuts',
-			alt: 'Editing with quick cuts on 02.29.08',
-		},
 	];
 	const FILM_BASE_INDEX = baseImages.length;
 	const sectionMedia = $derived<GalleryItem[]>([
@@ -139,6 +138,50 @@
 				}))
 			: []),
 	]);
+
+	// The REC readout above the heading is a real deck: it starts rolling when
+	// the page hydrates and counts how long you've been here, in tape timecode.
+	// It only ticks while the section is on screen — off screen there is nobody
+	// reading it, so there is no reason to burn a frame loop on it.
+	const START = Date.now();
+	let elapsed_ms = $state(0);
+	let rec_el = $state<HTMLElement>();
+
+	function pad(n: number) {
+		return String(Math.floor(n)).padStart(2, '0');
+	}
+	const timecode = $derived.by(() => {
+		const s = elapsed_ms / 1000;
+		return `${pad(s / 3600)}:${pad((s / 60) % 60)}:${pad(s % 60)}:${pad((s * 30) % 30)}`;
+	});
+
+	$effect(() => {
+		const el = rec_el;
+		if (!el) return;
+		// Frames tick 30 times a second, which is exactly the kind of motion
+		// reduced-motion readers asked us not to make — drop to whole seconds and
+		// let the frame field sit at :00 for them.
+		const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+		let frame = 0;
+		function tick() {
+			const ms = Date.now() - START;
+			elapsed_ms = reduced.matches ? Math.floor(ms / 1000) * 1000 : ms;
+			frame = requestAnimationFrame(tick);
+		}
+		const io = new IntersectionObserver(([entry]) => {
+			if (entry.isIntersecting) {
+				if (!frame) frame = requestAnimationFrame(tick);
+			} else {
+				cancelAnimationFrame(frame);
+				frame = 0;
+			}
+		});
+		io.observe(el);
+		return () => {
+			io.disconnect();
+			cancelAnimationFrame(frame);
+		};
+	});
 </script>
 
 <SectionShell id="humble-beginnings" year="2006" label="Humble Beginnings" theme="tape">
@@ -152,10 +195,10 @@
 
 		<Reveal variant="up">
 			<h2 class="title">
-				<span class="rec" aria-hidden="true">
+				<span bind:this={rec_el} class="rec" aria-hidden="true">
 					<span class="rec-dot"></span>
 					REC
-					<span class="tc">00:00:01:14</span>
+					<span class="tc">{timecode}</span>
 				</span>
 				A bedroom, two kids,
 				<br />
@@ -232,30 +275,51 @@
 			</Reveal>
 		</div>
 
-		<Reveal variant="up" delay={150}>
-			<div class="problem">
-				<div class="problem-eyebrow">PROBLEM</div>
-				<p>
-					Setting up a tripod was hard. We <em>thought</em>
-					we could film handheld — we couldn't. That meant one of us was always behind the camera.
-					With only two of us, how do you make a film with only one character?
-				</p>
-				<div class="problem-eyebrow">ANSWER</div>
-				<p>Film your stuffed animals.</p>
-			</div>
-		</Reveal>
+		<div class="problem-grid">
+			<Reveal variant="up" delay={150}>
+				<div class="problem">
+					<div class="problem-eyebrow">PROBLEM</div>
+					<p>
+						Setting up a tripod was hard. We <em>thought</em>
+						we could film handheld — we couldn't. That meant one of us was always behind the
+						camera. With only two of us, how do you make a film with only one character?
+					</p>
+					<div class="problem-eyebrow">ANSWER</div>
+					<p>Film your stuffed animals.</p>
+				</div>
+			</Reveal>
+
+			<Reveal variant="right" delay={250}>
+				<figure class="answer">
+					<ViewfinderFrame timecode="00:02:47:03">
+						<LazyMedia
+							src="https://cdn.brianschwabauer.com/media/2006-08-10_quanesha-brian_puppets_stuffed_animal.avif"
+							alt="A stuffed bear in a Santa hat propped up on a desk and puppeted by a hand"
+							ratio="16 / 9"
+							onclick={(e) => gallery?.open(1, e.currentTarget)} />
+					</ViewfinderFrame>
+					<figcaption>
+						<strong>Quanesha</strong>
+						· 08.10.2006 — our first film. stuffed animal characters.
+					</figcaption>
+				</figure>
+			</Reveal>
+		</div>
 
 		<div class="fight-block">
 			<Reveal variant="up">
-				<h3 class="subtle">
-					<span class="caret">▌</span>
-					The "slowmo" fight scene
-				</h3>
-				<p>
-					Our first big special-effects idea: act a fight in slow motion, then speed it up
-					in editing so we wouldn't actually hurt each other. It turns out humans cannot
-					act believably in slow motion. The footage is ridiculous. We kept it anyway.
-				</p>
+				<div class="fight-copy">
+					<h3 class="subtle">
+						<span class="caret">▌</span>
+						The "slowmo" fight scene
+					</h3>
+					<p>
+						Our first big special-effects idea: act a fight in slow motion, then speed it
+						up in editing so we wouldn't actually hurt each other. It turns out humans
+						cannot act believably in slow motion. The footage is ridiculous. We kept it
+						anyway.
+					</p>
+				</div>
 			</Reveal>
 			<div class="fight-pair">
 				<Reveal variant="left" delay={100}>
@@ -264,7 +328,7 @@
 							src="https://cdn.brianschwabauer.com/media/2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo.avif"
 							alt="Brian and Kevin fight in slow motion"
 							ratio="16 / 9"
-							onclick={(e) => gallery?.open(1, e.currentTarget)} />
+							onclick={(e) => gallery?.open(2, e.currentTarget)} />
 					</ViewfinderFrame>
 				</Reveal>
 				<Reveal variant="right" delay={200}>
@@ -273,120 +337,89 @@
 							src="https://cdn.brianschwabauer.com/media/2006-10-21_the_fight_scene-brian_and_kevin_fight_in_slowmo_2.avif"
 							alt="Round two, still in slowmo"
 							ratio="16 / 9"
-							onclick={(e) => gallery?.open(2, e.currentTarget)} />
+							onclick={(e) => gallery?.open(3, e.currentTarget)} />
 					</ViewfinderFrame>
 				</Reveal>
 			</div>
 		</div>
 
-		<!-- One fold for the whole back half of the toy-camera years: two
-		     scenes and the process they taught. The vault below closes the
-		     section for signed-in visitors only, so it isn't counted otherwise. -->
-		<DeletedScenes scenes={3 + (signedIn ? privateFilms.length : 0)}>
-			<Reveal variant="up">
-				<div class="karate">
-					<div class="karate-text">
-						<h3 class="subtle">
-							<span class="caret">▌</span>
-							Pre-school special effects
-						</h3>
-						<p>
-							A year after The Fight Scene we made <strong>Ninja Men</strong>
-							. We pre-cut an apple, jammed a toothpick into it to hold it together, and let
-							a karate chop "split" it cleanly. Seventh-grade ingenuity I'm still a little proud
-							of.
-						</p>
-					</div>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2007-09-09_ninja_men-grant_splits_apple_with_karate_chop_special_effect.avif"
-						alt="The karate-chop apple split"
-						ratio="16 / 9"
-						class="karate-media"
-						onclick={(e) => gallery?.open(3, e.currentTarget)} />
-				</div>
-			</Reveal>
-
-			<Reveal>
-				<div class="quick-cuts">
-					<div class="qc-meta">
-						<div class="qc-title">02.29.08</div>
-						<div class="qc-sub">Leap-day shorts contest · 29 seconds</div>
-						<p>
-							The local paper ran a 29-second short film contest for leap day. The
-							constraint forced us to learn quick cuts for the first time. We placed 2nd.
-							The technique stuck with us forever.
-						</p>
-					</div>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2008-02-25_02.29.08-editing_with_quick_shots.avif"
-						alt="Editing with quick cuts on 02.29.08"
-						ratio="16 / 9"
-						onclick={(e) => gallery?.open(4, e.currentTarget)} />
-				</div>
-			</Reveal>
-
-			<Reveal variant="up">
-				<div class="prose">
-					<p>
-						Every weekend looked the same. I'd ride over to Kevin's house. We'd come up
-						with whatever crazy thing we could that day. We'd film it. We'd edit it. All
-						within a day, sometimes two. Then we'd repeat that loop, over and over.
-					</p>
-					<p>
-						We upgraded our camera to one that recorded to a hard drive. We got a computer
-						with actual editing software (we'd been editing <em>
-							directly on the camera
-						</em>
-						before). We still didn't have lights or mics. But we started learning how to piece
-						together multiple shots in a row to build a real narrative.
-					</p>
-					<p>
-						With our new software, we could finally start doing "special effects". The
-						first one was speed manipulation. The second was greenscreen. Each project
-						added a new tool to the toolbag. Each tool combined with the others to unlock
-						the next one. That stacking is the entire story of this page, really.
-					</p>
-					<p>
-						Around this time I noticed I had a real knack for the technical side. Kevin
-						was the better actor, so he started to act more. I started to film more.
-						Together, we made an awesome team.
-					</p>
-				</div>
-			</Reveal>
-
-			{#if signedIn}
-				<Reveal variant="up">
-					<h3 class="vault-heading">
-						<span class="vault-line"></span>
-						The vault
+		<Reveal variant="up">
+			<div class="karate">
+				<div class="karate-text">
+					<h3 class="subtle">
+						<span class="caret">▌</span>
+						Pre-school special effects
 					</h3>
-					<p class="vault-sub">
-						These are bad. Some of them are wonderful-bad. They are <em>
-							where every other section of this page came from.
-						</em>
+					<p>
+						A year after The Fight Scene we made <strong>Ninja Men</strong>
+						. We pre-cut an apple, jammed a toothpick into it to hold it together, and let a
+						karate chop "split" it cleanly. Seventh-grade ingenuity I'm still a little proud
+						of.
 					</p>
-				</Reveal>
+				</div>
+				<LazyMedia
+					src="https://cdn.brianschwabauer.com/media/2007-09-09_ninja_men-grant_splits_apple_with_karate_chop_special_effect.avif"
+					alt="The karate-chop apple split"
+					ratio="16 / 9"
+					class="karate-media"
+					onclick={(e) => gallery?.open(4, e.currentTarget)} />
+			</div>
+		</Reveal>
 
-				<ul class="films">
-					{#each privateFilms as film, i}
-						<Reveal variant="up" delay={50 + (i % 3) * 80}>
-							<li class="film">
-								<div class="film-head">
-									<span class="film-index">№ {String(i + 1).padStart(2, '0')}</span>
-									<span class="film-date">{film.date}</span>
-								</div>
-								<h4 class="film-title">{film.title}</h4>
-								<p class="film-blurb">{film.blurb}</p>
-								<PlayFilm
-									title={film.title}
-									color="#ff9c4a"
-									onclick={(e) => gallery?.open(FILM_BASE_INDEX + i, e.currentTarget)} />
-							</li>
-						</Reveal>
-					{/each}
-				</ul>
-			{/if}
-		</DeletedScenes>
+		<Reveal variant="up">
+			<div class="closing">
+				<p>
+					Every weekend looked the same. I'd walk (through neighbor's yards) to Kevin's
+					house. We'd come up with whatever crazy thing we could that day. We'd film it.
+					We'd edit it. All within a day, sometimes two. Then we'd repeat that loop, over
+					and over.
+				</p>
+				<p>
+					We upgraded our camera to one that recorded to a hard drive. We got a computer
+					with actual editing software (we'd been editing <em>directly on the camera</em>
+					before). We still didn't have lights or mics. But we started learning how to piece
+					together multiple shots in a row to build a real narrative.
+				</p>
+				<p>
+					With our new software, we could finally start doing "special effects". The first
+					one was speed manipulation. The second was greenscreen. Each project added a new
+					tool to the toolbag. Each tool combined with the others to unlock the next one.
+				</p>
+			</div>
+		</Reveal>
+
+		{#if signedIn}
+			<Reveal variant="up">
+				<h3 class="vault-heading">
+					<span class="vault-line"></span>
+					The vault
+				</h3>
+				<p class="vault-sub">
+					These are bad. Some of them are wonderful-bad. They are <em>
+						where every other section of this page came from.
+					</em>
+				</p>
+			</Reveal>
+
+			<ul class="films">
+				{#each privateFilms as film, i}
+					<Reveal variant="up" delay={50 + (i % 3) * 80}>
+						<li class="film">
+							<div class="film-head">
+								<span class="film-index">№ {String(i + 1).padStart(2, '0')}</span>
+								<span class="film-date">{film.date}</span>
+							</div>
+							<h4 class="film-title">{film.title}</h4>
+							<p class="film-blurb">{film.blurb}</p>
+							<PlayFilm
+								title={film.title}
+								color="#ff9c4a"
+								onclick={(e) => gallery?.open(FILM_BASE_INDEX + i, e.currentTarget)} />
+						</li>
+					</Reveal>
+				{/each}
+			</ul>
+		{/if}
 	</div>
 
 	<LightboxGallery
@@ -505,9 +538,12 @@
 			opacity: 0.25;
 		}
 	}
+	/* It counts, so the digits have to hold still — proportional numerals would
+	   make the whole REC chip twitch 30 times a second. */
 	.tc {
 		opacity: 0.7;
 		margin-left: 0.4rem;
+		font-variant-numeric: tabular-nums;
 	}
 
 	.lede-grid {
@@ -546,13 +582,41 @@
 		pointer-events: none;
 	}
 
+	/* The answer to "how do you film with one actor" should be sitting right
+	   there next to the question, not a scroll away. */
+	.problem-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+		gap: clamp(1.5rem, 4vw, 3rem);
+		align-items: center;
+		margin: 2.5rem 0;
+	}
+	@media (max-width: 768px) {
+		.problem-grid {
+			grid-template-columns: 1fr;
+		}
+	}
 	.problem {
-		max-width: 50rem;
 		background: rgba(255, 156, 74, 0.06);
 		border-left: 3px solid var(--tape-accent);
 		padding: 1.25rem 1.5rem;
-		margin: 2.5rem 0;
 		border-radius: 0 8px 8px 0;
+	}
+	.answer {
+		margin: 0;
+		figcaption {
+			font-family: var(--font-mono);
+			font-size: 0.78rem;
+			line-height: 1.5;
+			letter-spacing: 0.04em;
+			opacity: 0.72;
+			margin-top: 0.75rem;
+		}
+		strong {
+			color: var(--tape-accent);
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+		}
 	}
 	.problem-eyebrow {
 		font-family: var(--font-mono);
@@ -571,6 +635,15 @@
 
 	.fight-block {
 		margin: 4rem 0;
+	}
+	/* The two frames want the full width; the copy above them does not — a
+	   paragraph running the whole 80rem container is a paragraph nobody
+	   finishes. Hold it to a reading measure and let it hang left of the pair. */
+	.fight-copy {
+		max-width: 38rem;
+		p {
+			line-height: 1.65;
+		}
 	}
 	.subtle {
 		font-size: clamp(1.4rem, 2.4vw, 2rem);
@@ -607,38 +680,6 @@
 	}
 	.karate-text p {
 		line-height: 1.6;
-	}
-
-	.quick-cuts {
-		display: grid;
-		grid-template-columns: 1fr 1.5fr;
-		gap: clamp(1.5rem, 4vw, 3rem);
-		align-items: center;
-		background: linear-gradient(135deg, rgba(255, 156, 74, 0.08), transparent);
-		border: 1px solid rgba(255, 156, 74, 0.15);
-		border-radius: 12px;
-		padding: 2rem;
-		margin: 4rem 0;
-	}
-	@media (max-width: 768px) {
-		.quick-cuts {
-			grid-template-columns: 1fr;
-		}
-	}
-	.qc-title {
-		font-family: var(--font-mono);
-		font-size: 2.2rem;
-		font-weight: 800;
-		color: var(--tape-accent);
-		letter-spacing: 0.02em;
-	}
-	.qc-sub {
-		font-family: var(--font-mono);
-		font-size: 0.78rem;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-		opacity: 0.75;
-		margin-bottom: 0.8rem;
 	}
 
 	.vault-heading {
@@ -711,11 +752,18 @@
 		margin: 0;
 	}
 
-	.prose p {
+	/* Closes the section the way the lede opened it — same type, same colour,
+	   just centred in the container instead of hanging off the left edge. */
+	.closing {
+		max-width: 44rem;
+		margin-inline: auto;
+	}
+	.closing p {
+		font-size: clamp(1.05rem, 1.5vw, 1.25rem);
 		line-height: 1.65;
 		margin-bottom: 1rem;
 	}
-	.prose em {
+	.closing em {
 		color: var(--tape-accent);
 		font-style: italic;
 	}

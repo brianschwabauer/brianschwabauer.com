@@ -1035,14 +1035,6 @@
 		line-height: 1.55;
 	}
 
-	.prose p {
-		line-height: 1.65;
-		margin-bottom: 1rem;
-	}
-	.prose strong {
-		color: #ffb84d;
-	}
-
 	.inline-video {
 		max-width: 880px;
 		margin: 2rem auto 0;

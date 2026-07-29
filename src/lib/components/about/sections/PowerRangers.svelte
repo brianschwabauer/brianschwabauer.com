@@ -681,9 +681,4 @@
 			grid-template-columns: 1fr;
 		}
 	}
-
-	.prose p {
-		line-height: 1.65;
-		margin-bottom: 1rem;
-	}
 </style>

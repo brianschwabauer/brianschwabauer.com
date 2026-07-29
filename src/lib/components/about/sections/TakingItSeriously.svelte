@@ -170,7 +170,7 @@
 			items={sectionExtras} />
 
 		<Reveal>
-			<div class="prose">
+			<div class="closing">
 				<p>
 					Looking back: iWeb → Dreamweaver → Flash + ActionScript. The blog was a
 					hand-rolled mess. The video player was a custom embed. The "CMS" was me, in
@@ -384,7 +384,14 @@
 		border-radius: 999px;
 	}
 
-	.prose p {
+	/* Closes the section in the same voice it opened in: the lede's type and
+	   the section's own ink, held to a reading measure. */
+	.closing {
+		max-width: 44rem;
+		margin-inline: auto;
+	}
+	.closing p {
+		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
 		line-height: 1.65;
 		margin-bottom: 1rem;
 	}

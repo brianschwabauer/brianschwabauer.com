@@ -420,7 +420,7 @@
 			     tricks behind the shoot. The film itself always plays. -->
 			<DeletedScenes scenes={exposureImages.length + 1}>
 				<Reveal>
-					<div class="prose">
+					<div class="closing">
 						<p>
 							We wanted to shoot in rain at night, but couldn't wait for the weather, so
 							we filmed outside during the day and dunked the actors in water. The ground
@@ -794,7 +794,14 @@
 		}
 	}
 
-	.prose p {
+	/* Closes the section in the same voice it opened in: the lede's type and
+	   the section's own ink, held to a reading measure. */
+	.closing {
+		max-width: 44rem;
+		margin-inline: auto;
+	}
+	.closing p {
+		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
 		line-height: 1.65;
 		margin-bottom: 1rem;
 	}

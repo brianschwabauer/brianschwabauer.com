@@ -460,7 +460,7 @@
 			</div>
 
 			<Reveal>
-				<div class="prose">
+				<div class="closing">
 					<p>
 						This was the pattern: we picked an effect we'd never done before. We dove
 						right in. No research, no tutorials. We learned by failing in public. With
@@ -790,11 +790,18 @@
 		font-weight: 700;
 	}
 
-	.prose p {
+	/* Closes the section in the same voice it opened in: the lede's type and
+	   the section's own ink, held to a reading measure. */
+	.closing {
+		max-width: 44rem;
+		margin-inline: auto;
+	}
+	.closing p {
+		font-size: clamp(1.05rem, 1.5vw, 1.25rem);
 		line-height: 1.65;
 		margin-bottom: 1rem;
 	}
-	.prose em {
+	.closing em {
 		color: #22ff90;
 		font-style: italic;
 	}

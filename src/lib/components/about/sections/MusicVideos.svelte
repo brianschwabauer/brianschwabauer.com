@@ -412,7 +412,7 @@
 		</Reveal>
 
 		<Reveal>
-			<div class="prose">
+			<div class="closing">
 				<p>
 					We were not good musicians. The recordings live somewhere on a hard drive
 					between "endearing" and "unlistenable", depending on the track. But the music
@@ -661,11 +661,18 @@
 		color: #ff7ad0;
 		margin: 0 0 0.7rem;
 	}
-	.prose p {
+	/* Closes the section in the same voice it opened in: the lede's type and
+	   the section's own ink, held to a reading measure. */
+	.closing {
+		max-width: 44rem;
+		margin-inline: auto;
+	}
+	.closing p {
+		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
 		line-height: 1.65;
 		margin-bottom: 1rem;
 	}
-	.prose em {
+	.closing em {
 		color: #ff7ad0;
 		font-style: italic;
 	}
