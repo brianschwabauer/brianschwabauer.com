@@ -41,6 +41,74 @@
 		},
 	];
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
+
+	/** The three homepage redesigns, oldest first. Index doubles as the gallery
+	 *  index, since these are the first three entries in `sectionExtras`. */
+	const sites = [
+		{
+			year: '2008',
+			tool: 'iWeb',
+			src: 'https://cdn.brianschwabauer.com/media/2008-01-01_hunky_spunky_productions-website_design-home_page.jpg',
+		},
+		{
+			year: '2009',
+			tool: 'Dreamweaver',
+			src: 'https://cdn.brianschwabauer.com/media/2009-01-01_hunky_spunky_productions-website_design-home_page.jpg',
+		},
+		{
+			year: '2010',
+			tool: 'Flash',
+			src: 'https://cdn.brianschwabauer.com/media/2010-01-01_hunky_spunky_productions-website_design-home_page.avif',
+		},
+	];
+
+	/** Which redesign is on top of the deck. Starts on 2009 so the stack looks
+	 *  the way it always has before anyone touches it. */
+	let front = $state(1);
+
+	/** Cyclic depth, so bringing a card forward rotates the whole deck rather
+	 *  than swapping two cards — it reads as one physical stack being shuffled. */
+	function depthOf(i: number) {
+		return (i - front + sites.length) % sites.length;
+	}
+
+	/** The deck deals itself, so all three redesigns get seen without anyone
+	 *  having to discover the controls. */
+	const DWELL_MS = 4000;
+
+	let paused = $state(false);
+	let visible = $state(false);
+	let reduced_motion = $state(false);
+	let stack = $state<HTMLElement>();
+
+	$effect(() => {
+		const query = matchMedia('(prefers-reduced-motion: reduce)');
+		const sync = () => (reduced_motion = query.matches);
+		sync();
+		query.addEventListener('change', sync);
+		return () => query.removeEventListener('change', sync);
+	});
+
+	// Only deal while the deck is actually on screen — otherwise it has silently
+	// cycled a dozen times before the reader ever scrolls down to it.
+	$effect(() => {
+		if (!stack) return;
+		const observer = new IntersectionObserver(
+			([entry]) => (visible = entry.isIntersecting),
+			{ threshold: 0.35 },
+		);
+		observer.observe(stack);
+		return () => observer.disconnect();
+	});
+
+	$effect(() => {
+		if (paused || !visible || reduced_motion) return;
+		// Reading `front` restarts the dwell after every change, so a manual pick
+		// gets a full 4s before the deck takes over again.
+		front;
+		const timer = setTimeout(() => (front = (front + 1) % sites.length), DWELL_MS);
+		return () => clearTimeout(timer);
+	});
 </script>
 
 <SectionShell id="taking-it-seriously" year="2009" label="First Websites" theme="flash">
@@ -82,51 +150,51 @@
 			</Reveal>
 
 			<Reveal variant="right" delay={100}>
-				<div class="browser-stack">
-					<div class="browser b3">
-						<div class="chrome">
-							<div class="lights">
-								<span></span>
-								<span></span>
-								<span></span>
+				<div
+					class="deck"
+					role="group"
+					aria-label="Hunky Spunky homepage redesigns"
+					onpointerenter={() => (paused = true)}
+					onpointerleave={() => (paused = false)}
+					onfocusin={() => (paused = true)}
+					onfocusout={() => (paused = false)}>
+					<div class="browser-stack" bind:this={stack}>
+						{#each sites as site, i (site.year)}
+							<div class="browser" data-depth={depthOf(i)}>
+								<div class="chrome">
+									<div class="lights">
+										<span></span>
+										<span></span>
+										<span></span>
+									</div>
+									<div class="url">www.hunkyspunky.com / {site.year}</div>
+								</div>
+								<LazyMedia
+									src={site.src}
+									alt="HSP {site.year} site — {site.tool}"
+									ratio="4 / 3"
+									onclick={(e) => {
+										// Buried cards deal themselves to the top first; only the
+										// card you can actually see opens full size.
+										if (depthOf(i) !== 0) front = i;
+										else gallery?.open(i, e.currentTarget);
+									}} />
 							</div>
-							<div class="url">www.hunkyspunky.com / 2009</div>
-						</div>
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2009-01-01_hunky_spunky_productions-website_design-home_page.jpg"
-							alt="HSP 2009 site"
-							ratio="4 / 3"
-							onclick={(e) => gallery?.open(1, e.currentTarget)} />
+						{/each}
 					</div>
-					<div class="browser b2">
-						<div class="chrome">
-							<div class="lights">
-								<span></span>
-								<span></span>
-								<span></span>
-							</div>
-							<div class="url">www.hunkyspunky.com / 2010</div>
-						</div>
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2010-01-01_hunky_spunky_productions-website_design-home_page.avif"
-							alt="HSP 2010 site"
-							ratio="4 / 3"
-							onclick={(e) => gallery?.open(2, e.currentTarget)} />
-					</div>
-					<div class="browser b1">
-						<div class="chrome">
-							<div class="lights">
-								<span></span>
-								<span></span>
-								<span></span>
-							</div>
-							<div class="url">www.hunkyspunky.com / 2008</div>
-						</div>
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2008-01-01_hunky_spunky_productions-website_design-home_page.jpg"
-							alt="HSP 2008 site"
-							ratio="4 / 3"
-							onclick={(e) => gallery?.open(0, e.currentTarget)} />
+
+					<div class="deck-nav">
+						{#each sites as site, i (site.year)}
+							<button
+								type="button"
+								class="year"
+								class:on={front === i}
+								aria-pressed={front === i}
+								onclick={() => (front = i)}>
+								<span class="y">{site.year}</span>
+								<span class="t">{site.tool}</span>
+							</button>
+						{/each}
 					</div>
 				</div>
 			</Reveal>
@@ -266,31 +334,104 @@
 			0 24px 60px rgba(0, 0, 0, 0.55),
 			0 4px 14px rgba(0, 0, 0, 0.3);
 		border: 1px solid rgba(255, 255, 255, 0.12);
-		transition: transform 350ms ease;
+		/* Which card is on top is driven by `front`, never by hover — the same
+		   easing plays whether a card is dealt up or falls back. Hover only
+		   fans the deck apart so you can see what's buried. */
+		transition:
+			transform 420ms var(--ease-deck),
+			filter 420ms ease;
+		--ease-deck: cubic-bezier(0.34, 1.2, 0.64, 1);
 	}
-	.browser.b1 {
-		transform: rotate(-8deg) translate(-7%, 6%);
-		z-index: 1;
-	}
-	.browser.b2 {
-		transform: rotate(2deg) translate(2%, -3%);
-		z-index: 2;
-	}
-	.browser.b3 {
+	/* The three resting slots. Cards cycle through them; they never swap places
+	   pairwise, so the stack always reads as one deck. */
+	.browser[data-depth='0'] {
 		transform: rotate(-2deg);
 		z-index: 3;
 	}
-	.browser-stack:hover .b1 {
-		transition-duration: 0s;
-		transform: rotate(-12deg) translate(-14%, 10%);
+	.browser[data-depth='1'] {
+		transform: rotate(3deg) translate(5%, -5%);
+		z-index: 2;
+		filter: brightness(0.72) saturate(0.85);
 	}
-	.browser-stack:hover .b2 {
-		transition-duration: 0s;
-		transform: rotate(4deg) translate(6%, -7%);
+	.browser[data-depth='2'] {
+		transform: rotate(-9deg) translate(-9%, 8%);
+		z-index: 1;
+		filter: brightness(0.55) saturate(0.7);
 	}
-	.browser-stack:hover .b3 {
-		transition-duration: 0s;
-		transform: rotate(0deg) translate(2%, -2%);
+	/* Hovering the stack spreads it out and brings the buried cards up out of
+	   the shadows — a peek, not a selection.
+
+	   Deliberate exception to the repo's instant-on-hover rule: these cards are
+	   already animating between deck slots on their own, and a hard snap in the
+	   middle of that reads as a glitch rather than as snappiness. The fan eases
+	   both ways, so it stays in the same physical language as the deal. */
+	.browser-stack:hover .browser[data-depth='0'] {
+		transform: rotate(0deg) translate(3%, -3%);
+	}
+	.browser-stack:hover .browser[data-depth='1'] {
+		transform: rotate(5deg) translate(10%, -9%);
+		filter: brightness(0.88) saturate(0.95);
+	}
+	.browser-stack:hover .browser[data-depth='2'] {
+		transform: rotate(-13deg) translate(-16%, 12%);
+		filter: brightness(0.75) saturate(0.85);
+	}
+
+	.deck-nav {
+		display: flex;
+		justify-content: center;
+		gap: 0.4rem;
+		/* Clears the back card, which hangs below the stack's own box. */
+		margin-top: 3rem;
+	}
+	.year {
+		appearance: none;
+		display: grid;
+		gap: 0.15rem;
+		padding: 0.4rem 0.85rem;
+		background: transparent;
+		border: 1px solid rgba(255, 102, 204, 0.25);
+		border-radius: 999px;
+		color: inherit;
+		font-family: var(--font-mono);
+		cursor: pointer;
+		transition:
+			background-color 260ms ease,
+			border-color 260ms ease,
+			color 260ms ease,
+			translate 200ms ease;
+	}
+	.year:active {
+		translate: 0 1px;
+		scale: 0.97;
+	}
+	.year .y {
+		font-size: 0.8rem;
+		font-weight: 800;
+		letter-spacing: 0.12em;
+	}
+	.year .t {
+		font-size: 0.6rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		opacity: 0.6;
+	}
+	.year.on {
+		background: #ff66cc;
+		border-color: #ff66cc;
+		color: #1b0214;
+	}
+	.year.on .t {
+		opacity: 0.75;
+	}
+	.year:focus-visible {
+		outline: 2px solid #00e0ff;
+		outline-offset: 2px;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.browser {
+			transition-duration: 1ms;
+		}
 	}
 
 	.chrome {
