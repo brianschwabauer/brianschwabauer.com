@@ -3,8 +3,17 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import DeletedScenes from '../primitives/DeletedScenes.svelte';
+	import Turntable, { type Track } from '../primitives/Turntable.svelte';
 	import { Gallery, Video, type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+
+	// The record's three bands, outermost first — the order a record actually
+	// plays in, which is also the order the tracks are numbered below.
+	const TRACKS: Track[] = [
+		{ num: '01', title: 'Flashlight', year: '2007', target: 'track-flashlight' },
+		{ num: '02', title: 'Do Da Flava G', year: '2010', target: 'track-flava' },
+		{ num: '03', title: 'You Derive Me Crazy', year: '2010', target: 'track-calc' },
+	];
 
 	/*
 	 * Standing waves, drifting.
@@ -283,20 +292,14 @@
 			</Reveal>
 
 			<Reveal variant="right" delay={120}>
-				<div class="vinyl">
-					<div class="vinyl-disc">
-						<div class="vinyl-label">DDFG · 2010</div>
-						<div class="grooves"></div>
-					</div>
-					<div class="vinyl-arm"></div>
-				</div>
+				<Turntable tracks={TRACKS} color="#ff7ad0" />
 			</Reveal>
 		</div>
 
 		<!-- The three songs themselves, each with its film playing where it sits:
 		     the section is three tracks, so the tracks are the section. -->
 		<div class="tracks">
-			<div class="track">
+			<div class="track" id="track-flashlight">
 				<span class="track-num" aria-hidden="true">01</span>
 				<Reveal>
 					<div class="track-copy">
@@ -324,7 +327,7 @@
 				</Reveal>
 			</div>
 
-			<div class="track">
+			<div class="track" id="track-flava">
 				<span class="track-num" aria-hidden="true">02</span>
 				<Reveal>
 					<div class="track-copy">
@@ -357,7 +360,7 @@
 				</Reveal>
 			</div>
 
-			<div class="track">
+			<div class="track" id="track-calc">
 				<span class="track-num" aria-hidden="true">03</span>
 				<Reveal>
 					<div class="track-copy">
@@ -508,74 +511,6 @@
 	.lede em {
 		color: #ff7ad0;
 		font-style: italic;
-	}
-
-	.vinyl {
-		position: relative;
-		aspect-ratio: 1;
-		max-width: 420px;
-		margin: 0 auto;
-	}
-	.vinyl-disc {
-		position: absolute;
-		inset: 5%;
-		border-radius: 50%;
-		background:
-			repeating-radial-gradient(circle at center, #181818 0 1px, #0a0a0a 1px 3px), #0a0a0a;
-		box-shadow:
-			0 30px 80px rgba(255, 122, 208, 0.25),
-			0 6px 20px rgba(0, 0, 0, 0.6),
-			inset 0 0 30px rgba(0, 0, 0, 0.8);
-		animation: spin 12s linear infinite;
-	}
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-	.vinyl-label {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 38%;
-		height: 38%;
-		border-radius: 50%;
-		background: radial-gradient(circle, #ff7ad0 0%, #ff4090 70%, #d02b78 100%);
-		display: grid;
-		place-items: center;
-		font-family: var(--font-mono);
-		font-size: 0.65rem;
-		letter-spacing: 0.2em;
-		color: #fff;
-	}
-	.vinyl-label::after {
-		content: '';
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 6px;
-		height: 6px;
-		background: #000;
-		border-radius: 50%;
-	}
-	.vinyl-arm {
-		position: absolute;
-		top: 0;
-		right: -10%;
-		width: 60%;
-		height: 8px;
-		background: linear-gradient(180deg, #444, #222);
-		border-radius: 4px;
-		transform-origin: right center;
-		transform: rotate(35deg);
-		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.vinyl-disc {
-			animation: none;
-		}
 	}
 
 	/* Numeral, copy, film — the numeral in its own column so 01 → 02 → 03 line
