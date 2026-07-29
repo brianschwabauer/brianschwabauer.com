@@ -2,10 +2,8 @@
 	import SectionShell from '../primitives/SectionShell.svelte';
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
-	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import DeletedScenes from '../primitives/DeletedScenes.svelte';
-	import PeekGallery from '../primitives/PeekGallery.svelte';
-	import { type GalleryItem } from '@delightstack/components/media';
+	import { Gallery, Video, type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	/*
@@ -219,39 +217,17 @@
 	// piles rather than one body of work.
 	const trackImages: GalleryItem[] = [...flashlightImages, ...flavaImages, ...calcImages];
 
-	// The inline video posters, in document order: Flashlight, Do Da Flava G,
-	// You Derive Me Crazy.
-	const sectionExtras: GalleryItem[] = [
-		{
-			type: 'video',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/master.m3u8',
-			poster: 'https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/poster.jpg',
-			width: 352,
-			height: 240,
-			caption: 'Flashlight (2007) — music video',
-			alt: 'Flashlight (2007) — music video',
-		},
-		{
-			type: 'video',
-			src: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/master.m3u8',
-			poster: 'https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/poster.jpg',
-			width: 720,
-			height: 480,
-			caption: 'Do Da Flava G (2010) — music video',
-			alt: 'Do Da Flava G (2010) — music video',
-		},
-		{
-			type: 'video',
-			src: 'https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/master.m3u8',
-			poster:
-				'https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/poster.jpg',
-			width: 720,
-			height: 480,
-			caption: 'You Derive Me Crazy (2010) — calculus parody music video',
-			alt: 'You Derive Me Crazy (2010) — calculus parody music video',
-		},
-	];
-	let gallery = $state<ReturnType<typeof LightboxGallery>>();
+	// The stills grid lives inside a `DeletedScenes` fold, which unmounts its
+	// children — so the deep-linkable `LightboxGallery` stays mounted out here,
+	// headless, and the folded grid is a plain `Gallery` that opens it. (A
+	// LightboxGallery inside a fold loses its `?media=` links.)
+	let stills = $state<ReturnType<typeof LightboxGallery>>();
+
+	function onStillClick(event: MouseEvent | KeyboardEvent, index: number) {
+		const tile = (event.target as HTMLElement | null)?.closest?.('.gallery-item');
+		stills?.open(index, (tile as HTMLElement) ?? undefined);
+		return false as const;
+	}
 </script>
 
 <SectionShell id="music-videos" year="2009" label="Music Videos" theme="audio">
@@ -280,7 +256,6 @@
 
 		<div class="hero-grid">
 			<Reveal>
-				<div class="eyebrow">FOLLOWING THE BEAT</div>
 				<h2 class="title">
 					When you don't
 					<br />
@@ -291,8 +266,12 @@
 				<p class="lede">
 					I was always drawn to music videos. You don't have to invent a plot or
 					characters — you just get to mash a bunch of clips against a beat with quick
-					cuts and clever transitions. It is the cleanest excuse to do editing exercises
-					while pretending you're making art.
+					cuts and clever transitions. We were not good musicians; the recordings live
+					somewhere between "endearing" and "unlistenable", depending on the track. But
+					they taught me <em>so much</em>
+					about editing to tempo, about how a cut can land on a beat, about how a small change
+					in audio completely changes what a viewer feels in a shot. I cut every short film
+					I make differently because of those years.
 				</p>
 				<p class="lede">
 					Our first attempts were honestly just "stand in front of a tripod and lip-sync".
@@ -314,9 +293,9 @@
 			</Reveal>
 		</div>
 
-		<!-- The three songs themselves. The stills roll below is always
-		     there, so a reader who never opens this still gets the photos. -->
-		<DeletedScenes scenes={3}>
+		<!-- The three songs themselves, each with its film playing where it sits:
+		     the section is three tracks, so the tracks are the section. -->
+		<div class="tracks">
 			<div class="track">
 				<span class="track-num" aria-hidden="true">01</span>
 				<Reveal>
@@ -334,12 +313,14 @@
 					</div>
 				</Reveal>
 				<Reveal variant="right" delay={160}>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/poster.jpg"
-						alt="Flashlight (2007) — music video"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(0, e.currentTarget)} />
+					<div class="film">
+						<Video
+							src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/master.m3u8"
+							poster="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/poster.jpg"
+							title="Flashlight (2007)"
+							aspect_ratio="352/240"
+							preload="none" />
+					</div>
 				</Reveal>
 			</div>
 
@@ -365,12 +346,14 @@
 					</div>
 				</Reveal>
 				<Reveal variant="right" delay={160}>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/poster.jpg"
-						alt="Do Da Flava G (2010) — music video"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(1, e.currentTarget)} />
+					<div class="film">
+						<Video
+							src="https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/master.m3u8"
+							poster="https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/poster.jpg"
+							title="Do Da Flava G (2010)"
+							aspect_ratio="3/2"
+							preload="none" />
+					</div>
 				</Reveal>
 			</div>
 
@@ -392,44 +375,38 @@
 					</div>
 				</Reveal>
 				<Reveal variant="right" delay={160}>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/poster.jpg"
-						alt="You Derive Me Crazy (2010) — calculus parody music video"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(2, e.currentTarget)} />
+					<div class="film">
+						<Video
+							src="https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/master.m3u8"
+							poster="https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/poster.jpg"
+							title="You Derive Me Crazy (2010)"
+							aspect_ratio="3/2"
+							preload="none" />
+					</div>
 				</Reveal>
 			</div>
-		</DeletedScenes>
+		</div>
 
-		<Reveal variant="up" delay={120}>
-			<div class="roll-eyebrow bleed-head">
-				ALL THREE SHOOTS · {trackImages.length} STILLS
-			</div>
-			<div class="gallery-bleed">
-				<PeekGallery key="music-videos-stills" items={trackImages} peek={8} size="2" />
-			</div>
-		</Reveal>
-
-		<Reveal>
-			<div class="closing">
-				<p>
-					We were not good musicians. The recordings live somewhere on a hard drive
-					between "endearing" and "unlistenable", depending on the track. But the music
-					videos taught me <em>so much</em>
-					about editing to tempo, about how a cut can land on a beat, about how a small change
-					in audio can completely change what a viewer feels in a shot. I cut every short film
-					I make differently because of those years.
-				</p>
-			</div>
-		</Reveal>
+		<!-- The stills are the extra footage now that the films play in place, so
+		     they're what the strip hides. -->
+		<div class="stills-fold">
+			<DeletedScenes scenes={trackImages.length}>
+				<div class="roll-eyebrow bleed-head">
+					ALL THREE SHOOTS · {trackImages.length} STILLS
+				</div>
+				<div class="gallery-bleed">
+					<Gallery
+						items={trackImages}
+						display="masonry"
+						size="2"
+						disable_fullscreen
+						onclick={onStillClick} />
+				</div>
+			</DeletedScenes>
+		</div>
 	</div>
 
-	<LightboxGallery
-		bind:this={gallery}
-		key="music-videos"
-		items={sectionExtras}
-		autoplay_video />
+	<LightboxGallery bind:this={stills} key="music-videos-stills" items={trackImages} />
 </SectionShell>
 
 <style>
@@ -513,13 +490,6 @@
 			grid-template-columns: 1fr;
 		}
 	}
-	.eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #ff7ad0;
-		margin-bottom: 1rem;
-	}
 	.title {
 		font-size: clamp(2.4rem, 7vw, 5rem);
 		font-weight: 900;
@@ -534,6 +504,10 @@
 		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
 		line-height: 1.6;
 		max-width: 38rem;
+	}
+	.lede em {
+		color: #ff7ad0;
+		font-style: italic;
 	}
 
 	.vinyl {
@@ -654,26 +628,25 @@
 	.dot {
 		color: #ff7ad0;
 	}
+	/* The player carries the same corners and lift the poster tiles used to, so
+	   swapping a still for a real film changed the behaviour and not the look. */
+	.film {
+		border-radius: 12px;
+		overflow: clip;
+		box-shadow:
+			0 10px 30px rgba(0, 0, 0, 0.35),
+			0 2px 6px rgba(0, 0, 0, 0.25);
+	}
+	/* The strip is a full-width rule; give it room off the last track and off
+	   whatever section follows. */
+	.stills-fold {
+		margin-top: 4rem;
+	}
 	.roll-eyebrow {
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
 		letter-spacing: 0.32em;
 		color: #ff7ad0;
-		margin: 0 0 0.7rem;
-	}
-	/* Closes the section in the same voice it opened in: the lede's type and
-	   the section's own ink, held to a reading measure. */
-	.closing {
-		max-width: 44rem;
-		margin-inline: auto;
-	}
-	.closing p {
-		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
-		line-height: 1.65;
-		margin-bottom: 1rem;
-	}
-	.closing em {
-		color: #ff7ad0;
-		font-style: italic;
+		margin: 1.5rem 0 0.7rem;
 	}
 </style>
