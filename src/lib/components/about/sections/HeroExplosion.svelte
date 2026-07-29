@@ -123,29 +123,33 @@
 		return c;
 	}
 
+	/**
+	 * THE PALETTE IS THE BUTTON'S.
+	 *
+	 * The debris used to be brand confetti — #00f2c3, #a8a0ff, #6c63ff — which
+	 * reads as celebration, the wrong emotional colour for the gag, and has no
+	 * causal link to the thing that broke. These are sampled from the button
+	 * instead: the translucent white skin, its cool shaded underside, and the
+	 * near-black #052028 of its label. Heat is the only warm thing in the
+	 * frame, so it reads as heat.
+	 */
+	const SPARK_COLORS = ['#ffffff', '#fff8c0', '#ffe9b0', '#ffd934', '#ff9d40'];
+	const CHUNK_COLORS = [
+		'#ffffff',
+		'#f3f6fa',
+		'#dfe6ef',
+		'#c3ccd9',
+		'#8f9bab',
+		'#052028',
+		'#0d3440',
+	];
+
 	function ensureSprites() {
 		if (sparkSprites.length === 0) {
-			const sparkColors = [
-				'#fff8c0',
-				'#ffd934',
-				'#ff9d40',
-				'#00f2c3',
-				'#a8a0ff',
-				'#ffffff',
-			];
-			sparkSprites = sparkColors.map((col) => buildSparkSprite(col));
+			sparkSprites = SPARK_COLORS.map((col) => buildSparkSprite(col));
 		}
 		if (chunkSprites.length === 0) {
-			const chunkColors = [
-				'#222632',
-				'#3a4357',
-				'#0c1018',
-				'#1a2230',
-				'#00f2c3',
-				'#6c63ff',
-				'#ffd934',
-			];
-			chunkSprites = chunkColors.map((col) => buildChunkSprite(col));
+			chunkSprites = CHUNK_COLORS.map((col) => buildChunkSprite(col));
 		}
 		if (!smokeSprite) {
 			smokeSprite = buildSmokeSprite();
@@ -156,10 +160,17 @@
 		return min + Math.random() * (max - min);
 	}
 
+	// cached so `loop()` never forces a layout flush on a frame that is already
+	// the most expensive one in the shot
+	let view_w = 0;
+	let view_h = 0;
+
 	function fitCanvas() {
 		if (!canvas) return;
 		const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 		const rect = canvas.getBoundingClientRect();
+		view_w = rect.width;
+		view_h = rect.height;
 		canvas.width = Math.floor(rect.width * dpr);
 		canvas.height = Math.floor(rect.height * dpr);
 		const ctx = canvas.getContext('2d');
@@ -168,11 +179,14 @@
 
 	function spawnBurst() {
 		if (!canvas) return;
+		// A reduced-motion user asked not to be shown this. The hero's
+		// short-circuit still ticks the trigger so the aftermath copy appears —
+		// so the guard has to live here, at the thing that actually moves.
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 		ensureSprites();
 
-		const rect = canvas.getBoundingClientRect();
-		const cx = rect.width * origin.x;
-		const cy = rect.height * origin.y;
+		const cx = view_w * origin.x;
+		const cy = view_h * origin.y;
 
 		particles = [];
 		ringLife = 0;
@@ -260,8 +274,7 @@
 		const dt = Math.min(0.05, (now - lastTime) / 1000);
 		lastTime = now;
 
-		const rect = canvas.getBoundingClientRect();
-		ctx.clearRect(0, 0, rect.width, rect.height);
+		ctx.clearRect(0, 0, view_w, view_h);
 
 		// shockwave ring (single, drawn first under everything else)
 		ringLife += dt;
@@ -357,7 +370,7 @@
 			raf = requestAnimationFrame(loop);
 		} else {
 			running = false;
-			ctx.clearRect(0, 0, rect.width, rect.height);
+			ctx.clearRect(0, 0, view_w, view_h);
 		}
 	}
 
@@ -372,6 +385,11 @@
 	$effect(() => {
 		if (!canvas) return;
 		fitCanvas();
+		// PRE-WARM. `boom` was the only phase dropping frames — mean 27.3ms with
+		// one interval at 81.7ms — because thirteen offscreen sprite canvases
+		// were being rasterised on the money frame. Build them at mount, when
+		// nothing is moving.
+		ensureSprites();
 		const onResize = () => fitCanvas();
 		window.addEventListener('resize', onResize);
 		return () => {
@@ -381,9 +399,15 @@
 	});
 </script>
 
-<div class="layer" aria-hidden="true">
-	<canvas bind:this={canvas}></canvas>
+<!-- The wash sits BEHIND the character (z 4, the mascot is z 6) and the debris
+     in front of him (z 8). At one shared layer the wash hid the entire 820ms
+     flee for its first ~400ms — an exit nobody could see. A blast should
+     silhouette a character, not erase him. -->
+<div class="layer behind" aria-hidden="true">
 	<div class="flash" class:on={flashing}></div>
+</div>
+<div class="layer front" aria-hidden="true">
+	<canvas bind:this={canvas}></canvas>
 </div>
 
 <style>
@@ -391,8 +415,13 @@
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
-		z-index: 8;
 		overflow: hidden;
+	}
+	.behind {
+		z-index: 4;
+	}
+	.front {
+		z-index: 8;
 	}
 	canvas {
 		position: absolute;
@@ -403,12 +432,14 @@
 	.flash {
 		position: absolute;
 		inset: 0;
+		/* tighter and dimmer than it was: a blast that covers the whole viewport
+		   at high alpha is a white-out, not a flash */
 		background: radial-gradient(
 			ellipse at var(--ox, 50%) var(--oy, 45%),
-			rgba(255, 250, 220, 1) 0%,
-			rgba(255, 200, 120, 0.85) 20%,
-			rgba(255, 80, 30, 0.5) 40%,
-			transparent 70%
+			rgba(255, 250, 220, 0.95) 0%,
+			rgba(255, 200, 120, 0.6) 14%,
+			rgba(255, 80, 30, 0.26) 30%,
+			transparent 56%
 		);
 		opacity: 0;
 		mix-blend-mode: screen;

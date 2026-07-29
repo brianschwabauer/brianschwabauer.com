@@ -40,5 +40,36 @@
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
+		<script>
+			// EARLY-CLICK CAPTURE.
+			//
+			// Server-rendered controls look alive the moment they paint, but they
+			// have no handlers until the page hydrates. On the home page that gap
+			// is long enough to lose a click on the hero CTA, and the CTA is a gag
+			// — "nothing happened" is the one response it must never give. SSRing
+			// it `disabled` was the alternative and was rejected: a greyed-out
+			// "Don't push this button" reads as broken.
+			//
+			// This is a classic (non-module) script at the END of the body, so it
+			// runs as soon as the markup exists and always BEFORE the deferred
+			// module bundle — i.e. before hydration, by construction. It records
+			// at most one click on an opted-in control; the component replays it
+			// on mount and detaches this listener, so the sequence can never fire
+			// twice. With JS disabled nothing here runs and the button is inert,
+			// exactly as it is today.
+			(function () {
+				var el = document.querySelector('[data-early-click]');
+				if (!el) return;
+				function onClick(e) {
+					var hit =
+						e.target && e.target.closest && e.target.closest('[data-early-click]');
+					if (hit) window.__earlyClick = hit.getAttribute('data-early-click') || '1';
+				}
+				document.addEventListener('click', onClick, true);
+				window.__earlyClickOff = function () {
+					document.removeEventListener('click', onClick, true);
+				};
+			})();
+		</script>
 	</body>
 </html>

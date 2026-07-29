@@ -453,35 +453,339 @@
 
 	let phase = $state<Phase>('idle');
 	let pumpCount = $state(0);
-	let pumpStroke = $state(0); // 0 = up, 1 = down
+	// which stroke is in flight (1–4); 0 between beats. The mascot re-keys its
+	// rig whenever this changes, so each stroke replays a hand-timed curve
+	// rather than lerping between two toggle states.
+	let pumpStroke = $state(0);
+	let strokeMs = $state(780);
+	let strokeKind = $state<'light' | 'fail' | 'reset' | 'heavy'>('light');
 	let explosionTick = $state(0);
 	let warned = $state(false); // user hovered/peeked
 	let prePress = $state(false); // momentary squish on click
+	// the button pivots on its centre until the press has fully settled, then
+	// on `0% 100%` for the rest of the shot — see ORIGIN_SWITCH_AT
+	let from_corner = $state(false);
+	// the demolition readout: a number that ticks, not a phrase that flips
+	let percent = $state(0);
+	let percent_live = $state(false);
+	// flipped on every tick so the digits can re-run their flicker without the
+	// element being re-created (a `{#key}` here would make the number FLIP,
+	// which is exactly what it must not do)
+	let tick_parity = $state(false);
 
 	// Button scale is purely derived from pump count (no transition during scale —
 	// we apply a per-pump spring via .pulse class instead)
 	const buttonScale = $derived(1 + pumpCount * 0.55);
 
+	/**
+	 * THE BUTTON IS INSTRUMENTATION, NOT A CHARACTER — and there are only THREE
+	 * phrases on it.
+	 *
+	 * Round 8 cut the status ladder ("evacuate", "over pressure warning",
+	 * "pressure holding" and the rest). Six changing phrases in seven seconds
+	 * put a second thing to READ next to the thing to WATCH, and the reader
+	 * lost the mascot. What is left is two warnings and one statement of
+	 * intent, after which the button stops using words at all and becomes a
+	 * progress readout — see PERCENT / `.boom-btn-count` below.
+	 *
+	 *   idle              "Don't push this button"
+	 *   idle, peeked      "Seriously, don’t"
+	 *   awake             "Demolition started"
+	 *   pumping → boom    the counter: "42% Complete"
+	 *
+	 * Longest string is the idle one (21 chars); `.boom-btn` has a fixed
+	 * footprint, so a swap can never reflow the layout.
+	 */
 	const buttonLabel = $derived(
 		phase === 'idle' && !warned
 			? "Don't push this button"
 			: phase === 'idle' && warned
-				? 'Seriously, don’t.'
+				? 'Seriously, don’t'
 				: phase === 'awake'
-					? 'uh oh'
-					: phase === 'pumping' && pumpCount < 3
-						? 'hey, stop'
-						: phase === 'pumping'
-							? 'HELP'
-							: '',
+					? 'Demolition started'
+					: '',
 	);
 
 	function sleep(ms: number) {
 		return new Promise((r) => setTimeout(r, ms));
 	}
 
+	/**
+	 * The pump beat sheet. This is a STORY, not four identical reps: he is
+	 * cocky for two, the third fails outright, the fourth beat is the puzzled
+	 * hold where he works out that it is harder than he thought, and only then
+	 * does he commit to the two heavy ones. (Whitaker & Halas's barbell lift is
+	 * the canonical version of this structure.)
+	 *
+	 * `pump: false` beats still play — they just do not inflate the button, so
+	 * `pumpCount` still reaches 4 and everything downstream is unchanged.
+	 *
+	 * ---- THE COUNTER'S PACING — how each beat's percentage is spent ----
+	 *
+	 * `pct_ease` maps a tick's INDEX (0→1 through the run) onto WHEN it lands
+	 * (0→1 through `pct_ms`). It is not an interpolation curve on the value:
+	 * the value always steps by exactly `pct_step`, and the easing decides how
+	 * bunched or spread the steps are in time. That is the difference between a
+	 * number sliding and a needle jumping.
+	 *
+	 *   surge  ticks pile up at the front, then the last few creep in
+	 *   lurch  a beat of nothing, then it runs
+	 *   even   metronomic — used only where the readout is barely moving
+	 *
+	 * Uneven by design: a tyre does not take psi linearly. Two eager light
+	 * strokes (11, then 12 in steps of two), a FAIL beat that advances ONE
+	 * point in 380 ms — the gag: he puts everything in and the gauge shrugs — a
+	 * puzzled reset that only bleeds up 3 at 120 ms a point, then the two heavy
+	 * strokes, which do 73 of the 100 between them.
+	 *
+	 * EVERY BEAT'S RUN FINISHES INSIDE ITS OWN BEAT. `pct_ms` is checked
+	 * against `ms − round(ms × IMPACT_AT)`, the time left after the impact, and
+	 * the margins are 29 / 62 / 34 / 17 / 29 / 70 ms. That matters most at the
+	 * FAIL beat: a previous tuning let the second stroke's last two ticks spill
+	 * 30 ms into it, which softened the stall the joke depends on.
+	 *
+	 * The last beat lands on exactly 100. It cannot overshoot (the final tick
+	 * is `pct_to` itself, not `from + n × step`), it cannot land early (it is
+	 * scheduled at `pct_ms`), and it cannot still be running at the boom:
+	 * 670 ms impact + 500 ms of ticks = 1170 ms of a 1240 ms beat, leaving that
+	 * 70 ms tail plus the whole 900 ms alarm — measured live at 951 ms of 100 %
+	 * on screen before the shell goes.
+	 */
+	/** no two ticks may share a paint — see `rampPercent` */
+	const MIN_TICK_MS = 28;
+	const EASE_SURGE = (t: number) => t * t;
+	const EASE_LURCH = (t: number) => t * (2 - t);
+	const EASE_EVEN = (t: number) => t;
+
+	const PUMP_BEATS = [
+		{
+			ms: 780,
+			kind: 'light',
+			pump: true,
+			pct_to: 11,
+			pct_ms: 330,
+			pct_step: 1,
+			pct_ease: EASE_SURGE,
+		},
+		// steps of TWO and a slower tick — the same climb read at a different
+		// resolution, so two "identical" light strokes do not count identically
+		{
+			ms: 700,
+			kind: 'light',
+			pump: true,
+			pct_to: 23,
+			pct_ms: 260,
+			pct_step: 2,
+			pct_ease: EASE_LURCH,
+		},
+		// FAIL — the handle does not move, so neither does the gauge. ONE point,
+		// arriving 380 ms late, is the joke.
+		{
+			ms: 900,
+			kind: 'fail',
+			pump: false,
+			pct_to: 24,
+			pct_ms: 380,
+			pct_step: 1,
+			pct_ease: EASE_EVEN,
+		},
+		// RESET — the puzzled hold. Three points, 120 ms apart, evenly spaced:
+		// pressure settling on its own rather than work being done.
+		{
+			ms: 820,
+			kind: 'reset',
+			pump: false,
+			pct_to: 27,
+			pct_ms: 360,
+			pct_step: 1,
+			pct_ease: EASE_EVEN,
+		},
+		// HEAVY — he commits, and the readout stops resolving single points.
+		// Steps of FOUR: the digits visibly skip, which is what a gauge does
+		// when the needle is moving faster than it can be read.
+		{
+			ms: 1020,
+			kind: 'heavy',
+			pump: true,
+			pct_to: 86,
+			pct_ms: 440,
+			pct_step: 4,
+			pct_ease: EASE_SURGE,
+		},
+		// The last one. Back to single points, surging and then CREEPING —
+		// the final gaps run 54 / 58 / 64 / 69 ms, so 97 · 98 · 99 · 100 arrive
+		// one at a time and 100 is a landing rather than a blur.
+		{
+			ms: 1240,
+			kind: 'heavy',
+			pump: true,
+			pct_to: 100,
+			pct_ms: 500,
+			pct_step: 1,
+			pct_ease: EASE_SURGE,
+		},
+	] as const;
+
+	/**
+	 * Ramp the readout to `to` in `step`-sized ticks over `ms`.
+	 *
+	 * Every tick gets its own scheduled time, and the LAST one is always `to`
+	 * itself rather than `from + n * step` — so the counter can never overshoot
+	 * 100, never land a frame early, and never be caught mid-count by the boom.
+	 * The schedule is then WALKED on rAF, one value per frame, so a janky frame
+	 * cannot make a value disappear. See the two comments below.
+	 */
+	function rampPercent(
+		to: number,
+		ms: number,
+		step: number,
+		ease: (t: number) => number,
+	) {
+		const from = percent;
+		if (to <= from) return;
+		const values: number[] = [];
+		for (let v = from + step; v < to; v += step) values.push(v);
+		values.push(to);
+
+		// The schedule, in ms from the impact. A hard floor on the gap, because
+		// `surge` would otherwise place its first few ticks 2–7 ms apart and a
+		// browser only paints every 16.7 — three values inside one frame means
+		// the reader never sees two of them. The floor only ever pushes a tick
+		// LATER, so the run still cannot land early, and every beat has room
+		// for all of its ticks at this spacing inside its own beat.
+		const at: number[] = [];
+		let prev = -MIN_TICK_MS;
+		for (let i = 0; i < values.length; i++) {
+			const t = Math.max(
+				Math.round(ease((i + 1) / values.length) * ms),
+				prev + MIN_TICK_MS,
+			);
+			prev = t;
+			at.push(t);
+		}
+
+		// AT MOST ONE VALUE PER FRAME, walked on rAF rather than fired off six
+		// timers. The schedule already guarantees ≥ MIN_TICK_MS between ticks,
+		// but a janky frame lets two delayed timers fire between one pair of
+		// paints and the reader simply never sees one of the numbers — measured
+		// live, exactly one value in a 51-value run went missing that way. This
+		// turns a dropped frame into a frame of lateness instead of a missing
+		// digit, and the ladder has 2–3 frames of slack per tick to absorb it.
+		const start = performance.now();
+		let i = 0;
+		const walk = (now: number) => {
+			if (now - start >= at[i]) {
+				percent = values[i];
+				tick_parity = !tick_parity;
+				i += 1;
+			}
+			if (i < values.length) requestAnimationFrame(walk);
+		};
+		requestAnimationFrame(walk);
+	}
+	/**
+	 * The button's shell, pre-cut into wedges.
+	 *
+	 * A triangle fan struck off the button's own box: each shard is a full-size
+	 * copy of the skin clipped to one wedge, so together they tile the button
+	 * exactly and the first frame of the burst is pixel-identical to the last
+	 * frame of the intact button. They then fly along the wedge's own outward
+	 * normal, which is why the rupture reads as pressure escaping rather than as
+	 * particles being emitted near a thing.
+	 *
+	 * The seam is jittered per shard so the break line is not a clean starburst.
+	 */
+	const SHARD_COUNT = 9;
+	/** walks the unit square's perimeter; t = 0 is the top-left corner */
+	function perimeter(t: number): [number, number] {
+		const u = ((t % 1) + 1) % 1;
+		if (u < 0.25) return [u * 4, 0];
+		if (u < 0.5) return [1, (u - 0.25) * 4];
+		if (u < 0.75) return [1 - (u - 0.5) * 4, 1];
+		return [0, 1 - (u - 0.75) * 4];
+	}
+	const SHELL_SHARDS = Array.from({ length: SHARD_COUNT }, (_, i) => {
+		// deterministic jitter — a fixed irregular break, not a random one that
+		// changes every hot reload
+		const jitter = (n: number) => (Math.sin(n * 12.9898) * 43758.5453) % 1;
+		const t0 = (i + jitter(i) * 0.42) / SHARD_COUNT;
+		const t1 = (i + 1 + jitter(i + 1) * 0.42) / SHARD_COUNT;
+		const a = perimeter(t0);
+		const b = perimeter(t1);
+		const mid = perimeter((t0 + t1) / 2);
+		const pct = (p: [number, number]) =>
+			`${(p[0] * 100).toFixed(2)}% ${(p[1] * 100).toFixed(2)}%`;
+		// a wedge with a slightly ragged outer edge
+		const clip = `polygon(50% 50%, ${pct(a)}, ${pct(mid)}, ${pct(b)})`;
+		// fly along the wedge's own normal, biased up — debris arcs, it does not
+		// spray evenly in a circle
+		const nx = mid[0] - 0.5;
+		const ny = mid[1] - 0.5;
+		const len = Math.hypot(nx, ny) || 1;
+		const speed = 260 + jitter(i + 7) * 240;
+		return {
+			clip,
+			dx: Math.round((nx / len) * speed),
+			dy: Math.round((ny / len) * speed * 0.62 - 90),
+			rot: Math.round((jitter(i + 3) - 0.5) * 320),
+			delay: Math.round(jitter(i + 11) * 42),
+		};
+	});
+
+	// where in a beat the hands bottom out, as a fraction — must match the 54%
+	// contact frame in HeroMascot's stroke keyframes, so the button swells on
+	// the exact frame the hit lands.
+	const IMPACT_AT = 0.54;
+
+	/**
+	 * How long into `awake` the hose is allowed to exist.
+	 *
+	 * He carries the pump in with him from two frame-heights up, so for the
+	 * whole descent the tube end is in the SKY. `.hose-bridge`'s `d` is solved
+	 * from both live rects every frame, so an ungated bridge draws a 738 px
+	 * straight grey pipe from the sky down to the button — a scaffold pole
+	 * through the headline for the first ~410 ms of the shot. The nozzle already
+	 * had this delay; the bridge needs the same one, and it needs it as a MOUNT
+	 * gate rather than an opacity ramp, because a half-transparent scaffold pole
+	 * is still a scaffold pole.
+	 *
+	 * 620 ms = the 420 ms fall plus the knee compression and the push back up.
+	 * MUST stay equal to the `.nozzle` transition-delay in the CSS below, or the
+	 * fitting and the run of hose that plugs into it appear on different frames.
+	 */
+	const HOSE_READY_AT = 620;
+	let hose_ready = $state(false);
+
+	/**
+	 * When the button's transform-origin moves from its centre to `0% 100%`,
+	 * measured from the end of the press squish.
+	 *
+	 * The press must be OVER — all the way back to resting scale — before the
+	 * origin moves, because moving the origin under a live scale teleports the
+	 * element. The press has two parts and both have to finish:
+	 *   `:active`  `scale: 0.97`, 140 ms — released the instant `phase` leaves
+	 *              `idle` (at +0 ms here) because the button becomes `disabled`,
+	 *              so it is home by +140 ms even if the pointer is still down.
+	 *   `pre-press` `scale(--scale * 0.88)`, returning on the base transition,
+	 *              380 ms with the spring — home by +380 ms.
+	 * 520 ms gives 140 ms of headroom on the slower of the two. It also lands
+	 * comfortably before ANY inflation: `--scale` does not leave 1 until the
+	 * first impact frame, 2100 + 421 = 2521 ms after this point.
+	 *
+	 * MUST stay < HOSE_READY_AT so it is spent inside the first `awake` sleep
+	 * and the 2100 ms total is untouched.
+	 */
+	const ORIGIN_SWITCH_AT = 520;
+
+	// `phase` is not enough of a guard on its own: it stays `'idle'` across the
+	// 180ms pre-press squish below, so two clicks inside that window both get
+	// past the check and run the whole sequence twice over each other. This
+	// latches synchronously, before the first `await`.
+	let started = false;
+
 	async function startDestruction() {
-		if (phase !== 'idle') return;
+		if (phase !== 'idle' || started) return;
+		started = true;
 
 		const reduce =
 			typeof window !== 'undefined' &&
@@ -498,25 +802,43 @@
 		prePress = false;
 
 		phase = 'awake';
-		// mascot springs up + settles
-		await sleep(1500);
+		// The mascot's whole `prep` beat — the FALL, the contact, the knees
+		// absorbing it, the settle, the cocky size-up, the reach and the grip.
+		// It is authored at 2100ms (was 1900) and the TOTAL of the three sleeps
+		// below MUST equal that or the last part of the beat is silently
+		// discarded; round 2 had it at 1500 and threw away the frames where the
+		// pump reacts to being picked up. Play the beat you animated.
+		await sleep(ORIGIN_SWITCH_AT);
+		// the press is fully home and `--scale` is still 1, so the pivot can be
+		// moved to the nozzle's corner without a single frame of jump
+		from_corner = true;
+		await sleep(HOSE_READY_AT - ORIGIN_SWITCH_AT);
+		hose_ready = true;
+		await sleep(2100 - HOSE_READY_AT);
 
 		phase = 'pumping';
-		const pumps = 4;
-		for (let i = 0; i < pumps; i++) {
-			// stroke down (arm pushes pump handle)
-			pumpStroke = 1;
-			await sleep(180);
-			// at impact, count the pump (button inflates)
-			pumpCount = i + 1;
-			await sleep(160);
-			// stroke back up
-			pumpStroke = 0;
-			await sleep(360);
+		// the readout takes the button here, at 0 %, and holds while he winds up
+		percent_live = true;
+		for (const b of PUMP_BEATS) {
+			pumpStroke += 1;
+			strokeMs = b.ms;
+			strokeKind = b.kind;
+			// the mascot's hands bottom out at IMPACT_AT of the beat's curve —
+			// the button has to swell on that exact frame or the hit is a lie,
+			// and the counter has to start climbing on that frame too rather
+			// than predicting the stroke a beat early
+			const hit = Math.round(b.ms * IMPACT_AT);
+			await sleep(hit);
+			rampPercent(b.pct_to, b.pct_ms, b.pct_step, b.pct_ease);
+			if (b.pump) pumpCount += 1;
+			await sleep(b.ms - hit);
 		}
 
-		// pre-boom held breath — button shudders
-		await sleep(420);
+		// Pre-boom held breath. pumpStroke drops to 0, which puts the mascot
+		// into its alarm beat — the anticipation for the flee. The readout is
+		// already sitting on 100 % and stays there for the whole beat.
+		pumpStroke = 0;
+		await sleep(900);
 
 		phase = 'boom';
 		explosionTick++;
@@ -524,6 +846,106 @@
 
 		phase = 'aftermath';
 	}
+
+	/**
+	 * REPLAY A PRE-HYDRATION CLICK.
+	 *
+	 * The button is server-rendered, so it paints (and takes clicks) well before
+	 * this component has a handler on it. The classic script at the bottom of
+	 * `src/app.html` catches a click in that window and parks it on
+	 * `window.__earlyClick`; this picks it up on the first frame we own the
+	 * button and runs the sequence the visitor already asked for.
+	 *
+	 * The flag is CLEARED as it is read. It has to be: a client-side navigation
+	 * away and back remounts this component in the same document, and a stale
+	 * flag would detonate the button with no click — every time, forever.
+	 */
+	onMount(() => {
+		const w = window as unknown as {
+			__earlyClick?: string;
+			__earlyClickOff?: () => void;
+		};
+		const early = w.__earlyClick;
+		w.__earlyClick = undefined;
+		w.__earlyClickOff?.();
+		if (early === 'boom') {
+			// he was already warned by whatever made him click
+			warned = true;
+			startDestruction();
+		}
+	});
+
+	// ---- the hose → nozzle joint -------------------------------------------
+	/**
+	 * THE ONE JOINT THAT CANNOT BE AUTHORED BY HAND.
+	 *
+	 * The far end of the hose is drawn inside the mascot's SVG, which is placed
+	 * in percentages of a `clamp()`ed box and letterboxed by `preserveAspectRatio`
+	 * — so where a viewBox unit lands in stage pixels changes with the viewport.
+	 * The nozzle end is a DOM box pinned to the balloon's left edge. Two
+	 * different coordinate systems, one of them animated (`st-hose-a/b` swings
+	 * the tube end every stroke) and the other one scaling to 3.2×: no pair of
+	 * hand-authored offsets can hold them together, which is why every previous
+	 * round measured a few px of daylight here.
+	 *
+	 * So the run of hose between them is not authored, it is SOLVED, every
+	 * frame: measure both ends and fit a cubic that leaves the SVG tube on its
+	 * own tangent and arrives at the fitting horizontally. `.hose-end` is a
+	 * marker circle inside `.hose-b`, so it carries the hose's animation — and
+	 * its own round cap covers the seam — for free.
+	 */
+	let nozzle_el = $state<HTMLElement | null>(null);
+	let stage_el = $state<HTMLElement | null>(null);
+	let bridge_d = $state('');
+	/** how far in from the nozzle's left edge the hose actually plugs in */
+	const LINK_INSET = 12;
+	/**
+	 * Belt and braces on top of the `hose_ready` mount gate: a hose runs roughly
+	 * level from him to the fitting (the two ends stay inside ~40 px of each
+	 * other vertically while he pumps), so any solve with the tube hundreds of
+	 * pixels above the button is the airborne case and is not a hose. Hold the
+	 * last good `d` rather than drawing it.
+	 */
+	const MAX_BRIDGE_RISE = 260;
+
+	$effect(() => {
+		if (phase !== 'awake' && phase !== 'pumping') return;
+		const nozzle = nozzle_el;
+		const stage = stage_el;
+		if (!nozzle || !stage) return;
+		let frame = 0;
+		const tick = () => {
+			const end = stage.querySelector('.hose-end');
+			if (end) {
+				const n = nozzle.getBoundingClientRect();
+				const e = end.getBoundingClientRect();
+				const st = stage.getBoundingClientRect();
+				// both ends expressed in the stage's own box, so the <svg> can be a
+				// plain `inset: 0` overlay with no transform of its own
+				const px = n.left + LINK_INSET - st.left;
+				const py = n.top + n.height / 2 - st.top;
+				const ex = e.left + e.width / 2 - st.left;
+				const ey = e.top + e.height / 2 - st.top;
+				if (Math.abs(py - ey) <= MAX_BRIDGE_RISE) {
+					// handle length: 45 % of the run, but never more than 42 % of the
+					// horizontal span, or the two handles cross and the hose draws an S
+					const k = Math.min(
+						Math.hypot(px - ex, py - ey) * 0.45,
+						Math.abs(px - ex) * 0.42,
+					);
+					const d =
+						`M${ex.toFixed(1)} ${ey.toFixed(1)}` +
+						`C${(ex + k).toFixed(1)} ${(ey + k * 0.22).toFixed(1)},` +
+						`${(px - k).toFixed(1)} ${py.toFixed(1)},` +
+						`${px.toFixed(1)} ${py.toFixed(1)}`;
+					if (d !== bridge_d) bridge_d = d;
+				}
+			}
+			frame = requestAnimationFrame(tick);
+		};
+		tick();
+		return () => cancelAnimationFrame(frame);
+	});
 
 	// ---- contact form ------------------------------------------------------
 	// One record so <Form> has a single data object to validate and submit over.
@@ -644,6 +1066,7 @@
 		{#if phase !== 'aftermath'}
 			<div
 				class="hero-inner before"
+				class:staged={phase === 'awake' || phase === 'pumping'}
 				class:exploding={phase === 'boom'}
 				bind:this={beforeRef}>
 				<div class="badge" data-frag>
@@ -667,32 +1090,143 @@
 					developed apps, and produced videos. I live to create. I work to delight.
 				</p>
 
-				<div class="button-stage" data-frag>
-					<button
-						class="boom-btn"
-						class:warn={warned}
+				<div class="button-stage" data-frag bind:this={stage_el}>
+					<!-- THE BALLOON RIG. The button carries the INFLATION (scale only,
+					     about its bottom-left corner, which is the corner the nozzle is
+					     welded to). Every translation — the per-stroke wobble, the
+					     over-pressure shudder, the press — lives on this wrapper instead,
+					     so the nozzle is a sibling that receives exactly the same motion.
+					     It used to sit outside all of it: a `translateY(-4px)` written
+					     INSIDE `transform: scale(3.2)` moved the button 12.8 px while the
+					     nozzle held still, which is most of the daylight the client kept
+					     seeing at the hose end. -->
+					<div
+						class="balloon"
 						class:pre-press={prePress}
-						class:wobble={phase === 'pumping' && pumpCount > 0}
-						class:shudder={phase === 'pumping' && pumpCount >= 4}
-						class:popped={phase === 'boom'}
-						type="button"
-						onmouseenter={() => (warned = true)}
-						onmouseleave={() => (warned = phase !== 'idle')}
-						onfocus={() => (warned = true)}
-						onclick={startDestruction}
-						disabled={phase !== 'idle'}
-						aria-label={phase === 'idle' ? "Don't push this button" : 'Boom in progress'}
-						style:--scale={buttonScale}
-						{@attach ripple({ enabled: phase === 'idle', zIndex: 1, opacity: 0.14 })}>
-						<span class="boom-btn-skin"></span>
-						<span class="boom-btn-label" aria-live="polite">
-							{#key buttonLabel}
-								<span class="boom-btn-text">{buttonLabel}</span>
-							{/key}
-						</span>
-					</button>
+						class:wobble-a={phase === 'pumping' && pumpCount % 2 === 1}
+						class:wobble-b={phase === 'pumping' && pumpCount > 0 && pumpCount % 2 === 0}
+						class:shudder={phase === 'pumping' && pumpCount >= 4}>
+						<button
+							class="boom-btn"
+							class:warn={warned}
+							class:from-corner={from_corner}
+							class:popped={phase === 'boom'}
+							type="button"
+							data-early-click="boom"
+							onmouseenter={() => (warned = true)}
+							onmouseleave={() => (warned = phase !== 'idle')}
+							onfocus={() => (warned = true)}
+							onclick={startDestruction}
+							disabled={phase !== 'idle'}
+							aria-label={phase === 'idle'
+								? buttonLabel
+								: 'Button pushed — demonstration playing'}
+							style:--scale={buttonScale}
+							{@attach ripple({ enabled: phase === 'idle', zIndex: 1, opacity: 0.14 })}>
+							<span class="boom-btn-skin"></span>
+							<!-- NOT a live region. Once the sequence is running the readout
+							     changes ten times in ten seconds; announcing every one of
+							     them turns a decorative gag into ten interruptions. The
+							     button's own `aria-label` carries the state that matters —
+							     the invitation while it is idle, then one static statement
+							     that the demonstration is playing. -->
+							<span class="boom-btn-label">
+								{#if percent_live}
+									<!-- THE READOUT. Not inside a `{#key}`: keying it on the
+									     value would destroy and recreate the node on every
+									     tick, which is precisely the label FLIP the phrases
+									     use and the one thing the number must not do. The
+									     element mounts once and its text node is patched in
+									     place, so the digits change where they stand. The
+									     flicker is restarted by alternating two identical
+									     animations on `tick_parity` — the same trick the
+									     wobble uses, for the same reason. -->
+									<span class="boom-btn-count">
+										<span
+											class="count-num"
+											class:tick-a={tick_parity}
+											class:tick-b={!tick_parity}>
+											{percent}
+										</span>
+										<span class="count-unit">% Complete</span>
+									</span>
+								{:else}
+									{#key buttonLabel}
+										<span class="boom-btn-text">{buttonLabel}</span>
+									{/key}
+								{/if}
+							</span>
+						</button>
 
-					<HeroMascot {phase} {pumpCount} {pumpStroke} {buttonScale} />
+						<!-- The valve the mascot's hose plugs into. Inside the balloon so it
+						     rides every wobble and shudder the button does, but OUTSIDE the
+						     button so it never rides the inflation scale. The run of hose
+						     that reaches it is `.hose-bridge` below, solved per frame. -->
+						<span class="nozzle" aria-hidden="true" bind:this={nozzle_el}>
+							<svg viewBox="0 0 32 26">
+								<rect x="20" y="7" width="12" height="12" rx="2" />
+								<rect x="11" y="3" width="10" height="20" rx="3" />
+								<rect x="4" y="8" width="8" height="10" rx="2" />
+								<rect class="nozzle-hi" x="13.5" y="6" width="3" height="14" rx="1.5" />
+							</svg>
+						</span>
+					</div>
+
+					<!-- THE BRIDGE. The run of hose between the mascot's tube and the
+					     fitting, drawn in the stage's own coordinate box so it can span two
+					     different coordinate systems. It is a CURVE, solved to both
+					     endpoints every frame: it leaves the SVG tube on that tube's own
+					     tangent and arrives at the fitting dead horizontal, so nothing
+					     kinks at either joint, and it sags a little under its own weight
+					     the way a hose does. A straight capsule was tried first and read as
+					     a scaffold pole — at this staging the run is ~245 px, far too long
+					     to be a butt joint.
+
+					     GATED ON `hose_ready`, NOT JUST ON THE PHASE. He arrives carrying
+					     the pump, so from frame 0 of `awake` the solved run is 738 px long
+					     and 733 px tall — a grey scaffold pole through the headline for the
+					     whole descent. It does not exist until he is standing on his mark.
+					     `.nozzle`'s opacity delay is the same 620 ms; keep them equal. -->
+					{#if hose_ready && (phase === 'awake' || phase === 'pumping')}
+						<svg class="hose-bridge" aria-hidden="true">
+							<path class="bridge-line" d={bridge_d} />
+							<path class="bridge-core" d={bridge_d} />
+						</svg>
+					{/if}
+
+					<!-- THE RUPTURE. Not a burst drawn near the button — the button's
+					     own shell, cut into wedges by clip-path and thrown outward. Each
+					     shard is a real copy of the skin at the size the balloon actually
+					     reached, so the debris IS the thing that broke. -->
+					{#if phase === 'pumping' || phase === 'boom'}
+						<!-- mounted a beat EARLY and held paused on frame 0 (which is the
+						     intact button), so the burst frame costs no DOM insertion,
+						     style recalc or first paint — it only flips two classes -->
+						<div
+							class="shards"
+							class:live={phase === 'boom'}
+							aria-hidden="true"
+							style:--scale={buttonScale}>
+							{#each SHELL_SHARDS as shard, i (i)}
+								<span
+									class="shard"
+									style:clip-path={shard.clip}
+									style:--dx="{shard.dx}px"
+									style:--dy="{shard.dy}px"
+									style:--rot="{shard.rot}deg"
+									style:animation-delay="{shard.delay}ms">
+								</span>
+							{/each}
+						</div>
+					{/if}
+
+					<HeroMascot
+						{phase}
+						{pumpCount}
+						{pumpStroke}
+						{strokeMs}
+						{strokeKind}
+						{buttonScale} />
 				</div>
 			</div>
 		{/if}
@@ -952,23 +1486,27 @@
 	.starfield.scattering .star {
 		animation: star-blast 1150ms cubic-bezier(0.34, 1.15, 0.5, 1) forwards;
 		animation-delay: var(--blast-delay, 0ms);
+		/* The blast blow-out is a STATIC filter, not an animated one. Animating
+		   brightness/saturate/blur across 24 image elements re-rasterises all of
+		   them every frame, and `boom` was the only phase in the shot dropping
+		   frames — one interval at 93ms on the money frame. Interpolating only
+		   transform and opacity keeps the burst on the compositor. */
+		filter: brightness(2.2) saturate(1.4);
+		will-change: transform, opacity;
 	}
 	@keyframes star-blast {
 		0% {
 			opacity: 0.9;
 			transform: translate(-50%, -50%) translateZ(0) rotate(var(--rot, 0deg));
-			filter: brightness(1.7) saturate(1.4);
 		}
 		30% {
 			opacity: 1;
 			transform: translate(-50%, -50%) translateZ(150px) rotate(var(--rot, 0deg));
-			filter: brightness(2.6) saturate(1.6);
 		}
 		100% {
 			opacity: 0;
 			transform: translate(-50%, -50%) translateZ(540px)
 				rotate(calc(var(--rot, 0deg) + var(--blast-spin, 0deg)));
-			filter: brightness(3) saturate(0.6) blur(3px);
 		}
 	}
 	.vignette {
@@ -1070,6 +1608,17 @@
 		line-height: 1.55;
 		color: rgba(255, 255, 255, 0.75);
 		margin: 0;
+		transition: filter 420ms ease;
+	}
+	/* Staging: the mascot stands in front of this paragraph for his whole
+	   performance, so the two most detailed things on the screen were stacked on
+	   each other and neither read. He is the subject once he is on stage — the
+	   copy steps back and comes straight back when he leaves. Dimmed through
+	   `filter`, not `opacity`, because the scroll reveal owns `.lede`'s inline
+	   opacity and an inline declaration beats any rule we could write here. */
+	.before.staged .lede,
+	.before.exploding .lede {
+		filter: blur(1.6px) opacity(0.24);
 	}
 
 	/* ---- The big red button ---- */
@@ -1088,6 +1637,16 @@
 		/* gives the button's :active z-translate something to recede into —
 		   same trick delightstack's <Button> wrapper uses. */
 		perspective: 100px;
+	}
+	/* The rig the button and its nozzle share. Its box is exactly the button's
+	   untransformed box, so the button's `scale()` about `0% 100%` leaves this
+	   wrapper's bottom-left corner — and therefore the nozzle — exactly where it
+	   was, at every inflation. Everything that TRANSLATES the balloon lives here;
+	   only the scale lives on the button. */
+	.balloon {
+		position: relative;
+		display: inline-flex;
+		align-items: flex-end;
 	}
 	.boom-btn {
 		--scale: 1;
@@ -1122,7 +1681,16 @@
 		cursor: pointer;
 		/* other feedback (squish, label swap) covers the press — no tap flash */
 		-webkit-tap-highlight-color: transparent;
-		transform-origin: 50% 100%;
+		/* TWO ORIGINS, ONE AT A TIME. The press has to squish from the MIDDLE —
+		   a button that shrinks toward its bottom-left corner under your cursor
+		   reads as sliding away, not as being pushed. The inflation has to grow
+		   from `0% 100%`, because that is the one corner the nozzle is welded to
+		   (and the corner `.shards`' fan tiles from). So the button starts
+		   centred, and `.from-corner` moves the origin later — see
+		   `ORIGIN_SWITCH_AT`. The handover is invisible because it happens while
+		   the computed transform is `scale(1)`, i.e. the identity: with no scale
+		   to pivot, the origin has nothing to move. */
+		transform-origin: 50% 50%;
 		transform: scale(var(--scale));
 		transition:
 			transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -1141,6 +1709,13 @@
 		translate: 0px 1px clamp(-10px, calc(0.2em - 12px), -2px);
 		scale: 0.97;
 	}
+	/* The inflation origin. Applied ONLY once the press has fully returned to
+	   resting scale (see `ORIGIN_SWITCH_AT`), and never removed afterwards —
+	   from here on every scale in the shot (wobble, shudder, burst, the fan)
+	   pivots on the corner the nozzle holds. */
+	.boom-btn.from-corner {
+		transform-origin: 0% 100%;
+	}
 	.boom-btn:disabled {
 		cursor: default;
 	}
@@ -1155,6 +1730,74 @@
 		backdrop-filter: blur(10px);
 		transition: background-color 300ms ease;
 	}
+	/* The fitting. Bolted to the balloon's bottom-left corner — the one corner
+	   the inflation cannot move, because the button scales about `0% 100%`. */
+	.nozzle {
+		position: absolute;
+		left: -30px;
+		bottom: 18px;
+		width: 32px;
+		height: 26px;
+		z-index: 6;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 300ms ease;
+	}
+	/* IN THE HOSE'S OWN GREY FAMILY, not the page's. The fitting used to be
+	   #2f3648 filled and #10141f stroked on a rgb(13,15,28) stage — three values
+	   darker than the `oklch(0.38 …)` hose it joins, so the last inch of the run
+	   dropped into the background and the line read as dying just before it
+	   arrived, even though the geometry was solved. It is machined metal at the
+	   end of a rubber hose, so it sits one step LIGHTER than the tube, with the
+	   same hue and chroma, and carries the tube's own highlight value. */
+	.nozzle svg {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		display: block;
+		fill: oklch(0.46 0.007 250);
+		stroke: oklch(0.27 0.008 250);
+		stroke-width: 1.6;
+	}
+	.nozzle .nozzle-hi {
+		fill: oklch(0.72 0.008 250 / 0.55);
+		stroke: none;
+	}
+	/* The bridge run of hose. Same two-pass construction as the tube inside the
+	   mascot's SVG — a wide dark stroke with a thin light core — and the same
+	   `--steel-2` / `--steel-hi` values, so the two halves read as one object
+	   rather than as two objects that meet. Under the mascot (z 6) and under the
+	   button (z 5), because the hose comes out from behind him and plugs in
+	   under the fitting. */
+	.hose-bridge {
+		position: absolute;
+		inset: 0;
+		z-index: 4;
+		overflow: visible;
+		pointer-events: none;
+		fill: none;
+		stroke-linecap: round;
+	}
+	.bridge-line {
+		stroke: oklch(0.38 0.006 250);
+		stroke-width: 15;
+	}
+	.bridge-core {
+		stroke: oklch(0.68 0.008 250 / 0.5);
+		stroke-width: 4;
+	}
+	/* He brings the pump in with him, so during the fall the hose is up in the
+	   sky with him and the link would have to stretch 700 px to reach it. The
+	   fitting therefore does not appear until he is standing on his mark —
+	   620 ms is the 420 ms fall plus the compression and the push back up. It
+	   leaves instantly on the way out, which is why the delay is on this rule
+	   and not on the base `transition`. */
+	.hero[data-phase='awake'] .nozzle,
+	.hero[data-phase='pumping'] .nozzle {
+		opacity: 1;
+		transition: opacity 260ms ease 620ms;
+	}
+
 	.boom-btn-label {
 		position: relative;
 		z-index: 1;
@@ -1188,6 +1831,71 @@
 		}
 	}
 
+	/* THE READOUT — a number that TICKS, deliberately not a label that flips.
+	   It arrives on `label-swap` (one mount, one run) so the handover from
+	   "Demolition started" matches the phrase before it, and from then on the
+	   digits change in place. The `label-swap` keyframes and `.boom-btn-text`
+	   above are untouched and byte-identical to HEAD — the client has chosen
+	   that transition twice. */
+	.boom-btn-count {
+		grid-area: 1 / 1;
+		display: inline-flex;
+		align-items: baseline;
+		white-space: nowrap;
+		/* every digit the same advance, so 9 → 10 → 100 cannot shuffle the
+		   glyphs to its right */
+		font-variant-numeric: tabular-nums;
+		animation: label-swap 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+	}
+	/* A FIXED SLOT, right-aligned — the instrument idiom, and the reason the
+	   string's width is constant from 0 % to 100 %. `.boom-btn` is a fixed
+	   280 px box, so nothing here could reflow the layout; what this prevents
+	   is the label sliding sideways under itself as a digit is gained. */
+	.count-num {
+		display: inline-block;
+		min-width: 3ch;
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+		transform-origin: 50% 58%;
+	}
+	/* the unit is the quiet half of a readout — the value leads */
+	.count-unit {
+		opacity: 0.58;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+	}
+	/* Two identical animations under different names, alternated by
+	   `tick_parity`, so each tick RESTARTS the flicker without the node being
+	   replaced. On a fast run the restarts overlap and the digits simply stay
+	   hot and slightly proud; on the last tick of a beat it settles — so the
+	   readout visibly cools as each stroke's pressure runs out. */
+	.count-num.tick-a {
+		animation: count-tick-a 190ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+	.count-num.tick-b {
+		animation: count-tick-b 190ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+	@keyframes count-tick-a {
+		0% {
+			transform: scale(1.2);
+			color: oklch(0.58 0.19 38);
+		}
+		100% {
+			transform: scale(1);
+			color: inherit;
+		}
+	}
+	@keyframes count-tick-b {
+		0% {
+			transform: scale(1.2);
+			color: oklch(0.58 0.19 38);
+		}
+		100% {
+			transform: scale(1);
+			color: inherit;
+		}
+	}
+
 	/* idle invitation pulse */
 	.boom-btn:not(:disabled) {
 		animation: invite 2.6s ease-in-out infinite;
@@ -1211,72 +1919,219 @@
 	.boom-btn.warn {
 		color: #052028;
 	}
-	.boom-btn.pre-press {
+	.balloon.pre-press .boom-btn {
 		animation: none;
-		transform: scale(calc(var(--scale) * 0.88)) translateY(2px);
+		transform: scale(calc(var(--scale) * 0.88));
 		transition:
 			transform 120ms ease-out,
 			translate 140ms ease-out,
 			scale 140ms ease-out;
 	}
-
-	/* wobble between pumps — overlap/follow-through */
-	.boom-btn.wobble {
-		animation: btn-wobble 480ms cubic-bezier(0.36, 1.4, 0.4, 1) 1;
+	.balloon.pre-press {
+		transform: translateY(2px);
+		transition: transform 120ms ease-out;
 	}
-	@keyframes btn-wobble {
+
+	/* Wobble on every landed stroke — overlap/follow-through. Two identical
+	   animations under different names, alternated by pump parity, because a
+	   single latching class would only ever fire once.
+
+	   SPLIT IN TWO. The bounce (a translate) runs on the balloon so the nozzle
+	   comes with it; the squash (a scale) runs on the button so the nozzle does
+	   not. Both halves share the beat and the easing, so they still read as one
+	   wobble. Written as one translate curve because the wrapper is shared. */
+	.balloon.wobble-a,
+	.balloon.wobble-b {
+		animation: bal-bounce 480ms cubic-bezier(0.36, 1.4, 0.4, 1) 1;
+	}
+	.balloon.wobble-b {
+		animation-name: bal-bounce-b;
+	}
+	.balloon.wobble-a .boom-btn {
+		animation: btn-wobble-a 480ms cubic-bezier(0.36, 1.4, 0.4, 1) 1;
+	}
+	.balloon.wobble-b .boom-btn {
+		animation: btn-wobble-b 480ms cubic-bezier(0.36, 1.4, 0.4, 1) 1;
+	}
+	@keyframes bal-bounce {
 		0% {
-			transform: scale(calc(var(--scale) * 0.85)) translateY(4px);
+			transform: translateY(4px);
 		}
 		40% {
-			transform: scale(calc(var(--scale) * 1.12)) translateY(-4px);
+			transform: translateY(-4px);
 		}
 		70% {
-			transform: scale(calc(var(--scale) * 0.96)) translateY(2px);
+			transform: translateY(2px);
 		}
 		100% {
-			transform: scale(var(--scale)) translateY(0);
+			transform: translateY(0);
 		}
 	}
-	.boom-btn.shudder {
+	@keyframes bal-bounce-b {
+		0% {
+			transform: translateY(4px);
+		}
+		40% {
+			transform: translateY(-4px);
+		}
+		70% {
+			transform: translateY(2px);
+		}
+		100% {
+			transform: translateY(0);
+		}
+	}
+	@keyframes btn-wobble-a {
+		0% {
+			transform: scale(calc(var(--scale) * 0.85));
+		}
+		40% {
+			transform: scale(calc(var(--scale) * 1.12));
+		}
+		70% {
+			transform: scale(calc(var(--scale) * 0.96));
+		}
+		100% {
+			transform: scale(var(--scale));
+		}
+	}
+	@keyframes btn-wobble-b {
+		0% {
+			transform: scale(calc(var(--scale) * 0.85));
+		}
+		40% {
+			transform: scale(calc(var(--scale) * 1.12));
+		}
+		70% {
+			transform: scale(calc(var(--scale) * 0.96));
+		}
+		100% {
+			transform: scale(var(--scale));
+		}
+	}
+	/* The shudder moves the whole balloon rig — button AND nozzle — so an
+	   over-pressure shake can never open the joint. It lives on the wrapper
+	   rather than inside the button's `transform: scale(3.2)`, where a 2 px
+	   shake was multiplied into a 6.4 px one. */
+	.balloon.shudder {
 		animation: btn-shudder 220ms ease infinite;
 	}
 	@keyframes btn-shudder {
 		0%,
 		100% {
-			transform: scale(var(--scale)) translate(0, 0);
+			translate: 0 0;
 		}
 		25% {
-			transform: scale(var(--scale)) translate(-3px, -1px);
+			translate: -1px -1px;
 		}
 		50% {
-			transform: scale(var(--scale)) translate(3px, 1px);
+			translate: 1px 1px;
 		}
 		75% {
-			transform: scale(var(--scale)) translate(-2px, 2px);
+			translate: -1px 2px;
 		}
 	}
 
-	/* When it pops, the button vanishes (its mass becomes the canvas particles) */
+	/* THE RUPTURE, not a vanish. The button over-inflates for two frames — the
+	   last thing an over-pressured shell does before it goes — and then hard
+	   cuts on ONE frame as the shards take over. The old 12× collapse between
+	   two consecutive frames read as the object being deleted. */
 	.boom-btn.popped {
-		animation: btn-pop 280ms ease-in forwards;
+		animation: btn-burst 120ms cubic-bezier(0.5, 0, 0.9, 0.4) forwards;
 		pointer-events: none;
 	}
-	@keyframes btn-pop {
+	@keyframes btn-burst {
 		0% {
-			transform: scale(var(--scale)) translateY(0);
+			transform: scale(var(--scale));
 			opacity: 1;
-			filter: brightness(2);
 		}
-		60% {
-			transform: scale(calc(var(--scale) * 1.4)) translateY(-4px);
+		70% {
+			transform: scale(calc(var(--scale) * 1.075));
 			opacity: 1;
-			filter: brightness(3.5);
+		}
+		/* one frame of hard cut — the shards are already in place underneath */
+		71%,
+		100% {
+			transform: scale(calc(var(--scale) * 1.075));
+			opacity: 0;
+		}
+	}
+
+	/* The shell. Same box, same corner treatment, same skin colour and the same
+	   transform-origin as the button, so the fan tiles the balloon exactly at
+	   t = 0 and there is no jump between the intact object and its pieces. */
+	.shards {
+		--scale: 1;
+		position: absolute;
+		z-index: 5;
+		left: 50%;
+		bottom: 0;
+		width: min(280px, 80vw);
+		height: 56px;
+		pointer-events: none;
+		opacity: 0;
+		/* `translate` composes BEFORE `transform`, so the box is centred exactly
+		   where the button's untransformed box is, and then scales from the same
+		   0% 100% origin the button inflates from */
+		translate: -50% 0;
+		transform-origin: 0% 100%;
+		transform: scale(var(--scale));
+	}
+	.shard {
+		--dx: 0px;
+		--dy: 0px;
+		--rot: 0deg;
+		position: absolute;
+		inset: 0;
+		border-radius: var(--action-radius, var(--radius-lg));
+		/* The button's own skin, hot at the break. The heat is baked into the
+		   gradient rather than animated with `filter: brightness()`: `boom` is the
+		   only phase in the shot that drops frames, and a filter on nine full-size
+		   clipped boxes re-rasterises all of them every frame. Only transform and
+		   opacity animate here. */
+		background: linear-gradient(
+			100deg,
+			rgb(255 255 255 / 0.96) 0%,
+			rgb(255 250 236 / 0.84) 46%,
+			rgb(214 225 236 / 0.82) 100%
+		);
+		animation: shard-fly 880ms cubic-bezier(0.12, 0.62, 0.32, 1) both;
+		animation-play-state: paused;
+		will-change: transform, opacity;
+	}
+	.shards.live {
+		opacity: 1;
+	}
+	.shards.live .shard {
+		animation-play-state: running;
+	}
+	@keyframes shard-fly {
+		0% {
+			transform: translate(0, 0) rotate(0deg);
+			opacity: 1;
+		}
+		/* the shell separates before it tumbles — pressure first, gravity after */
+		9% {
+			transform: translate(calc(var(--dx) * 0.16), calc(var(--dy) * 0.16))
+				rotate(calc(var(--rot) * 0.07));
+			opacity: 1;
+			animation-timing-function: cubic-bezier(0.2, 0.5, 0.4, 1);
+		}
+		54% {
+			transform: translate(calc(var(--dx) * 0.76), calc(var(--dy) * 0.86))
+				rotate(calc(var(--rot) * 0.6));
+			opacity: 0.95;
+			animation-timing-function: cubic-bezier(0.5, 0, 0.8, 0.7);
 		}
 		100% {
-			transform: scale(calc(var(--scale) * 0.1)) translateY(0);
+			transform: translate(var(--dx), calc(var(--dy) + 340px)) rotate(var(--rot));
 			opacity: 0;
-			filter: brightness(5);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.shard {
+			animation: none;
+			opacity: 0;
 		}
 	}
 
@@ -1539,6 +2394,12 @@
 			animation: none;
 		}
 		.boom-btn {
+			animation: none;
+		}
+		/* belt and braces — `startDestruction` jumps straight to `aftermath`
+		   under reduce, so the readout never mounts on that path anyway */
+		.boom-btn-count,
+		.count-num {
 			animation: none;
 		}
 		.cue-arrow {
