@@ -3,11 +3,30 @@
 	import { ripple } from '@delightstack/utilities';
 	import { page } from '$app/state';
 	import { hideHeaderLogo, searchOpen } from '$lib/stores/navState';
-	import SearchModal from '$lib/components/search/SearchModal.svelte';
+	import type SearchModal from '$lib/components/search/SearchModal.svelte';
 
 	let { showThemeToggle = false, invertLogo = false } = $props();
 
 	let scrolled = $state(false);
+
+	// SearchModal pulls in @orama/orama, which is too heavy for the initial
+	// bundle of every page. Load it lazily: warm the import on intent (hovering
+	// the search button or pressing the shortcut modifier), and mount it the
+	// first time search opens. The modal reacts to its `open` prop on mount, so
+	// a late mount with open=true still shows it once the chunk arrives.
+	let SearchModalComp = $state<typeof SearchModal | null>(null);
+	let search_modal_promise: Promise<unknown> | null = null;
+
+	function warmSearchModal() {
+		if (typeof window === 'undefined' || search_modal_promise) return;
+		search_modal_promise = import('$lib/components/search/SearchModal.svelte').then(
+			(m) => (SearchModalComp = m.default),
+		);
+	}
+
+	$effect(() => {
+		if ($searchOpen && !SearchModalComp) warmSearchModal();
+	});
 
 	if (typeof window !== 'undefined') {
 		$effect(() => {
@@ -18,13 +37,16 @@
 			// mid-page (via browser scroll restoration) renders the scrolled
 			// chrome immediately instead of waiting for the first scroll event.
 			handleScroll();
-			window.addEventListener('scroll', handleScroll);
+			window.addEventListener('scroll', handleScroll, { passive: true });
 			return () => window.removeEventListener('scroll', handleScroll);
 		});
 	}
 
 	$effect(() => {
 		function handleShortcut(e: KeyboardEvent) {
+			// Warm the lazy SearchModal chunk as soon as a shortcut modifier goes
+			// down — by the time ⌘K / Ctrl+K completes, the import is in flight.
+			if (e.metaKey || e.ctrlKey) warmSearchModal();
 			if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
 				e.preventDefault();
 				$searchOpen = true;
@@ -98,6 +120,8 @@
 				class="search-btn"
 				class:on-dark={invertLogo}
 				onclick={() => ($searchOpen = true)}
+				onpointerover={warmSearchModal}
+				onfocus={warmSearchModal}
 				aria-label="Search the site"
 				title="Search (⌘K)"
 				{@attach ripple({ zIndex: 1 })}>
@@ -115,7 +139,9 @@
 	</div>
 </header>
 
-<SearchModal bind:open={$searchOpen} />
+{#if SearchModalComp}
+	<SearchModalComp bind:open={$searchOpen} />
+{/if}
 
 <style>
 	.header {

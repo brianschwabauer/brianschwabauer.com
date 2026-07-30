@@ -4,11 +4,22 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/brandmark.svg" type="image/svg+xml" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<!-- Fonts are self-hosted (static/fonts/, @font-face in src/app.css). Preload
+		     the two families visible above the fold: Nunito Sans (hero/UI sans) and
+		     Merriweather (body serif). Italics and Playfair load on demand. -->
 		<link
-			href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200..1000;1,200..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap"
-			rel="stylesheet" />
+			rel="preload"
+			href="%sveltekit.assets%/fonts/nunito-sans-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin />
+		<link
+			rel="preload"
+			href="%sveltekit.assets%/fonts/merriweather-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin />
+		<link rel="preconnect" href="https://cdn.brianschwabauer.com" crossorigin />
 		<script>
 			// Pre-paint theme bootstrap — mirrors logic in src/routes/+layout.svelte
 			// to prevent the light/dark flash on reload.

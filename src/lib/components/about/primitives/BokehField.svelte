@@ -17,6 +17,8 @@
 	 * produces: a constant number of highlights in frame, however long the
 	 * section that frame is scrolling through.
 	 */
+	import { onScrollProgress } from './scrollProgress';
+
 	let {
 		/** 1 = the full field; 0.5 ≈ half the discs in each band. */
 		density = 1,
@@ -87,8 +89,13 @@
 			const h = bg_el!.getBoundingClientRect().height;
 			// One band per screenful, rounded rather than ceiled: a section 2.4
 			// screens tall wants its placement stretched slightly over two bands,
-			// not squashed into three. Never fewer than one.
-			if (h > 0) bands = Math.max(1, Math.round(h / Math.max(1, window.innerHeight)));
+			// not squashed into three. Never fewer than one — and never more than
+			// four: past that a very tall section was buying hundreds of discs.
+			// The bands tile 0–100% of the section whatever their count, so a
+			// capped band simply covers more than one screenful and the placement
+			// stretches with it; coverage stays even, with no gaps.
+			if (h > 0)
+				bands = Math.min(4, Math.max(1, Math.round(h / Math.max(1, window.innerHeight))));
 		};
 		measure_bands();
 		const ro = new ResizeObserver(measure_bands);
@@ -97,8 +104,7 @@
 		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 			return () => ro.disconnect();
 		}
-		const measure = () => {
-			const rect = bg_el!.getBoundingClientRect();
+		const unsubscribe = onScrollProgress(bg_el, (rect) => {
 			const travel = window.innerHeight + rect.height;
 			if (travel <= 0) return;
 			const raw = (window.innerHeight / 2 - (rect.top + rect.height / 2)) / travel;
@@ -106,14 +112,10 @@
 			// ratio keeps growing, and twenty sections away it reached ±15 — a
 			// translate of thousands of pixels on discs nobody can see.
 			shift = Math.max(-0.5, Math.min(0.5, raw));
-		};
-		measure();
-		window.addEventListener('scroll', measure, { passive: true });
-		window.addEventListener('resize', measure);
+		});
 		return () => {
 			ro.disconnect();
-			window.removeEventListener('scroll', measure);
-			window.removeEventListener('resize', measure);
+			unsubscribe();
 		};
 	});
 
@@ -395,6 +397,15 @@
 		animation:
 			twinkle var(--twinkle) ease-in-out var(--delay) infinite,
 			flicker calc(var(--twinkle) / 5.7) ease-in-out var(--delay) infinite;
+		/*
+		 * The shimmer rides *on top of* the breath: flicker's keyframes are small
+		 * opacity deltas added to whatever twinkle is doing, instead of the old
+		 * `filter: brightness()` — which re-rasterized every disc every frame.
+		 * On this dark background a brightness bump and an opacity bump are the
+		 * same visible thing, and the amplitudes below match the old brightness
+		 * amounts (×0.892 / ×1.126) at the disc's resting opacity.
+		 */
+		animation-composition: replace, add;
 	}
 	/*
 	 * The near plane. Push a highlight further out of focus and the disc doesn't
@@ -451,13 +462,13 @@
 	@keyframes flicker {
 		0%,
 		100% {
-			filter: brightness(1);
+			opacity: 0;
 		}
 		30% {
-			filter: brightness(0.892);
+			opacity: calc(var(--opacity) * -0.108);
 		}
 		64% {
-			filter: brightness(1.126);
+			opacity: calc(var(--opacity) * 0.126);
 		}
 	}
 
@@ -483,6 +494,9 @@
 			0 0 26px 12px rgba(255, 244, 214, 0.5),
 			0 0 70px 34px rgba(255, 226, 150, 0.22);
 		animation: pop var(--period) linear var(--delay) infinite;
+		/* Promote to its own layer: the pop only varies opacity/scale, and without
+		   this the static 3-layer shadow was re-rasterized on every frame of it. */
+		will-change: transform, opacity;
 	}
 	/* The horizontal flare an anamorphic-ish lens throws off a point that
 	   bright. Scales with the pop, so it arrives and leaves with it. */

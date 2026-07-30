@@ -7,6 +7,7 @@
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+	import { onScrollProgress } from '../primitives/scrollProgress';
 
 	const pr1ReelImages = [
 		{
@@ -261,7 +262,9 @@
 		const section = scope_el.closest('section');
 		const year = section?.querySelector('.year-mark');
 		if (!section || !year) return;
-		const measure = () => {
+		// Gated on the section, not the fixed-position bars: the bars are pinned
+		// to the viewport, but everything the math needs is where the section is.
+		return onScrollProgress(section, (rect) => {
 			const vh = window.innerHeight || 1;
 			/*
 			 * The crop is timed off the year mark, not off the section's arrival.
@@ -275,16 +278,9 @@
 			const y = year.getBoundingClientRect().top;
 			const arriving = (vh * 0.3 - y) / (vh * 0.3);
 			// …and opens back up as the section's bottom edge leaves.
-			const leaving = section.getBoundingClientRect().bottom / (vh * 0.6);
+			const leaving = rect.bottom / (vh * 0.6);
 			closed = Math.max(0, Math.min(1, Math.min(arriving, leaving)));
-		};
-		measure();
-		window.addEventListener('scroll', measure, { passive: true });
-		window.addEventListener('resize', measure);
-		return () => {
-			window.removeEventListener('scroll', measure);
-			window.removeEventListener('resize', measure);
-		};
+		});
 	});
 </script>
 

@@ -1,28 +1,54 @@
 <script lang="ts">
+	// ---- eager: everything the first viewport needs -------------------------
+	// The hero (and the fixed chrome that frames the whole page) hydrates with
+	// the page. Rewind stays eager too: it is the first thing under the fold
+	// and a flick of the wheel reaches it before any lazy chunk could land.
 	import Hero from '$lib/components/about/sections/Hero.svelte';
 	import Rewind from '$lib/components/about/sections/Rewind.svelte';
-	import HumbleBeginnings from '$lib/components/about/sections/HumbleBeginnings.svelte';
-	import GreenScreen from '$lib/components/about/sections/GreenScreen.svelte';
-	import FeatureLength from '$lib/components/about/sections/FeatureLength.svelte';
-	import TakingItSeriously from '$lib/components/about/sections/TakingItSeriously.svelte';
-	import MusicVideos from '$lib/components/about/sections/MusicVideos.svelte';
-	import Animation from '$lib/components/about/sections/Animation.svelte';
-	import Festivals from '$lib/components/about/sections/Festivals.svelte';
-	import College from '$lib/components/about/sections/College.svelte';
-	import Spunksters from '$lib/components/about/sections/Spunksters.svelte';
-	import WhatMakesUsHuman from '$lib/components/about/sections/WhatMakesUsHuman.svelte';
-	import Freelancer from '$lib/components/about/sections/Freelancer.svelte';
-	import Entrepreneurship from '$lib/components/about/sections/Entrepreneurship.svelte';
-	import ShowAndTour from '$lib/components/about/sections/ShowAndTour.svelte';
-	import Now from '$lib/components/about/sections/Now.svelte';
-	import Creed from '$lib/components/about/sections/Creed.svelte';
-	import TheEnd from '$lib/components/about/sections/TheEnd.svelte';
-	import Credits from '$lib/components/about/sections/Credits.svelte';
 	import YearScrubber from '$lib/components/about/primitives/YearScrubber.svelte';
 	import ChapterCard from '$lib/components/about/primitives/ChapterCard.svelte';
 	import EmptyYearMark from '$lib/components/about/primitives/EmptyYearMark.svelte';
 	import YearCycler from '$lib/components/about/primitives/YearCycler.svelte';
 	import RootNavDropdown from '$lib/components/layout/RootNavDropdown.svelte';
+
+	// ---- lazy: every section below the first fold ---------------------------
+	// Each loader is awaited inside a <svelte:boundary> below. With the
+	// experimental async compiler (already on in svelte.config.js) the server
+	// AWAITS these during SSR and renders the full HTML — the crawler sees
+	// everything — while the client ships each section as its own chunk.
+	// During hydration Svelte leaves the server-rendered DOM in place until a
+	// chunk resolves, then hydrates over the very same nodes: no teardown, no
+	// flicker, no layout shift. SvelteKit also emits the CSS of SSR-executed
+	// dynamic imports as eager <link>s, so the HTML never paints unstyled.
+	//
+	// TWO RULES, both load-bearing:
+	// 1. NO `pending` snippet on these boundaries — with one, the SERVER
+	//    renders the pending snippet instead of the section and the SSR HTML
+	//    (and SEO) is gone.
+	// 2. Loaders stay module-scope arrows so the awaited expression is
+	//    referentially stable and never re-runs.
+	const humbleBeginnings = () =>
+		import('$lib/components/about/sections/HumbleBeginnings.svelte');
+	const greenScreen = () => import('$lib/components/about/sections/GreenScreen.svelte');
+	const featureLength = () =>
+		import('$lib/components/about/sections/FeatureLength.svelte');
+	const takingItSeriously = () =>
+		import('$lib/components/about/sections/TakingItSeriously.svelte');
+	const musicVideos = () => import('$lib/components/about/sections/MusicVideos.svelte');
+	const animation = () => import('$lib/components/about/sections/Animation.svelte');
+	const festivals = () => import('$lib/components/about/sections/Festivals.svelte');
+	const college = () => import('$lib/components/about/sections/College.svelte');
+	const spunksters = () => import('$lib/components/about/sections/Spunksters.svelte');
+	const whatMakesUsHuman = () =>
+		import('$lib/components/about/sections/WhatMakesUsHuman.svelte');
+	const freelancer = () => import('$lib/components/about/sections/Freelancer.svelte');
+	const entrepreneurship = () =>
+		import('$lib/components/about/sections/Entrepreneurship.svelte');
+	const showAndTour = () => import('$lib/components/about/sections/ShowAndTour.svelte');
+	const now = () => import('$lib/components/about/sections/Now.svelte');
+	const creed = () => import('$lib/components/about/sections/Creed.svelte');
+	const theEnd = () => import('$lib/components/about/sections/TheEnd.svelte');
+	const credits = () => import('$lib/components/about/sections/Credits.svelte');
 
 	let { data } = $props();
 	const signedIn = $derived(Boolean(data.signedIn));
@@ -64,40 +90,91 @@
 <div class="root">
 	<YearScrubber {stops} />
 
-	<Hero isMobile={data.isMobile} seed={data.starSeed} />
+	<Hero isMobile={data.isMobile} field={data.starField} />
 	<Rewind />
 	<ChapterCard act={1} />
-	<HumbleBeginnings {signedIn} />
-	<GreenScreen {signedIn} />
-	<FeatureLength />
-	<TakingItSeriously />
-	<MusicVideos />
-	<Animation />
-	<Festivals {signedIn} />
+	<svelte:boundary>
+		{@const HumbleBeginnings = (await humbleBeginnings()).default}
+		<HumbleBeginnings {signedIn} />
+	</svelte:boundary>
+	<svelte:boundary>
+		{@const GreenScreen = (await greenScreen()).default}
+		<GreenScreen {signedIn} />
+	</svelte:boundary>
+	<svelte:boundary>
+		{@const FeatureLength = (await featureLength()).default}
+		<FeatureLength />
+	</svelte:boundary>
+	<svelte:boundary>
+		{@const TakingItSeriously = (await takingItSeriously()).default}
+		<TakingItSeriously />
+	</svelte:boundary>
+	<svelte:boundary>
+		{@const MusicVideos = (await musicVideos()).default}
+		<MusicVideos />
+	</svelte:boundary>
+	<svelte:boundary>
+		{@const Animation = (await animation()).default}
+		<Animation />
+	</svelte:boundary>
+	<svelte:boundary>
+		{@const Festivals = (await festivals()).default}
+		<Festivals {signedIn} />
+	</svelte:boundary>
 	<ChapterCard act={2} />
-	<College />
-	<Spunksters />
+	<svelte:boundary>
+		{@const College = (await college()).default}
+		<College />
+	</svelte:boundary>
+	<svelte:boundary>
+		{@const Spunksters = (await spunksters()).default}
+		<Spunksters />
+	</svelte:boundary>
 	<EmptyYearMark
 		year="2014"
 		color="#ffd934"
 		note="Nothing big shipped this year — just film sets, coursework, and a growing pile of notes, all quietly pointed at one thing: the senior thesis." />
-	<WhatMakesUsHuman />
+	<svelte:boundary>
+		{@const WhatMakesUsHuman = (await whatMakesUsHuman()).default}
+		<WhatMakesUsHuman />
+	</svelte:boundary>
 	<ChapterCard act={3} />
-	<Freelancer />
-	<Entrepreneurship />
+	<svelte:boundary>
+		{@const Freelancer = (await freelancer()).default}
+		<Freelancer />
+	</svelte:boundary>
+	<svelte:boundary>
+		{@const Entrepreneurship = (await entrepreneurship()).default}
+		<Entrepreneurship />
+	</svelte:boundary>
 	<EmptyYearMark
 		year="2018"
 		color="#00d6ff"
 		note="Heads-down year: client work paying the bills while the idea that became Show&Tour kept getting sketched and re-sketched." />
-	<ShowAndTour />
+	<svelte:boundary>
+		{@const ShowAndTour = (await showAndTour()).default}
+		<ShowAndTour />
+	</svelte:boundary>
 	<YearCycler
 		years={[2020, 2021, 2022, 2023, 2024, 2025]}
 		color="#00f2c3"
 		caption="Building Show&Tour" />
-	<Now />
-	<Creed />
-	<TheEnd />
-	<Credits />
+	<svelte:boundary>
+		{@const Now = (await now()).default}
+		<Now />
+	</svelte:boundary>
+	<svelte:boundary>
+		{@const Creed = (await creed()).default}
+		<Creed />
+	</svelte:boundary>
+	<svelte:boundary>
+		{@const TheEnd = (await theEnd()).default}
+		<TheEnd />
+	</svelte:boundary>
+	<svelte:boundary>
+		{@const Credits = (await credits()).default}
+		<Credits />
+	</svelte:boundary>
 </div>
 
 <style>

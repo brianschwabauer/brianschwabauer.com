@@ -327,6 +327,13 @@
 	}
 
 	function drawLimbs(limbs: Limb[]) {
+		// TWO PHASES, NEVER INTERLEAVED. getCTM() is a geometry READ and
+		// setAttribute('d') is a geometry WRITE — doing limb 1's writes before
+		// limb 2's reads forced the browser to re-resolve SVG geometry once per
+		// limb per frame. All four limbs are read first, then all are written,
+		// so a frame costs at most one geometry flush.
+		type Job = { limb: Limb; da: string; db: string; ds: string };
+		const jobs: Job[] = [];
 		for (const limb of limbs) {
 			const ctm = limb.host.getCTM();
 			if (!ctm) continue;
@@ -349,16 +356,22 @@
 			const j = `${p1[0].toFixed(2)} ${p1[1].toFixed(2)}`;
 			const da = `M${p0[0].toFixed(2)} ${p0[1].toFixed(2)}L${j}`;
 			const db = `M${j}L${p2[0].toFixed(2)} ${p2[1].toFixed(2)}`;
+			let ds = '';
+			if (limb.seg_s.length) {
+				const sx = p0[0] + (p1[0] - p0[0]) * 0.42;
+				const sy = p0[1] + (p1[1] - p0[1]) * 0.42;
+				ds = `M${p0[0].toFixed(2)} ${p0[1].toFixed(2)}L${sx.toFixed(2)} ${sy.toFixed(2)}`;
+			}
+			jobs.push({ limb, da, db, ds });
+		}
+		for (const { limb, da, db, ds } of jobs) {
 			for (const path of limb.seg_a) {
 				if (path.getAttribute('d') !== da) path.setAttribute('d', da);
 			}
 			for (const path of limb.seg_b) {
 				if (path.getAttribute('d') !== db) path.setAttribute('d', db);
 			}
-			if (limb.seg_s.length) {
-				const sx = p0[0] + (p1[0] - p0[0]) * 0.42;
-				const sy = p0[1] + (p1[1] - p0[1]) * 0.42;
-				const ds = `M${p0[0].toFixed(2)} ${p0[1].toFixed(2)}L${sx.toFixed(2)} ${sy.toFixed(2)}`;
+			if (ds) {
 				for (const path of limb.seg_s) {
 					if (path.getAttribute('d') !== ds) path.setAttribute('d', ds);
 				}
@@ -378,8 +391,24 @@
 			drawLimbs(limbs);
 			frame = requestAnimationFrame(tick);
 		};
+		// pause the solve while the hero is scrolled out of sight — the show
+		// keeps playing (CSS animations are the browser's problem), only the
+		// per-frame limb IK stops paying rent. On re-entry the first frame
+		// re-solves before paint, so nothing can be seen mid-correction.
+		const io = new IntersectionObserver(([entry]) => {
+			if (entry.isIntersecting) {
+				if (!frame) tick();
+			} else if (frame) {
+				cancelAnimationFrame(frame);
+				frame = 0;
+			}
+		});
+		io.observe(root);
 		tick();
-		return () => cancelAnimationFrame(frame);
+		return () => {
+			io.disconnect();
+			if (frame) cancelAnimationFrame(frame);
+		};
 	});
 </script>
 

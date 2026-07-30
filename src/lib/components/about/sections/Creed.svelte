@@ -434,17 +434,19 @@
 		untrack(() => {
 			for (let i = 0; i < 10; i++) spawnPlane(bounds);
 		});
+		// The chain only runs while the section is on screen — the IO below
+		// starts it on entry and clears it on exit, so an idle page parked on
+		// another section doesn't keep a timer waking the CPU every ~2.6s.
 		const scheduleSpawn = () => {
 			spawnTimeout = setTimeout(
 				() => {
-					if (!alive) return;
-					if (visible && planes.length < PLANE_AMBIENT) spawnPlane(bounds);
+					if (!alive || !visible) return;
+					if (planes.length < PLANE_AMBIENT) spawnPlane(bounds);
 					scheduleSpawn();
 				},
 				1300 + Math.random() * 2600,
 			);
 		};
-		scheduleSpawn();
 
 		// the svg's nose points 42° above horizontal; rotate flight heading to it
 		const NOSE_OFFSET = 42;
@@ -514,11 +516,14 @@
 		};
 
 		const io = new IntersectionObserver(([entry]) => {
+			const was_visible = visible;
 			visible = entry.isIntersecting;
 			if (visible && !raf) {
 				last = performance.now();
 				raf = requestAnimationFrame(tick);
 			}
+			if (visible && !was_visible) scheduleSpawn();
+			else if (!visible) clearTimeout(spawnTimeout);
 		});
 		io.observe(field);
 		return () => {

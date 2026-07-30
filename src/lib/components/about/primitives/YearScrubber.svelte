@@ -2,6 +2,7 @@
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
 	import { scrollToSection, setSectionHash } from '$lib/sectionNav';
+	import { sectionSpy } from '$lib/sectionSpy';
 
 	let {
 		stops,
@@ -146,10 +147,6 @@
 	}
 
 	onMount(() => {
-		const sections: HTMLElement[] = stops
-			.map((s) => document.getElementById(s.id))
-			.filter((el): el is HTMLElement => !!el);
-
 		// Debounce scroll-driven hash writes: Safari rate-limits history API
 		// calls, and fast scrubbing through 16 sections can exceed the quota.
 		// The URL only needs to be right once scrolling settles.
@@ -161,12 +158,21 @@
 			}, 200);
 		};
 
-		let ticking = false;
-		const update = () => {
-			ticking = false;
+		// Section geometry comes from the shared spy's CACHE — the old per-frame
+		// version re-measured 17 sections plus document scrollHeight on every
+		// scroll frame, and that scrollHeight read forces layout of the whole
+		// page across its content-visibility sections. The spy re-measures only
+		// on resize / section-height changes and hands everyone the same rAF-
+		// coalesced numbers.
+		const unsubscribeSpy = sectionSpy((m) => {
+			// this scrubber's stops are the spy's sections in the same DOM order;
+			// index by id so a missing section can never shift the rail
 			const probe = window.innerHeight * 0.35;
 			const y = window.scrollY + probe;
-			const tops = sections.map((s) => s.getBoundingClientRect().top + window.scrollY);
+			const tops = stops.map((s) => {
+				const idx = m.ids.indexOf(s.id);
+				return idx === -1 ? Infinity : m.tops[idx];
+			});
 
 			// Index of the section being read, and how far through it we are.
 			let i = 0;
@@ -174,8 +180,8 @@
 			// Past the last stop there is no next top to interpolate towards, so the
 			// end of the scrollable range stands in — that way the fill reaches the
 			// final dot exactly at the bottom of the page.
-			const maxY = document.documentElement.scrollHeight - window.innerHeight + probe;
-			const next = i + 1 < tops.length ? tops[i + 1] : maxY;
+			const maxY = m.scrollHeight - window.innerHeight + probe;
+			const next = i + 1 < tops.length && tops[i + 1] !== Infinity ? tops[i + 1] : maxY;
 			const span = next - tops[i];
 			const within = span > 0 ? Math.min(1, Math.max(0, (y - tops[i]) / span)) : 0;
 
@@ -193,39 +199,28 @@
 			 */
 			railProgress = tops.length > 1 ? Math.min(1, (i + within) / (tops.length - 1)) : 0;
 
-			const current = sections[i]?.id ?? '';
-			if (current !== activeId) {
+			const current = tops[i] === Infinity ? '' : (stops[i]?.id ?? '');
+			if (current && current !== activeId) {
 				activeId = current;
 				if (!jumping) queueHash(current);
 			}
-		};
-		// Coalesce scroll events into one measurement per frame.
-		const onScroll = () => {
-			if (ticking) return;
-			ticking = true;
-			requestAnimationFrame(update);
-		};
-		const onResize = () => {
-			measureRail();
-			onScroll();
-		};
+		});
+		const onResize = () => measureRail();
 		// After the first paint, so the rows have a height to measure.
 		tick().then(measureRail);
-		update();
-		window.addEventListener('scroll', onScroll, { passive: true });
 		window.addEventListener('resize', onResize);
 
 		// Restore a deep-linked section on load. The browser/SvelteKit will have
 		// attempted a native hash scroll already, but content-visibility estimates
 		// make that land in the wrong place — re-run the converging jump to fix it.
 		const hashId = page.url.hash.replace(/^#/, '');
-		if (hashId && sections.some((s) => s.id === hashId)) {
+		if (hashId && stops.some((s) => s.id === hashId)) {
 			tick().then(() => requestAnimationFrame(() => jump(hashId)));
 		}
 
 		return () => {
 			window.clearTimeout(hashTimer);
-			window.removeEventListener('scroll', onScroll);
+			unsubscribeSpy();
 			window.removeEventListener('resize', onResize);
 		};
 	});

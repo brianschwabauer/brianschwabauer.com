@@ -103,9 +103,31 @@
 				if (Math.abs(fling) < 12) fling = 0;
 			}
 		};
-		raf = requestAnimationFrame(tick);
-		return () => {
+		const start = () => {
+			if (raf) return;
+			// Reset the clock so the first resumed frame doesn't swallow the whole
+			// off-screen stretch as one giant dt.
+			last = performance.now();
+			raf = requestAnimationFrame(tick);
+		};
+		const stop = () => {
 			cancelAnimationFrame(raf);
+			raf = 0;
+		};
+		// Nothing to drift while the strip is off screen. Fail open without IO.
+		let io: IntersectionObserver | null = null;
+		if (typeof IntersectionObserver === 'undefined') {
+			start();
+		} else {
+			io = new IntersectionObserver(
+				(entries) => (entries.some((e) => e.isIntersecting) ? start() : stop()),
+				{ rootMargin: '20%' },
+			);
+			io.observe(strip_el);
+		}
+		return () => {
+			stop();
+			io?.disconnect();
 			// Unmounting mid-drag would otherwise leave the window listeners behind.
 			window.removeEventListener('pointermove', onpointermove);
 			window.removeEventListener('pointerup', endDrag);

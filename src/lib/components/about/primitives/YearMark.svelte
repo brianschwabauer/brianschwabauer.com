@@ -9,6 +9,8 @@
 	 * section never pays for a second scroll listener to get one: they are
 	 * different readings of the same number.
 	 */
+	import { onScrollProgress } from './scrollProgress';
+
 	let {
 		year,
 		subtitle = '',
@@ -37,21 +39,13 @@
 
 	$effect(() => {
 		if (!el) return;
-		const onScroll = () => {
-			const rect = el!.getBoundingClientRect();
+		return onScrollProgress(el, (rect) => {
 			const vh = window.innerHeight || 1;
 			const navbarHeight = 350;
 			const total = rect.height + vh - navbarHeight;
 			const traversed = vh - rect.top;
 			progress = Math.max(0, Math.min(1, traversed / total));
-		};
-		onScroll();
-		window.addEventListener('scroll', onScroll, { passive: true });
-		window.addEventListener('resize', onScroll);
-		return () => {
-			window.removeEventListener('scroll', onScroll);
-			window.removeEventListener('resize', onScroll);
-		};
+		});
 	});
 
 	/**
@@ -130,7 +124,8 @@
 		-webkit-background-clip: text;
 		background-clip: text;
 		transform: translateX(calc((1 - var(--p)) * -3vw));
-		transition: transform 200ms linear;
+		/* No transition here: the transform is driven per-frame from --p, and a
+		   transition on it would restart every frame. */
 		/* Above its own clones. */
 		position: relative;
 		z-index: 1;

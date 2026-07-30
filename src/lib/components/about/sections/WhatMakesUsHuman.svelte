@@ -6,6 +6,7 @@
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+	import { onScrollProgress } from '../primitives/scrollProgress';
 
 	const filmImages: GalleryItem[] = [
 		{
@@ -572,18 +573,10 @@
 	$effect(() => {
 		const sec = section();
 		if (!sec) return;
-		const onScroll = () => {
-			const rect = sec.getBoundingClientRect();
+		return onScrollProgress(sec, (rect) => {
 			const travel = Math.max(1, rect.height - (window.innerHeight || 0));
 			progress = Math.max(0, Math.min(1, -rect.top / travel));
-		};
-		onScroll();
-		window.addEventListener('scroll', onScroll, { passive: true });
-		window.addEventListener('resize', onScroll);
-		return () => {
-			window.removeEventListener('scroll', onScroll);
-			window.removeEventListener('resize', onScroll);
-		};
+		});
 	});
 
 	let copies = $derived(

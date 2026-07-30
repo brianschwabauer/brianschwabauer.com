@@ -1,24 +1,28 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { ripple } from '@delightstack/utilities';
 	import { Button } from '@delightstack/components/actions';
 	import { Form, Input } from '@delightstack/components/form';
 	import { Expand } from '@delightstack/components/display';
 	import { Callout } from '@delightstack/components/feedback';
-	import { STARFIELD_IMAGES } from '../starfield-images';
-	import HeroMascot from './HeroMascot.svelte';
-	import HeroExplosion from './HeroExplosion.svelte';
+	import { createStarField, STAR_COUNT, type Star } from '../starfield-core';
+	import type { SeededField } from '../starfield-build';
+	// The mascot and the explosion are the two heaviest artifacts on the page
+	// (HeroMascot alone is ~120KB of CSS + a 170-node SVG rig) and neither is
+	// visible until the button is pushed — so neither ships in the initial
+	// chunk. They are dynamically imported: warmed during idle time / on first
+	// hover, and awaited by startDestruction() before the show begins.
+	import type HeroMascotType from './HeroMascot.svelte';
+	import type HeroExplosionType from './HeroExplosion.svelte';
 
 	// Both of these come from the server, and for the same reason: the seeded
 	// starfield has to be built from identical inputs on the server and on the
 	// client or the field rebuilds itself somewhere else at hydration. `isMobile`
-	// (User-Agent) picks the anchor exclusion zone — see the buffers below —  and
-	// `seed` is rolled per request in +page.server.ts so every visit gets a
-	// different set of photos. A viewport check or a `Math.random()` here would
-	// each be a different number on the two sides; the load data is the one
-	// channel that is guaranteed to carry the same value across the boundary.
-	let { isMobile = false, seed = 0x5742_2026 }: { isMobile?: boolean; seed?: number } =
-		$props();
+	// (User-Agent) picks the anchor exclusion zone for click-conjured tiles, and
+	// `field` IS the seeded opening field — built in +page.server.ts (see
+	// starfield-build.ts) and shipped in the load data, so the client hydrates
+	// from the finished stars without ever downloading the 503-name pool.
+	let { isMobile = false, field }: { isMobile?: boolean; field: SeededField } = $props();
 
 	// ---- starfield ---------------------------------------------------------
 	// A 3D "warp" field of past-work thumbnails. A fixed seed renders the whole
@@ -32,8 +36,8 @@
 	// *every* tile's u in lockstep — a real zoom-through: scrolling down sweeps
 	// tiles out and leaves them gone, so the field empties across the pin;
 	// scrolling up flows tiles on and also draws drained tiles back in from
-	// deep space, so fresh work zooms toward you.
-	const STAR_COUNT = 24;
+	// deep space, so fresh work zooms toward you. (STAR_COUNT lives in
+	// starfield-core.ts now, alongside the rest of the star-making machinery.)
 
 	// ---- the easter egg -----------------------------------------------------
 	// Clicking anywhere in the field strikes another tile at that spot. The cap
@@ -94,57 +98,10 @@
 	 */
 	const U_SPAWN = -Z_FAR / (Z_NEAR - Z_FAR); // z(U_SPAWN) === 0
 
-	/**
-	 * THE TILE OWNS ITS SHAPE — THE IMAGE DOES NOT.
-	 *
-	 * `height: auto` asks the image for the box, and an image that has not
-	 * arrived has no answer: an <img> with no intrinsic size and a set width
-	 * lays out at HEIGHT ZERO. On a warm load that never shows, because the
-	 * images are in cache and have their dimensions before the first layout. On
-	 * a cold one — a fresh incognito window — the tiles are laid out flat and
-	 * then snap open to full height as each image's header lands, which is the
-	 * "some of them jump, always upward, only on a new session" this fixes. It
-	 * was never hydration; it just happens to land near it, because that is when
-	 * the network is busiest.
-	 *
-	 * So the box is declared up front and `object-fit: cover` fits the image to
-	 * it. The ratios are the three the pool is actually made of — a 502-image
-	 * library that is 4:3, 3:2 and 16:9 almost end to end (sampled: p25 1.47,
-	 * median 1.50, p75 1.78) — weighted the way the pool is, so most tiles get
-	 * the ratio their image already has and crop by nothing at all.
-	 */
-	const TILE_RATIOS = [4 / 3, 3 / 2, 3 / 2, 16 / 9] as const;
-
-	type Star = {
-		id: number;
-		src: string;
-		x: number; // % across the hero — the tile's anchor / direction from centre
-		y: number; // % down the hero
-		w: number; // width factor (~0.7–1.5)
-		ar: number; // the tile's own aspect ratio — see TILE_RATIOS
-		rot: number; // flat in-plane rotation (deg) — no 3D skew
-		drift: number; // seconds for one idle (unscrolled) pass through the tunnel
-		spawned?: boolean; // conjured by a click rather than seeded
-	};
-
-	// deterministic PRNG (mulberry32) — the seeded field must be byte-identical
-	// on the server and the client so hydration never flickers.
-	function mulberry32(seed: number) {
-		let a = seed >>> 0;
-		return () => {
-			a = (a + 0x6d2b79f5) | 0;
-			let t = Math.imul(a ^ (a >>> 15), 1 | a);
-			t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-		};
-	}
-
-	// Centre exclusion half-extents (% from centre): an anchor landing inside
-	// this box is re-rolled, keeping tiles off the headline. Mobile widens the
-	// box — the hero text is proportionally far larger there. Set here, before
-	// the seed runs, off the server `isMobile` flag so the SSR and client
-	// fields are byte-identical (a viewport check would differ → hydration
-	// mismatch, the tiles popping out of the centre).
+	// Centre exclusion half-extents (% from centre) for CLICK-CONJURED tiles —
+	// the seeded field's own buffers live in starfield-build.ts and MUST match
+	// these. Off the server `isMobile` flag for the same server/client-identity
+	// reason as ever.
 	let anchorBufX = 23;
 	let anchorBufY = 34;
 	// a one-time read by design — isMobile is fixed for the page's lifetime
@@ -154,74 +111,19 @@
 		anchorBufY = 36;
 	}
 
-	// A raw anchor that stays clear of the central column the headline owns.
-	function randomAnchor(rand: () => number): { x: number; y: number } {
-		let x = 4 + rand() * 92;
-		let y = 6 + rand() * 88;
-		for (let i = 0; i < 12; i++) {
-			if (Math.abs(x - 50) > anchorBufX || Math.abs(y - 50) > anchorBufY) break;
-			x = 4 + rand() * 92;
-			y = 6 + rand() * 88;
-		}
-		return { x, y };
-	}
-
-	// Best-candidate sampling: try a handful of anchors and keep the one
-	// sitting furthest from every other tile, so a new star drops into the
-	// emptiest gap instead of piling onto its neighbours.
-	function placeStar(rand: () => number, others: Star[]): { x: number; y: number } {
-		let best = { x: 50, y: 50 };
-		let bestDist = -1;
-		for (let c = 0; c < 9; c++) {
-			const cand = randomAnchor(rand);
-			let nearest = Infinity;
-			for (const o of others) {
-				const dx = cand.x - o.x;
-				const dy = cand.y - o.y;
-				const d = dx * dx + dy * dy;
-				if (d < nearest) nearest = d;
-			}
-			if (nearest > bestDist) {
-				bestDist = nearest;
-				best = cand;
-			}
-		}
-		return best;
-	}
-
-	let starId = 0;
-
-	// A shuffle-bag of image names: every image is dealt exactly once before
-	// any repeat. When the bag empties it refills with the full pool minus
-	// whatever is on screen, so no two tiles ever show the same image and
-	// every image in the pool is guaranteed its turn.
-	let imageBag: string[] = [];
-
-	function drawImage(rand: () => number, onScreen: string[]): string {
-		if (imageBag.length === 0) {
-			imageBag = STARFIELD_IMAGES.filter((s) => !onScreen.includes(s));
-			if (imageBag.length === 0) imageBag = STARFIELD_IMAGES.slice();
-		}
-		const idx = Math.floor(rand() * imageBag.length);
-		return imageBag.splice(idx, 1)[0];
-	}
-
-	function makeStar(rand: () => number, others: Star[]): Star {
-		const { x, y } = placeStar(rand, others);
-		return {
-			id: starId++,
-			src: drawImage(
-				rand,
-				others.map((o) => o.src),
-			),
-			x,
-			y,
-			w: 1.1 + rand() * 0.8,
-			ar: TILE_RATIOS[Math.floor(rand() * TILE_RATIOS.length)],
-			rot: (rand() - 0.5) * 22,
-			drift: 15 + rand() * 13,
-		};
-	}
+	// The client's star factory: conjures clicked tiles and re-deals recycled
+	// ones. It starts with only the names the server dealt (a tile recycled in
+	// the first seconds re-shows one of those — invisible in practice, the
+	// recycle window is at opacity ~0) and swaps in the full 503-name pool once
+	// its lazy chunk arrives; see the idle load in onMount below.
+	// svelte-ignore state_referenced_locally
+	const starFieldFactory = createStarField(
+		field.stars.map((s) => s.src),
+		anchorBufX,
+		anchorBufY,
+		field.stars.length,
+	);
+	const makeStar = starFieldFactory.makeStar;
 
 	// The look of a tile at warp position u — a pure function, so the server,
 	// the hydrated first paint and the rAF loop all agree exactly. u rides
@@ -241,20 +143,15 @@
 		};
 	}
 
-	// SSR-stable seed → an identical field on server and client. Each tile is
-	// placed against the ones already chosen so the opening field is spread,
-	// and seeded with a warp position so the field looks alive on first paint.
-	// The seed itself changes per request, so the photos differ every visit.
-	// a one-time read by design — the seed is fixed for the page's lifetime, and
-	// the field is built from it exactly once, here
+	// The seeded opening field, built server-side and carried over in the load
+	// data — an identical field on server and client by construction. Cloned
+	// before use: the warp loop mutates stars in place (swapContent), and load
+	// data is not ours to mutate.
+	// a one-time read by design — the field is fixed for the page's lifetime
 	// svelte-ignore state_referenced_locally
-	const seededRand = mulberry32(seed);
-	const seededStars: Star[] = [];
-	const seededU: number[] = [];
-	for (let i = 0; i < STAR_COUNT; i++) {
-		seededStars.push(makeStar(seededRand, seededStars));
-		seededU.push(seededRand());
-	}
+	const seededStars: Star[] = field.stars.map((s) => ({ ...s }));
+	// svelte-ignore state_referenced_locally
+	const seededU: number[] = field.u.slice();
 	let stars = $state<Star[]>(seededStars);
 	// static fallback styles — shown as-is under reduced motion (no animation),
 	// and harmlessly overridden by the CSS idle drift / JS warp loop otherwise.
@@ -723,6 +620,51 @@
 		return new Promise((r) => setTimeout(r, ms));
 	}
 
+	// ---- the lazy heavyweights ----------------------------------------------
+	// The mascot rig and the explosion canvas are only needed once the button
+	// is pushed, so they live in their own chunks. `preloadDestruction()` is
+	// idempotent — first call starts the downloads, every call returns the same
+	// promise — and it is fired from three places: idle time after hydration
+	// (so a mobile visitor who never hovers still has it warm), the button's
+	// hover/focus (the classic intent signal), and startDestruction itself
+	// (the guarantee — the 180ms press squish absorbs most of a cold fetch).
+	let MascotComp = $state<typeof HeroMascotType | null>(null);
+	let ExplosionComp = $state<typeof HeroExplosionType | null>(null);
+	let destructionAssets: Promise<unknown> | undefined;
+
+	function preloadDestruction() {
+		destructionAssets ??= Promise.all([
+			import('./HeroMascot.svelte').then((m) => (MascotComp = m.default)),
+			import('./HeroExplosion.svelte').then((m) => (ExplosionComp = m.default)),
+		]).catch((err) => {
+			// a failed fetch (flaky network) must not poison the cache — clear it
+			// so the next intent signal retries the download
+			destructionAssets = undefined;
+			throw err;
+		});
+		return destructionAssets;
+	}
+
+	// Warm the deferred pieces once the browser is idle: first the full image
+	// pool (tiny — recycling needs it), then the destruction assets. Neither
+	// touches the critical path; both are ready long before they can be needed.
+	onMount(() => {
+		const warm = () => {
+			import('../starfield-pool')
+				.then((m) => starFieldFactory.setPool(m.STARFIELD_POOL))
+				.catch(() => {})
+				.finally(() => {
+					preloadDestruction();
+				});
+		};
+		if ('requestIdleCallback' in window) {
+			const id = requestIdleCallback(warm, { timeout: 4000 });
+			return () => cancelIdleCallback(id);
+		}
+		const id = setTimeout(warm, 2500);
+		return () => clearTimeout(id);
+	});
+
 	/**
 	 * The pump beat sheet. This is a STORY, not four identical reps: he is
 	 * cocky for two, the third fails outright, the fourth beat is the puzzled
@@ -999,11 +941,20 @@
 	async function startDestruction() {
 		if (phase !== 'idle' || started) return;
 		started = true;
+		// the show needs the mascot and the explosion — start (or join) their
+		// downloads now; the press squish below absorbs most of a cold fetch
+		const assets = preloadDestruction();
 
 		const reduce =
 			typeof window !== 'undefined' &&
 			window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		if (reduce) {
+			// the explosion must be MOUNTED before the tick, or the trigger
+			// increments against a component that isn't there to see it (its
+			// own reduced-motion guard then skips the burst, but the aftermath
+			// copy still needs the phase flip)
+			await assets.catch(() => {});
+			await tick();
 			phase = 'aftermath';
 			explosionTick++;
 			return;
@@ -1013,6 +964,12 @@
 		prePress = true;
 		await sleep(180);
 		prePress = false;
+
+		// the mascot has to exist in the DOM before `awake`, or the fall — the
+		// first 2100ms beat — plays to an empty stage. On a warm cache this
+		// resolves instantly; cold, the squish already covered ~180ms of it.
+		await assets.catch(() => {});
+		await tick();
 
 		phase = 'awake';
 		// The mascot's whole `prep` beat — the FALL, the contact, the knees
@@ -1259,6 +1216,7 @@
 						src="https://cdn.brianschwabauer.com/media/{star.src}"
 						alt=""
 						loading={i < 8 ? 'eager' : 'lazy'}
+						fetchpriority={i < 4 ? 'high' : 'auto'}
 						decoding="async"
 						style:--x="{star.x}%"
 						style:--y="{star.y}%"
@@ -1286,9 +1244,13 @@
 				bind:this={beforeRef}>
 				<div class="badge" data-frag>
 					<span class="avatar" aria-hidden="true">
+						<!-- the -thumb is a 96px avif cut for this ~40px circle; the
+						     original 93KB file stays for anything that needs it full-size -->
 						<img
-							src="/profile_picture2.webp"
+							src="/profile_picture2-thumb.avif"
 							alt="Selfie of Brian Schwabauer"
+							width="96"
+							height="96"
 							loading="eager"
 							decoding="async" />
 					</span>
@@ -1328,9 +1290,16 @@
 							class:popped={phase === 'boom'}
 							type="button"
 							data-early-click="boom"
-							onmouseenter={() => (warned = true)}
+							onmouseenter={() => {
+								warned = true;
+								preloadDestruction();
+							}}
 							onmouseleave={() => (warned = phase !== 'idle')}
-							onfocus={() => (warned = true)}
+							onfocus={() => {
+								warned = true;
+								preloadDestruction();
+							}}
+							onpointerdown={() => preloadDestruction()}
 							onclick={startDestruction}
 							disabled={phase !== 'idle'}
 							aria-label={phase === 'idle'
@@ -1435,18 +1404,22 @@
 						</div>
 					{/if}
 
-					<HeroMascot
-						{phase}
-						{pumpCount}
-						{pumpStroke}
-						{strokeMs}
-						{strokeKind}
-						{buttonScale} />
+					{#if MascotComp}
+						<MascotComp
+							{phase}
+							{pumpCount}
+							{pumpStroke}
+							{strokeMs}
+							{strokeKind}
+							{buttonScale} />
+					{/if}
 				</div>
 			</div>
 		{/if}
 
-		<HeroExplosion trigger={explosionTick} origin={{ x: 0.5, y: 0.62 }} />
+		{#if ExplosionComp}
+			<ExplosionComp trigger={explosionTick} origin={{ x: 0.5, y: 0.62 }} />
+		{/if}
 
 		<!-- AFTERMATH: shown after the dust settles -->
 		{#if phase === 'aftermath'}

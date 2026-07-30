@@ -8,6 +8,7 @@
 	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+	import { onScrollProgress } from '../primitives/scrollProgress';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
@@ -28,24 +29,17 @@
 				(i) => (padding + i * spacing - startCenter) / travel,
 			);
 		};
-		const updateProgress = () => {
-			const rect = pacTunnel!.getBoundingClientRect();
+		recomputePelletTargets();
+		window.addEventListener('resize', recomputePelletTargets);
+		const unsubscribe = onScrollProgress(pacTunnel, (rect) => {
 			const vh = window.innerHeight || 1;
 			const range = vh + pacTunnel!.offsetHeight;
 			const p = range > 0 ? (vh - rect.top) / range : 0;
 			pacProgress = Math.max(0, Math.min(1, p));
-		};
-		const onResize = () => {
-			recomputePelletTargets();
-			updateProgress();
-		};
-		recomputePelletTargets();
-		updateProgress();
-		window.addEventListener('scroll', updateProgress, { passive: true });
-		window.addEventListener('resize', onResize);
+		});
 		return () => {
-			window.removeEventListener('scroll', updateProgress);
-			window.removeEventListener('resize', onResize);
+			window.removeEventListener('resize', recomputePelletTargets);
+			unsubscribe();
 		};
 	});
 
