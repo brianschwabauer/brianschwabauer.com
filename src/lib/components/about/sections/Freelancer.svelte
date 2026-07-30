@@ -5,7 +5,7 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveTabs from '../primitives/ArchiveTabs.svelte';
 	import ShippedWall, { type Column } from '../primitives/ShippedWall.svelte';
-	import { type GalleryItem } from '@delightstack/components/media';
+	import { Video, type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const CDN = 'https://cdn.brianschwabauer.com/media/';
@@ -236,7 +236,8 @@
 	];
 
 	// Standalone clickable LazyMedias in document order:
-	// 0: business card, 1: 2015 demo reel, 2: wedding film
+	// 0: business card, 1: wedding film
+	// (The 2015 demo reel isn't here — it plays inline in its own feature block.)
 	const sectionExtras: GalleryItem[] = [
 		img(
 			'2013-03-12_brian_schwabauer_business_card.avif',
@@ -244,15 +245,6 @@
 			615,
 			'The actual business card',
 		),
-		{
-			type: 'video' as const,
-			src: `${CDN}2015-08-24_brian_demo_reel_2015/master.m3u8`,
-			poster: `${CDN}2015-08-24_brian_demo_reel_2015/poster.jpg`,
-			width: 1920,
-			height: 818,
-			caption: 'Brian Schwabauer — 2015 demo reel',
-			alt: 'Brian Schwabauer — 2015 demo reel',
-		},
 		{
 			type: 'video' as const,
 			src: `${CDN}2015-06-27_jordan_and_brian_wedding-highlight_video/master.m3u8`,
@@ -466,13 +458,12 @@
 				</Reveal>
 				<Reveal variant="up" delay={120}>
 					<div class="reel-stage">
-						<LazyMedia
-							src="https://cdn.brianschwabauer.com/media/2015-08-24_brian_demo_reel_2015/poster.jpg"
-							alt="Brian Schwabauer — 2015 demo reel"
-							ratio="1920 / 818"
-							rounded={false}
-							video
-							onclick={(e) => gallery?.open(1, e.currentTarget)} />
+						<Video
+							src="https://cdn.brianschwabauer.com/media/2015-08-24_brian_demo_reel_2015/master.m3u8"
+							poster="https://cdn.brianschwabauer.com/media/2015-08-24_brian_demo_reel_2015/poster.jpg"
+							title="Brian Schwabauer — 2015 demo reel"
+							aspect_ratio="1920/818"
+							preload="none" />
 					</div>
 				</Reveal>
 			</div>
@@ -513,7 +504,7 @@
 								alt="Jordan & Brian (2015) — our wedding highlight film"
 								ratio="1920 / 818"
 								video
-								onclick={(e) => gallery?.open(2, e.currentTarget)} />
+								onclick={(e) => gallery?.open(1, e.currentTarget)} />
 						</div>
 					</Reveal>
 					<Reveal variant="up" delay={120}>
