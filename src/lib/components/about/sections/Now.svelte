@@ -31,83 +31,133 @@
 		{ name: 'stripe', role: 'billing & metered usage' },
 	];
 
-	const markableShots = [
+	/**
+	 * The side projects, minus SCRMBLD — that one is the breakout above and keeps
+	 * its own treatment. Everything in here renders through one card shape:
+	 * cover, name, tagline, a paragraph, one button. Adding the next project is
+	 * adding an entry to this array, which is the point — the shape is fixed so
+	 * the collection stays a shelf rather than a pile of one-offs.
+	 *
+	 * `images[0]` is the cover, and clicking it opens the whole set in the
+	 * lightbox — so the ones with more to show don't have to spend more card.
+	 */
+	type Shot = {
+		src: string;
+		width: number;
+		height: number;
+		caption: string;
+		alt: string;
+	};
+	type Project = {
+		name: string;
+		tagline: string;
+		body: string;
+		/** Where the button goes, and its label. */
+		href: string;
+		cta: string;
+		/** Deep-link key for this project's lightbox (`?media=<key>`). */
+		key: string;
+		/** Cover first; the rest only ever appear in the lightbox. */
+		images: Shot[];
+	};
+
+	const PROJECTS: Project[] = [
 		{
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_app-home_page_screenshot.avif',
-			width: 1907,
-			height: 979,
-			caption: 'markable.page · the builder',
-			alt: 'markable.page builder',
+			name: 'markable.page',
+			tagline: 'A PDF planner builder for e-ink tablets.',
+			body: 'Generates deeply customizable planner PDFs with working internal links, built for devices like the reMarkable. Started life as “Remarkably Organized”; now open source, with 200+ stars on GitHub.',
+			href: 'https://markable.page',
+			cta: 'Visit markable.page',
+			key: 'now-markable',
+			images: [
+				{
+					src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_app-home_page_screenshot.avif',
+					width: 1907,
+					height: 979,
+					caption: 'markable.page · the builder',
+					alt: 'markable.page builder',
+				},
+				{
+					src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_app-settings_popup_screenshot.avif',
+					width: 1532,
+					height: 1222,
+					caption: 'Planner settings',
+					alt: 'markable.page planner settings',
+				},
+				{
+					src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-close_up_on_navigation.avif',
+					width: 2048,
+					height: 1536,
+					caption: 'On the reMarkable · navigation',
+					alt: 'Planner navigation on a reMarkable tablet',
+				},
+				{
+					src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-shallow_depth_of_field_year_view.avif',
+					width: 2048,
+					height: 1536,
+					caption: 'On the reMarkable · year view',
+					alt: 'Planner year view on a reMarkable tablet',
+				},
+				{
+					src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-title_page_close_up.avif',
+					width: 2048,
+					height: 1536,
+					caption: 'On the reMarkable · title page',
+					alt: 'Planner title page on a reMarkable tablet',
+				},
+			],
 		},
 		{
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_app-settings_popup_screenshot.avif',
-			width: 1532,
-			height: 1222,
-			caption: 'Planner settings',
-			alt: 'markable.page planner settings',
+			name: 'ghtui',
+			tagline: 'A fast, minimal terminal UI for GitHub.',
+			body: 'Triage your notification inbox without leaving the terminal. Open pull requests, comment, review, merge — all keyboard-first, no browser tab required.',
+			href: 'https://github.com/brianschwabauer/ghtui',
+			cta: 'ghtui on GitHub',
+			key: 'now-ghtui',
+			images: [
+				{
+					src: 'https://cdn.brianschwabauer.com/media/2026-01-01_ghtui_screen_recording.avif',
+					width: 1080,
+					height: 608,
+					caption: 'ghtui · terminal UI for GitHub',
+					alt: 'ghtui in action',
+				},
+			],
 		},
 		{
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-close_up_on_navigation.avif',
-			width: 2048,
-			height: 1536,
-			caption: 'On the reMarkable · navigation',
-			alt: 'Planner navigation on a reMarkable tablet',
-		},
-		{
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-shallow_depth_of_field_year_view.avif',
-			width: 2048,
-			height: 1536,
-			caption: 'On the reMarkable · year view',
-			alt: 'Planner year view on a reMarkable tablet',
-		},
-		{
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-title_page_close_up.avif',
-			width: 2048,
-			height: 1536,
-			caption: 'On the reMarkable · title page',
-			alt: 'Planner title page on a reMarkable tablet',
+			name: 'Video Curator',
+			tagline: 'Intelligent curation for action-camera footage.',
+			body: 'Works through huge volumes of video on its own: drops the pocket shots, surfaces the clips and stills worth keeping, and finds the moments where the kids are laughing. Mostly aimed at GoPro footage from family trips.',
+			href: 'https://github.com/brianschwabauer/videocurator',
+			cta: 'videocurator on GitHub',
+			key: 'now-video-curator',
+			// Clips page leads: it is the screen the project is actually about.
+			images: [
+				{
+					src: 'https://cdn.brianschwabauer.com/media/2026-01-01_video_curator_screenshot-clips_page.avif',
+					width: 1920,
+					height: 993,
+					caption: 'Video Curator · clips page',
+					alt: 'Video Curator clips page',
+				},
+				{
+					src: 'https://cdn.brianschwabauer.com/media/2026-01-01_video_curator_screenshot-dashboard.avif',
+					width: 1920,
+					height: 993,
+					caption: 'Video Curator · dashboard',
+					alt: 'Video Curator dashboard',
+				},
+			],
 		},
 	];
-	const markableImages: GalleryItem[] = markableShots.map((shot) => ({
-		type: 'image',
-		...shot,
-	}));
-	// Three of the five sit in the card; the lightbox carries the whole set.
-	const MARKABLE_THUMBS = [0, 2, 3];
 
-	const ghtuiImages: GalleryItem[] = [
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_ghtui_screen_recording.avif',
-			width: 1080,
-			height: 608,
-			caption: 'ghtui · terminal UI for GitHub',
-			alt: 'ghtui in action',
-		},
-	];
+	/** The same shots as gallery items, indexed alongside `PROJECTS`. */
+	const PROJECT_ITEMS: GalleryItem[][] = PROJECTS.map((project) =>
+		project.images.map((shot) => ({ type: 'image', ...shot })),
+	);
 
-	const videoCuratorImages: GalleryItem[] = [
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_video_curator_screenshot-dashboard.avif',
-			width: 1920,
-			height: 993,
-			caption: 'Video Curator · dashboard',
-			alt: 'Video Curator dashboard',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_video_curator_screenshot-clips_page.avif',
-			width: 1920,
-			height: 993,
-			caption: 'Video Curator · clips page',
-			alt: 'Video Curator clips page',
-		},
-	];
-
-	let markable_gallery = $state<ReturnType<typeof LightboxGallery>>();
-	let ghtui_gallery = $state<ReturnType<typeof LightboxGallery>>();
-	let curator_gallery = $state<ReturnType<typeof LightboxGallery>>();
+	/** One lightbox per project, indexed alongside `PROJECTS`. */
+	let galleries = $state<Array<ReturnType<typeof LightboxGallery> | undefined>>([]);
 
 	/**
 	 * The one photograph in this section, and the only non-screenshot on it.
@@ -295,131 +345,45 @@
 				</article>
 			</Reveal>
 
-			<!-- A plain grid, and a project is allowed to break out of it. Adding the
-			     next side project is adding one <article>. -->
+			<!-- One shape, repeated: cover, name, tagline, paragraph, button. The
+			     cards are deliberately identical — the breakout above is where the
+			     variety lives, and a shelf only reads as a shelf if the things on it
+			     line up. -->
 			<div class="grid">
-				<Reveal variant="up">
-					<article class="card">
-						<h4>
-							<a href="https://markable.page" target="_blank" rel="noopener">
-								markable.page
-							</a>
-							<span class="dash">— a PDF planner builder for e-ink tablets</span>
-						</h4>
-						<p>
-							A planner builder that generates highly customizable PDFs with internal
-							links, designed for devices like the reMarkable. Started life as "Remarkably
-							Organized"; now open source, with
-							<strong>200+ stars on GitHub.</strong>
-						</p>
-						<a
-							class="card-link"
-							href="https://github.com/brianschwabauer/remarkably-organized"
-							target="_blank"
-							rel="noopener">
-							github.com/brianschwabauer/remarkably-organized
-							<svg viewBox="0 0 24 24" aria-hidden="true">
-								<path
-									d="M5 12h14M13 6l6 6-6 6"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round" />
-							</svg>
-						</a>
-						<div class="shots three">
-							{#each MARKABLE_THUMBS as index (index)}
+				{#each PROJECTS as project, i (project.key)}
+					<Reveal variant="up" delay={80 + i * 60}>
+						<article class="card project">
+							<div class="cover">
 								<LazyMedia
-									src={markableShots[index].src}
-									alt={markableShots[index].alt}
-									ratio="4 / 3"
-									onclick={(e) => markable_gallery?.open(index, e.currentTarget)} />
-							{/each}
-						</div>
-					</article>
-				</Reveal>
-
-				<Reveal variant="up" delay={120}>
-					<article class="card terminal">
-						<div class="terminal-bar">
-							<span class="dot r"></span>
-							<span class="dot y"></span>
-							<span class="dot g"></span>
-							<span class="terminal-title">~/projects/ghtui — bash</span>
-						</div>
-						<div class="card-body">
-							<h4>ghtui</h4>
-							<p class="card-tagline">A fast, minimal terminal UI for managing GitHub.</p>
-							<p>
-								Triage your inbox without leaving the terminal. Open PRs, comment, review,
-								merge — all keyboard-first.
-							</p>
-							<a
-								class="card-link"
-								href="https://github.com/brianschwabauer/ghtui"
-								target="_blank"
-								rel="noopener">
-								github.com/brianschwabauer/ghtui
-								<svg viewBox="0 0 24 24" aria-hidden="true">
-									<path
-										d="M5 12h14M13 6l6 6-6 6"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round" />
-								</svg>
-							</a>
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2026-01-01_ghtui_screen_recording.avif"
-								alt="ghtui in action"
-								ratio="16 / 10"
-								onclick={(e) => ghtui_gallery?.open(0, e.currentTarget)} />
-						</div>
-					</article>
-				</Reveal>
-
-				<Reveal variant="up" delay={180}>
-					<article class="card">
-						<h4>Video Curator</h4>
-						<p class="card-tagline">Intelligent curation for action-camera footage.</p>
-						<p>
-							Processes huge volumes of footage automatically: drops pocket shots,
-							surfaces high-quality clips and stills, and picks out moments where children
-							are smiling or laughing. Mostly used to wrangle GoPro footage from family
-							trips.
-						</p>
-						<a
-							class="card-link"
-							href="https://github.com/brianschwabauer/videocurator"
-							target="_blank"
-							rel="noopener">
-							github.com/brianschwabauer/videocurator
-							<svg viewBox="0 0 24 24" aria-hidden="true">
-								<path
-									d="M5 12h14M13 6l6 6-6 6"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round" />
-							</svg>
-						</a>
-						<div class="shots">
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2026-01-01_video_curator_screenshot-dashboard.avif"
-								alt="Video Curator dashboard"
-								ratio="16 / 10"
-								onclick={(e) => curator_gallery?.open(0, e.currentTarget)} />
-							<LazyMedia
-								src="https://cdn.brianschwabauer.com/media/2026-01-01_video_curator_screenshot-clips_page.avif"
-								alt="Video Curator clips page"
-								ratio="16 / 10"
-								onclick={(e) => curator_gallery?.open(1, e.currentTarget)} />
-						</div>
-					</article>
-				</Reveal>
+									src={project.images[0].src}
+									alt={project.images[0].alt}
+									ratio="16 / 9"
+									rounded={false}
+									shadow={false}
+									onclick={(e) => galleries[i]?.open(0, e.currentTarget)} />
+								{#if project.images.length > 1}
+									<span class="count">{project.images.length} shots</span>
+								{/if}
+							</div>
+							<div class="card-body">
+								<h4>{project.name}</h4>
+								<p class="card-tagline">{project.tagline}</p>
+								<p>{project.body}</p>
+								<!-- Pinned to the bottom of the body, so the buttons sit on one
+								     line across the row however long the paragraphs run. -->
+								<div class="cta">
+									<PlayFilm
+										href={project.href}
+										target="_blank"
+										rel="noopener"
+										icon="arrow"
+										label={project.cta}
+										color="#00f2c3" />
+								</div>
+							</div>
+						</article>
+					</Reveal>
+				{/each}
 			</div>
 		</div>
 
@@ -458,15 +422,12 @@
 		</div>
 	</div>
 
-	<LightboxGallery
-		bind:this={markable_gallery}
-		key="now-markable"
-		items={markableImages} />
-	<LightboxGallery bind:this={ghtui_gallery} key="now-ghtui" items={ghtuiImages} />
-	<LightboxGallery
-		bind:this={curator_gallery}
-		key="now-video-curator"
-		items={videoCuratorImages} />
+	{#each PROJECTS as project, i (project.key)}
+		<LightboxGallery
+			bind:this={galleries[i]}
+			key={project.key}
+			items={PROJECT_ITEMS[i]} />
+	{/each}
 </SectionShell>
 
 <style>
@@ -791,50 +752,10 @@
 		margin: 0;
 		color: rgba(255, 255, 255, 0.8);
 	}
-	.card strong {
-		color: #00f2c3;
-	}
 	.card-tagline {
 		font-family: var(--font-mono);
 		font-size: 0.92rem;
 		color: #00f2c3;
-	}
-	.card-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		align-self: flex-start;
-		color: #00f2c3;
-		text-decoration: underline;
-		text-underline-offset: 4px;
-		font-family: var(--font-mono);
-		font-size: 0.82rem;
-		word-break: break-all;
-		transition: color 250ms ease;
-	}
-	.card-link:hover {
-		transition-duration: 0s;
-		color: #fff;
-	}
-	.card-link svg {
-		width: 14px;
-		height: 14px;
-		flex-shrink: 0;
-	}
-	.shots {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.6rem;
-		padding-top: 0.4rem;
-	}
-	.shots.three {
-		grid-template-columns: repeat(3, 1fr);
-	}
-	@media (max-width: 640px) {
-		.shots,
-		.shots.three {
-			grid-template-columns: 1fr;
-		}
 	}
 
 	.breakout {
@@ -860,72 +781,69 @@
 		box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
 	}
 
-	/* Cards take their own height rather than stretching to the tallest in the
-	   row: these carry very different amounts of artwork, and forcing them level
-	   left a card's worth of empty space above the shorter one's screenshots. A
-	   ragged last row is also the honest shape of a list that only grows. */
+	/* Three across, and every card the same height: the projects differ in how
+	   much they have to show, but the collection is supposed to read as one
+	   shelf, so the cover ratio is fixed and the button is pinned to the floor of
+	   the card. A ragged last row is fine — that is the honest shape of a list
+	   that only grows. */
 	.grid {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 1.5rem;
-		align-items: start;
 	}
-	@media (max-width: 900px) {
+	@media (max-width: 1100px) {
 		.grid {
-			grid-template-columns: 1fr;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 	}
-
-	.terminal {
-		padding: 0;
-		overflow: hidden;
+	@media (max-width: 700px) {
+		.grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
-	.terminal-bar {
+	/* Reveal wraps each card in a div of its own, so the stretch has to be handed
+	   down a level before the card can fill the row. */
+	.grid :global(.reveal) {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.45rem 0.7rem;
-		background: #1a1a1a;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.project {
+		width: 100%;
+		padding: 0;
+		gap: 0;
+		overflow: clip;
+	}
+	/* Full-bleed cover: the card clips it, so the top corners are the card's own
+	   radius rather than a second rounded rectangle inset inside one. */
+	.cover {
+		position: relative;
+		border-bottom: 1px solid rgba(0, 242, 195, 0.15);
+	}
+	.count {
+		position: absolute;
+		right: 0.6rem;
+		bottom: 0.6rem;
+		padding: 0.15rem 0.45rem;
+		border-radius: 5px;
+		background: rgba(4, 16, 18, 0.72);
+		backdrop-filter: blur(3px);
 		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		color: rgba(255, 255, 255, 0.6);
-	}
-	.dot {
-		width: 11px;
-		height: 11px;
-		border-radius: 50%;
-		display: block;
-	}
-	.dot.r {
-		background: #ff5f57;
-	}
-	.dot.y {
-		background: #febc2e;
-	}
-	.dot.g {
-		background: #28c840;
-	}
-	.terminal-title {
-		margin-left: 0.5rem;
+		font-size: 0.68rem;
+		color: rgba(255, 255, 255, 0.85);
+		pointer-events: none;
 	}
 	.card-body {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 0.7rem;
-		padding: 1.5rem;
+		gap: 0.55rem;
+		padding: 1.4rem;
 	}
-	.video-tag {
-		align-self: flex-start;
-		font-family: var(--font-mono);
-		font-size: 0.65rem;
-		letter-spacing: 0.32em;
-		padding: 0.18rem 0.6rem;
-		background: rgba(0, 242, 195, 0.14);
-		color: #00f2c3;
-		border-radius: 4px;
-		font-weight: 700;
+	.cta {
+		margin-top: auto;
+		/* The button carries its own top margin for sitting under prose; here it
+		   is the last thing in a flex column that already spaces itself. */
+		--play-film-offset: 1.1rem;
 	}
 
 	/* ── Off the clock ──────────────────────────────────────────────────── */
