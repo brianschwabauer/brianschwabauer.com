@@ -4,7 +4,7 @@
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import ArchiveTabs from '../primitives/ArchiveTabs.svelte';
-	import ShippedWall from '../primitives/ShippedWall.svelte';
+	import ShippedWall, { type Column } from '../primitives/ShippedWall.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -277,6 +277,98 @@
 		{ label: 'OVERDUE', kind: 'overdue', x: 74, y: 82, rot: -14, scale: 0.92 },
 		{ label: 'SENT', kind: 'sent', x: 8, y: 91, rot: 12, scale: 1 },
 	];
+
+	// The closing wall: every screen that shipped out of these years. Columns are
+	// balanced by total height rather than by count — the Engagement Grower capture
+	// is 7655px on its own and carries a whole column.
+	const SHIPPED_COLUMNS: Column[] = [
+		{
+			direction: -1,
+			speed: 1,
+			// The only 1907px-wide capture here; it goes illegible on a phone.
+			drop_on_phone: true,
+			shots: [
+				{
+					file: '2016-01-01_engagement_grower_marketing_website-full_home_page.avif',
+					width: 1907,
+					height: 7655,
+					caption: 'Engagement Grower · the whole marketing site',
+				},
+			],
+		},
+		{
+			direction: 1,
+			speed: 1,
+			shots: [
+				{
+					file: '2015-08-13_blue_tape_estate_sales-website_redesign_mockup-home_page.avif',
+					width: 874,
+					height: 2048,
+					caption: 'Blue Tape Estate Sales · home page',
+				},
+				{
+					file: '2015-08-13_blue_tape_estate_sales-website_redesign_mockup-services_page.avif',
+					width: 562,
+					height: 2048,
+					caption: 'Blue Tape Estate Sales · services page',
+				},
+				{
+					file: '2015-08-13_blue_tape_estate_sales-website_redesign_mockup-sales_page.avif',
+					width: 562,
+					height: 2048,
+					caption: 'Blue Tape Estate Sales · sales page',
+				},
+				{
+					file: '2015-08-13_blue_tape_estate_sales-website_redesign_mockup-contact_page.avif',
+					width: 562,
+					height: 2048,
+					caption: 'Blue Tape Estate Sales · contact page',
+				},
+			],
+		},
+		{
+			direction: -1,
+			speed: 0.75,
+			shots: [
+				{
+					file: '2018-01-01_bassless_ideas_website_design_v2.avif',
+					width: 599,
+					height: 2048,
+					caption: 'Bassless Ideas · site design, v2',
+				},
+				{
+					file: '2018-01-01_bassless_ideas_website_design_v1.avif',
+					width: 933,
+					height: 2048,
+					caption: 'Bassless Ideas · site design, v1',
+				},
+				{
+					file: '2018-01-01_tapkeep_v4-dashboard_phone_mockup-tasks_page-create_task–details.png',
+					width: 1080,
+					height: 2352,
+					caption: 'TapKeep · create-task details',
+				},
+				{
+					file: '2017-01-01_tapnotion_app_screenshot_home_page.avif',
+					width: 375,
+					height: 812,
+					caption: 'TapNotion · home',
+				},
+				{
+					file: '2017-01-01_tapnotion_app_screenshot_game-item-multiple_choice.avif',
+					width: 375,
+					height: 812,
+					caption: 'TapNotion · multiple choice',
+				},
+				{
+					file: '2017-01-01_tapnotion_app_screenshot_game_over-win.avif',
+					width: 375,
+					height: 812,
+					caption: 'TapNotion · game over',
+				},
+			],
+		},
+	];
 </script>
 
 <SectionShell
@@ -472,7 +564,7 @@
 	  The chapter's last word is a picture, not a sentence: every screen that
 	  shipped out of these years, scrubbing past on the diagonal.
 	-->
-	<ShippedWall />
+	<ShippedWall key="shipped-wall" columns={SHIPPED_COLUMNS} accent="#ffb84d" />
 </SectionShell>
 
 <style>

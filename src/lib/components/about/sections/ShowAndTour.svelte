@@ -7,98 +7,122 @@
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 	import BokehField from '../primitives/BokehField.svelte';
 	import PlayFilm from '../primitives/PlayFilm.svelte';
+	import ShippedWall, { type Column } from '../primitives/ShippedWall.svelte';
 
-	const dashboardMockupsImages: GalleryItem[] = [
+	/*
+	 * Everything the product looks like, as one diagonal scrub at the end of the
+	 * chapter: the tall full-page captures of what the photographer's clients see,
+	 * and the dashboard screens they run the business from, on the same wall.
+	 *
+	 * Columns are balanced by total *height*, not by count — a column's travel is
+	 * the part of it that doesn't fit on screen, so a short column would arrive
+	 * early and then sit still. The tall 2048px captures do most of that work, so
+	 * each column gets one or two of them and the 16:9 dashboard screens fill in
+	 * around them.
+	 *
+	 * The project detail page is deliberately absent: it is the hero shot at the
+	 * top of the section, and seeing it again forty lines later reads as a mistake
+	 * rather than as a set.
+	 */
+	const WALL_COLUMNS: Column[] = [
 		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_list.avif',
-			width: 1904,
-			height: 978,
-			caption: 'Project list · dark mode',
-			alt: 'Project list · dark mode',
+			direction: -1,
+			speed: 1,
+			// Three ~1900px-wide captures, which are the first things to go illegible
+			// in a third of a phone screen.
+			drop_on_phone: true,
+			shots: [
+				{
+					file: '2026-01-01_show_and_tour-legacy_delivery_page_screenshot-963_n1950_rd.avif',
+					width: 702,
+					height: 2048,
+					caption: '963 N 1950 RD · client delivery',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_mockup-signin_page.avif',
+					width: 2048,
+					height: 1152,
+					caption: 'Sign in',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_list.avif',
+					width: 1904,
+					height: 978,
+					caption: 'Project list · dark mode',
+				},
+				{
+					file: '2026-01-01_show_and_tour-website_screenshot-home_page.avif',
+					width: 1890,
+					height: 956,
+					caption: 'showandtour.com · home',
+				},
+			],
 		},
 		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif',
-			width: 1890,
-			height: 975,
-			caption: 'Project detail',
-			alt: 'Project detail',
+			direction: 1,
+			speed: 1,
+			shots: [
+				{
+					file: '2026-01-01_show_and_tour-dashboard_mockup-delivery_page_dark.avif',
+					width: 733,
+					height: 2048,
+					caption: 'Delivery page · dark',
+				},
+				{
+					file: '2026-01-01_show_and_tour-property_website_screenshot-prairievillageestate.avif',
+					width: 1375,
+					height: 2048,
+					caption: 'Prairie Village Estate · property site',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_settings_page.avif',
+					width: 1907,
+					height: 1632,
+					caption: 'Settings',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_mockup-media_player.avif',
+					width: 1440,
+					height: 960,
+					caption: 'Built-in media player',
+				},
+			],
 		},
 		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_client_page.avif',
-			width: 1907,
-			height: 980,
-			caption: 'Project · client view',
-			alt: 'Project · client view',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_settings_page.avif',
-			width: 1907,
-			height: 1632,
-			caption: 'Settings',
-			alt: 'Settings',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_mockup-clients_page_empty.avif',
-			width: 2048,
-			height: 1152,
-			caption: 'Clients (empty state)',
-			alt: 'Clients (empty state)',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_mockup-projects_page_empty.avif',
-			width: 2048,
-			height: 1152,
-			caption: 'Projects (empty state)',
-			alt: 'Projects (empty state)',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_mockup-delivery_page_dark.avif',
-			width: 733,
-			height: 2048,
-			caption: 'Delivery page · dark',
-			alt: 'Delivery page · dark',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_mockup-media_player.avif',
-			width: 1440,
-			height: 960,
-			caption: 'Built-in media player',
-			alt: 'Built-in media player',
-		},
-	];
-
-	const deliveryPagesImages: GalleryItem[] = [
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-legacy_delivery_page_screenshot-963_n1950_rd.avif',
-			width: 702,
-			height: 2048,
-			caption: '963 N 1950 RD · client delivery',
-			alt: '963 N 1950 RD · client delivery',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-property_website_screenshot-8700leeboulevard.avif',
-			width: 854,
-			height: 2048,
-			caption: '8700 Lee Boulevard · property site',
-			alt: '8700 Lee Boulevard · property site',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-property_website_screenshot-prairievillageestate.avif',
-			width: 1375,
-			height: 2048,
-			caption: 'Prairie Village Estate · property site',
-			alt: 'Prairie Village Estate · property site',
+			direction: -1,
+			speed: 0.75,
+			shots: [
+				{
+					file: '2026-01-01_show_and_tour-property_website_screenshot-8700leeboulevard.avif',
+					width: 854,
+					height: 2048,
+					caption: '8700 Lee Boulevard · property site',
+				},
+				{
+					file: '2026-01-01_show_and_tour-website_screenshot-home_page-portrait.avif',
+					width: 1897,
+					height: 1852,
+					caption: 'showandtour.com · the long scroll',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_client_page.avif',
+					width: 1907,
+					height: 980,
+					caption: 'Project · client view',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_mockup-clients_page_empty.avif',
+					width: 2048,
+					height: 1152,
+					caption: 'Clients (empty state)',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_mockup-projects_page_empty.avif',
+					width: 2048,
+					height: 1152,
+					caption: 'Projects (empty state)',
+				},
+			],
 		},
 	];
 
@@ -313,39 +337,10 @@
 			</div>
 		</div>
 
-		<div class="dash-block">
-			<Reveal class="bleed-head">
-				<h3 class="sub">The dashboard</h3>
-				<p>Where photographers run their business day to day.</p>
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<div class="gallery-bleed">
-					<LightboxGallery
-						key="show-and-tour-dashboards"
-						items={dashboardMockupsImages}
-						display="masonry"
-						size="1" />
-				</div>
-			</Reveal>
-		</div>
-
-		<div class="delivery-block">
-			<Reveal>
-				<h3 class="sub">Property websites &amp; delivery pages</h3>
-				<p>What the photographer's clients actually see.</p>
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<LightboxGallery
-					key="show-and-tour-delivery"
-					items={deliveryPagesImages}
-					display="masonry-row"
-					size="2" />
-			</Reveal>
-		</div>
-
 		<div class="brand-block">
 			<Reveal class="bleed-head">
-				<h3 class="sub">Brand · the rest</h3>
+				<h3 class="sub">Brand</h3>
+				<p>The identity the whole product is dressed in.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="gallery-bleed">
@@ -358,6 +353,13 @@
 			</Reveal>
 		</div>
 	</div>
+
+	<!--
+	  The chapter's last word is the product itself: every screen — the dashboard
+	  the photographer works in and the pages their clients land on — scrubbing
+	  past on the diagonal.
+	-->
+	<ShippedWall key="show-and-tour-wall" columns={WALL_COLUMNS} accent="#33d0c1" />
 
 	<LightboxGallery bind:this={gallery} key="show-and-tour" items={heroShot} />
 </SectionShell>
@@ -561,9 +563,13 @@
 		margin: 0;
 	}
 
-	.dash-block,
-	.delivery-block,
+	/* No bottom margin: the wall follows immediately and brings its own edge fade,
+	   so a gap here would just read as the section running out. */
 	.brand-block {
-		margin: 4rem 0;
+		margin: 4rem 0 0;
+	}
+	.brand-block p {
+		line-height: 1.55;
+		opacity: 0.9;
 	}
 </style>
