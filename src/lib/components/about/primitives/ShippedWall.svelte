@@ -1,8 +1,9 @@
 <script lang="ts">
-	import SectionShell from '../primitives/SectionShell.svelte';
-	import PinScrub from '../primitives/PinScrub.svelte';
-	import Reveal from '../primitives/Reveal.svelte';
-	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+	// A full-bleed diagonal set piece of tall screenshots that scrub past as the
+	// page scrolls. It is a *visual*, not a section — it carries no heading and
+	// no copy, and is dropped in at the end of whatever chapter it belongs to.
+	import PinScrub from './PinScrub.svelte';
+	import LightboxGallery from './LightboxGallery.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 
 	const CDN = 'https://cdn.brianschwabauer.com/media/';
@@ -194,28 +195,7 @@
 	}
 </script>
 
-<SectionShell
-	id="shipped-wall"
-	year="2015–18"
-	label="The Shipped Wall"
-	theme="wall"
-	class="wall-shell">
-	<div class="container">
-		<Reveal>
-			<div class="intro">
-				<div class="head">
-					<div class="eyebrow">2015–18</div>
-					<h2 class="title">The wall of shipped screens</h2>
-				</div>
-				<p class="standfirst">
-					Between client work and product experiments, a lot of pixels shipped. These are
-					full-height captures — no scaling down, no cropping. Click any of them to
-					inspect.
-				</p>
-			</div>
-		</Reveal>
-	</div>
-
+<div class="shipped-wall">
 	{#if reduced}
 		<div class="container">
 			<div class="static-wall">
@@ -282,33 +262,21 @@
 	{/if}
 
 	<LightboxGallery bind:this={gallery} key="shipped-wall" items={ITEMS} />
-</SectionShell>
+</div>
 
 <style>
-	:global([data-theme='wall']) {
-		background:
-			radial-gradient(ellipse at 20% 0%, rgba(0, 214, 255, 0.07), transparent 55%),
-			linear-gradient(180deg, #06050a, #0b0d14 55%, #06050a);
-		color: #e8f2f6;
+	.shipped-wall {
+		position: relative;
+		width: 100%;
 		/* Read by PinScrub's inline height and by the rotation below, so the whole
 		   set piece reshapes at one breakpoint. */
 		--wall-span: 250vh;
 		--wall-rotate: -12deg;
 	}
 	@media (max-width: 720px) {
-		:global([data-theme='wall']) {
+		.shipped-wall {
 			--wall-span: 200vh;
 			--wall-rotate: -8deg;
-		}
-	}
-	/* This section is one long pinned scrub — the 1200px default estimate is off by
-	   an order of magnitude, which throws off hash jumps until it has rendered once. */
-	:global(.section-shell.wall-shell) {
-		contain-intrinsic-size: 1px 2600px;
-	}
-	@supports (contain-intrinsic-size: auto 1px) {
-		:global(.section-shell.wall-shell) {
-			contain-intrinsic-size: auto 1px auto 2600px;
 		}
 	}
 
@@ -316,44 +284,6 @@
 		max-width: 80rem;
 		margin: 0 auto;
 		padding: 0 clamp(1rem, 3vw, 2rem);
-	}
-	.eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #00d6ff;
-		margin-bottom: 1rem;
-	}
-	.title {
-		font-size: clamp(2.2rem, 5.5vw, 4rem);
-		font-weight: 900;
-		line-height: 1.02;
-		letter-spacing: -0.03em;
-		margin: 0 0 1rem;
-	}
-	.standfirst {
-		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
-		line-height: 1.6;
-		max-width: 44rem;
-		margin: 0;
-		color: rgba(232, 242, 246, 0.85);
-	}
-	/* Title left, standfirst right, sitting on the same baseline. On a wide
-	   monitor the old stacked intro left the entire right half of the fold empty
-	   while the text ran to a 44rem measure on the left. */
-	.intro {
-		display: grid;
-		gap: 1rem clamp(2rem, 5vw, 4.5rem);
-		margin-bottom: clamp(2.5rem, 6vw, 4rem);
-	}
-	@media (min-width: 900px) {
-		.intro {
-			grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-			align-items: end;
-		}
-		.standfirst {
-			padding-bottom: 0.5rem;
-		}
 	}
 
 	.stage {
@@ -414,10 +344,10 @@
 		border-color: rgba(255, 255, 255, 0.35);
 		box-shadow:
 			0 30px 80px rgba(0, 0, 0, 0.6),
-			0 0 0 2px rgba(0, 214, 255, 0.35);
+			0 0 0 2px rgba(255, 184, 77, 0.35);
 	}
 	.print:focus-visible {
-		outline: 2px solid #00d6ff;
+		outline: 2px solid #ffb84d;
 		outline-offset: 3px;
 	}
 	.print img {
