@@ -3,10 +3,11 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import GradientCollapse from '../primitives/GradientCollapse.svelte';
+	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import FilmReel from '../primitives/FilmReel.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+	import { onScrollProgress } from '../primitives/scrollProgress';
 
 	const pr1ReelImages = [
 		{
@@ -140,6 +141,24 @@
 			caption: 'More set life',
 			alt: 'More set life',
 		},
+		// The premiere is behind-the-scenes too — it's the night the shoot became
+		// a screening, which is the only reason any of the rest of it happened.
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif',
+			width: 1536,
+			height: 2048,
+			caption: 'Premiere night · the backyard projector setup',
+			alt: 'The PR360 II premiere projector setup',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg',
+			width: 1024,
+			height: 1536,
+			caption: 'Brian and Kevin at the PR360 II premiere',
+			alt: 'Brian and Kevin at the PR360 II premiere',
+		},
 	];
 
 	const pr2StillImages: GalleryItem[] = [
@@ -218,85 +237,99 @@
 			caption: 'Premiere · summer 2007 · backyard cinema · ~40 friends and family',
 			alt: 'The Power Rangers cast',
 		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif',
-			width: 1536,
-			height: 2048,
-			caption: 'PR360 II premiere · backyard projector setup',
-			alt: 'The PR360 II premiere projector setup',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg',
-			width: 1024,
-			height: 1536,
-			caption: 'Brian and Kevin at the PR360 II premiere',
-			alt: 'Brian and Kevin at the PR360 II premiere',
-		},
 	];
 
 	let reelGallery = $state<ReturnType<typeof LightboxGallery>>();
 	let extrasGallery = $state<ReturnType<typeof LightboxGallery>>();
+
+	/**
+	 * Red, blue, black, yellow, pink — the order they were always introduced in.
+	 * Black is lifted well off actual black: on this background the real costume
+	 * colour is a gap in the row rather than a member of it.
+	 */
+	const RANGERS = ['#ff3a3a', '#3f7dff', '#6a6a80', '#ffcc33', '#ff6fc4'];
+
+	let scope_el = $state<HTMLElement | null>(null);
+	/**
+	 * 0 before the crop, 1 once it has fully closed, ramping between. The bars are
+	 * driven by this rather than by an enter/leave flag so the crop *arrives* — a
+	 * projectionist racking the masking in, not two divs appearing.
+	 */
+	let closed = $state(0);
+
+	$effect(() => {
+		if (!scope_el) return;
+		const section = scope_el.closest('section');
+		const year = section?.querySelector('.year-mark');
+		if (!section || !year) return;
+		// Gated on the section, not the fixed-position bars: the bars are pinned
+		// to the viewport, but everything the math needs is where the section is.
+		return onScrollProgress(section, (rect) => {
+			const vh = window.innerHeight || 1;
+			/*
+			 * The crop is timed off the year mark, not off the section's arrival.
+			 * Tying it to how much of the section covered the viewport meant the
+			 * bars were already closing while the section was still sliding in —
+			 * so the reader met the crop before they had met the chapter. Running
+			 * it over the year's last 30% of travel instead means the frame
+			 * finishes closing exactly as "2008" reaches the top of the screen,
+			 * which is a beat *after* you have arrived rather than during.
+			 */
+			const y = year.getBoundingClientRect().top;
+			const arriving = (vh * 0.3 - y) / (vh * 0.3);
+			// …and opens back up as the section's bottom edge leaves.
+			const leaving = rect.bottom / (vh * 0.6);
+			closed = Math.max(0, Math.min(1, Math.min(arriving, leaving)));
+		});
+	});
 </script>
 
-<SectionShell id="power-rangers" year="2008" label="Power Rangers 360" theme="ranger">
+<SectionShell id="feature-length" year="2008" label="Feature Length" theme="ranger">
+	<!--
+	  The chapter where two kids decided the next one would be a *feature*, so the
+	  section puts on the one thing that says feature before a single frame plays:
+	  it goes wide. The bars close in as you enter and open again as you leave —
+	  and being fixed to the viewport rather than to the section, they crop the
+	  page itself, which is what a scope print does to the room you're sitting in.
+	-->
+	<div bind:this={scope_el} class="scope" aria-hidden="true" style:--closed={closed}>
+		<span class="bar top"></span>
+		<span class="bar bottom"></span>
+	</div>
+
 	<div class="container">
 		<Reveal>
-			<YearMark year="2008" subtitle="Feature Length" color="#ffcc33" />
+			<YearMark year="2008" subtitle="Backyard Blockbusters" color="#ffcc33" />
 		</Reveal>
 
 		<div class="lockup">
 			<Reveal>
-				<div class="eyebrow">PROJECT 02 · A FULL-LENGTH FILM, ALMOST</div>
 				<h2 class="title">
-					<span class="word w1">POWER</span>
-					<span class="word w2">RANGERS</span>
-					<span class="word w3">360</span>
+					<span class="word w1">&ldquo;FEATURE LENGTH&rdquo;</span>
+					<span class="word w2">FILMS</span>
 				</h2>
 				<p class="lede">
 					We'd spent two summers on short films. We were ready for the big one — a
 					Hollywood feature-length movie. We didn't know how long a script needed to be,
-					so we wrote until we couldn't write anymore. We didn't want to invent characters
-					or world-building, so we borrowed an existing IP. We were thirteen.
+					so we wrote until we couldn't write anymore. It was too much work to invent
+					characters or world-building, so we "borrowed" an existing IP. We were thirteen.
 				</p>
 			</Reveal>
-		</div>
-
-		<div class="rangers">
-			{#each [{ name: 'RED', who: 'Brian', color: '#ff3a3a' }, { name: 'BLUE', who: 'Kevin', color: '#3a8cff' }, { name: 'YELLOW', who: 'Emma', color: '#ffd934' }, { name: 'WHITE', who: 'Amanda', color: '#ffffff' }] as r, i}
-				<Reveal variant="up" delay={i * 90}>
-					<div class="ranger-card" style:--c={r.color}>
-						<div class="ranger-helmet">
-							<svg viewBox="0 0 100 110" aria-hidden="true">
-								<path
-									d="M50 8 L82 26 L82 62 Q82 100 50 100 Q18 100 18 62 L18 26 Z"
-									fill="var(--c)"
-									stroke="#000"
-									stroke-width="2" />
-								<rect x="28" y="46" width="44" height="14" fill="#000" />
-								<path d="M50 8 L62 26 L38 26 Z" fill="#fff" opacity="0.18" />
-							</svg>
-						</div>
-						<div class="ranger-name">{r.name}</div>
-						<div class="ranger-who">played by {r.who}</div>
-					</div>
-				</Reveal>
-			{/each}
 		</div>
 
 		<div class="pr-grid">
 			<Reveal>
 				<h3 class="sub">Power Rangers 360 (2007)</h3>
 				<p>
-					Thirty minutes. Our first "feature". The blue ranger goes rogue, joins the
-					villain Vino, fights the red ranger, dies in his arms. Our friends gave up their
-					summer to be in it.
+					Thirty minutes long. Our first "feature". The blue ranger goes rogue, joins the
+					villain Vino, fights the red ranger, and dies in his arms. Not a good film. But
+					it taught us to aim way past what we could actually pull off — a habit that
+					never wore off.
 				</p>
 				<p>
-					We held the premiere in my backyard. Bed sheets over the windows, a projector on
-					a borrowed light stand, sundown. The "screen" was 20 feet tall. It was the
-					biggest moment of either of our lives at that point.
+					We held the film premiere in my backyard after sundown. We put white bed sheets
+					over the windows to make a 20ft tall screen and a projector on a card table. It
+					was a pretty big deal&hellip; at the time.
 				</p>
 			</Reveal>
 			<Reveal variant="right" delay={100}>
@@ -334,80 +367,80 @@
 			<span></span>
 		</div>
 
+		<!--
+		  The second film gets the widest layout in the section, because the second
+		  film is the one there are two months of photographs of. The writing holds
+		  still in a narrow column on the left — a page from the script binder,
+		  pinned — while the footage scrolls past it.
+		-->
 		<div class="pr2-block">
-			<Reveal>
-				<h3 class="sub">Power Rangers 360 II (2008)</h3>
-				<p>
-					We spent weeks writing. The script hit 60+ pages, printed into binders and
-					handed out to a cast that, by then, had grown to a small army of friends. The
-					result was 64 minutes long — counting the credits and a handful of scenes we
-					left way too long because we were chasing a runtime. Worth it.
-				</p>
-				<p>
-					Zordon, the rangers' leader, was played by Kevin's dog. We filmed him "talking"
-					via peanut butter and comped him into the scene with — what else — greenscreen.
-				</p>
-			</Reveal>
+			<div class="pr2-copy">
+				<Reveal>
+					<h3 class="sub">Power Rangers 360 II (2008)</h3>
+					<p>
+						The next summer it was time for BIGGER and BETTER. We spent weeks writing a
+						60+ page script and printed script binders for the whole cast — which by now
+						was a small army of whichever friends were available.
+					</p>
+					<p>
+						It turns out it's pretty hard to make a 60+ minute film in the heat of summer,
+						when everyone just wants to be at the pool. But we stuck it out. We had to pad
+						the film with some unnecessary scenes and a very long credits reel, but we did
+						it. We made a 64-minute film we could be proud of.
+					</p>
 
-			<Reveal variant="up" delay={100}>
-				<div class="bts-strip">
-					<div class="bts-eyebrow bleed-head">BEHIND THE SCENES</div>
-					<div class="gallery-bleed">
-						<LightboxGallery key="power-rangers-pr2-bts" items={pr2BTSImages} display="masonry" size="2" />
-					</div>
-				</div>
-			</Reveal>
-
-			<Reveal variant="up" delay={150}>
-				<div class="bts-strip">
-					<div class="bts-eyebrow bleed-head">FROM THE FILM</div>
-					<div class="gallery-bleed">
-						<LightboxGallery key="power-rangers-pr2-stills" items={pr2StillImages} display="masonry" size="1" />
-					</div>
-				</div>
-			</Reveal>
-
-			<div class="premiere-2">
-				<Reveal variant="left">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-backyward_projector_setup.avif"
-						alt="The PR360 II premiere projector setup"
-						ratio="4 / 3"
-						onclick={(e) => extrasGallery?.open(1, e.currentTarget)} />
+					<aside class="casting-note">
+						<div class="note-eyebrow">CASTING NOTE</div>
+						<p>
+							One of the &ldquo;characters&rdquo; in the film was Zordon, the rangers'
+							leader. We thought it would be funny if he was played by Kevin's dog. So
+							that's what we did. We filmed him &ldquo;talking&rdquo; via the ol'
+							peanut-butter-in-the-mouth trick, then used a green screen to comp him into
+							scenes with the rangers.
+						</p>
+					</aside>
 				</Reveal>
-				<Reveal variant="right" delay={100}>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2008-08-09_power_rangers_360_ii-premiere-brian_and_kevin_1.jpg"
-						alt="Brian and Kevin at the PR360 II premiere"
-						ratio="4 / 3"
-						onclick={(e) => extrasGallery?.open(2, e.currentTarget)} />
+			</div>
+
+			<div class="pr2-media">
+				<Reveal variant="up" delay={100}>
+					<div class="bts-strip">
+						<div class="bts-eyebrow">BEHIND THE SCENES</div>
+						<div class="gallery-contained">
+							<PeekGallery
+								key="feature-length-pr2-bts"
+								items={pr2BTSImages}
+								peek={6}
+								size="1" />
+						</div>
+					</div>
+				</Reveal>
+
+				<Reveal variant="up" delay={150}>
+					<div class="bts-strip">
+						<div class="bts-eyebrow">FROM THE FILM</div>
+						<div class="gallery-contained">
+							<PeekGallery
+								key="feature-length-pr2-stills"
+								items={pr2StillImages}
+								peek={6}
+								size="1" />
+						</div>
+					</div>
 				</Reveal>
 			</div>
 		</div>
-
-		<Reveal>
-			<GradientCollapse label="What we learned filming for two months in a row">
-				<div class="prose">
-					<p>
-						Filming day after day in midwestern August heat is a different kind of work.
-						By week three, everyone is tired. Performances slip. Composition slips.
-						Patience slips. We learned to plan harder. We learned what call sheets were
-						for. We learned what an actual production day's energy looks like. None of
-						that is in a film school book — you can only learn it by doing it.
-					</p>
-					<p>
-						Looking back, neither of these movies is good. But I'm still proud of them.
-						They were the first time we tried something that should have been out of
-						reach, and finished it.
-					</p>
-				</div>
-			</GradientCollapse>
-		</Reveal>
 	</div>
 
-	<LightboxGallery bind:this={reelGallery} key="power-rangers-reel" items={pr1ReelImages} />
+	<LightboxGallery
+		bind:this={reelGallery}
+		key="feature-length-reel"
+		items={pr1ReelImages} />
 
-	<LightboxGallery bind:this={extrasGallery} key="power-rangers-extras" items={sectionExtras} />
+	<LightboxGallery
+		bind:this={extrasGallery}
+		key="feature-length-extras"
+		items={sectionExtras} />
 </SectionShell>
 
 <style>
@@ -417,6 +450,71 @@
 			radial-gradient(ellipse at 80% 90%, rgba(80, 160, 255, 0.32), transparent 60%),
 			linear-gradient(180deg, #0a0710 0%, #100612 50%, #06080f 100%);
 		color: #f4ecff;
+	}
+
+	/*
+	 * The scope crop.
+	 *
+	 * These are `sticky`, not `fixed`, and that is not a stylistic choice:
+	 * `SectionShell` sets `content-visibility: auto`, which applies paint
+	 * containment at all times, and a paint-contained element is a containing
+	 * block for fixed descendants — so `position: fixed` here would have pinned
+	 * the bars to the section and quietly done nothing. Sticky inside a
+	 * full-height absolute wrapper gives the behaviour that was actually wanted:
+	 * pinned to the top and bottom of the *viewport*, for exactly as long as this
+	 * section is the thing on screen.
+	 */
+	.scope {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		pointer-events: none;
+		z-index: 2;
+	}
+	.bar {
+		display: block;
+		width: 100%;
+		background: #000;
+		/* Fades up with the crop, so at rest there is no hairline rule sitting
+		   across the top of the section waiting for something to happen. */
+		--edge: rgba(255, 204, 51, calc(var(--closed, 0) * 0.34));
+		/*
+		 * The crop only exists if you can see its edge. On a section this dark,
+		 * black bars over a near-black background were geometrically correct and
+		 * completely invisible — what actually reads as masking coming in is the
+		 * bright line where the mask meets the picture, so that line is the
+		 * effect and the black is just what's behind it.
+		 */
+		box-shadow: 0 0 22px 4px rgba(0, 0, 0, 0.95);
+		/*
+		 * 2.39:1 worth of crop, which is what "we're making a feature" meant to
+		 * two kids who had only ever seen one in a cinema. Capped at 14vh so a
+		 * phone in portrait — where the maths wants to eat two thirds of the
+		 * screen — gets the gesture rather than the geometry.
+		 */
+		height: calc(var(--closed, 0) * clamp(0px, (100svh - 41.84svw) / 2, 14svh));
+		/* Short, and linear: the height already follows a scroll ramp, so this is
+		   only smoothing the gaps between scroll events. Anything longer lags
+		   behind the wheel and the crop stops feeling attached to it. */
+		transition: height 120ms linear;
+	}
+	.bar.top {
+		position: sticky;
+		top: 0;
+		border-bottom: 1px solid var(--edge);
+	}
+	.bar.bottom {
+		position: sticky;
+		bottom: 0;
+		border-top: 1px solid var(--edge);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.bar {
+			transition: none;
+		}
 	}
 
 	.container {
@@ -430,31 +528,26 @@
 		text-align: center;
 		margin-bottom: 4rem;
 	}
-	.eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		letter-spacing: 0.4em;
-		opacity: 0.75;
-		margin-bottom: 1rem;
-	}
 	.title {
+		/* One line, phone to desktop — the clamp below is sized so the longest
+		   string still clears the narrowest gutter. */
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.1rem;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		justify-content: center;
+		align-items: baseline;
+		gap: 0.28em;
+		white-space: nowrap;
 		font-family: 'Inter', sans-serif;
 		font-weight: 900;
-		line-height: 0.9;
+		line-height: 0.95;
 		letter-spacing: -0.04em;
 		margin: 0;
 	}
 	.word {
 		display: inline-block;
-		font-size: clamp(3rem, 12vw, 9rem);
-		background: linear-gradient(180deg, #ffd934 0%, #ffcc33 50%, #ffaa00 100%);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
+		font-size: clamp(1.4rem, 6.6vw, 5rem);
+		color: oklch(from #ffcc33 0.82 calc(c * 0.9) h);
 		text-shadow: 0 0 60px rgba(255, 217, 52, 0.15);
 		transform-origin: center;
 	}
@@ -463,9 +556,6 @@
 	}
 	.w2 {
 		animation: slamIn 1s cubic-bezier(0.2, 1, 0.3, 1.2) 0.15s both;
-	}
-	.w3 {
-		animation: slamIn 1s cubic-bezier(0.2, 1, 0.3, 1.2) 0.3s both;
 		color: #fff;
 		-webkit-text-stroke: 2px #ffcc33;
 	}
@@ -485,56 +575,6 @@
 		font-size: clamp(1.05rem, 1.6vw, 1.25rem);
 		line-height: 1.6;
 		opacity: 0.88;
-	}
-
-	.rangers {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 1rem;
-		margin: 0 0 4rem;
-	}
-	@media (max-width: 720px) {
-		.rangers {
-			grid-template-columns: repeat(2, 1fr);
-		}
-	}
-	.ranger-card {
-		text-align: center;
-		padding: 1.4rem 0.6rem;
-		background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
-		border: 1px solid var(--c);
-		border-radius: 12px;
-		position: relative;
-		overflow: hidden;
-		transition: transform 200ms ease;
-	}
-	.ranger-card:hover {
-		transition-duration: 0s;
-		transform: translateY(-4px);
-	}
-	.ranger-card::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: radial-gradient(circle at 50% 0%, var(--c), transparent 65%);
-		opacity: 0.16;
-	}
-	.ranger-helmet svg {
-		width: 70px;
-		height: auto;
-		filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
-	}
-	.ranger-name {
-		font-family: var(--font-mono);
-		font-weight: 800;
-		letter-spacing: 0.16em;
-		margin-top: 0.4rem;
-		color: var(--c);
-	}
-	.ranger-who {
-		font-size: 0.85rem;
-		opacity: 0.7;
-		margin-top: 0.2rem;
 	}
 
 	.pr-grid {
@@ -607,16 +647,70 @@
 		margin-top: 0.2rem;
 	}
 
+	/* Full bleed, out of the 80rem container it is nested in. */
 	.pr2-block {
+		width: 100vw;
+		margin-inline: calc(50% - 50vw);
+		padding-inline: clamp(1rem, 3vw, 2rem);
+		box-sizing: border-box;
 		margin-bottom: 3rem;
+		display: grid;
+		/*
+		 * The prose column is capped at a readable measure rather than taking a
+		 * share of the width — on a wide monitor a 50% text column is a wall, and
+		 * the photographs are what deserve the extra pixels anyway.
+		 */
+		grid-template-columns: minmax(0, 31rem) minmax(0, 1fr);
+		gap: clamp(1.5rem, 4vw, 4rem);
+		align-items: start;
+	}
+	.pr2-copy {
+		position: sticky;
+		/*
+		 * Clear of the scope bar, which eats up to 14svh off the top of the
+		 * viewport while this section is on screen.
+		 */
+		top: max(6rem, 20vh);
 	}
 	.pr2-block p {
-		max-width: 56rem;
 		line-height: 1.6;
 	}
 
-	.bts-strip {
-		margin: 2rem 0;
+	/*
+	 * A note pinned to the script binder — a different voice from the section's
+	 * narration, so it gets a different surface rather than just italics.
+	 */
+	.casting-note {
+		margin-top: 1.6rem;
+		padding: 1rem 1.1rem;
+		border-left: 2px solid #ffd934;
+		border-radius: 0 6px 6px 0;
+		background: linear-gradient(
+			90deg,
+			oklch(from #ffd934 0.72 c h / 0.12),
+			oklch(from #ffd934 0.72 c h / 0.03)
+		);
+	}
+	.note-eyebrow {
+		font-family: var(--font-mono);
+		font-size: 0.66rem;
+		letter-spacing: 0.28em;
+		color: #ffd934;
+		margin-bottom: 0.5rem;
+	}
+	.casting-note p {
+		margin: 0;
+		font-size: 0.95rem;
+		opacity: 0.92;
+	}
+
+	.pr2-media {
+		display: flex;
+		flex-direction: column;
+		gap: 2.5rem;
+		/* The galleries carry their own @container context; without a min of 0 a
+		   masonry child's intrinsic width can blow the grid track out. */
+		min-width: 0;
 	}
 	.bts-eyebrow {
 		font-family: var(--font-mono);
@@ -626,20 +720,12 @@
 		margin-bottom: 0.8rem;
 	}
 
-	.premiere-2 {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1rem;
-		margin-top: 2rem;
-	}
-	@media (max-width: 640px) {
-		.premiere-2 {
-			grid-template-columns: 1fr;
+	@media (max-width: 900px) {
+		.pr2-block {
+			grid-template-columns: minmax(0, 1fr);
 		}
-	}
-
-	.prose p {
-		line-height: 1.65;
-		margin-bottom: 1rem;
+		.pr2-copy {
+			position: static;
+		}
 	}
 </style>

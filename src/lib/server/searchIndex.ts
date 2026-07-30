@@ -43,14 +43,15 @@ const HOME_SECTIONS: SearchEntry[] = [
 		imageUrl: '/profile_picture2.webp',
 	},
 	{
-		id: 'home:what-im-up-to',
+		id: 'home:now',
 		type: 'home',
-		title: "What I'm up to",
-		summary: "What I'm building, learning, and shipping right now.",
+		title: 'Now',
+		summary:
+			'What I am building today: Show&Tour full-time, the delightstack toolkit, and the side projects — markable.page, scrmbld.app, ghtui, Video Curator.',
 		body: '',
-		tags: ['About', 'Current'],
+		tags: ['About', 'Current', 'Side Projects', 'delightstack'],
 		date: Date.now(),
-		url: '/#what-im-up-to',
+		url: '/#now',
 		imageUrl: mediaUrl(
 			'2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif',
 		),
@@ -82,15 +83,15 @@ const HOME_SECTIONS: SearchEntry[] = [
 		),
 	},
 	{
-		id: 'home:power-rangers',
+		id: 'home:feature-length',
 		type: 'home',
-		title: 'Power Rangers',
+		title: 'Feature Length',
 		summary:
 			'Backyard fight choreography, costumes, and the Power Rangers fan film phase.',
 		body: '',
 		tags: ['Film', 'Fan Film', '2008'],
 		date: new Date('2008-01-01').getTime(),
-		url: '/#power-rangers',
+		url: '/#feature-length',
 		imageUrl: mediaUrl(
 			'2007-06-16_power_rangers_360-premiere-power_rangers_group_photo_1.jpg',
 		),
@@ -214,17 +215,6 @@ const HOME_SECTIONS: SearchEntry[] = [
 		imageUrl: mediaUrl(
 			'2026-01-01_show_and_tour-property_website_screenshot-prairievillageestate.avif',
 		),
-	},
-	{
-		id: 'home:side-projects',
-		type: 'home',
-		title: 'Side Projects',
-		summary: 'Side projects and personal experiments.',
-		body: '',
-		tags: ['Work', 'Side Projects', '2026'],
-		date: new Date('2026-01-01').getTime(),
-		url: '/#side-projects',
-		imageUrl: mediaUrl('2026-01-01_ghtui_screen_recording.avif'),
 	},
 ];
 

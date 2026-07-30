@@ -6,10 +6,17 @@
 	let {
 		children,
 		timecode = '00:00:01:14',
+		mode = '',
 		class: klass = '',
 	}: {
 		children: Snippet;
 		timecode?: string;
+		/**
+		 * Transport readout beside the timecode — e.g. `▶ PLAY` for playback.
+		 * Empty by default: a camcorder that is recording shows REC and nothing
+		 * else down there.
+		 */
+		mode?: string;
 		class?: string;
 	} = $props();
 </script>
@@ -28,7 +35,10 @@
 		<span class="battery">
 			<span class="battery-body"><span class="battery-fill"></span></span>
 		</span>
-		<span class="tc">SP {timecode}</span>
+		<span class="tc">
+			SP {timecode}
+			{#if mode}<span class="transport">{mode}</span>{/if}
+		</span>
 		<span class="mode">AUTO</span>
 	</div>
 </div>
@@ -121,7 +131,16 @@
 		position: absolute;
 		bottom: calc(6% + 4px);
 		left: calc(4% + clamp(20px, 4vw, 30px));
+		display: flex;
+		align-items: baseline;
+		gap: 0.9em;
+		white-space: nowrap;
 		font-variant-numeric: tabular-nums;
+	}
+	/* Sits with the timecode rather than opposite it: on a real deck the tape
+	   readout and the transport mode are one cluster. */
+	.transport {
+		letter-spacing: 0.18em;
 	}
 	.mode {
 		position: absolute;

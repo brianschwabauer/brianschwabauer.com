@@ -3,9 +3,10 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import GradientCollapse from '../primitives/GradientCollapse.svelte';
+	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+	import { onScrollProgress } from '../primitives/scrollProgress';
 
 	const filmImages: GalleryItem[] = [
 		{
@@ -437,21 +438,219 @@
 				'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human/poster.jpg',
 			width: 1920,
 			height: 818,
-			caption: 'What Makes Us Human (2014) — full senior thesis short',
-			alt: 'What Makes Us Human (2014) — full senior thesis short',
+			caption: 'What Makes Us Human (2015) — full senior thesis short',
+			alt: 'What Makes Us Human (2015) — full senior thesis short',
 		},
 	];
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
+
+	/*
+	 * The scan. It was already here — an 80px band blurred by 8px, sweeping the
+	 * top 120vh of the section on an 8s loop — and it read as a soft smear
+	 * because of two things: it had no hard edge anywhere in it, and it passed
+	 * over nothing. A beam is only legible if it has a defined core, and it only
+	 * means anything if it finds something.
+	 *
+	 * So: a bright 2px core inside the same wide falloff (which reads far
+	 * sharper at the same overall brightness, rather than needing more of it).
+	 */
+
+	/** The section box — parent of the effect layers, and what both of them measure. */
+	let host = $state<HTMLDivElement | null>(null);
+	const section = () => host?.parentElement ?? null;
+
+	/* ---------------------------------------------------------------------------
+	 * The beam, now sweeping the section instead of the screen.
+	 *
+	 * Pinned to the viewport it was always in front of you, which is also why it
+	 * never felt like it belonged to the film: a real scan passes over a subject
+	 * once and is gone. So the band travels the section's own length and you can
+	 * scroll out from under it.
+	 *
+	 * That alone would make it rare — this section is several screens tall, so one
+	 * band crossing it end to end is off-screen most of the time. The fix is to
+	 * hold the *speed* fixed and let the count follow the geometry: a band takes
+	 * `CROSS` seconds to cover one viewport, so a section N viewports tall needs N
+	 * bands, evenly staggered, for roughly one to be in front of you at any moment.
+	 * A short section under a tall screen gets one; a long section on a laptop gets
+	 * six. Nothing here has to know which case it is.
+	 * ------------------------------------------------------------------------- */
+
+	/** Seconds for a band to travel one viewport height. Sets the beam's speed. */
+	const CROSS = 5;
+
+	let section_h = $state(0);
+	let viewport_h = $state(0);
+
+	/** Viewports of section to cross — the whole geometry both numbers come from. */
+	let spans = $derived(viewport_h > 0 ? Math.max(1, section_h / viewport_h) : 1);
+	/** One band per viewport of travel: enough for ~1 to be on screen at a time. */
+	let band_count = $derived(Math.min(8, Math.ceil(spans)));
+	/** Constant speed, so a taller section takes proportionally longer to sweep. */
+	let sweep_dur = $derived(CROSS * spans);
+
+	$effect(() => {
+		const sec = section();
+		if (!sec || typeof ResizeObserver === 'undefined') return;
+		const measure = () => {
+			viewport_h = window.innerHeight || 1;
+		};
+		measure();
+		const ro = new ResizeObserver(() => {
+			const h = sec.getBoundingClientRect().height;
+			if (h > 0) section_h = h;
+		});
+		ro.observe(sec);
+		window.addEventListener('resize', measure);
+		return () => {
+			ro.disconnect();
+			window.removeEventListener('resize', measure);
+		};
+	});
+
+	/* ---------------------------------------------------------------------------
+	 * The copies.
+	 *
+	 * The year mark's own treatment is the scan itself: outlines out of register
+	 * that resolve into one solid 2015 as the mark arrives. What happens after
+	 * that is the film's actual premise. The machine already ran; now the copies
+	 * come off.
+	 *
+	 * Each generation spawns from the *previous* generation, not from the year —
+	 * that is the whole point of a copy of a copy. Generation n starts wherever
+	 * n-1 had drifted to by the time it appeared, heads off on its own bearing,
+	 * and is fainter and softer than its parent. Solid, unlike the outlines
+	 * above: these are the substance that got printed, and there is less of it
+	 * every time.
+	 *
+	 * Ceiling on all of it is `PEAK` — these live behind body copy, so the
+	 * brightest ghost on screen is a sixth of a stop above the background.
+	 * ------------------------------------------------------------------------- */
+
+	/** How far a copy travels from its spawn point over its life, in `em`. */
+	const DRIFT = 0.85;
+	/** Section progress between spawns. */
+	const STEP = 0.115;
+	/** Section progress a copy takes to emerge, drift and vanish. */
+	const LIFE = 0.34;
+	/** Opacity of the first copy at its peak. Everything after is dimmer. */
+	const PEAK = 0.155;
+
+	/**
+	 * Bearings, deliberately uneven in angle. Copies fanning out at even
+	 * intervals read as a designed starburst; the premise is that nobody chose
+	 * where these went.
+	 */
+	const BEARINGS = [
+		/* The first one heads out to the left: the year mark sits at the left edge,
+		   so leaving to the left takes the brightest copy off the page instead of
+		   across the synopsis. */
+		{ dx: -0.92, dy: -0.28 },
+		{ dx: -0.71, dy: 0.62 },
+		{ dx: 0.44, dy: 0.86 },
+		{ dx: -0.95, dy: -0.22 },
+		{ dx: 0.66, dy: -0.72 },
+		{ dx: -0.38, dy: 0.9 },
+		{ dx: 0.88, dy: 0.4 },
+	];
+
+	/**
+	 * Where each generation is born: the point its parent had reached by then.
+	 * A parent is `STEP / LIFE` of the way through its own drift when its child
+	 * appears, so the birthplaces chain outward on their own — no generation is
+	 * measured from the original.
+	 */
+	const ORIGINS: { x: number; y: number }[] = [];
+	for (let i = 0, x = 0, y = 0; i < BEARINGS.length; i++) {
+		ORIGINS.push({ x, y });
+		x += BEARINGS[i].dx * DRIFT * (STEP / LIFE);
+		y += BEARINGS[i].dy * DRIFT * (STEP / LIFE);
+	}
+
+	/** 0 when the section's top reaches the top of the screen, 1 at its bottom. */
+	let progress = $state(0);
+
+	$effect(() => {
+		const sec = section();
+		if (!sec) return;
+		return onScrollProgress(sec, (rect) => {
+			const travel = Math.max(1, rect.height - (window.innerHeight || 0));
+			progress = Math.max(0, Math.min(1, -rect.top / travel));
+		});
+	});
+
+	let copies = $derived(
+		BEARINGS.map((b, i) => {
+			// Nothing before this generation's turn, nothing after it dissolves.
+			const life = Math.max(0, Math.min(1, (progress - i * STEP) / LIFE));
+			const origin = ORIGINS[i];
+			return {
+				born: life > 0 && life < 1,
+				tx: origin.x + b.dx * DRIFT * life,
+				ty: origin.y + b.dy * DRIFT * life,
+				// Emerge, hold, fade — one arc, and each generation's is lower
+				// than its parent's.
+				opacity: Math.sin(life * Math.PI) * PEAK * 0.8 ** i,
+				// Each copy swells as it goes, and starts a little larger than its
+				// parent did — a print that never quite registers at the same size,
+				// and, growing while it dims, something coming toward you as it
+				// loses substance.
+				scale: 1 + i * 0.05 + life * 0.32,
+				blur: 1 + i * 0.7,
+			};
+		}),
+	);
 </script>
 
 <SectionShell id="what-makes-us-human" year="2015" label="Senior Thesis" theme="thesis">
-	<div class="scan" aria-hidden="true">
-		<div class="scan-line"></div>
+	<!--
+	  The beam. One element per band, all on the same keyframes at the same speed,
+	  each offset by a negative delay of one `CROSS` — a single animation per band
+	  and nothing to keep in sync, because the stagger is baked into where in the
+	  cycle each one starts rather than maintained frame to frame.
+	-->
+	<div
+		bind:this={host}
+		class="scan"
+		aria-hidden="true"
+		style:--sec-h="{section_h}px"
+		style:--dur="{sweep_dur}s"
+		style:--stagger="{CROSS}s">
+		{#each Array(band_count) as _, i (i)}
+			<div class="band" style:--i={i}>
+				<div class="core"></div>
+			</div>
+		{/each}
+	</div>
+
+	<!--
+	  The copies, on a layer pinned to the viewport so a generation stays legible
+	  for its whole life instead of being left behind the moment it is born. Its
+	  rail repeats the container's geometry, which is what puts the first copy on
+	  top of the real year mark at the moment the section's top reaches the top of
+	  the screen — where generation 0 spawns.
+	-->
+	<div class="echoes" aria-hidden="true">
+		<div class="rail">
+			{#each copies as c, i (i)}
+				{#if c.born}
+					<span
+						class="echo"
+						style:--tx={c.tx}
+						style:--ty={c.ty}
+						style:--o={c.opacity}
+						style:--s={c.scale}
+						style:--b="{c.blur}px">
+						2015
+					</span>
+				{/if}
+			{/each}
+		</div>
 	</div>
 
 	<div class="container">
 		<Reveal>
-			<YearMark year="2015" subtitle="Senior Thesis" color="#00f2c3" />
+			<YearMark year="2015" subtitle="Senior Thesis" color="#00f2c3" treatment="clone" />
 		</Reveal>
 
 		<div class="lockup">
@@ -526,7 +725,7 @@
 					</div>
 					<LazyMedia
 						src="https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human/poster.jpg"
-						alt="What Makes Us Human (2014) — full senior thesis short"
+						alt="What Makes Us Human (2015) — full senior thesis short"
 						ratio="16 / 9"
 						video
 						onclick={(e) => gallery?.open(0, e.currentTarget)} />
@@ -594,16 +793,13 @@
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
-				<GradientCollapse
-					class="gallery-bleed"
-					label="Show all 41 production stills"
-					collapsedHeight="30rem">
-					<LightboxGallery
+				<div class="gallery-bleed">
+					<PeekGallery
 						key="what-makes-us-human-bts"
 						items={btsImages}
-						display="masonry"
+						peek={8}
 						size="2" />
-				</GradientCollapse>
+				</div>
 			</Reveal>
 		</div>
 
@@ -612,8 +808,9 @@
 				<h3 class="big-sub">Premiere · MSU Electronic Arts Showcase · May 2015</h3>
 				<p>
 					The end of college. A theater. A crowd. The film ran. People reacted to the
-					beats we'd been building toward for almost a year. It is, to this day, the
-					single longest project I've ever shipped.
+					beats we'd been building toward for almost a year. It's still the biggest film
+					production I've ever been a part of — and now that I build software instead of
+					films, the biggest I ever will be.
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
@@ -648,33 +845,125 @@
 		color: #e8f7fa;
 	}
 	.scan {
+		--band-h: 260px;
+		/* Laid over the section, not the screen — so a band passes you once and is
+		   gone, and you can scroll out from under it. The section's paint
+		   containment (`content-visibility: auto`) clips the bands to it. */
 		position: absolute;
 		inset: 0;
 		overflow: hidden;
 		pointer-events: none;
-		opacity: 0.35;
 	}
-	.scan-line {
+	/*
+	 * The beam's soft body. Wide and dim, exactly as before — what changed is
+	 * that it now has a hard core running through it (`.core`) and something
+	 * inside it to light up. A gradient with no hard edge anywhere reads as fog;
+	 * one bright line inside the same fog reads as a beam.
+	 */
+	.band {
 		position: absolute;
 		top: 0;
 		left: 0;
 		right: 0;
-		height: 80px;
+		height: var(--band-h);
+		overflow: hidden;
 		background: linear-gradient(
 			180deg,
 			transparent 0%,
-			rgba(0, 242, 195, 0.3) 50%,
+			rgba(0, 242, 195, 0.07) 34%,
+			rgba(0, 242, 195, 0.16) 50%,
+			rgba(0, 242, 195, 0.07) 66%,
 			transparent 100%
 		);
-		filter: blur(8px);
-		animation: scan 8s linear infinite;
+		animation: scan-band var(--dur) linear infinite;
+		/* The stagger is a head start, not a wait: every band is mid-cycle from the
+		   first frame, one `--stagger` apart, so the section is never empty while
+		   the first one gets going. */
+		animation-delay: calc(var(--i) * var(--stagger) * -1);
 	}
-	@keyframes scan {
+	.core {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		right: 0;
+		height: 2px;
+		translate: 0 -1px;
+		background: linear-gradient(
+			90deg,
+			transparent,
+			rgba(140, 255, 232, 0.85) 18%,
+			rgba(190, 255, 244, 0.95) 50%,
+			rgba(140, 255, 232, 0.85) 82%,
+			transparent
+		);
+		box-shadow: 0 0 14px rgba(0, 242, 195, 0.55);
+	}
+	/* The section's top edge to its bottom edge, then back to the top. */
+	@keyframes scan-band {
 		from {
-			transform: translateY(-80px);
+			translate: 0 calc(var(--band-h) * -1);
 		}
 		to {
-			transform: translateY(120vh);
+			translate: 0 var(--sec-h);
+		}
+	}
+	/* A beam sweeping the page is exactly the kind of large ambient motion
+	   reduced motion is asking us to drop. Keep one band, parked, so the section
+	   keeps its instrument without the sweep. */
+	@media (prefers-reduced-motion: reduce) {
+		.band {
+			animation: none;
+			translate: 0 calc(var(--sec-h) * 0.2);
+		}
+		.band:not(:first-child) {
+			display: none;
+		}
+	}
+
+	/*
+	 * The copies. Pinned to the viewport and pulled back out of flow, so the page
+	 * content sits over the layer rather than a screen below it.
+	 */
+	.echoes {
+		position: sticky;
+		top: 0;
+		height: 100svh;
+		margin-bottom: -100svh;
+		overflow: hidden;
+		pointer-events: none;
+	}
+	/* The container's geometry, repeated, so the first generation lands on the
+	   real year mark instead of near it. */
+	.rail {
+		position: relative;
+		height: 100%;
+		max-width: 80rem;
+		margin: 0 auto;
+	}
+	.echo {
+		position: absolute;
+		/* The year mark's own top margin — where the numerals actually start. */
+		top: clamp(2rem, 6vw, 4rem);
+		left: clamp(1rem, 3vw, 2rem);
+		font-family: var(--font-mono);
+		font-weight: 900;
+		font-size: clamp(7rem, 22vw, 18rem);
+		line-height: 0.85;
+		letter-spacing: -0.04em;
+		white-space: nowrap;
+		/* Filled, unlike the outlines that converge above: the outlines are the
+		   scan, these are what the printer put down. */
+		color: #00f2c3;
+		opacity: var(--o);
+		translate: calc(var(--tx) * 1em) calc(var(--ty) * 1em);
+		scale: var(--s);
+		filter: blur(var(--b));
+	}
+	@media (prefers-reduced-motion: reduce) {
+		/* The effect is entirely travel and generation. Held still it is a stack of
+		   overlapping numerals on top of the body copy. */
+		.echoes {
+			display: none;
 		}
 	}
 

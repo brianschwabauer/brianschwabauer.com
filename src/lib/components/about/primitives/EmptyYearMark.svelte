@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { onScrollProgress } from './scrollProgress';
+
 	let {
 		year,
 		color = '#ffffff',
@@ -17,20 +19,12 @@
 
 	$effect(() => {
 		if (!el) return;
-		const onScroll = () => {
-			const rect = el!.getBoundingClientRect();
+		return onScrollProgress(el, (rect) => {
 			const vh = window.innerHeight || 1;
 			const total = rect.height + vh;
 			const traversed = vh - rect.top;
 			progress = Math.max(0, Math.min(1, traversed / total));
-		};
-		onScroll();
-		window.addEventListener('scroll', onScroll, { passive: true });
-		window.addEventListener('resize', onScroll);
-		return () => {
-			window.removeEventListener('scroll', onScroll);
-			window.removeEventListener('resize', onScroll);
-		};
+		});
 	});
 
 	// Bell curve — invisible at edges, peak when centered in viewport.

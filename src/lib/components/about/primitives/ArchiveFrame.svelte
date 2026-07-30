@@ -51,7 +51,9 @@
 					stroke-width="1.5" />
 			</svg>
 			<span class="url">{displayHost}</span>
-			<span class="archive-pill">ARCHIVED · {title}</span>
+			<!-- The page's own title, the way a browser shows it on the tab —
+			     context for what loads, not a status badge. -->
+			<span class="page-title">{title}</span>
 		</div>
 		<button class="open-btn" type="button" onclick={() => (open = !open)}>
 			{open ? closeLabel : label}
@@ -151,16 +153,23 @@
 		color: #fff;
 		flex-shrink: 0;
 	}
-	.archive-pill {
-		font-size: 0.65rem;
-		letter-spacing: 0.18em;
-		padding: 0.1rem 0.55rem;
-		border-radius: 999px;
-		background: rgba(255, 200, 0, 0.18);
-		color: #ffd866;
+	.page-title {
+		font-size: 0.7rem;
+		color: rgba(255, 255, 255, 0.5);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+	/* A hairline between the address and the title, so the two read as separate
+	   pieces of chrome rather than one long string. */
+	.page-title::before {
+		content: '';
+		display: inline-block;
+		width: 1px;
+		height: 0.85em;
+		margin-right: 0.55rem;
+		translate: 0 0.12em;
+		background: rgba(255, 255, 255, 0.18);
 	}
 	.open-btn {
 		font: inherit;

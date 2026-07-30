@@ -18,6 +18,8 @@
 	} = $props();
 
 	let el = $state<HTMLElement | null>(null);
+	/** Last height written into contain-intrinsic-size (0 = nothing recorded). */
+	let stamped = 0;
 
 	// Stamp the section's real rendered height into contain-intrinsic-size.
 	// Without this, every section far from the viewport is laid out at the
@@ -33,7 +35,6 @@
 		const rendered = () =>
 			typeof el!.checkVisibility !== 'function' ||
 			el!.checkVisibility({ contentVisibilityAuto: true });
-		let stamped = 0;
 		const ro = new ResizeObserver((entries) => {
 			if (!rendered()) return;
 			for (const entry of entries) {

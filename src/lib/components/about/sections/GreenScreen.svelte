@@ -3,9 +3,12 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import GradientCollapse from '../primitives/GradientCollapse.svelte';
+	import DeletedScenes from '../primitives/DeletedScenes.svelte';
+	import PeekGallery from '../primitives/PeekGallery.svelte';
+	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+	import { onScrollProgress } from '../primitives/scrollProgress';
 
 	let { signedIn = false }: { signedIn?: boolean } = $props();
 
@@ -26,71 +29,21 @@
 				(i) => (padding + i * spacing - startCenter) / travel,
 			);
 		};
-		const updateProgress = () => {
-			const rect = pacTunnel!.getBoundingClientRect();
+		recomputePelletTargets();
+		window.addEventListener('resize', recomputePelletTargets);
+		const unsubscribe = onScrollProgress(pacTunnel, (rect) => {
 			const vh = window.innerHeight || 1;
 			const range = vh + pacTunnel!.offsetHeight;
 			const p = range > 0 ? (vh - rect.top) / range : 0;
 			pacProgress = Math.max(0, Math.min(1, p));
-		};
-		const onResize = () => {
-			recomputePelletTargets();
-			updateProgress();
-		};
-		recomputePelletTargets();
-		updateProgress();
-		window.addEventListener('scroll', updateProgress, { passive: true });
-		window.addEventListener('resize', onResize);
+		});
 		return () => {
-			window.removeEventListener('scroll', updateProgress);
-			window.removeEventListener('resize', onResize);
+			window.removeEventListener('resize', recomputePelletTargets);
+			unsubscribe();
 		};
 	});
 
-	const xyzImages: GalleryItem[] = [
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen.avif',
-			width: 352,
-			height: 240,
-			caption: 'Floating anchor — turns out you need a tripod',
-			alt: 'Floating anchor — turns out you need a tripod',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-brian_talks_while_floating_with_green_screen.avif',
-			width: 352,
-			height: 240,
-			caption: 'Same thumbs-up bug, different shot',
-			alt: 'Same thumbs-up bug, different shot',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_dances_in_front_of_green_screen_weather_report.avif',
-			width: 352,
-			height: 240,
-			caption: 'Kevin as weatherman #1',
-			alt: 'Kevin as weatherman #1',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_appears_using_green_screen_blanket_visual_effect.avif',
-			width: 352,
-			height: 240,
-			caption: 'Greenscreen blanket → vanishing trick',
-			alt: 'Greenscreen blanket → vanishing trick',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_makes_funny_expression_while_wearing_a_frisbee.avif',
-			width: 352,
-			height: 240,
-			caption: 'Kevin, also wearing a frisbee',
-			alt: 'Kevin, also wearing a frisbee',
-		},
-	];
-
-	const vfxImages: GalleryItem[] = [
+	const aeTests: GalleryItem[] = [
 		{
 			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2008-03-09_clone_brian_test.avif',
@@ -120,9 +73,25 @@
 			src: 'https://cdn.brianschwabauer.com/media/2009-03-22_yard_sale-hit_by_car.avif',
 			width: 480,
 			height: 320,
-			caption: 'Same effect, in a real film a year later',
-			alt: 'Same effect, in a real film a year later',
+			caption: 'Hit-by-car test, in a real film a year later',
+			alt: 'Hit-by-car test, in a real film a year later',
 			favorite: true,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_dances_in_front_of_green_screen_weather_report.avif',
+			width: 352,
+			height: 240,
+			caption: 'Kevin as weatherman #1',
+			alt: 'Kevin as weatherman #1',
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-kevin_appears_using_green_screen_blanket_visual_effect.avif',
+			width: 352,
+			height: 240,
+			caption: 'Greenscreen blanket → vanishing trick',
+			alt: 'Greenscreen blanket → vanishing trick',
 		},
 		{
 			type: 'image',
@@ -150,30 +119,26 @@
 		},
 	];
 
-	const nuisanceImages: GalleryItem[] = [
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone-brian_explains_the_product.avif',
-			width: 480,
-			height: 320,
-			caption: 'The pitch',
-			alt: 'The pitch',
-		},
+	// The Nuisance-B-Gone stills are the rotoscope entry in the same run of
+	// tests, so they live at the end of the VFX set rather than in a gallery of
+	// their own — captions name the film, since the surrounding tiles don't.
+	const vfxImages: GalleryItem[] = [
+		...aeTests,
 		{
 			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone-product_makes_chair_disappear_visual_effect.avif',
 			width: 480,
 			height: 320,
-			caption: 'Chair, gone',
-			alt: 'Chair, gone',
+			caption: 'Cleanplate rotoscope — chair, gone',
+			alt: 'Cleanplate rotoscope — chair, gone',
 		},
 		{
 			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone-product_makes_shoe_disappear_visual_effect.avif',
 			width: 480,
 			height: 320,
-			caption: 'Shoe, gone',
-			alt: 'Shoe, gone',
+			caption: 'Cleanplate rotoscope — shoe, gone',
+			alt: 'Cleanplate rotoscope — shoe, gone',
 		},
 	];
 
@@ -185,7 +150,7 @@
 			src: 'https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen_2.avif',
 			width: 352,
 			height: 240,
-			caption: 'XYZ News — the floating anchor bug',
+			caption: 'Floating anchor — turns out you need a tripod',
 			alt: 'Brian floating in front of XYZ News greenscreen',
 		},
 		{
@@ -256,6 +221,14 @@
 
 <SectionShell id="green-screen" year="2007" label="Green Screen" theme="green">
 	<div class="bg-grid" aria-hidden="true"></div>
+	<!--
+	  Spill. A green screen lights the whole room green whether you want it to or
+	  not — it comes off the cloth, wraps the edges of everything in front of it,
+	  and turns up in your footage as a rim you spend the evening trying to
+	  remove. Here it leans in from both sides, breathing slightly, because a
+	  bedsheet on a wall never hung still either.
+	-->
+	<div class="spill" aria-hidden="true"></div>
 	<div class="container">
 		<Reveal>
 			<YearMark year="2007" subtitle="Early Technical Tests" color="#22ff90" />
@@ -269,9 +242,10 @@
 					<span class="key">painted neon green.</span>
 				</h2>
 				<p class="lede">
-					Suddenly the possibilities felt infinite. We didn't know how to use a chroma
-					key. We didn't know what "chroma key" was. We knew our editing software had a
-					button labeled "green screen". That was enough.
+					After painting a green screen on a bedroom wall, suddenly the possibilities felt
+					infinite. We didn't know how to use a chroma key. We didn't know what "chroma
+					key" was. We knew our editing software had a button labeled "green screen". That
+					was enough.
 				</p>
 				<p class="lede">
 					So we wrote up a fake news broadcast. <strong>XYZ News</strong>
@@ -297,20 +271,6 @@
 						class="key-img"
 						onclick={(e) => gallery?.open(0, e.currentTarget)} />
 				</div>
-			</Reveal>
-		</div>
-
-		<div class="xyz-block">
-			<Reveal variant="up">
-				<h3 class="sub">XYZ News, Episode I</h3>
-				<p>The funniest thing we'd ever made, by a country mile.</p>
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<LightboxGallery
-					key="green-screen-xyz"
-					items={xyzImages}
-					display="masonry-row"
-					size="2" />
 			</Reveal>
 		</div>
 
@@ -361,9 +321,15 @@
 					</p>
 					<p>
 						I also built a small Flash game to launch with the film — you played a pacman
-						eating animated faces. It was my first real taste of programming creating
-						something on screen. I never forgot it.
+						eating animated faces. It was the first time I wrote code and watched it
+						become something on a screen.
 					</p>
+					<PlayFilm
+						label="Watch the short"
+						title="Pac-Attack (2008) — full short"
+						meta="2008"
+						color="#22ff90"
+						onclick={(e) => gallery?.open(5, e.currentTarget)} />
 				</Reveal>
 
 				<Reveal variant="right" delay={100}>
@@ -386,6 +352,8 @@
 				</Reveal>
 			</div>
 
+			<!-- How the trick actually worked, beside the film it produced — the
+			     three steps only read as steps next to the Pac-Attack copy. -->
 			<Reveal variant="up" delay={150}>
 				<div class="pac-flow">
 					<div class="pac-step">
@@ -419,105 +387,88 @@
 					</div>
 				</div>
 			</Reveal>
-
-			<Reveal variant="up" delay={200}>
-				<div class="pac-video">
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2008-01-06_pac-attack/poster.jpg"
-						alt="Pac-Attack (2008) — full short"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(5, e.currentTarget)} />
-				</div>
-			</Reveal>
 		</div>
 
 		<div class="ae-block">
 			<Reveal variant="up">
 				<h3 class="sub">Discovering After Effects</h3>
 				<p>
-					Our editor couldn't take us further. So I picked up After Effects and started
-					running tests — every VFX artist's rite of passage. Clone yourself. Build a
-					lightsaber. Get hit by a car. Animate a logo.
+					Our video editing software couldn't take us further. So I picked up Adobe After
+					Effects and started running tests — every VFX artist's rite of passage. Clone
+					yourself. Build a lightsaber. Get hit by a car. Animate a logo.
 				</p>
 			</Reveal>
-
 			<Reveal variant="up" delay={100}>
-				<LightboxGallery
-					key="green-screen-vfx"
-					items={vfxImages}
-					display="masonry"
-					size="0" />
+				<PeekGallery key="green-screen-vfx" items={vfxImages} size="00" />
 			</Reveal>
 		</div>
 
-		<div class="nuisance-block">
-			<Reveal variant="up">
-				<h3 class="sub">Nuisance-B-Gone</h3>
-				<p>
-					Once I learned After Effects had a "rotoscope" capability, I had to test it. Cut
-					out a chair before it vanishes. Cut out a shoe. Stay locked-off on a tripod and
-					let the trick do the work. We turned the test into a fake infomercial.
-				</p>
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<LightboxGallery
-					key="green-screen-nuisance"
-					items={nuisanceImages}
-					display="masonry-row"
-					size="2" />
-			</Reveal>
-			<Reveal variant="up" delay={150}>
-				<div class="inline-video">
+		<!-- The two films those tests turned into, and why we never planned. -->
+		<DeletedScenes scenes={3}>
+			<!-- Copy and player side by side, and the second one mirrored: two
+			     identical text-then-video stacks in a row read as a template,
+			     and the alternation keeps the eye moving across the page
+			     instead of straight down one gutter. -->
+			<div class="spot-block">
+				<Reveal variant="up">
+					<div class="spot-copy">
+						<h3 class="sub">Nuisance-B-Gone</h3>
+						<p>
+							Once I learned After Effects had a "rotoscope" capability, I had to test it.
+							Cut out a chair before it vanishes. Cut out a shoe. Stay locked-off on a
+							tripod and let the trick do the work. We turned the test into a fake
+							infomercial.
+						</p>
+					</div>
+				</Reveal>
+				<Reveal variant="right" delay={150}>
 					<LazyMedia
 						src="https://cdn.brianschwabauer.com/media/2008-08-21_nuisance-b-gone/poster.jpg"
 						alt="Nuisance-B-Gone — the fake infomercial"
 						ratio="16 / 9"
 						video
 						onclick={(e) => gallery?.open(6, e.currentTarget)} />
-				</div>
-			</Reveal>
-		</div>
+				</Reveal>
+			</div>
 
-		<div class="sideline-block">
-			<Reveal variant="up">
-				<h3 class="sub">Sideline Huddler</h3>
-				<p>
-					My sister Amanda "invented" a warm blanket with a waterproof shell for outdoor
-					sports — basically a Snuggie you could take outside, before Snuggies existed. We
-					made her a fake commercial that put her into rain, snow, and fire via green
-					screen.
-				</p>
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<div class="inline-video">
+			<div class="spot-block mirrored">
+				<Reveal variant="up">
+					<div class="spot-copy">
+						<h3 class="sub">Sideline Huddler</h3>
+						<p>
+							My sister Amanda "invented" a warm blanket with a waterproof shell for
+							outdoor sports — basically a Snuggie you could take outside, before Snuggies
+							existed. We made her a fake commercial that put her into rain, snow, and
+							fire via green screen.
+						</p>
+					</div>
+				</Reveal>
+				<Reveal variant="left" delay={100}>
 					<LazyMedia
 						src="https://cdn.brianschwabauer.com/media/2009-02-13_sideline_huddler/poster.jpg"
 						alt="Sideline Huddler — Amanda's invention commercial"
 						ratio="16 / 9"
 						video
 						onclick={(e) => gallery?.open(7, e.currentTarget)} />
-				</div>
-			</Reveal>
-		</div>
+				</Reveal>
+			</div>
 
-		<Reveal>
-			<GradientCollapse label="Why we never planned. Why it worked anyway.">
-				<div class="prose">
+			<Reveal>
+				<div class="closing">
 					<p>
-						This was the pattern: we picked an effect we'd never done before. We dove
-						right in. No research, no tutorials. We learned by failing in public. With
-						each film we added another tool to the box.
+						This was the pattern: pick an effect we'd never done, dive in with no research
+						and no tutorials, and learn by failing in public.
 					</p>
 					<p>
 						The "everything I make is a thinly disguised pretext to try one new technical
-						thing" loop never really left me. Pac-Attack was about a greenscreen trick.
+						thing" habit never really left me. Pac-Attack was about a greenscreen trick.
 						Nuisance-B-Gone was about cleanplate rotoscope. The "Calamity" film a year
-						later (next section over) was about stop-motion. Everything was an excuse.
+						later (a few sections from now) was about stop-motion. Everything was an
+						excuse.
 					</p>
 				</div>
-			</GradientCollapse>
-		</Reveal>
+			</Reveal>
+		</DeletedScenes>
 	</div>
 
 	<LightboxGallery
@@ -540,6 +491,40 @@
 			radial-gradient(ellipse at top, rgba(34, 255, 144, 0.06), transparent 50%),
 			linear-gradient(180deg, #04130a 0%, #0a1f12 50%, #04140b 100%);
 		color: #d8ffe6;
+	}
+	.spill {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background:
+			radial-gradient(
+				ellipse 34% 60% at -6% 34%,
+				rgba(34, 255, 144, 0.16),
+				transparent 70%
+			),
+			radial-gradient(
+				ellipse 30% 52% at 106% 66%,
+				rgba(34, 255, 144, 0.13),
+				transparent 70%
+			);
+		mix-blend-mode: screen;
+		animation: spill-breathe 13s ease-in-out infinite alternate;
+	}
+	@keyframes spill-breathe {
+		from {
+			opacity: 0.75;
+			scale: 1 1;
+		}
+		to {
+			opacity: 1;
+			/* Only the vertical — the cloth sags and lifts, it doesn't zoom. */
+			scale: 1 1.06;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.spill {
+			animation: none;
+		}
 	}
 	.bg-grid {
 		position: absolute;
@@ -657,20 +642,51 @@
 		font-family: var(--font-mono);
 		letter-spacing: 0.04em;
 	}
-	.xyz-block,
-	.ae-block,
-	.nuisance-block,
-	.sideline-block {
+	.ae-block {
 		margin: 4rem 0;
+		p {
+			max-width: 600px;
+		}
+	}
+	/* The gallery is the bulk of the block — it needs to sit off the copy rather
+	   than butt against it. `:global` because the child is a `Reveal` root. */
+	.ae-block > :global(.reveal + .reveal) {
+		margin-top: 1.5rem;
+	}
+	.spot-block {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+		align-items: center;
+		gap: clamp(1.5rem, 4vw, 3.5rem);
+		margin: 4rem 0;
+	}
+	/* Video first in the visual order, copy second — swapped with `order` so the
+	   reading order (and the tab order) still runs title → film. `:global`
+	   because these grid items are `Reveal` roots, which never carry this
+	   component's scoping class. */
+	.spot-block.mirrored {
+		grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+	}
+	.spot-block.mirrored > :global(.reveal:first-child) {
+		order: 2;
+	}
+	.spot-copy p {
+		margin-bottom: 0;
+	}
+	@media (max-width: 820px) {
+		.spot-block {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.spot-block.mirrored {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.spot-block.mirrored > :global(.reveal:first-child) {
+			order: 0;
+		}
 	}
 	.pac-block {
 		margin: 0;
 	}
-	.inline-video {
-		max-width: 880px;
-		margin: 2rem auto 0;
-	}
-
 	.pac-grid {
 		display: grid;
 		grid-template-columns: 1.1fr 1fr;
@@ -767,18 +783,19 @@
 		font-size: 1.6rem;
 		font-weight: 700;
 	}
-	.pac-video {
-		margin-top: 2.5rem;
-		max-width: 800px;
-		margin-left: auto;
-		margin-right: auto;
-	}
 
-	.prose p {
+	/* Closes the section in the same voice it opened in: the lede's type and
+	   the section's own ink, held to a reading measure. */
+	.closing {
+		max-width: 44rem;
+		margin-inline: auto;
+	}
+	.closing p {
+		font-size: clamp(1.05rem, 1.5vw, 1.25rem);
 		line-height: 1.65;
 		margin-bottom: 1rem;
 	}
-	.prose em {
+	.closing em {
 		color: #22ff90;
 		font-style: italic;
 	}

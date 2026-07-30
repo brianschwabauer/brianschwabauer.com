@@ -5,99 +5,124 @@
 	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
+	import BokehField from '../primitives/BokehField.svelte';
+	import PlayFilm from '../primitives/PlayFilm.svelte';
+	import ShippedWall, { type Column } from '../primitives/ShippedWall.svelte';
 
-
-	const dashboardMockupsImages: GalleryItem[] = [
+	/*
+	 * Everything the product looks like, as one diagonal scrub at the end of the
+	 * chapter: the tall full-page captures of what the photographer's clients see,
+	 * and the dashboard screens they run the business from, on the same wall.
+	 *
+	 * Columns are balanced by total *height*, not by count — a column's travel is
+	 * the part of it that doesn't fit on screen, so a short column would arrive
+	 * early and then sit still. The tall 2048px captures do most of that work, so
+	 * each column gets one or two of them and the 16:9 dashboard screens fill in
+	 * around them.
+	 *
+	 * The project detail page is deliberately absent: it is the hero shot at the
+	 * top of the section, and seeing it again forty lines later reads as a mistake
+	 * rather than as a set.
+	 */
+	const WALL_COLUMNS: Column[] = [
 		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_list.avif',
-			width: 1904,
-			height: 978,
-			caption: 'Project list · dark mode',
-			alt: 'Project list · dark mode',
+			direction: -1,
+			speed: 1,
+			// Three ~1900px-wide captures, which are the first things to go illegible
+			// in a third of a phone screen.
+			drop_on_phone: true,
+			shots: [
+				{
+					file: '2026-01-01_show_and_tour-legacy_delivery_page_screenshot-963_n1950_rd.avif',
+					width: 702,
+					height: 2048,
+					caption: '963 N 1950 RD · client delivery',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_mockup-signin_page.avif',
+					width: 2048,
+					height: 1152,
+					caption: 'Sign in',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_list.avif',
+					width: 1904,
+					height: 978,
+					caption: 'Project list · dark mode',
+				},
+				{
+					file: '2026-01-01_show_and_tour-website_screenshot-home_page.avif',
+					width: 1890,
+					height: 956,
+					caption: 'showandtour.com · home',
+				},
+			],
 		},
 		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_page.avif',
-			width: 1890,
-			height: 975,
-			caption: 'Project detail',
-			alt: 'Project detail',
+			direction: 1,
+			speed: 1,
+			shots: [
+				{
+					file: '2026-01-01_show_and_tour-dashboard_mockup-delivery_page_dark.avif',
+					width: 733,
+					height: 2048,
+					caption: 'Delivery page · dark',
+				},
+				{
+					file: '2026-01-01_show_and_tour-property_website_screenshot-prairievillageestate.avif',
+					width: 1375,
+					height: 2048,
+					caption: 'Prairie Village Estate · property site',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_settings_page.avif',
+					width: 1907,
+					height: 1632,
+					caption: 'Settings',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_mockup-media_player.avif',
+					width: 1440,
+					height: 960,
+					caption: 'Built-in media player',
+				},
+			],
 		},
 		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_client_page.avif',
-			width: 1907,
-			height: 980,
-			caption: 'Project · client view',
-			alt: 'Project · client view',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_settings_page.avif',
-			width: 1907,
-			height: 1632,
-			caption: 'Settings',
-			alt: 'Settings',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_mockup-clients_page_empty.avif',
-			width: 2048,
-			height: 1152,
-			caption: 'Clients (empty state)',
-			alt: 'Clients (empty state)',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_mockup-projects_page_empty.avif',
-			width: 2048,
-			height: 1152,
-			caption: 'Projects (empty state)',
-			alt: 'Projects (empty state)',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_mockup-delivery_page_dark.avif',
-			width: 733,
-			height: 2048,
-			caption: 'Delivery page · dark',
-			alt: 'Delivery page · dark',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-dashboard_mockup-media_player.avif',
-			width: 1440,
-			height: 960,
-			caption: 'Built-in media player',
-			alt: 'Built-in media player',
-		},
-	];
-
-	const deliveryPagesImages: GalleryItem[] = [
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-legacy_delivery_page_screenshot-963_n1950_rd.avif',
-			width: 702,
-			height: 2048,
-			caption: '963 N 1950 RD · client delivery',
-			alt: '963 N 1950 RD · client delivery',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-property_website_screenshot-8700leeboulevard.avif',
-			width: 854,
-			height: 2048,
-			caption: '8700 Lee Boulevard · property site',
-			alt: '8700 Lee Boulevard · property site',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-property_website_screenshot-prairievillageestate.avif',
-			width: 1375,
-			height: 2048,
-			caption: 'Prairie Village Estate · property site',
-			alt: 'Prairie Village Estate · property site',
+			direction: -1,
+			speed: 0.75,
+			shots: [
+				{
+					file: '2026-01-01_show_and_tour-property_website_screenshot-8700leeboulevard.avif',
+					width: 854,
+					height: 2048,
+					caption: '8700 Lee Boulevard · property site',
+				},
+				{
+					file: '2026-01-01_show_and_tour-website_screenshot-home_page-portrait.avif',
+					width: 1897,
+					height: 1852,
+					caption: 'showandtour.com · the long scroll',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_screenshot-dark_mode_project_client_page.avif',
+					width: 1907,
+					height: 980,
+					caption: 'Project · client view',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_mockup-clients_page_empty.avif',
+					width: 2048,
+					height: 1152,
+					caption: 'Clients (empty state)',
+				},
+				{
+					file: '2026-01-01_show_and_tour-dashboard_mockup-projects_page_empty.avif',
+					width: 2048,
+					height: 1152,
+					caption: 'Projects (empty state)',
+				},
+			],
 		},
 	];
 
@@ -190,20 +215,62 @@
 		},
 	];
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
+
+	/*
+	 * A rack focus onto the title. This section is the photography product and
+	 * the background is already a lens; the logical thing for the subject to do
+	 * is come into focus rather than fade or slide in like everything else on the
+	 * page.
+	 *
+	 * One-shot on entry rather than scroll-linked: a real focus pull is an
+	 * operator turning a ring once and stopping, not a value that tracks your
+	 * scrollbar. It is also a transition rather than a per-frame blur, which
+	 * matters — blurring live text on every scroll event is one of the more
+	 * expensive things you can ask a browser to do.
+	 */
+	let title_el = $state<HTMLElement | null>(null);
+	let focused = $state(false);
+
+	$effect(() => {
+		if (!title_el) return;
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			focused = true;
+			return;
+		}
+		const io = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) {
+					focused = true;
+					io.disconnect();
+				}
+			},
+			{ rootMargin: '-12% 0px -20% 0px' },
+		);
+		io.observe(title_el);
+		return () => io.disconnect();
+	});
 </script>
 
 <SectionShell id="showandtour" year="2019" label="Show&Tour" theme="snt">
-	<div class="snt-bg" aria-hidden="true"></div>
+	<!-- The field runs the whole section, behind the lockup, the features and all
+	     three galleries. Its mask is gentler than the NOW section's: there is copy
+	     from top to bottom here, so the discs thin toward the middle column rather
+	     than clearing one hole in the centre. -->
+	<!-- Brand teal and brand blue, so the two light sources in the room are the
+	     two Show&Tour accents rather than generic cyans. -->
+	<BokehField
+		tints={['51, 208, 193', '0, 128, 253']}
+		mask="linear-gradient(90deg, #000, rgba(0, 0, 0, 0.32) 30%, rgba(0, 0, 0, 0.32) 70%, #000)" />
 
 	<div class="container">
 		<Reveal>
-			<YearMark year="2019 → today" subtitle="What I'm building now" color="#00f2c3" />
+			<YearMark year="2019" color="#33d0c1" />
 		</Reveal>
 
 		<div class="lockup">
 			<Reveal>
-				<div class="eyebrow">CURRENT FOCUS · CO-FOUNDER</div>
-				<h2 class="title">
+				<div class="eyebrow">CO-FOUNDER</div>
+				<h2 bind:this={title_el} class="title" class:focused>
 					<span class="snt-mark">
 						<img
 							src="https://cdn.brianschwabauer.com/media/2026-01-01_show_and_tour-logo-icon_flash.svg"
@@ -218,27 +285,22 @@
 					photographers — beautiful property websites, branded delivery pages, smart invoicing,
 					and a workflow built around how photographers actually work.
 				</p>
+				<!-- The origin, told from 2019. Every present-tense claim about
+				     Show&Tour — full-time, the user count, the roadmap — belongs to
+				     the NOW section, so this chapter never has to say "still". -->
 				<p class="lede">
-					This is my full-time job now. We have thousands of users. I'm incredibly proud
-					of what we've built.
+					Everything else on this page was practice for this. A decade of shipping other
+					people's projects, a string of products that almost worked — and then the one
+					that stuck.
 				</p>
 				<div class="cta-row">
-					<a
-						class="cta-primary"
+					<PlayFilm
 						href="https://showandtour.com"
 						target="_blank"
-						rel="noopener">
-						showandtour.com
-						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<path
-								d="M5 12h14M13 6l6 6-6 6"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round" />
-						</svg>
-					</a>
+						rel="noopener"
+						icon="arrow"
+						label="showandtour.com"
+						color="#33d0c1" />
 				</div>
 			</Reveal>
 		</div>
@@ -258,7 +320,7 @@
 
 		<div class="features">
 			<Reveal>
-				<h3 class="sub">What it does, in six bullets</h3>
+				<h3 class="sub">The pitch, in six bullets</h3>
 			</Reveal>
 			<div class="features-grid">
 				{#each features as f, i}
@@ -275,60 +337,70 @@
 			</div>
 		</div>
 
-		<div class="dash-block">
-			<Reveal class="bleed-head">
-				<h3 class="sub">The dashboard</h3>
-				<p>Where photographers run their business day to day.</p>
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<div class="gallery-bleed">
-					<LightboxGallery key="show-and-tour-dashboards" items={dashboardMockupsImages} display="masonry" size="1" />
-				</div>
-			</Reveal>
-		</div>
-
-		<div class="delivery-block">
-			<Reveal>
-				<h3 class="sub">Property websites &amp; delivery pages</h3>
-				<p>What the photographer's clients actually see.</p>
-			</Reveal>
-			<Reveal variant="up" delay={100}>
-				<LightboxGallery key="show-and-tour-delivery" items={deliveryPagesImages} display="masonry-row" size="2" />
-			</Reveal>
-		</div>
-
 		<div class="brand-block">
 			<Reveal class="bleed-head">
-				<h3 class="sub">Brand · the rest</h3>
+				<h3 class="sub">Brand</h3>
+				<p>The identity the whole product is dressed in.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="gallery-bleed">
-					<LightboxGallery key="show-and-tour-brand" items={brandImages} display="masonry" size="2" />
+					<LightboxGallery
+						key="show-and-tour-brand"
+						items={brandImages}
+						display="masonry"
+						size="2" />
 				</div>
 			</Reveal>
 		</div>
 	</div>
 
+	<!--
+	  The chapter's last word is the product itself: every screen — the dashboard
+	  the photographer works in and the pages their clients land on — scrubbing
+	  past on the diagonal.
+	-->
+	<ShippedWall key="show-and-tour-wall" columns={WALL_COLUMNS} accent="#33d0c1" />
+
 	<LightboxGallery bind:this={gallery} key="show-and-tour" items={heroShot} />
 </SectionShell>
 
 <style>
+	/* The teal and violet corner glows that used to sit here are gone with the
+	   grid — the depth now comes from the bokeh, which is a real photographic
+	   effect rather than a light source with nothing making it. */
+	/*
+	 * The Show&Tour brand palette, since this is the Show&Tour chapter. The base
+	 * of the room is FOCUS (#004a63 → oklch(0.383 0.076 229)): the linear stops
+	 * sit either side of it so the middle of the section lands on the brand
+	 * colour exactly and the ends fall away into shadow. The two washes are the
+	 * accents used as light rather than as fill — BLUE from above, TEAL bouncing
+	 * off the lower right — which is the "occasional use of accents in more
+	 * prominent and unexpected ways" the brand guide asks for.
+	 *
+	 * Bokeh is light in a *room*, so the room has to have a colour for the discs
+	 * to read as highlights on a scene rather than dots on black.
+	 *
+	 * NOW no longer shares this theme; it owns `now` and stays green.
+	 */
 	:global([data-theme='snt']) {
 		background:
-			radial-gradient(circle at 20% 20%, rgba(0, 242, 195, 0.1), transparent 50%),
-			radial-gradient(circle at 80% 80%, rgba(108, 99, 255, 0.08), transparent 50%),
-			linear-gradient(180deg, #050a0c, #08161a 50%, #050a10);
-		color: #e8faf6;
-	}
-	.snt-bg {
-		position: absolute;
-		inset: 0;
-		background-image:
-			linear-gradient(rgba(0, 242, 195, 0.04) 1px, transparent 1px),
-			linear-gradient(90deg, rgba(0, 242, 195, 0.04) 1px, transparent 1px);
-		background-size: 60px 60px;
-		mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
-		pointer-events: none;
+			radial-gradient(
+				ellipse 110% 70% at 50% 0%,
+				oklch(0.5 0.115 250 / 0.5),
+				transparent 62%
+			),
+			radial-gradient(
+				ellipse 95% 60% at 82% 100%,
+				oklch(0.55 0.1 187 / 0.3),
+				transparent 66%
+			),
+			linear-gradient(
+				180deg,
+				oklch(0.26 0.06 232),
+				oklch(0.383 0.076 229) 55%,
+				oklch(0.23 0.068 248)
+			);
+		color: #f4f2f2;
 	}
 	.container {
 		max-width: 80rem;
@@ -346,7 +418,7 @@
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
 		letter-spacing: 0.32em;
-		color: #00f2c3;
+		color: #33d0c1;
 		margin-bottom: 1.2rem;
 	}
 	.title {
@@ -359,6 +431,28 @@
 		align-items: center;
 		gap: 1.2rem;
 		flex-wrap: wrap;
+		/*
+		 * Out of focus until the observer says otherwise. The scale is part of the
+		 * effect and not decoration: a lens breathes as it racks, and a title that
+		 * only unblurs reads as a CSS filter coming off rather than as a lens
+		 * finding its subject.
+		 *
+		 * Slow, and quart-out, so almost all of the travel happens early and the
+		 * last of the softness takes its time — which is what the end of a focus
+		 * pull looks like when somebody good is doing it.
+		 */
+		filter: blur(16px);
+		scale: 1.035;
+		opacity: 0.55;
+		transition:
+			filter 1100ms cubic-bezier(0.25, 1, 0.5, 1),
+			scale 1100ms cubic-bezier(0.25, 1, 0.5, 1),
+			opacity 700ms cubic-bezier(0.25, 1, 0.5, 1);
+	}
+	.title.focused {
+		filter: blur(0);
+		scale: 1;
+		opacity: 1;
 	}
 	.snt-mark {
 		display: inline-grid;
@@ -373,7 +467,7 @@
 		font-family: var(--font-mono);
 		font-size: 1.05rem;
 		letter-spacing: 0.06em;
-		color: #00f2c3;
+		color: #33d0c1;
 		margin: 0 0 1.2rem;
 	}
 	.lede {
@@ -383,7 +477,7 @@
 		margin-bottom: 1rem;
 	}
 	.lede a {
-		color: #00f2c3;
+		color: #33d0c1;
 		text-decoration: underline;
 		text-underline-offset: 4px;
 	}
@@ -393,30 +487,6 @@
 		gap: 1rem;
 		margin-top: 1.5rem;
 		flex-wrap: wrap;
-	}
-	.cta-primary {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.6rem;
-		padding: 0.85rem 1.4rem;
-		background: linear-gradient(135deg, #00f2c3, #00d6ff);
-		color: #052028;
-		font-weight: 800;
-		border-radius: 999px;
-		text-decoration: none;
-		transition:
-			transform 200ms ease,
-			box-shadow 200ms ease;
-		box-shadow: 0 10px 30px rgba(0, 242, 195, 0.3);
-	}
-	.cta-primary:hover {
-		transition-duration: 0s;
-		transform: translateY(-3px);
-		box-shadow: 0 14px 40px rgba(0, 242, 195, 0.45);
-	}
-	.cta-primary svg {
-		width: 18px;
-		height: 18px;
 	}
 
 	.hero-shot {
@@ -479,7 +549,7 @@
 		font-family: var(--font-mono);
 		font-size: 1.4rem;
 		font-weight: 900;
-		color: #00f2c3;
+		color: #33d0c1;
 		line-height: 1;
 	}
 	.feature h4 {
@@ -493,9 +563,13 @@
 		margin: 0;
 	}
 
-	.dash-block,
-	.delivery-block,
+	/* No bottom margin: the wall follows immediately and brings its own edge fade,
+	   so a gap here would just read as the section running out. */
 	.brand-block {
-		margin: 4rem 0;
+		margin: 4rem 0 0;
+	}
+	.brand-block p {
+		line-height: 1.55;
+		opacity: 0.9;
 	}
 </style>

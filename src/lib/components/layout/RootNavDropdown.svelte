@@ -3,6 +3,7 @@
 	import { ripple } from '@delightstack/utilities';
 	import { hideHeaderLogo, searchOpen } from '$lib/stores/navState';
 	import { scrollToSection, setSectionHash } from '$lib/sectionNav';
+	import { sectionSpy } from '$lib/sectionSpy';
 
 	// material-style ripple for the bar buttons — gated to the mobile bottom
 	// bar (the desktop top bar is left as it was)
@@ -30,39 +31,32 @@
 			.filter((s) => s.id);
 	};
 
-	const updateScrollState = () => {
-		const heroEl =
-			document.getElementById('hero') ||
-			document.querySelector<HTMLElement>('[data-section]');
-		if (!heroEl) return;
-		const heroBottom = heroEl.getBoundingClientRect().bottom;
-		const passed = heroBottom <= 80;
-		visible = passed;
-		hideHeaderLogo.set(passed);
-
-		const probe = window.innerHeight * 0.35;
-		let current = 0;
-		for (let i = 0; i < stops.length; i++) {
-			const el = document.getElementById(stops[i].id);
-			if (!el) continue;
-			const top = el.getBoundingClientRect().top;
-			if (top - probe <= 0) current = i;
-		}
-		activeIndex = current;
-	};
-
 	onMount(() => {
 		collectStops();
-		updateScrollState();
 
-		const onScroll = () => updateScrollState();
-		const onResize = () => updateScrollState();
-		window.addEventListener('scroll', onScroll, { passive: true });
-		window.addEventListener('resize', onResize);
+		// All section geometry comes from the shared spy's cache — one
+		// rAF-coalesced measurement for this component AND the year scrubber,
+		// instead of ~18 getBoundingClientRect() calls per scroll event here.
+		const unsubscribe = sectionSpy((m) => {
+			if (m.ids.length === 0) return;
+			const y = window.scrollY;
+			const heroIdx = Math.max(0, m.ids.indexOf('hero'));
+			const passed = m.bottoms[heroIdx] - y <= 80;
+			visible = passed;
+			hideHeaderLogo.set(passed);
+
+			const probe = y + window.innerHeight * 0.35;
+			let current = 0;
+			for (let i = 0; i < stops.length; i++) {
+				const idx = m.ids.indexOf(stops[i].id);
+				if (idx === -1) continue;
+				if (m.tops[idx] <= probe) current = i;
+			}
+			activeIndex = current;
+		});
 
 		return () => {
-			window.removeEventListener('scroll', onScroll);
-			window.removeEventListener('resize', onResize);
+			unsubscribe();
 			hideHeaderLogo.set(false);
 		};
 	});
@@ -294,6 +288,22 @@
 			border-color 180ms ease,
 			transform 180ms ease;
 	}
+	/* These are 4–5 position:fixed pills floating over the page from the end
+	   of the hero to the bottom — each backdrop-blur region makes the
+	   compositor re-sample and re-blur the content behind it every scroll
+	   frame, which is real money on weak GPUs. Where the platform says
+	   rendering is slow (or the user asked for less transparency), trade the
+	   blur for a slightly more opaque fill — same shape, same read. */
+	@media (update: slow), (prefers-reduced-transparency: reduce) {
+		.up,
+		.trigger,
+		.action-link,
+		.action-icon {
+			backdrop-filter: none;
+			-webkit-backdrop-filter: none;
+			background: rgba(8, 10, 18, 0.92);
+		}
+	}
 	.up:hover,
 	.trigger:hover,
 	.action-link:hover,
@@ -360,7 +370,15 @@
 		padding: 0 0.95rem 0 0.95rem;
 		max-width: min(60vw, 22rem);
 	}
+	/* The bar is fixed furniture, so it must not resize as you scroll past it.
+	   The year gets a slot wide enough for a four-digit year and is forbidden
+	   from wrapping — a range like "2015–18" used to break across two lines and
+	   push the whole pill taller than it is everywhere else. */
 	.trigger .year {
+		flex-shrink: 0;
+		min-width: 4ch;
+		text-align: right;
+		white-space: nowrap;
 		font-weight: 800;
 		color: #00f2c3;
 		font-variant-numeric: tabular-nums;

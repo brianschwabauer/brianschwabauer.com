@@ -3,7 +3,7 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import ArchiveFrame from '../primitives/ArchiveFrame.svelte';
+	import ArchiveTabs from '../primitives/ArchiveTabs.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
@@ -15,8 +15,6 @@
 		'2017-01-01_tapnotion_app_screenshot_milestone-start.avif',
 		'2017-01-01_tapnotion_app_screenshot_question-multiple_choice-answer_revealed.avif',
 	].map((src) => ({ src: `https://cdn.brianschwabauer.com/media/${src}` }));
-
-	const scrambledLetters = ['S', 'C', 'R', 'M', 'B', 'L', 'D'];
 
 	const towerImages: GalleryItem[] = [
 		{
@@ -92,39 +90,6 @@
 			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_engagement_grower-fresh_content_addon_animation_for_website.gif',
 		},
 	];
-	const markableImages: GalleryItem[] = [
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_app-home_page_screenshot.avif',
-			width: 1907,
-			height: 979,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_app-settings_popup_screenshot.avif',
-			width: 1532,
-			height: 1222,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-close_up_on_navigation.avif',
-			width: 2048,
-			height: 1536,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-shallow_depth_of_field_year_view.avif',
-			width: 2048,
-			height: 1536,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2024-01-01_remarkably_organized_planner-picture_of_planner_on_remarkable_device-title_page_close_up.avif',
-			width: 2048,
-			height: 1536,
-		},
-	];
-
 	// Standalone clickable LazyMedias in document order:
 	// 0: Tower BTS camera shot, 1: Tower demo on tablet shot,
 	// 2..7: 6 tapnotion phone mockups
@@ -192,6 +157,54 @@
 </script>
 
 <SectionShell id="entrepreneurship" year="2017" label="Entrepreneurship" theme="entr">
+	<!--
+	  The board, after somebody has half-wiped it. Boxes and arrows with no labels
+	  in them — a diagram you can read the *shape* of but not the content of,
+	  which is exactly what the year looked like from inside it. The smears are
+	  what makes it a whiteboard rather than a flowchart: nothing here came off
+	  cleanly.
+	-->
+	<svg
+		class="board"
+		viewBox="0 0 1200 800"
+		preserveAspectRatio="xMidYMid meet"
+		aria-hidden="true">
+		<defs>
+			<!-- The eraser, as a mask rather than a blend: white keeps, black
+			     removes, and the blur on the strokes is what turns "wiped" into
+			     "smeared". A blend mode can't subtract in CSS — only a mask can. -->
+			<mask id="board-wipe">
+				<rect width="1200" height="800" fill="#fff" />
+				<g class="wipe">
+					<path d="M40 300 C 300 210, 620 330, 1160 220" />
+					<path d="M60 520 C 340 430, 700 560, 1180 470" />
+					<path d="M20 700 C 380 620, 760 730, 1190 660" />
+				</g>
+			</mask>
+		</defs>
+		<g class="ink" mask="url(#board-wipe)">
+			<rect x="88" y="96" width="190" height="92" rx="6" />
+			<rect x="430" y="70" width="150" height="80" rx="6" />
+			<rect x="760" y="140" width="210" height="98" rx="6" />
+			<rect x="180" y="380" width="170" height="86" rx="6" />
+			<rect x="560" y="430" width="230" height="104" rx="6" />
+			<rect x="880" y="580" width="160" height="80" rx="6" />
+			<circle cx="380" cy="250" r="46" />
+			<circle cx="1010" cy="380" r="34" />
+			<path d="M278 142 C 340 142, 360 110, 430 110" />
+			<path d="M580 110 C 660 110, 690 170, 760 180" />
+			<path d="M380 296 C 380 340, 300 350, 265 380" />
+			<path d="M350 420 C 450 420, 470 450, 560 470" />
+			<path d="M790 500 C 850 510, 850 560, 880 600" />
+			<path d="M866 238 C 900 290, 980 300, 1008 346" />
+			<!-- Arrowheads, drawn as two strokes because that is how a marker draws
+			     one — you never lift and fill a triangle. -->
+			<path d="M420 108 l-14 -7 M420 112 l-14 8" />
+			<path d="M756 178 l-13 -9 M754 182 l-11 10" />
+			<path d="M556 468 l-14 -6 M556 472 l-13 9" />
+		</g>
+	</svg>
+
 	<div class="container">
 		<Reveal>
 			<YearMark year="2017" subtitle="Entrepreneurship" color="#00d6ff" />
@@ -199,7 +212,6 @@
 
 		<div class="lockup">
 			<Reveal>
-				<div class="eyebrow">FROM FREELANCER → FOUNDER</div>
 				<h2 class="title">
 					I stopped
 					<br />
@@ -221,13 +233,10 @@
 			<div class="card-head">
 				<Reveal>
 					<div class="year-tag">2016</div>
-					<h3 class="sub">
-						<span class="loc">[SA]</span>
-						Tower of the Americas — a kiosk companion app
-					</h3>
+					<h3 class="sub">Tower of the Americas — a kiosk companion app</h3>
 					<p>
-						The Tower of the Americas (in San Antonio) hired me to build an immersive
-						companion app. The idea: visitors get a tablet on a kiosk mount, point it
+						I was hired to build an immersive companion app for The Tower of the Americas
+						(in San Antonio). The idea: visitors get a tablet on a kiosk mount, point it
 						where they're looking out the windows, and the app shows them a 360 panorama
 						with landmark labels they can tap to learn more.
 					</p>
@@ -240,7 +249,6 @@
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<div class="gal-eyebrow">FROM THE TOWER SHOOT · {towerImages.length} PHOTOS</div>
 				<div class="gallery-contained">
 					<LightboxGallery
 						key="entrepreneurship-tower"
@@ -316,12 +324,6 @@
 					display="masonry-row"
 					size="2" />
 			</Reveal>
-			<Reveal variant="up" delay={150}>
-				<ArchiveFrame
-					src="http://cdn.brianschwabauer.com/site/engagementgrower/index.html"
-					title="Engagement Grower marketing site"
-					label="Open the archived marketing site" />
-			</Reveal>
 		</div>
 
 		<div class="card project wyoti">
@@ -330,85 +332,25 @@
 					<div class="year-tag">2017–2018</div>
 					<h3 class="sub">Wyoti — partnered WordPress agency</h3>
 					<p>
-						Spun out of the Engagement Grower work — we partnered with Wyoti to build
-						custom WordPress sites and plugins for clients. A solid bridge between
-						freelance and product.
+						Spun out of the Engagement Grower work — I partnered with Wyoti to build
+						custom WordPress sites and plugins for clients.
 					</p>
 				</Reveal>
 			</div>
 			<Reveal variant="up" delay={100}>
-				<ArchiveFrame
-					src="https://cdn.brianschwabauer.com/site/wyoti/index.html"
-					title="Wyoti — agency site"
-					label="Open Wyoti" />
-			</Reveal>
-		</div>
-
-		<div class="card project markable">
-			<div class="card-head">
-				<Reveal>
-					<div class="year-tag">2024</div>
-					<h3 class="sub">
-						<a href="https://markable.page" target="_blank" rel="noopener">
-							markable.page
-						</a>
-						— a PDF planner builder for e-ink tablets
-					</h3>
-					<p>
-						A planner builder that generates highly customizable PDFs with internal links,
-						designed for devices like the reMarkable. Originally called "Remarkably
-						Organized". Open-sourced.
-						<strong>200+ stars on GitHub.</strong>
-						Built with Svelte.
-					</p>
-					<p>
-						<a
-							href="https://github.com/brianschwabauer/remarkably-organized"
-							target="_blank"
-							rel="noopener">
-							github.com/brianschwabauer/remarkably-organized
-						</a>
-					</p>
-				</Reveal>
-			</div>
-			<Reveal variant="up" delay={100}>
-				<LightboxGallery
-					key="entrepreneurship-markable"
-					items={markableImages}
-					display="masonry-row"
-					size="2" />
-			</Reveal>
-		</div>
-
-		<div class="card project scrmbld">
-			<div class="card-head">
-				<Reveal>
-					<div class="year-tag">2024+</div>
-					<h3 class="sub">
-						<a href="https://scrmbld.app" target="_blank" rel="noopener">SCRMBLD</a>
-						— a daily word game in split-flap style
-					</h3>
-					<p>
-						You're given 8 letters. One is a decoy. Unscramble the other 7 into the day's
-						word. Letters animate on like a split-flap display — I spent a stupid amount
-						of time hand-crafting the look and feel of that animation. Made for fun, not
-						for money.
-					</p>
-				</Reveal>
-			</div>
-
-			<Reveal variant="up" delay={100}>
-				<div class="splitflap">
-					{#each scrambledLetters as letter, i}
-						<div class="flap" style:--delay="{i * 100}ms">
-							<div class="flap-inner">
-								<span class="flap-top">{letter}</span>
-								<span class="flap-bottom">{letter}</span>
-							</div>
-						</div>
-					{/each}
-				</div>
-				<div class="splitflap-tag">scrmbld.app · daily</div>
+				<ArchiveTabs
+					tabs={[
+						{
+							title: 'Engagement Grower',
+							src: 'http://cdn.brianschwabauer.com/site/engagementgrower/index.html',
+							host: 'engagementgrower.com',
+						},
+						{
+							title: 'Wyoti',
+							src: 'https://cdn.brianschwabauer.com/site/wyoti/index.html',
+							host: 'wyoti.com',
+						},
+					]} />
 			</Reveal>
 		</div>
 	</div>
@@ -424,29 +366,66 @@
 			linear-gradient(180deg, #050a14, #07101f 50%, #050810);
 		color: #e0f1fa;
 	}
+	/*
+	 * Drawn at its own proportions rather than stretched to the section's.
+	 * `slice` on a section several screens tall crops to a sliver of the board
+	 * and magnifies it, which turned a diagram into two enormous arcs; `meet`
+	 * keeps the whole board legible as a board. It occupies the top of the
+	 * section — a whiteboard is a thing on a wall, not a texture over everything.
+	 */
+	.board {
+		position: absolute;
+		top: 3%;
+		left: 0;
+		width: 100%;
+		height: auto;
+		pointer-events: none;
+		/* Pulled right back. At 0.4 the diagram was legible enough that you read
+		   the boxes instead of the copy in front of them — a background you can
+		   follow is a competing subject. This is the level where you notice there
+		   is *something* on the wall and then stop looking at it. */
+		opacity: 0.16;
+		/* And kept out of the middle column entirely. */
+		mask-image: linear-gradient(
+			90deg,
+			#000,
+			rgba(0, 0, 0, 0.25) 28%,
+			rgba(0, 0, 0, 0.25) 72%,
+			#000
+		);
+	}
+	.ink {
+		fill: none;
+		stroke: #00d6ff;
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		opacity: 0.3;
+	}
+	/*
+	 * The eraser strokes, inside the mask. Black removes; the blur is what stops
+	 * the result reading as three clean stripes and makes it a smear instead.
+	 * Not quite opaque, so the ink survives faintly even where the cloth went —
+	 * a board nobody has cleaned properly since the first meeting.
+	 */
+	.wipe {
+		fill: none;
+		stroke: rgba(0, 0, 0, 0.88);
+		stroke-width: 110;
+		stroke-linecap: round;
+		filter: blur(26px);
+	}
+
 	.container {
 		max-width: 80rem;
 		margin: 0 auto;
 		padding: 0 clamp(1rem, 3vw, 2rem);
+		position: relative;
+		z-index: 1;
 	}
 
 	.lockup {
 		margin-bottom: 4rem;
-	}
-	.gal-eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		text-transform: uppercase;
-		color: #00d6ff;
-		margin-bottom: 0.75rem;
-	}
-	.eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #00d6ff;
-		margin-bottom: 1rem;
 	}
 	.title {
 		font-size: clamp(2.4rem, 7vw, 5rem);
@@ -470,10 +449,7 @@
 		transform: skewY(-3deg);
 	}
 	.grad {
-		background: linear-gradient(90deg, #00d6ff, #00f2c3, #ff6688);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
+		color: oklch(from #00f2c3 0.82 calc(c * 0.9) h);
 	}
 	.lede {
 		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
@@ -514,35 +490,13 @@
 		align-items: baseline;
 		gap: 0.4rem;
 	}
-	.sub a {
-		color: #00d6ff;
-		text-decoration: underline;
-		text-underline-offset: 4px;
-	}
-	.loc {
-		font-family: var(--font-mono);
-		font-size: 0.65rem;
-		letter-spacing: 0.2em;
-		padding: 0.15rem 0.55rem;
-		background: #00d6ff;
-		color: #052a35;
-		font-weight: 800;
-		border-radius: 4px;
-		margin-right: 0.35rem;
-		display: inline-block;
-		transform: translateY(-3px);
-	}
 	.card p {
 		line-height: 1.6;
 		margin-bottom: 1rem;
 	}
-	.card strong {
-		color: #00f2c3;
-	}
-	.card a {
-		color: #00d6ff;
-		text-decoration: underline;
-		text-underline-offset: 4px;
+	.archive-lead {
+		margin: 0 0 0.9rem;
+		line-height: 1.6;
 	}
 
 	.bts-row {
@@ -573,77 +527,5 @@
 	.phone-mini:hover {
 		transition-duration: 0s;
 		transform: rotate(0deg) translateY(-4px);
-	}
-
-	.splitflap {
-		display: flex;
-		justify-content: center;
-		gap: 0.4rem;
-		padding: 2rem 0 1rem;
-		font-family: var(--font-mono);
-	}
-	.flap {
-		position: relative;
-		width: clamp(40px, 7vw, 70px);
-		aspect-ratio: 1;
-		background: #1a1a1a;
-		border-radius: 6px;
-		overflow: hidden;
-		perspective: 600px;
-		box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6);
-		animation: flap 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-		animation-delay: var(--delay);
-	}
-	.flap-inner {
-		position: relative;
-		width: 100%;
-		height: 100%;
-	}
-	.flap-top,
-	.flap-bottom {
-		position: absolute;
-		width: 100%;
-		height: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: clamp(1.5rem, 3vw, 2.4rem);
-		font-weight: 800;
-		color: #fff;
-		background: #2a2a2a;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-	}
-	.flap-top {
-		top: 0;
-		align-items: flex-end;
-		padding-bottom: 4%;
-		border-bottom: 1px solid #000;
-	}
-	.flap-bottom {
-		bottom: 0;
-		align-items: flex-start;
-		padding-top: 4%;
-	}
-	@keyframes flap {
-		0%,
-		20% {
-			transform: rotateX(0);
-		}
-		30% {
-			transform: rotateX(-30deg);
-		}
-		40% {
-			transform: rotateX(0);
-		}
-		100% {
-			transform: rotateX(0);
-		}
-	}
-	.splitflap-tag {
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		letter-spacing: 0.32em;
-		text-align: center;
-		opacity: 0.7;
 	}
 </style>
