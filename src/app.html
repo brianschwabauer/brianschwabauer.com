@@ -52,6 +52,185 @@
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
 		<script>
+			// PRE-HYDRATION HASH PIN (home page only).
+			//
+			// A deep link like /#college must open ON that section, but the home
+			// page's sections are content-visibility placeholders whose heights are
+			// estimates, and its below-the-fold sections hydrate as lazy chunks that
+			// each shift layout when they land. The browser's native hash scroll
+			// (and its scroll restoration on reload) therefore parks the reader at a
+			// spot that turns wrong again with every arriving chunk — visibly, since
+			// hydration hasn't started yet and no component can correct it.
+			//
+			// Like the early-click capture below, this is a classic script at the
+			// end of the body: it runs the moment the SSR markup exists — the full
+			// HTML is server-rendered, so the target id is already in the DOM — and
+			// re-pins the scroll to the target every frame until YearScrubber
+			// hydrates and takes over via window.__hashPinStop (its module-side pin
+			// continues seamlessly from the same position). Any user input ends the
+			// pin immediately; a deliberate scroll always wins.
+			//
+			// The target math and the sessionStorage key/shape mirror
+			// src/lib/sectionNav.ts (sectionScrollTop / saveScrollState) — this
+			// script cannot import modules, so keep them in sync by hand.
+			// While the pin holds the scroll, the viewport is showing sections
+			// mid-hydration: unfilled year outlines, media placeholders, icons and
+			// scroll-driven treatments popping in as each lazy chunk lands. Rather
+			// than let a deep link open on that, raise a curtain — page background
+			// over the whole viewport — and let the page (+page.svelte) fade it out
+			// once every section chunk has resolved. Any user input lifts it
+			// immediately, and a timeout failsafe means it can never trap the page.
+			(function () {
+				if (location.pathname !== '/' || !location.hash) return;
+				var id = location.hash.slice(1);
+				if (!/^[\w-]+$/.test(id) || !document.getElementById(id)) return;
+
+				// Restore the exact spot within the section on reload/back-forward;
+				// a fresh link arrival lands at the section's opening instead.
+				var within = 0;
+				try {
+					var nav = performance.getEntriesByType('navigation')[0];
+					if (!nav || nav.type === 'reload' || nav.type === 'back_forward') {
+						var saved = JSON.parse(sessionStorage.getItem('home-scroll') || 'null');
+						if (saved && saved.id === id) within = Number(saved.within) || 0;
+					}
+				} catch (e) {}
+
+				// Keep the browser from fighting the pin with its own restoration.
+				// (SvelteKit sets this itself once it boots.)
+				if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+				// The curtain shows where you're headed, not a blank wall: the
+				// chapter's year in its own color — filling left-to-right on a loop,
+				// the same wipe the real YearMark runs — over its label and a quiet
+				// "loading" line. All of it is read out of the SSR DOM: the year and
+				// label from SectionShell's data attributes, the color from the
+				// --year-color inline style YearMark puts on the scroll anchor.
+				var curtain = document.createElement('div');
+				curtain.style.cssText =
+					'position:fixed;inset:0;z-index:2147483647;background:#06060a;' +
+					'opacity:1;transition:opacity 400ms ease;pointer-events:none;' +
+					'display:flex;flex-direction:column;align-items:center;' +
+					'justify-content:center;gap:1.25rem;';
+				var section = document.getElementById(id);
+				var yearText = section.getAttribute('data-section-year') || '';
+				var labelText = section.getAttribute('data-section-label') || '';
+				var anchorEl = section.querySelector('[data-scroll-anchor]');
+				var color = (anchorEl && anchorEl.style.getPropertyValue('--year-color')) || '';
+				if (!color || color === 'currentColor') color = '#fff';
+				var reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+				var mono = 'var(--font-mono), ui-monospace, monospace';
+				if (yearText) {
+					var yearEl = document.createElement('div');
+					yearEl.textContent = yearText;
+					yearEl.style.cssText =
+						'font-family:' +
+						mono +
+						';font-weight:900;font-size:clamp(4.5rem,16vw,12rem);' +
+						'line-height:.85;letter-spacing:-.04em;color:transparent;' +
+						'-webkit-text-stroke:2px ' +
+						color +
+						';background-image:linear-gradient(90deg,' +
+						color +
+						' 50%,transparent 50%);background-size:200% 100%;' +
+						'-webkit-background-clip:text;background-clip:text;' +
+						// Reduced motion holds the year fully filled instead of looping.
+						'background-position:' +
+						(reduceMotion ? '0 0' : '100% 0') +
+						';';
+					if (!reduceMotion) {
+						yearEl.animate(
+							[{ backgroundPosition: '100% 0' }, { backgroundPosition: '0% 0' }],
+							{ duration: 1600, iterations: Infinity, easing: 'ease-in-out' },
+						);
+					}
+					curtain.appendChild(yearEl);
+				}
+				if (labelText) {
+					var labelEl = document.createElement('div');
+					labelEl.textContent = labelText;
+					labelEl.style.cssText =
+						'font-family:' +
+						mono +
+						';text-transform:uppercase;letter-spacing:.4em;' +
+						'text-indent:.4em;font-size:.85rem;color:rgba(255,255,255,.7);';
+					curtain.appendChild(labelEl);
+				}
+				var loadingEl = document.createElement('div');
+				loadingEl.textContent = 'loading';
+				loadingEl.style.cssText =
+					'font-family:' +
+					mono +
+					';text-transform:uppercase;letter-spacing:.3em;text-indent:.3em;' +
+					'font-size:.7rem;color:rgba(255,255,255,.4);margin-top:.5rem;';
+				if (!reduceMotion) {
+					loadingEl.animate([{ opacity: 0.35 }, { opacity: 1 }, { opacity: 0.35 }], {
+						duration: 1600,
+						iterations: Infinity,
+						easing: 'ease-in-out',
+					});
+				}
+				curtain.appendChild(loadingEl);
+				document.body.appendChild(curtain);
+				function lift() {
+					if (!curtain) return;
+					var el = curtain;
+					curtain = null;
+					el.style.opacity = '0';
+					setTimeout(function () {
+						el.remove();
+					}, 450);
+				}
+				window.__hashCurtainLift = lift;
+				setTimeout(lift, 4000);
+
+				var stopped = false;
+				function stop() {
+					stopped = true;
+				}
+				// The scrubber calls this on mount to take over the pin — hydration
+				// is still in flight at that point, so taking over must NOT lift the
+				// curtain. Real user input stops the pin AND lifts it: they chose to
+				// interact, so show them the page as it is.
+				window.__hashPinStop = stop;
+				['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(function (type) {
+					window.addEventListener(
+						type,
+						function () {
+							stop();
+							lift();
+						},
+						{ passive: true, once: true },
+					);
+				});
+
+				function target() {
+					var el = document.getElementById(id);
+					if (!el) return null;
+					var laidOut =
+						typeof el.checkVisibility !== 'function' ||
+						el.checkVisibility({ contentVisibilityAuto: true });
+					var anchor = laidOut ? el.querySelector('[data-scroll-anchor]') : null;
+					var box = anchor || el;
+					var gap = anchor
+						? parseFloat(getComputedStyle(anchor).scrollMarginTop) || 0
+						: 0;
+					var top = box.getBoundingClientRect().top + window.scrollY - 80 - gap;
+					return Math.max(0, Math.max(0, top) + within);
+				}
+
+				var frames = 0;
+				(function step() {
+					if (stopped || frames++ > 600) return;
+					var top = target();
+					if (top !== null && Math.abs(window.scrollY - top) > 1) {
+						window.scrollTo(0, top);
+					}
+					requestAnimationFrame(step);
+				})();
+			})();
+		</script>
+		<script>
 			// EARLY-CLICK CAPTURE.
 			//
 			// Server-rendered controls look alive the moment they paint, but they

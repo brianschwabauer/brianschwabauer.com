@@ -3,6 +3,7 @@
 	// The hero (and the fixed chrome that frames the whole page) hydrates with
 	// the page. Rewind stays eager too: it is the first thing under the fold
 	// and a flick of the wheel reaches it before any lazy chunk could land.
+	import { onMount } from 'svelte';
 	import Hero from '$lib/components/about/sections/Hero.svelte';
 	import Rewind from '$lib/components/about/sections/Rewind.svelte';
 	import YearScrubber from '$lib/components/about/primitives/YearScrubber.svelte';
@@ -52,6 +53,41 @@
 
 	let { data } = $props();
 	const signedIn = $derived(Boolean(data.signedIn));
+
+	// Lift the deep-link curtain (raised by the inline hash-pin script in
+	// app.html) once every lazy section chunk has resolved. The loaders are the
+	// same module-scope promises the boundaries above await, so this settles
+	// exactly when the last boundary hydrates; the double rAF gives that final
+	// hydration a painted frame before the fade starts. On loads with no
+	// curtain (no hash, or client-side navigation) this is a no-op.
+	onMount(() => {
+		const loaders = [
+			humbleBeginnings,
+			greenScreen,
+			featureLength,
+			takingItSeriously,
+			musicVideos,
+			animation,
+			festivals,
+			college,
+			spunksters,
+			whatMakesUsHuman,
+			freelancer,
+			entrepreneurship,
+			showAndTour,
+			now,
+			creed,
+			theEnd,
+			credits,
+		];
+		Promise.all(loaders.map((load) => load())).then(() => {
+			requestAnimationFrame(() =>
+				requestAnimationFrame(() =>
+					(window as { __hashCurtainLift?: () => void }).__hashCurtainLift?.(),
+				),
+			);
+		});
+	});
 
 	const stops = [
 		{ id: 'hero', year: 'Start', label: 'Delivering Delight' },

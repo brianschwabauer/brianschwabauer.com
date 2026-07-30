@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
-	import { scrollToSection, sectionScrollTop, setSectionHash } from '$lib/sectionNav';
+	import {
+		savedScrollWithin,
+		saveScrollState,
+		scrollToSection,
+		sectionScrollTop,
+		setSectionHash,
+	} from '$lib/sectionNav';
 	import { sectionSpy } from '$lib/sectionSpy';
 
 	let {
@@ -158,6 +164,17 @@
 			}, 200);
 		};
 
+		// Debounced alongside the hash: remember the exact spot within the active
+		// section, so a reload restores the line the reader was on rather than
+		// the top of the chapter.
+		let save_timer = 0;
+		const queueSave = () => {
+			window.clearTimeout(save_timer);
+			save_timer = window.setTimeout(() => {
+				if (!jumping && activeId) saveScrollState(activeId);
+			}, 250);
+		};
+
 		// Section geometry comes from the shared spy's CACHE — the old per-frame
 		// version re-measured 17 sections plus document scrollHeight on every
 		// scroll frame, and that scrollHeight read forces layout of the whole
@@ -204,24 +221,54 @@
 				activeId = current;
 				if (!jumping) queueHash(current);
 			}
+			queueSave();
 		});
 		const onResize = () => measureRail();
 		// After the first paint, so the rows have a height to measure.
 		tick().then(measureRail);
 		window.addEventListener('resize', onResize);
 
-		// Restore a deep-linked section on load. The browser/SvelteKit will have
-		// attempted a native hash scroll already, but content-visibility estimates
-		// make that land in the wrong place — re-run the converging jump to fix it.
+		// Restore a deep-linked section on load. The browser's native hash scroll
+		// lands on content-visibility estimates, and every lazy section chunk that
+		// hydrates afterwards shifts the page again — so a one-shot jump isn't
+		// enough. The inline script in app.html has been pinning the target since
+		// the HTML parsed; take over from it here with the module version of the
+		// same pin, which keeps holding the spot (plus the saved within-section
+		// offset on reloads) until layout stops moving or the reader scrolls.
 		const hashId = page.url.hash.replace(/^#/, '');
-		if (hashId && stops.some((s) => s.id === hashId)) {
-			tick().then(() => requestAnimationFrame(() => jump(hashId)));
+		const restore_el =
+			hashId && stops.some((s) => s.id === hashId)
+				? document.getElementById(hashId)
+				: null;
+		(window as { __hashPinStop?: () => void }).__hashPinStop?.();
+		if (restore_el) {
+			activeId = hashId;
+			jumping = true;
+			scrollToSection(restore_el, 80, {
+				within: savedScrollWithin(hashId),
+				pin: true,
+			}).then(() => (jumping = false));
 		}
+
+		// Editing the hash on an already-loaded page (address bar, an in-page
+		// #link, back/forward across hash entries) never reloads the document, so
+		// neither the app.html pin nor the restore above runs — only the browser's
+		// native scroll, which knows nothing about data-scroll-anchor and parks
+		// the year too far down the screen. Route it through the same converging
+		// jump a scrubber click uses. Our own scroll-spy hash writes go through
+		// replaceState, which never fires hashchange, so this can't loop.
+		const onHashChange = () => {
+			const id = location.hash.replace(/^#/, '');
+			if (id && stops.some((s) => s.id === id)) void jump(id);
+		};
+		window.addEventListener('hashchange', onHashChange);
 
 		return () => {
 			window.clearTimeout(hashTimer);
+			window.clearTimeout(save_timer);
 			unsubscribeSpy();
 			window.removeEventListener('resize', onResize);
+			window.removeEventListener('hashchange', onHashChange);
 		};
 	});
 </script>

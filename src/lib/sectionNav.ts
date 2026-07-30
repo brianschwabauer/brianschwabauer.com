@@ -29,7 +29,9 @@ const rendered = (el: HTMLElement) =>
  * top — keep landing at the section top, which is right for them.
  *
  * Exported for the rough, one-shot landings (a scrubber drag, a search hit)
- * that don't run the converging loop below but must still agree with it.
+ * that don't run the converging loop below but must still agree with it. The
+ * pre-hydration pin in `app.html` re-implements this math (it cannot import
+ * modules) — keep the two in sync.
  */
 export function sectionScrollTop(el: HTMLElement, headerOffset = 80) {
 	const anchor = rendered(el)
@@ -55,11 +57,29 @@ export function sectionScrollTop(el: HTMLElement, headerOffset = 80) {
  * for a few frames converges on the correct spot. That same loop is what lets
  * `targetTop` read geometry from inside the section: it is a placeholder on the
  * first frame and real by the time we arrive. Cancels on user
- * wheel/touch/keydown so a deliberate scroll always wins.
+ * wheel/touch/keydown/pointerdown so a deliberate scroll always wins.
+ *
+ * `opts.within` lands the jump that many pixels *into* the section instead of
+ * at its opening — the load-time restore uses it to put the reader back on the
+ * exact line they left, not just the right chapter.
+ *
+ * `opts.pin` is for the load-time restore: instead of resolving once the
+ * position holds for a few frames, keep holding the target for ~10s (600
+ * frames). On a fresh load "stable for 3 frames" is a lie — every lazy section
+ * chunk that lands above the target re-shifts the page seconds after the first
+ * convergence, which is exactly the "jumps to a random half-loaded section"
+ * bug. A pinned jump only issues a scrollTo when the position actually drifts,
+ * so the long tail costs one geometry read per frame, and any user input ends
+ * it instantly.
  */
-export function scrollToSection(el: HTMLElement, headerOffset = 80): Promise<void> {
+export function scrollToSection(
+	el: HTMLElement,
+	headerOffset = 80,
+	opts: { within?: number; pin?: boolean } = {},
+): Promise<void> {
+	const { within = 0, pin = false } = opts;
 	return new Promise((resolve) => {
-		let lastTop = NaN;
+		let last_top = NaN;
 		let stable = 0;
 		let frames = 0;
 		let cancelled = false;
@@ -67,24 +87,73 @@ export function scrollToSection(el: HTMLElement, headerOffset = 80): Promise<voi
 		window.addEventListener('wheel', cancel, { passive: true, once: true });
 		window.addEventListener('touchstart', cancel, { passive: true, once: true });
 		window.addEventListener('keydown', cancel, { once: true });
+		window.addEventListener('pointerdown', cancel, { passive: true, once: true });
 		const cleanup = () => {
 			window.removeEventListener('wheel', cancel);
 			window.removeEventListener('touchstart', cancel);
 			window.removeEventListener('keydown', cancel);
+			window.removeEventListener('pointerdown', cancel);
 			resolve();
 		};
 		const step = () => {
 			if (cancelled) return cleanup();
-			const top = sectionScrollTop(el, headerOffset);
+			const top = Math.max(0, sectionScrollTop(el, headerOffset) + within);
 			if (Math.abs(window.scrollY - top) > 1) window.scrollTo({ top });
-			stable = Math.abs(top - lastTop) < 1 ? stable + 1 : 0;
-			lastTop = top;
-			// Stable for 3 frames, or give up after ~1s (60 frames) of churn.
-			if (stable < 3 && frames++ < 60) requestAnimationFrame(step);
-			else cleanup();
+			stable = Math.abs(top - last_top) < 1 ? stable + 1 : 0;
+			last_top = top;
+			if (pin) {
+				// Hold through late-arriving lazy chunks; only user input or the
+				// failsafe cap ends the pin.
+				if (frames++ < 600) requestAnimationFrame(step);
+				else cleanup();
+			} else if (stable < 3 && frames++ < 60) {
+				// Stable for 3 frames, or give up after ~1s (60 frames) of churn.
+				requestAnimationFrame(step);
+			} else cleanup();
 		};
 		requestAnimationFrame(step);
 	});
+}
+
+/**
+ * Per-tab memory of where on the home page the reader is: the active section
+ * and how many pixels past its jump-landing point they've scrolled. Saved
+ * (debounced) by the scroll spy, read back by the load-time restore so a
+ * refresh reopens the page on the exact line, not just the right section.
+ *
+ * The pre-hydration pin in `app.html` reads this key directly — keep the key
+ * and shape in sync.
+ */
+const SCROLL_STATE_KEY = 'home-scroll';
+
+export function saveScrollState(id: string) {
+	const el = document.getElementById(id);
+	if (!el) return;
+	const within = Math.round(window.scrollY - sectionScrollTop(el));
+	try {
+		sessionStorage.setItem(SCROLL_STATE_KEY, JSON.stringify({ id, within }));
+	} catch {
+		// Storage full or blocked — the restore is a nicety, never worth a crash.
+	}
+}
+
+/**
+ * The saved within-section offset for `id`, or 0 when it shouldn't apply.
+ * Only reloads and back/forward navigations restore the exact spot; following
+ * a fresh link to `/#section` should land at the section's opening even if an
+ * earlier visit in this tab left a saved offset for it.
+ */
+export function savedScrollWithin(id: string): number {
+	try {
+		const nav = performance.getEntriesByType('navigation')[0] as
+			| PerformanceNavigationTiming
+			| undefined;
+		if (nav && nav.type !== 'reload' && nav.type !== 'back_forward') return 0;
+		const saved = JSON.parse(sessionStorage.getItem(SCROLL_STATE_KEY) ?? 'null');
+		return saved && saved.id === id ? Number(saved.within) || 0 : 0;
+	} catch {
+		return 0;
+	}
 }
 
 /**
