@@ -235,8 +235,8 @@
 					<div class="year-tag">2016</div>
 					<h3 class="sub">Tower of the Americas — a kiosk companion app</h3>
 					<p>
-						The Tower of the Americas (in San Antonio) hired me to build an immersive
-						companion app. The idea: visitors get a tablet on a kiosk mount, point it
+						I was hired to build an immersive companion app for The Tower of the Americas
+						(in San Antonio). The idea: visitors get a tablet on a kiosk mount, point it
 						where they're looking out the windows, and the app shows them a 360 panorama
 						with landmark labels they can tap to learn more.
 					</p>

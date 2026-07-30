@@ -327,8 +327,8 @@
 					</p>
 					<p>
 						I also built a small Flash game to launch with the film — you played a pacman
-						eating animated faces. It was my first real taste of programming creating
-						something on screen.
+						eating animated faces. It was the first time I wrote code and watched it
+						become something on a screen.
 					</p>
 					<PlayFilm
 						label="Watch the short"
@@ -462,15 +462,15 @@
 			<Reveal>
 				<div class="closing">
 					<p>
-						This was the pattern: we picked an effect we'd never done before. We dove
-						right in. No research, no tutorials. We learned by failing in public. With
-						each film we added another tool to the box.
+						This was the pattern: pick an effect we'd never done, dive in with no research
+						and no tutorials, and learn by failing in public.
 					</p>
 					<p>
 						The "everything I make is a thinly disguised pretext to try one new technical
-						thing" loop never really left me. Pac-Attack was about a greenscreen trick.
+						thing" habit never really left me. Pac-Attack was about a greenscreen trick.
 						Nuisance-B-Gone was about cleanplate rotoscope. The "Calamity" film a year
-						later (next section over) was about stop-motion. Everything was an excuse.
+						later (a few sections from now) was about stop-motion. Everything was an
+						excuse.
 					</p>
 				</div>
 			</Reveal>

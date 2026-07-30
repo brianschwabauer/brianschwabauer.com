@@ -308,10 +308,9 @@
 						</h4>
 						<p>
 							A planner builder that generates highly customizable PDFs with internal
-							links, designed for devices like the reMarkable. Originally called
-							"Remarkably Organized". Open-sourced.
+							links, designed for devices like the reMarkable. Started life as "Remarkably
+							Organized"; now open source, with
 							<strong>200+ stars on GitHub.</strong>
-							Built with Svelte.
 						</p>
 						<a
 							class="card-link"
@@ -454,7 +453,7 @@
 
 		<div class="bridge">
 			<Reveal variant="up">
-				<p>The projects keep changing. The way I build them doesn't.</p>
+				<p>The materials keep changing. The rules don't.</p>
 			</Reveal>
 		</div>
 	</div>

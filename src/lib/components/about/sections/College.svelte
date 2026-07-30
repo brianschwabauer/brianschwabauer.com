@@ -211,12 +211,6 @@
 			'Filming the dorm talent show',
 		),
 		photo(
-			'REDACTED',
-			448,
-			902,
-			'MED 290 — Flash animation ad',
-		),
-		photo(
 			'2013-10-29_ditch_the_pitch-short_film_snapshot-michael_in_silly_light_bulb_costume.jpg',
 			1920,
 			1080,
@@ -410,12 +404,6 @@
 			2048,
 			1152,
 			'Split Life — planning around the kitchen table',
-		),
-		photo(
-			'2015-04-12_split_life-sato_48-behind_the_scenes-excel_cheatsheet_for_filming_script.jpg',
-			1326,
-			676,
-			'Split Life — the master timecode spreadsheet',
 		),
 		photo(
 			'2015-04-12_split_life-sato_48-behind_the_scenes-film_poster.jpg',
@@ -683,8 +671,8 @@
 						I majored in <strong>Electronic Arts</strong>
 						— a multidisciplinary major covering video production, audio production, animation,
 						and interactive design — with a minor in
-						<strong>Computer Science</strong>
-						. Pretty much the perfect match for a kid who'd been combining all of those things
+						<strong>Computer Science.</strong>
+						Pretty much the perfect match for a kid who'd been combining all of those things
 						in his basement since he was eleven.
 					</p>
 				</div>
@@ -731,8 +719,8 @@
 					<p>
 						"Make something cool and impressive," our ART 300 professor said. So my group
 						made a
-						<strong>360-degree panoramic short film</strong>
-						. In 2014. When you couldn't buy a 360 camera, when YouTube didn't support 360 video,
+						<strong>360-degree panoramic short film.</strong>
+						In 2014. When you couldn't buy a 360 camera, when YouTube didn't support 360 video,
 						when "360 rig" wasn't a thing you could rent.
 					</p>
 				</div>
@@ -877,13 +865,13 @@
 				<Reveal>
 					<h3 class="sub">Fugue — my first 48-hour film (2014)</h3>
 					<p>
-						Before Split Life there was <strong>Fugue</strong>
-						, my first crack at
+						<strong>Fugue</strong>
+						was my first crack at
 						<strong>SATO 48</strong>
 						— the region's 48-hour film race. You're handed a genre, a prop, and a line of dialogue
 						at kickoff, then get 48 sleepless hours to write, shoot, score, and cut a finished
-						short. It's the film that taught me how much you can actually pull off in two days
-						— and set up the swing I took the next year.
+						short. It taught me how much you can actually pull off in two days — and set up
+						the bigger swing I took the next year.
 					</p>
 				</Reveal>
 				<Reveal variant="up" delay={100}>
@@ -904,9 +892,9 @@
 						before. So I made a film with
 						<strong>
 							two oner-shot perspectives, shown side-by-side at the same time, in real
-							time
+							time.
 						</strong>
-						. One: the protagonist leaves her house. Two: a man hidden outside breaks in while
+						One: the protagonist leaves her house. Two: a man hidden outside breaks in while
 						she's gone. She comes back. He gets stuck. They turn out to know each other. It
 						ends.
 					</p>
@@ -1014,8 +1002,10 @@
 							Nice to Meet You <span class="film-year">2014</span>
 						</h4>
 						<p>
-							Senior-thesis warmup, shot in Canon RAW on a 5D mkIV with Magic Lantern
-							firmware. The girl on the bench was on the phone the whole time.
+							The senior-thesis tech rehearsal: Canon RAW on a 5D mkIII with Magic Lantern
+							firmware. A guy chats up a girl on a park bench, not realizing she's on the
+							phone — and her half of the call happens to answer him perfectly. The title
+							is the punchline.
 						</p>
 						<Video
 							src="https://cdn.brianschwabauer.com/media/2014-09-02_nice_to_meet_you/master.m3u8"

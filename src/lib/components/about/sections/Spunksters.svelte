@@ -167,14 +167,17 @@
 					<span class="grow w3">Oscars.</span>
 				</h2>
 				<p class="lede">
-					High school was wrapping up. Kevin was going to Baylor. I was going to Missouri
-					State. We knew we'd see each other again — eventually — but Hunky Spunky
-					Productions, the version with our childhood in it, was done.
+					By 2013, Kevin and I were two years into college in two different states — him
+					at Baylor, me at Missouri State. Hunky Spunky Productions, the version with our
+					childhood in it, was over, and we both knew it. We were never going to make
+					films together again. That deserved more than a quiet fade-out.
 				</p>
 				<p class="lede">
-					So we sent it off the only way we knew how: <strong>The Spunksters</strong>
-					— an awards show, modeled after the Oscars, for ourselves. Awards in every category.
-					Speeches. Live-streamed. Projected on the side of a house. Forty friends in a backyard,
+					So we came home that summer and sent it off the only way we knew how:
+					<strong>The Spunksters</strong>
+					— an awards show, modeled after the Oscars, for ourselves and our films. Awards in
+					every category. Speeches. Live-streamed. Projected on the side of my childhood house
+					— the same wall the Power Rangers premieres had played on. Forty friends in the backyard,
 					watching a live video feed of Kevin hosting from inside, so the host appeared on a
 					twenty-foot tall projection like a giant.
 				</p>
@@ -226,7 +229,7 @@
 						</p>
 						<p class="aside">
 							I deeply believe in this: live life all the way through, even the parts that
-							don't matter. Backyard awards shows are nothing. It is so much more fun to
+							don't matter. Backyard awards shows are nothing. It's so much more fun to
 							take them seriously than to phone them in.
 						</p>
 					</div>
@@ -328,8 +331,8 @@
 			<div class="endcap">
 				<div class="endcap-line"></div>
 				<div class="endcap-text">
-					<span>END OF CHILDHOOD CHAPTER</span>
-					<strong>Off to college, in two different states.</strong>
+					<span>END OF THE HUNKY SPUNKY CHAPTER</span>
+					<strong>We never made another film together. That was the point.</strong>
 				</div>
 				<div class="endcap-line"></div>
 			</div>

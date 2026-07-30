@@ -437,8 +437,8 @@
 				'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human/poster.jpg',
 			width: 1920,
 			height: 818,
-			caption: 'What Makes Us Human (2014) — full senior thesis short',
-			alt: 'What Makes Us Human (2014) — full senior thesis short',
+			caption: 'What Makes Us Human (2015) — full senior thesis short',
+			alt: 'What Makes Us Human (2015) — full senior thesis short',
 		},
 	];
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
@@ -732,7 +732,7 @@
 					</div>
 					<LazyMedia
 						src="https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human/poster.jpg"
-						alt="What Makes Us Human (2014) — full senior thesis short"
+						alt="What Makes Us Human (2015) — full senior thesis short"
 						ratio="16 / 9"
 						video
 						onclick={(e) => gallery?.open(0, e.currentTarget)} />
@@ -815,8 +815,9 @@
 				<h3 class="big-sub">Premiere · MSU Electronic Arts Showcase · May 2015</h3>
 				<p>
 					The end of college. A theater. A crowd. The film ran. People reacted to the
-					beats we'd been building toward for almost a year. It is, to this day, the
-					single longest project I've ever shipped.
+					beats we'd been building toward for almost a year. It's still the biggest film
+					production I've ever been a part of — and now that I build software instead of
+					films, the biggest I ever will be.
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>

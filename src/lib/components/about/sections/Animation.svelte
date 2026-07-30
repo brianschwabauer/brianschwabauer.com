@@ -372,12 +372,6 @@
 								car. We drove it during the chase scene so it could get the low, weaving
 								angle that a human couldn't.
 							</p>
-							<p>
-								The "bullet-time" shot where the camera-robot shoots a DV tape at the
-								protagonist is a complete 3D recreation of the tape, animated in slow-mo
-								past the camera. Looking back at it, I'm still genuinely proud of that
-								one.
-							</p>
 							<PlayFilm
 								label="Play the short"
 								title="Exposure (2011) — the camera-robot short"
@@ -457,10 +451,10 @@
 					<h3 class="sub">XYZ News &middot; iPrez</h3>
 					<p>
 						The XYZ News bit, again — three years on. By 2011 our skills were
-						"professional" enough that I think we could've published this against The
-						Onion at the time. A 3D virtual newsroom set with actual jib-style camera
-						moves. Proper greenscreen lighting. The whole thing centered around one fake
-						story: a new iPhone app for the U.S. president that gives him unlimited power.
+						"professional" enough that it could've passed for a real Onion segment at the
+						time. A 3D virtual newsroom set with actual jib-style camera moves. Proper
+						greenscreen lighting. The whole thing centered around one fake story: a new
+						iPhone app for the U.S. president that gives him unlimited power.
 					</p>
 					<p class="aside">
 						This is, embarrassingly, still one of the funnier things I've ever made.

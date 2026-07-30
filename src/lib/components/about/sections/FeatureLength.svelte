@@ -303,7 +303,7 @@
 
 	<div class="container">
 		<Reveal>
-			<YearMark year="2008" subtitle="Feature Length" color="#ffcc33" />
+			<YearMark year="2008" subtitle="Backyard Blockbusters" color="#ffcc33" />
 		</Reveal>
 
 		<div class="lockup">
@@ -326,9 +326,9 @@
 				<h3 class="sub">Power Rangers 360 (2007)</h3>
 				<p>
 					Thirty minutes long. Our first "feature". The blue ranger goes rogue, joins the
-					villain Vino, fights the red ranger, and dies in his arms. Not the best film
-					ever, but we learned a valuable lesson about setting ambitious goals — even if
-					you have no chance of reaching them.
+					villain Vino, fights the red ranger, and dies in his arms. Not a good film. But
+					it taught us to aim way past what we could actually pull off — a habit that
+					never wore off.
 				</p>
 				<p>
 					We held the film premiere in my backyard after sundown. We put white bed sheets
@@ -382,16 +382,15 @@
 				<Reveal>
 					<h3 class="sub">Power Rangers 360 II (2008)</h3>
 					<p>
-						It was the next summer and it was time for BIGGER and BETTER. So we spend
-						weeks writing a 60+ page script and made script binders that we gave to the
-						whole cast - which had grown to a small army of friends (anyone we could find
-						that was available).
+						The next summer it was time for BIGGER and BETTER. We spent weeks writing a
+						60+ page script and printed script binders for the whole cast — which by now
+						was a small army of whichever friends were available.
 					</p>
 					<p>
-						It turns out, it's pretty hard to make a film 60+ minutes long in the heat of
-						summer - when everyone just wants to be at the pool. But we stuck through it.
-						We had to pad the film with some unnecessary scenes and a very long credits
-						reel, but we did it. We made a 64 min long film we could be proud of.
+						It turns out it's pretty hard to make a 60+ minute film in the heat of summer,
+						when everyone just wants to be at the pool. But we stuck it out. We had to pad
+						the film with some unnecessary scenes and a very long credits reel, but we did
+						it. We made a 64-minute film we could be proud of.
 					</p>
 
 					<aside class="casting-note">
@@ -399,7 +398,7 @@
 						<p>
 							One of the &ldquo;characters&rdquo; in the film was Zordon, the rangers'
 							leader. We thought it would be funny if he was played by Kevin's dog. So
-							that's what we did. We filmed him &ldquo;talking&rdquo; via the ole'
+							that's what we did. We filmed him &ldquo;talking&rdquo; via the ol'
 							peanut-butter-in-the-mouth trick, then used a green screen to comp him into
 							scenes with the rangers.
 						</p>

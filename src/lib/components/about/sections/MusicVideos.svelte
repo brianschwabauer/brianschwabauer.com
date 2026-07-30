@@ -273,14 +273,15 @@
 					<span class="grad">follow the song.</span>
 				</h2>
 				<p class="lede">
-					I was always drawn to music videos. You don't have to invent a plot or
-					characters — you just get to mash a bunch of clips against a beat with quick
-					cuts and clever transitions. We were not good musicians; the recordings live
-					somewhere between "endearing" and "unlistenable", depending on the track. But
-					they taught me <em>so much</em>
+					The websites didn't replace the films — the two threads just started running in
+					parallel. And on the film side, I was always drawn to music videos. You don't
+					have to invent a plot or characters — you just get to mash a bunch of clips
+					against a beat with quick cuts and clever transitions. We were not good
+					musicians; the recordings live somewhere between "endearing" and "unlistenable",
+					depending on the track. But they taught me <em>so much</em>
 					about editing to tempo, about how a cut can land on a beat, about how a small change
-					in audio completely changes what a viewer feels in a shot. I cut every short film
-					I make differently because of those years.
+					in audio completely changes what a viewer feels in a shot. I still cut everything
+					differently because of those years.
 				</p>
 				<p class="lede">
 					Our first attempts were honestly just "stand in front of a tripod and lip-sync".

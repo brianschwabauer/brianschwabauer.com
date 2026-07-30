@@ -418,7 +418,7 @@
 						College ended. I was freelancing full time. New site. New cards. A whole 2015
 						demo reel cut specifically to land me freelance gigs. I was technically a
 						"videographer", but in practice the gigs would shape-shift — sometimes it was
-						a logo animation, sometimes a kickstarter video, sometimes a promotional
+						a logo animation, sometimes a Kickstarter video, sometimes a promotional
 						motion-graphics piece, sometimes a wedding film, sometimes a WordPress theme.
 					</p>
 					<p class="lede">
@@ -501,7 +501,7 @@
 					<Reveal>
 						<h3 class="sub">Wedding films</h3>
 						<p>
-							Many of them — most for other couples. But the one I'm proudest of is the
+							I shot plenty of them for other couples. But the one I'm proudest of is the
 							one I was standing in: Jordan and I got married in June 2015, and I cut our
 							own highlight film.
 						</p>

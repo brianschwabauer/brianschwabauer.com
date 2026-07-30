@@ -253,7 +253,7 @@
 			width: 1078,
 			height: 720,
 			caption: 'Flash Video Game',
-			alt: 'Flash Video Game - gameplay',
+			alt: 'Flash Video Game — gameplay',
 		},
 		{
 			type: 'image',
@@ -539,8 +539,8 @@
 					<span class="ksms-grad">control room.</span>
 				</h3>
 				<p class="lede">
-					KSMS was my high school's broadcast journalism program. We made the morning
-					announcement show, news packages, sports features, comedy sketches — everything.
+					KSMS was my high school's broadcast journalism program. We made news packages,
+					sports features, comedy sketches — everything.
 				</p>
 			</Reveal>
 
@@ -577,7 +577,7 @@
 						<div class="cr-media">
 							<LazyMedia
 								src="https://cdn.brianschwabauer.com/media/2010-01-01_scott_hirons_experience_flash_game_screen_recording-gameplay.avif"
-								alt="Flash Video Game - gameplay"
+								alt="Flash Video Game — gameplay"
 								ratio="4 / 3"
 								onclick={(e) => extrasGallery?.open(3, e.currentTarget)} />
 						</div>
@@ -612,11 +612,13 @@
 						Probably my favorite KSMS memory. We brought live broadcasts to our sports
 						events — before YouTube had livestreams. I wired a row of cameras into an
 						analog video switcher, ran that into an analog-to-digital converter, and
-						pushed the output through some random live streaming service. Each camera also
-						fed a tape deck that recorded its input to a DV tape — that was our "instant
-						replay" rig. When something happened we wanted to replay, we'd rewind, hit
-						play on the deck, and switch the live broadcast to that input. Sometimes it
-						worked. When it worked, it felt like magic.
+						pushed the output through some random live streaming service.
+					</p>
+					<p>
+						Each camera also fed a tape deck that recorded its input to a DV tape — that
+						was our "instant replay" rig. When something happened we wanted to replay,
+						we'd rewind, hit play on the deck, and switch the live broadcast to that
+						input. Sometimes it worked. When it worked, it felt like magic.
 					</p>
 				</Reveal>
 
@@ -783,10 +785,10 @@
 				<Reveal>
 					<h4 class="lb-title">Long Time No See (2011)</h4>
 					<p>
-						Kevin and I were headed to different colleges, so we made one last film
-						together that summer. A fish-out-of-water comedy about a guy meeting his
-						foreign-raised long-lost brother. Lighter on effects, heavier on story. Our
-						best storytelling at that point.
+						Kevin and I were headed to different colleges, so we made what we thought was
+						our last film together that summer. A fish-out-of-water comedy about a guy
+						meeting his foreign-raised long-lost brother. Lighter on effects, heavier on
+						story. Our best storytelling at that point.
 					</p>
 				</Reveal>
 				<Reveal variant="up" delay={160}>

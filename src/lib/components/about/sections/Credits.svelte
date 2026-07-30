@@ -154,7 +154,7 @@
 	)}
 	{@render row(
 		'Shot on',
-		'MiniDV · four GoPros · Canon 60D · Any camera I could find · Coffee',
+		'MiniDV · four GoPros · Canon 60D · any camera I could find · coffee',
 	)}
 	{@render row(
 		'In loving memory of',

@@ -320,7 +320,7 @@
 
 		<div class="features">
 			<Reveal>
-				<h3 class="sub">What it does, in six bullets</h3>
+				<h3 class="sub">The pitch, in six bullets</h3>
 			</Reveal>
 			<div class="features-grid">
 				{#each features as f, i}

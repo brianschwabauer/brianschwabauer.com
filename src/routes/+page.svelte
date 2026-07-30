@@ -56,7 +56,7 @@
 	<meta property="og:title" content="Brian Schwabauer — Delivering Delight" />
 	<meta
 		property="og:description"
-		content="For as long as I have lived, I have loved to create. Startups, apps, videos. I live to create. I work to delight." />
+		content="For as long as I can remember, I've loved to make things — short films, Flash games, websites, products. I live to create. I work to delight." />
 </svelte:head>
 
 <RootNavDropdown />
@@ -80,7 +80,7 @@
 	<EmptyYearMark
 		year="2014"
 		color="#ffd934"
-		note="No releases this year — just film sets, coursework, and a growing pile of notes, all quietly pointed at one thing: the senior thesis." />
+		note="Nothing big shipped this year — just film sets, coursework, and a growing pile of notes, all quietly pointed at one thing: the senior thesis." />
 	<WhatMakesUsHuman />
 	<ChapterCard act={3} />
 	<Freelancer />

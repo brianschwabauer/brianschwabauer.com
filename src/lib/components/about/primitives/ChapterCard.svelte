@@ -26,12 +26,12 @@
 			1: {
 				eyebrow: 'Act I · 2006–2011',
 				title: 'The Film Kid',
-				sub: "A couple of kids, one camcorder, and no idea what 'coverage' means.",
+				sub: "Kevin and I had one camcorder, endless weekends, and no idea what 'coverage' meant. We made films anyway.",
 			},
 			2: {
 				eyebrow: 'Act II · 2012–2015',
 				title: 'The Pivot',
-				sub: 'Film school, a senior thesis, and the slow realization that the tool he kept reaching for was a code editor.',
+				sub: 'I went to film school and made the biggest films of my life. But the tool I kept reaching for was a code editor.',
 			},
 			3: {
 				eyebrow: 'Act III · 2016–Today',

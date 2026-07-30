@@ -209,15 +209,14 @@
 		<div class="lede-grid">
 			<Reveal variant="up" delay={100}>
 				<p class="lede">
-					My best friend Kevin and I were equipped with our family's miniDV cameras — the
-					kind where you literally had to play the tape back into the computer in real
-					time to digitize it. We had no filmmaking skills. We had no lights, no mics, no
-					idea what a "script" was. But we had time, and that was the only thing the work
-					required.
+					My best friend Kevin and I had our families' miniDV cameras — the kind where you
+					literally had to play the tape back into the computer in real time to digitize
+					it. We had no filmmaking skills. We had no lights, no mics, no idea what a
+					"script" was. But we had time, and that was the only thing the work required.
 				</p>
 				<p class="lede">
-					We called ourselves <strong>Hunky Spunky Productions</strong>
-					. We were eleven.
+					We called ourselves <strong>Hunky Spunky Productions.</strong>
+					We were eleven.
 				</p>
 			</Reveal>
 
@@ -348,11 +347,11 @@
 				<div class="karate-text">
 					<h3 class="subtle">
 						<span class="caret">▌</span>
-						Pre-school special effects
+						Duct-tape special effects
 					</h3>
 					<p>
-						A year after The Fight Scene we made <strong>Ninja Men</strong>
-						. We pre-cut an apple, jammed a toothpick into it to hold it together, and let a
+						A year after The Fight Scene we made <strong>Ninja Men.</strong>
+						 We pre-cut an apple, jammed a toothpick into it to hold it together, and let a
 						karate chop "split" it cleanly. Seventh-grade ingenuity I'm still a little proud
 						of.
 					</p>
@@ -369,7 +368,7 @@
 		<Reveal variant="up">
 			<div class="closing">
 				<p>
-					Every weekend looked the same. I'd walk (through neighbor's yards) to Kevin's
+					Every weekend looked the same. I'd walk (through neighbors' yards) to Kevin's
 					house. We'd come up with whatever crazy thing we could that day. We'd film it.
 					We'd edit it. All within a day, sometimes two. Then we'd repeat that loop, over
 					and over.

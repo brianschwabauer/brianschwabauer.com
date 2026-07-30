@@ -702,7 +702,7 @@
 	 * progress readout — see PERCENT / `.boom-btn-count` below.
 	 *
 	 *   idle              "Don't push this button"
-	 *   idle, peeked      "Seriously, don’t"
+	 *   idle, peeked      "Seriously, don't"
 	 *   awake             "Demolition started"
 	 *   pumping → boom    the counter: "42% Complete"
 	 *
@@ -713,7 +713,7 @@
 		phase === 'idle' && !warned
 			? "Don't push this button"
 			: phase === 'idle' && warned
-				? 'Seriously, don’t'
+				? "Seriously, don't"
 				: phase === 'awake'
 					? 'Demolition started'
 					: '',
@@ -1301,8 +1301,8 @@
 				</h1>
 
 				<p class="lede" data-frag>
-					For as long as I have lived, I have loved to create. I've built startups,
-					developed apps, and produced videos. I live to create. I work to delight.
+					For as long as I can remember, I've loved to make things — short films, Flash
+					games, websites, products. I live to create. I work to delight.
 				</p>
 
 				<div class="button-stage" data-frag bind:this={stage_el}>
@@ -1456,9 +1456,9 @@
 					<span class="line line-2">my site.</span>
 				</h1>
 				<p class="aftermath-lede">
-					Well&hellip; that escalated. I told you not to press the button 🤣. Anyway, now
-					that you've completely destroyed my website, let's build something new together.
-					Let me know your name/email and I'll get back to you.
+					Well&hellip; I told you not to press the button 🤣. Anyway, now that you've
+					destroyed my website, let's build something new together. Let me know your
+					name/email and I'll get back to you.
 				</p>
 
 				<div class="contact-form">

@@ -134,11 +134,11 @@
 					name was. But I knew we needed one.
 				</p>
 				<p class="lede">
-					I fired up Apple's <strong>iWeb</strong>
-					, which let me drag boxes onto a page and call it a website. It was perfect for someone
-					who had no idea what HTML was. Pretty soon I outgrew it and moved to
-					<strong>Adobe Dreamweaver</strong>
-					. That meant I was actually writing code. Mostly badly. But I had crossed a line —
+					I fired up Apple's <strong>iWeb,</strong>
+					which let me drag boxes onto a page and call it a website. It was perfect for
+					someone who had no idea what HTML was. Pretty soon I outgrew it and moved to
+					<strong>Adobe Dreamweaver.</strong>
+					 That meant I was actually writing code. Mostly badly. But I had crossed a line —
 					I could make pixels do what I wanted, and the pixels could now do things on click.
 				</p>
 				<p class="lede">
