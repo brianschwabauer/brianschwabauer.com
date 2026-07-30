@@ -62,8 +62,14 @@
 	];
 </script>
 
+<!--
+  Where a jump to this chapter lands. The section's top padding is air the
+  chapter needs while you scroll into it and does not need when you asked to be
+  put here — see `sectionScrollTop` in `$lib/sectionNav`.
+-->
 <div
 	bind:this={el}
+	data-scroll-anchor
 	class="year-mark {treatment}"
 	style:--p={progress}
 	style:--year-color={color}
@@ -107,6 +113,18 @@
 		pointer-events: none;
 		user-select: none;
 		margin: clamp(2rem, 6vw, 4rem) 0;
+		/*
+		 * Read by `sectionScrollTop`, not by the browser: the air to leave between
+		 * the header and the numerals when a jump lands here. Enough that the year
+		 * isn't tucked under the header, little enough that it reads as the top of
+		 * the page.
+		 *
+		 * Measured in the year's own type size rather than in `rem` or `vw`:
+		 * `line-height: 0.85` means the numerals overhang the top of their box, by
+		 * more the bigger they are set, and this is the one value that overhang
+		 * scales with — including when a chapter passes its own `size`.
+		 */
+		scroll-margin-top: calc(var(--year-size) * 0.25);
 	}
 	.year {
 		font-family: var(--font-mono);

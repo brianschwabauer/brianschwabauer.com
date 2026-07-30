@@ -5,6 +5,7 @@
 	import { create, load, search, type AnyOrama, type Results } from '@orama/orama';
 	import { Button } from '@delightstack/components/actions';
 	import { entryLabel, indexSchema, type SearchEntry } from '$lib/search';
+	import { scrollToSection } from '$lib/sectionNav';
 	import { bgStyle, thumbnailURL } from '$lib/client/images';
 	import { formatPostDate, isoPostDate } from '$lib/utils/date';
 
@@ -159,8 +160,11 @@
 	function scrollToId(id: string) {
 		const el = document.getElementById(id);
 		if (!el) return;
-		const top = el.getBoundingClientRect().top + window.scrollY - 64;
-		window.scrollTo({ top });
+		// Same converging jump the on-page nav uses: home sections are
+		// `content-visibility: auto`, so a single scrollTo lands on placeholder
+		// heights, and it's this that puts the section's year at the top rather
+		// than the section's top padding.
+		void scrollToSection(el, 64);
 	}
 
 	async function navigate(hit: Hit) {

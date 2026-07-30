@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
-	import { scrollToSection, setSectionHash } from '$lib/sectionNav';
+	import { scrollToSection, sectionScrollTop, setSectionHash } from '$lib/sectionNav';
 	import { sectionSpy } from '$lib/sectionSpy';
 
 	let {
@@ -90,7 +90,7 @@
 		const el = document.getElementById(id);
 		if (!el) return;
 		activeId = id;
-		window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80 });
+		window.scrollTo({ top: sectionScrollTop(el) });
 	}
 
 	/** The row the press landed on. It captures the pointer, so every later move

@@ -2,15 +2,59 @@ import { page } from '$app/state';
 import { replaceState } from '$app/navigation';
 
 /**
- * Scroll so `el` sits just below the fixed header, re-correcting every frame
- * until the target's document position stabilises, then resolve.
+ * Is `el` actually laid out, or is it a `content-visibility: auto` placeholder?
+ * A skipped section still answers `querySelector`, but its children have no
+ * geometry, so measuring inside one gives nonsense.
+ */
+const rendered = (el: HTMLElement) =>
+	typeof el.checkVisibility !== 'function' ||
+	el.checkVisibility({ contentVisibilityAuto: true });
+
+/**
+ * The document scroll position a jump to `el` should land on.
+ *
+ * Sections carry generous top padding — the air above the giant year is what
+ * makes the chapter breathe while you *scroll* through it. Landing a *jump* at
+ * the section's own top inherits all of that padding, so the year the reader
+ * asked for opens hundreds of pixels down the screen under an empty gap.
+ *
+ * So a section may nominate the element a jump should actually put at the top,
+ * with `data-scroll-anchor`, and tune the air left above it with a plain
+ * `scroll-margin-top` on that element. Nothing else reads `scroll-margin` here
+ * (the browser only applies it to its own scrolls, which
+ * `content-visibility` estimates make useless on this page anyway), so it is
+ * free to mean exactly this: how far below the header this thing should sit.
+ *
+ * Sections with no anchor — the pinned ones, whose effect starts at their very
+ * top — keep landing at the section top, which is right for them.
+ *
+ * Exported for the rough, one-shot landings (a scrubber drag, a search hit)
+ * that don't run the converging loop below but must still agree with it.
+ */
+export function sectionScrollTop(el: HTMLElement, headerOffset = 80) {
+	const anchor = rendered(el)
+		? el.querySelector<HTMLElement>('[data-scroll-anchor]')
+		: null;
+	const box = anchor ?? el;
+	const gap = anchor ? parseFloat(getComputedStyle(anchor).scrollMarginTop) || 0 : 0;
+	return Math.max(
+		0,
+		box.getBoundingClientRect().top + window.scrollY - headerOffset - gap,
+	);
+}
+
+/**
+ * Scroll so `el`'s opening lands just below the fixed header, re-correcting
+ * every frame until the target's document position stabilises, then resolve.
  *
  * The home-page sections use `content-visibility: auto`, so off-screen sections
  * are laid out at their `contain-intrinsic-size` estimate rather than their real
  * height. A single `scrollTo` lands at a position computed from those wrong
  * heights; as we approach the target, each section between renders for real and
  * shifts everything below it. Measuring and re-snapping until the position holds
- * for a few frames converges on the correct spot. Cancels on user
+ * for a few frames converges on the correct spot. That same loop is what lets
+ * `targetTop` read geometry from inside the section: it is a placeholder on the
+ * first frame and real by the time we arrive. Cancels on user
  * wheel/touch/keydown so a deliberate scroll always wins.
  */
 export function scrollToSection(el: HTMLElement, headerOffset = 80): Promise<void> {
@@ -31,7 +75,7 @@ export function scrollToSection(el: HTMLElement, headerOffset = 80): Promise<voi
 		};
 		const step = () => {
 			if (cancelled) return cleanup();
-			const top = el.getBoundingClientRect().top + window.scrollY - headerOffset;
+			const top = sectionScrollTop(el, headerOffset);
 			if (Math.abs(window.scrollY - top) > 1) window.scrollTo({ top });
 			stable = Math.abs(top - lastTop) < 1 ? stable + 1 : 0;
 			lastTop = top;

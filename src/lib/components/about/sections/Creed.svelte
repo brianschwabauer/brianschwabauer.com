@@ -610,7 +610,9 @@
 
 <SectionShell id="creed" year="Always" label="The Creed" theme="creed">
 	<div class="container">
-		<header class="opening">
+		<!-- No year mark on this chapter, so the opening statement is what a jump
+		     should land on — see `sectionScrollTop` in `$lib/sectionNav`. -->
+		<header data-scroll-anchor class="opening">
 			<Reveal>
 				<div class="eyebrow">THE CREED</div>
 				<h2 class="title">
@@ -806,6 +808,9 @@
 	}
 
 	.opening {
+		/* The statement is already centred in its own 70svh box — a jump landing
+		   here needs no extra air above it. */
+		scroll-margin-top: 0;
 		min-height: 70svh;
 		display: flex;
 		align-items: center;
