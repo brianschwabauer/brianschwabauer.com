@@ -1,4 +1,6 @@
 <script lang="ts">
+	import BuildField from './BuildField.svelte';
+
 	let {
 		years,
 		color = '#ffffff',
@@ -13,12 +15,19 @@
 
 	let el = $state<HTMLElement | null>(null);
 	let stickyEl = $state<HTMLElement | null>(null);
+	let stageEl = $state<HTMLElement | null>(null);
+	let stage_h = $state(0);
 	let progress = $state(0);
 
 	$effect(() => {
 		if (!el) return;
 		const onScroll = () => {
 			const rect = el!.getBoundingClientRect();
+			// The numerals' type size, for the field's clearing. Taken here rather
+			// than with `bind:clientHeight` because that binding is delivered by a
+			// ResizeObserver, and the field draws nothing at all until this arrives —
+			// this handler has already forced layout, so the read is free.
+			if (stageEl) stage_h = stageEl.offsetHeight;
 			// Measure the sticky window itself (100svh) instead of
 			// window.innerHeight, which changes when the mobile URL bar collapses
 			// and would make the progress mapping jump mid-scrub.
@@ -71,7 +80,11 @@
 	style:--pin-height={pinHeight}
 	aria-hidden="true">
 	<div class="sticky" bind:this={stickyEl}>
-		<div class="stage">
+		<!-- Fills the frame around the numerals. `gate` is the stage's own height —
+		     i.e. the type size, since `.stage` is exactly one line tall — which is
+		     what the field measures its clearing in. -->
+		<BuildField {progress} blocks={years.length} {color} gate={stage_h} />
+		<div class="stage" bind:this={stageEl}>
 			{#each years as y, i (y)}
 				{@const offset = i - virtualIndex}
 				{@const opacity = Math.max(0, 1 - Math.min(1, Math.abs(offset)))}
@@ -92,6 +105,10 @@
 <style>
 	.year-cycler {
 		position: relative;
+		/* The numerals' type size, hoisted: the stage box, the glyphs and the clearing
+		   the build field leaves for them are all measured from this one value, so
+		   they cannot drift apart. */
+		--gate: clamp(7rem, 22vw, 25rem);
 		width: 100%;
 		/* sticky window (100svh) + scroll distance (pinHeight) */
 		height: calc(100svh + var(--pin-height));
@@ -108,10 +125,17 @@
 		justify-content: center;
 		gap: 1.5rem;
 	}
-	.stage {
+	/* The field is absolutely positioned, so it would paint over these in-flow
+	   siblings without a stacking order of their own. */
+	.stage,
+	.rail,
+	.caption {
 		position: relative;
+		z-index: 1;
+	}
+	.stage {
 		width: 100%;
-		height: clamp(7rem, 22vw, 25rem);
+		height: var(--gate);
 		overflow: hidden;
 	}
 	.year {
@@ -122,7 +146,7 @@
 		justify-content: center;
 		font-family: var(--font-mono);
 		font-weight: 900;
-		font-size: clamp(7rem, 22vw, 25rem);
+		font-size: var(--gate);
 		line-height: 1;
 		letter-spacing: -0.04em;
 		color: transparent;
