@@ -33,10 +33,62 @@
 
 	let loaded = $state(false);
 	const interactive = $derived(typeof onclick === 'function');
+
+	let frame = $state<HTMLElement | null>(null);
+	let image = $state<HTMLImageElement | null>(null);
+
+	/*
+	 * The fade waits on `loaded`, so anything that swallows the load event leaves
+	 * the image invisible for good. Two ways that happens, both fixed here:
+	 *
+	 * 1. A cached image can finish before hydration attaches `onload`, so the
+	 *    event never arrives — check `complete` as soon as we have the element.
+	 * 2. A `loading="lazy"` image inside a `content-visibility: auto` subtree
+	 *    (which is every frame on this page) does not reliably start fetching
+	 *    when it arrives on screen *without a scroll*: landing on a `#hash`, a
+	 *    year-scrubber jump, or a lazily-imported section mounting already inside
+	 *    the viewport all leave the fetch un-triggered. So watch the frame — it
+	 *    keeps its box even while its contents are skipped, unlike the `img`
+	 *    inside it — and promote to eager the moment it comes near, which kicks
+	 *    off the normal load path.
+	 */
+	$effect(() => {
+		const img = image;
+		if (!img) return;
+		if (img.complete && img.naturalWidth > 0) {
+			loaded = true;
+			return;
+		}
+		if (!frame || img.loading !== 'lazy') return;
+		// Roughly Chrome's own lazy threshold, so this stays lazy loading — it only
+		// takes over deciding *when* the fetch starts.
+		const NEAR = 600;
+		// Already on screen at mount — which is the whole reason this exists, since
+		// that is the case the browser misses. Checked synchronously rather than
+		// left to the observer: the first observer callback needs a frame, and a
+		// section that mounts in view may not get one until the user moves.
+		const rect = frame.getBoundingClientRect();
+		if (rect.bottom > -NEAR && rect.top < window.innerHeight + NEAR) {
+			img.loading = 'eager';
+			return;
+		}
+		if (typeof IntersectionObserver === 'undefined') return;
+		const obs = new IntersectionObserver(
+			(entries) => {
+				if (!entries.some((entry) => entry.isIntersecting)) return;
+				img.loading = 'eager';
+				obs.disconnect();
+			},
+			{ rootMargin: `${NEAR}px 0px` },
+		);
+		obs.observe(frame);
+		return () => obs.disconnect();
+	});
 </script>
 
 {#if interactive}
 	<button
+		bind:this={frame}
 		type="button"
 		class="lazy-media lazy-media-button {klass}"
 		class:rounded
@@ -46,6 +98,7 @@
 		aria-label={alt || 'Open image'}
 		onclick={(e) => onclick?.(e)}>
 		<img
+			bind:this={image}
 			{src}
 			{alt}
 			loading={eager ? 'eager' : 'lazy'}
@@ -64,12 +117,14 @@
 	</button>
 {:else}
 	<figure
+		bind:this={frame}
 		class="lazy-media {klass}"
 		class:rounded
 		class:shadow
 		style:aspect-ratio={ratio || undefined}
 		{style}>
 		<img
+			bind:this={image}
 			{src}
 			{alt}
 			loading={eager ? 'eager' : 'lazy'}
