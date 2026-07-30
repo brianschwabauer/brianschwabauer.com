@@ -2,9 +2,8 @@
 	import SectionShell from '../primitives/SectionShell.svelte';
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
-	import LazyMedia from '../primitives/LazyMedia.svelte';
 	import PeekGallery from '../primitives/PeekGallery.svelte';
-	import { type GalleryItem } from '@delightstack/components/media';
+	import { Video, type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 	import { onScrollProgress } from '../primitives/scrollProgress';
 
@@ -429,21 +428,6 @@
 		},
 	];
 
-	// Only the full thesis film is rendered inline — defer playback to a Gallery lightbox.
-	const sectionExtras: GalleryItem[] = [
-		{
-			type: 'video',
-			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human/master.m3u8',
-			poster:
-				'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human/poster.jpg',
-			width: 1920,
-			height: 818,
-			caption: 'What Makes Us Human (2015) — full senior thesis short',
-			alt: 'What Makes Us Human (2015) — full senior thesis short',
-		},
-	];
-	let gallery = $state<ReturnType<typeof LightboxGallery>>();
-
 	/*
 	 * The scan. It was already here — an 80px band blurred by 8px, sweeping the
 	 * top 120vh of the section on an 8s loop — and it read as a soft smear
@@ -488,6 +472,19 @@
 	let band_count = $derived(Math.min(8, Math.ceil(spans)));
 	/** Constant speed, so a taller section takes proportionally longer to sweep. */
 	let sweep_dur = $derived(CROSS * spans);
+	/**
+	 * Phase spacing between bands — one full cycle divided by the number of bands,
+	 * which is the only value that spreads them evenly.
+	 *
+	 * This used to be a flat `CROSS`, on the reasoning that a band covers one
+	 * viewport in `CROSS` seconds so `CROSS` apart is one viewport apart. That only
+	 * holds when `spans` is a whole number. At `spans = 3.2` the cycle is 16s but
+	 * the four bands sat at 0/5/10/15s — so the last band trailed the first by 1s,
+	 * not 5, and you got two beams a few pixels apart. Dividing the cycle instead
+	 * keeps them evenly spread at every geometry; the beam's *speed* is still fixed
+	 * by `CROSS` (it sets `sweep_dur`), only the spacing follows the band count.
+	 */
+	let band_gap = $derived(sweep_dur / band_count);
 
 	$effect(() => {
 		const sec = section();
@@ -605,9 +602,17 @@
 <SectionShell id="what-makes-us-human" year="2015" label="Senior Thesis" theme="thesis">
 	<!--
 	  The beam. One element per band, all on the same keyframes at the same speed,
-	  each offset by a negative delay of one `CROSS` — a single animation per band
-	  and nothing to keep in sync, because the stagger is baked into where in the
-	  cycle each one starts rather than maintained frame to frame.
+	  each offset by a negative delay of `i` gaps — a single animation per band and
+	  nothing to keep in sync, because the stagger is baked into where in the cycle
+	  each one starts rather than maintained frame to frame.
+
+	  The key includes `band_count` on purpose. A band's phase is only its negative
+	  delay *relative to when it mounted*, so bands added later (the section is
+	  measured after paint, and `content-visibility` makes it remeasure as you
+	  scroll into it) start their cycle from a different zero than the ones already
+	  running — which is the other way two beams ended up on top of each other.
+	  Re-keying remounts the whole set whenever the count changes, so every band's
+	  clock starts at the same instant and the even spacing actually holds.
 	-->
 	<div
 		bind:this={host}
@@ -615,8 +620,8 @@
 		aria-hidden="true"
 		style:--sec-h="{section_h}px"
 		style:--dur="{sweep_dur}s"
-		style:--stagger="{CROSS}s">
-		{#each Array(band_count) as _, i (i)}
+		style:--stagger="{band_gap}s">
+		{#each Array(band_count) as _, i (`${band_count}:${i}`)}
 			<div class="band" style:--i={i}>
 				<div class="core"></div>
 			</div>
@@ -723,12 +728,12 @@
 						</svg>
 						<span>WATCH THE FULL FILM · 15 MIN</span>
 					</div>
-					<LazyMedia
-						src="https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human/poster.jpg"
-						alt="What Makes Us Human (2015) — full senior thesis short"
-						ratio="16 / 9"
-						video
-						onclick={(e) => gallery?.open(0, e.currentTarget)} />
+					<Video
+						src="https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human/master.m3u8"
+						poster="https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human/poster.jpg"
+						title="What Makes Us Human (2015) — full senior thesis short"
+						aspect_ratio="1920/818"
+						preload="none" />
 				</div>
 			</Reveal>
 		</div>
@@ -822,12 +827,6 @@
 			</Reveal>
 		</div>
 	</div>
-
-	<LightboxGallery
-		bind:this={gallery}
-		key="what-makes-us-human"
-		items={sectionExtras}
-		autoplay_video />
 </SectionShell>
 
 <style>
@@ -1129,7 +1128,10 @@
 
 	.full-film {
 		margin: 2.5rem auto 0;
-		max-width: 920px;
+		/* It's the fifteen-minute film, not a supporting still — give it most of the
+		   container. The bleed gallery above it runs the full viewport, so a 920px
+		   card read like a footnote underneath. */
+		max-width: 1120px;
 		padding: 1.4rem;
 		background: linear-gradient(135deg, rgba(0, 242, 195, 0.06), transparent);
 		border: 1px solid rgba(0, 242, 195, 0.25);
