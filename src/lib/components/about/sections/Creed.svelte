@@ -539,17 +539,26 @@
 	});
 
 	// ---- "nothing is ever final" filename gag ---------------------------------
-	// The line renames itself one step further every time the fourth tenet comes
-	// back on screen, so the joke lands on the reader who scrolls back up to
-	// re-read it — the same person the tenet is about.
+	// The line never stops renaming itself. While the fourth tenet is on screen
+	// the file gets one more coat of "final" every couple of seconds, so the
+	// tenet is being disproved in real time underneath its own paragraph — no
+	// punchline needed. It idles when the tenet is off screen.
 	const FILENAMES = [
 		'homepage_final.svelte',
 		'homepage_final_v2.svelte',
-		'homepage_FINAL_final.svelte',
+		'homepage_final_final.svelte',
+		'homepage_final_actually_final-14.svelte',
 		'homepage_FINAL_final_ACTUAL_v3.svelte',
+		'homepage_final_final_final_please_work_now.svelte',
+		'homepage_final_USE_THIS_ONE.svelte',
+		'homepage_final_v2_but_the_real_v2.svelte',
+		'homepage_final_do_not_touch.svelte',
+		'homepage_final_touched_it.svelte',
 	];
 	/** Whole rewrite, backspace plus retype, fits in this budget. */
 	const RENAME_MS = 600;
+	/** Beat between rewrites — long enough to read the new name before it goes. */
+	const HOLD_MS = 1500;
 
 	let t4El = $state<HTMLElement | null>(null);
 	let filename = $state(FILENAMES[0]);
@@ -559,10 +568,21 @@
 		if (!t4El || typeof IntersectionObserver === 'undefined') return;
 		let step = 0;
 		let timer = 0;
+		let visible = false;
+
+		/** Queue the next rewrite — the loop's only forward edge. */
+		const schedule = () => {
+			clearTimeout(timer);
+			if (!visible) return;
+			timer = window.setTimeout(rename, HOLD_MS);
+		};
+
 		const rename = () => {
 			step += 1;
 			const target = FILENAMES[step % FILENAMES.length];
 			if (reducedMotion()) {
+				// One rename on arrival and then nothing: text that rewrites itself
+				// forever is exactly what reduced motion is asking us not to do.
 				filename = target;
 				return;
 			}
@@ -588,15 +608,25 @@
 					filename = target.slice(0, filename.length + 1); // retype
 				} else {
 					renaming = false;
+					schedule();
 					return;
 				}
 				timer = window.setTimeout(tick, pace);
 			};
 			tick();
 		};
+
 		const io = new IntersectionObserver(
 			([entry]) => {
-				if (entry.isIntersecting) rename();
+				if (entry.isIntersecting === visible) return;
+				visible = entry.isIntersecting;
+				// Pausing mid-rewrite can leave a half-typed name on screen, which is
+				// fine: the next rename diffs from wherever the text actually stopped.
+				if (visible) schedule();
+				else {
+					clearTimeout(timer);
+					renaming = false;
+				}
 			},
 			{ threshold: 0.4 },
 		);
@@ -766,7 +796,6 @@
 							<span>{filename}</span>
 							<span class="caret" class:on={renaming} aria-hidden="true"></span>
 						</p>
-						<p class="fine">(see?)</p>
 					</Reveal>
 				</div>
 			</li>
@@ -946,6 +975,15 @@
 		   whole block would jump around under it mid-rewrite. */
 		min-height: 1.5em;
 		word-break: break-all;
+		/* The longest name in the cycle wraps to two or three lines on a phone, and
+		   it would drag the paragraph above it up and down on every rewrite. Hold
+		   the taller box permanently at the widths where wrapping happens. */
+		@media (width < 40rem) {
+			min-height: 3em;
+		}
+		@media (width < 24rem) {
+			min-height: 4.5em;
+		}
 	}
 	.caret {
 		display: inline-block;
@@ -959,10 +997,6 @@
 	.caret.on {
 		opacity: 0.8;
 	}
-	.t4 .fine {
-		margin-top: 0.7rem;
-	}
-
 	.grad {
 		background: linear-gradient(95deg, #a78bfa, #ff8b8b 55%, #ffd66e);
 		-webkit-background-clip: text;
