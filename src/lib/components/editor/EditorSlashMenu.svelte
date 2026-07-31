@@ -34,9 +34,11 @@
 		onPickImage?: () => void;
 		/** Called when the user picks "/gallery" — opens the multi-select picker. */
 		onInsertGallery?: () => void;
+		/** Called when the user picks "/video" — opens the video library. */
+		onPickVideo?: () => void;
 	}
 
-	let { editor, slashRef, onPickImage, onInsertGallery }: Props = $props();
+	let { editor, slashRef, onPickImage, onInsertGallery, onPickVideo }: Props = $props();
 
 	let visible = $state(false);
 	let top = $state(0);
@@ -74,14 +76,10 @@
 		{
 			id: 'video',
 			label: 'Video',
-			description: 'Embed a video from the media library',
+			description: 'Upload or pick from the video library',
 			aliases: ['video', 'film', 'movie', 'hls', 'clip'],
 			iconKind: 'video',
-			run: (ed) => {
-				const slug = window.prompt('Media video slug (e.g. 2015-04-22_legacy):');
-				if (slug?.trim())
-					ed.chain().focus().setBlogVideo({ videoSlug: slug.trim() }).run();
-			},
+			run: () => onPickVideo?.(),
 		},
 		{
 			id: 'audio',

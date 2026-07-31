@@ -15,12 +15,14 @@
 	import { SlashCommand } from './extensions/slashCommand';
 	import { TrailingParagraph } from './extensions/trailingParagraph';
 	import MediaLibrary from '$lib/components/media/MediaLibrary.svelte';
+	import VideoLibrary from '$lib/components/media/VideoLibrary.svelte';
 	import { notify } from '$lib/components/dialogs';
 	import EditorBubbleMenu from './EditorBubbleMenu.svelte';
 	import EditorPlusMenu from './EditorPlusMenu.svelte';
 	import EditorSlashMenu from './EditorSlashMenu.svelte';
 	import EditorMobileBar from './EditorMobileBar.svelte';
 	import type { ImageRecord } from '$lib/client/images';
+	import type { VideoRecord } from '$lib/client/videos';
 
 	/**
 	 * Heading shortcuts: `#` → H2, `##` → H3, … `#####` → H6.
@@ -71,6 +73,7 @@
 	// stacking both previews and shifting the page height.
 	let mounted = $state(false);
 	let libraryOpen = $state(false);
+	let videoLibraryOpen = $state(false);
 	// Gallery image modal. Preloaded with the gallery's current items
 	// (`galleryInitial`); `pendingGalleryPick` receives the FINAL ordered
 	// selection — used both to insert a new gallery (from a menu) and to edit an
@@ -189,6 +192,14 @@
 		editor?.chain().focus().setBlogImage(recordToBlogImageAttrs(image)).run();
 	}
 
+	function openVideoLibrary() {
+		videoLibraryOpen = true;
+	}
+
+	function insertVideoFromLibrary(video: VideoRecord) {
+		editor?.chain().focus().setBlogVideo({ videoSlug: video.slug }).run();
+	}
+
 	/**
 	 * Opens the gallery image modal preloaded with `current`; `onResult` is called
 	 * with the final ordered selection when the user confirms.
@@ -275,18 +286,27 @@
 </div>
 
 <EditorBubbleMenu {editor} {onAiAction} />
-<EditorPlusMenu {editor} onPickImage={openMediaLibrary} onInsertGallery={insertGallery} />
+<EditorPlusMenu
+	{editor}
+	onPickImage={openMediaLibrary}
+	onInsertGallery={insertGallery}
+	onPickVideo={openVideoLibrary} />
 <EditorSlashMenu
 	{editor}
 	{slashRef}
 	onPickImage={openMediaLibrary}
-	onInsertGallery={insertGallery} />
+	onInsertGallery={insertGallery}
+	onPickVideo={openVideoLibrary} />
 <EditorMobileBar
 	{editor}
 	onPickImage={openMediaLibrary}
 	onInsertGallery={insertGallery} />
 
 <MediaLibrary bind:open={libraryOpen} onSelect={insertFromLibrary} title="Insert Image" />
+<VideoLibrary
+	bind:open={videoLibraryOpen}
+	onSelect={insertVideoFromLibrary}
+	title="Insert Video" />
 <MediaLibrary
 	bind:open={galleryPickerOpen}
 	multiple

@@ -33,6 +33,7 @@
 		"@tiptap/pm": "^2.10.0",
 		"@tiptap/starter-kit": "^2.10.0",
 		"hls.js": "^1.6.16",
+		"mediabunny": "^1.50.8",
 		"thumbhash": "^0.1.1"
 	},
 	"devDependencies": {

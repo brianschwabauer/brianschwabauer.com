@@ -7,9 +7,11 @@
 		onPickImage?: () => void;
 		/** Trigger to open the multi-select picker and insert a gallery. */
 		onInsertGallery?: () => void;
+		/** Trigger to open the video library so the user can pick a video. */
+		onPickVideo?: () => void;
 	}
 
-	let { editor, onPickImage, onInsertGallery }: Props = $props();
+	let { editor, onPickImage, onInsertGallery, onPickVideo }: Props = $props();
 
 	let visible = $state(false);
 	let top = $state(0);
@@ -104,6 +106,11 @@
 		onInsertGallery?.();
 	}
 
+	function insertVideo() {
+		close();
+		onPickVideo?.();
+	}
+
 	function insertHeading(level: 2 | 3 | 4) {
 		editor?.chain().focus().setHeading({ level }).run();
 		close();
@@ -195,6 +202,20 @@
 				</svg>
 				<span class="pm-label">Gallery</span>
 				<span class="pm-desc">A grid of images with a lightbox</span>
+			</button>
+			<button type="button" class="pm-item" onclick={insertVideo}>
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					width="16"
+					height="16">
+					<rect x="2" y="5" width="20" height="14" rx="2" />
+					<polygon points="10 9 15 12 10 15" fill="currentColor" stroke="none" />
+				</svg>
+				<span class="pm-label">Video</span>
+				<span class="pm-desc">Upload or pick from the video library</span>
 			</button>
 			<button type="button" class="pm-item" onclick={() => insertHeading(2)}>
 				<span class="pm-icon">H1</span>
