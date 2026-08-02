@@ -125,6 +125,21 @@
 		 * scales with — including when a chapter passes its own `size`.
 		 */
 		scroll-margin-top: calc(var(--year-size) * 0.25);
+		/*
+		 * A fraction of the type size rather than a pixel width, because what makes
+		 * an outline read as an outline is how thin it is *relative to the glyph*,
+		 * and `--year-size` swings ~2.5× between a phone and a desktop. A fixed 2px
+		 * that sits right at 18rem is more than twice as heavy against the 7rem the
+		 * clamp floors out at on a phone — thick enough there that the empty state
+		 * reads as its own weight of type instead of the same numerals unfilled,
+		 * which flattens the whole point of the wipe.
+		 *
+		 * The ratios are the desktop values divided by that 18rem: at full size
+		 * these resolve to the 2px and 1.4px they replace, so the reading the wipe
+		 * was tuned against is unchanged and only the small end gets thinner.
+		 */
+		--year-stroke: calc(var(--year-size) * 0.007);
+		--copy-stroke: calc(var(--year-size) * 0.005);
 	}
 	.year {
 		font-family: var(--font-mono);
@@ -133,7 +148,7 @@
 		line-height: 0.85;
 		letter-spacing: -0.04em;
 		color: transparent;
-		-webkit-text-stroke: 2px var(--year-color);
+		-webkit-text-stroke: var(--year-stroke) var(--year-color);
 		background: linear-gradient(
 			90deg,
 			var(--year-color) calc(var(--p) * 100%),
@@ -177,11 +192,11 @@
 		pointer-events: none;
 	}
 	.fringe .year::before {
-		-webkit-text-stroke: 2px rgba(0, 224, 182, 0.7);
+		-webkit-text-stroke: var(--year-stroke) rgba(0, 224, 182, 0.7);
 		translate: var(--sep) 0;
 	}
 	.fringe .year::after {
-		-webkit-text-stroke: 2px rgba(255, 95, 179, 0.6);
+		-webkit-text-stroke: var(--year-stroke) rgba(255, 95, 179, 0.6);
 		translate: calc(var(--sep) * -1) 0;
 	}
 	/* Scroll-linked movement is still movement. Pin the plates in register. */
@@ -245,7 +260,7 @@
 		color: transparent;
 		/* Outline only. A filled copy would compete with the original; an outline
 		   is visibly the *shape* of it with the substance gone. */
-		-webkit-text-stroke: 1.4px var(--year-color);
+		-webkit-text-stroke: var(--copy-stroke) var(--year-color);
 		/*
 		 * Distance compounds with generation, so the gaps between copies grow
 		 * rather than staying even — each one is drifting from the one before it,
@@ -280,15 +295,5 @@
 		font-size: 0.85rem;
 		opacity: 0.7;
 		padding-left: 0.4rem;
-	}
-	@media (max-width: 640px) {
-		.year,
-		.fringe .year::before,
-		.fringe .year::after {
-			-webkit-text-stroke-width: 1.5px;
-		}
-		.copy {
-			-webkit-text-stroke-width: 1px;
-		}
 	}
 </style>
