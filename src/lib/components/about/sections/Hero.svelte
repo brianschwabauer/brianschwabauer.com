@@ -129,17 +129,26 @@
 	// the hydrated first paint and the rAF loop all agree exactly. u rides
 	// from 0 (deep space, small + faded) to 1 (swept past the camera, faded
 	// out again); outside that range the tile is invisible.
-	function starVisual(u: number, rot: number) {
+	//
+	// Opacity and filter are QUANTIZED (opacity to 0.02, filter to fstep) so a
+	// slow drift produces the same string for many frames in a row — the paint
+	// loop compares before writing, and an unchanged string is a write (and any
+	// repaint it drags along) that never happens. A 2% opacity step and a 5%
+	// saturation step are both below what a moving tile can show. Transform is
+	// exempt: it genuinely changes every frame, and it is the one property the
+	// compositor handles without repainting.
+	function starVisual(u: number, rot: number, fstep = 0.05) {
 		const z = Z_FAR + u * (Z_NEAR - Z_FAR);
 		const fadeIn = Math.min(1, Math.max(0, u / 0.12));
 		const fadeOut = Math.min(1, Math.max(0, (1 - u) / 0.28));
 		const vis = u <= 0 || u >= 1 ? 0 : Math.min(fadeIn, fadeOut);
 		const sat = 0.45 + 0.65 * fadeIn;
 		const bright = 0.7 + 0.55 * u;
+		const q = (v: number) => (Math.round(v / fstep) * fstep).toFixed(2);
 		return {
 			transform: `translate(-50%, -50%) translateZ(${z.toFixed(1)}px) rotate(${rot}deg)`,
-			opacity: (0.9 * vis).toFixed(3),
-			filter: `saturate(${sat.toFixed(2)}) brightness(${bright.toFixed(2)})`,
+			opacity: (Math.round(0.9 * vis * 50) / 50).toFixed(3),
+			filter: `saturate(${q(sat)}) brightness(${q(bright)})`,
 		};
 	}
 
@@ -156,6 +165,20 @@
 	// static fallback styles — shown as-is under reduced motion (no animation),
 	// and harmlessly overridden by the CSS idle drift / JS warp loop otherwise.
 	const seedStyles = seededStars.map((s, i) => starVisual(seededU[i], s.rot));
+
+	// ---- adaptive quality ---------------------------------------------------
+	// The warp loop watches its own frame times, and a device that keeps
+	// missing frames gets `low-fx`: the starfield zoom is untouched, but the
+	// per-frame luxuries around it are traded for static stand-ins — the
+	// backdrop blurs (re-blurred every frame while the field moves beneath
+	// them), the teal glow on every tile, the fine-grained filter ramp, and the
+	// last third of the field's density. Remembered for the session so a
+	// return visit skips the janky first seconds.
+	const LONG_FRAME_MS = 40; // a frame this late has visibly hitched
+	const FX_WINDOW = 120; // frames per verdict (~1–2s)
+	const FX_TRIP = 10; // long frames in a window that flip the mode
+	const LOWFX_CAP = 16; // live tiles under low-fx (desktop; mobile shows 12)
+	let lowFx = $state(false);
 
 	// set by the warp loop once it owns the field; the click handler below goes
 	// through it so a spawned tile lands in the loop's arrays and not beside them
@@ -174,6 +197,14 @@
 	onMount(() => {
 		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+		// a device that already proved itself slow this session starts degraded
+		// instead of re-earning it through another janky first second
+		try {
+			if (sessionStorage.getItem('hero_low_fx') === '1') lowFx = true;
+		} catch {
+			// storage denied — the frame-time watcher will re-detect
+		}
+
 		// per-tile warp position, and whether it has been swept out and parked.
 		// These grow with `stars` — a clicked tile pushes one entry onto each.
 		const u = seededU.slice();
@@ -182,6 +213,9 @@
 		const owned: boolean[] = Array.from({ length: STAR_COUNT }, () => false);
 		/** when this tile's swell-in began, 0 once it is over */
 		const introAt: number[] = Array.from({ length: STAR_COUNT }, () => 0);
+		/** last opacity/filter strings written, so an unchanged one is skipped */
+		const lastOp: string[] = Array.from({ length: STAR_COUNT }, () => '');
+		const lastFil: string[] = Array.from({ length: STAR_COUNT }, () => '');
 
 		let synced = false;
 		let heroVisible = true;
@@ -190,15 +224,23 @@
 		let lastY = window.scrollY;
 		let pendingScroll = 0; // signed px scrolled since the last frame
 		let refillBudget = 0; // fractional count of parked tiles owed re-entry
+		let lastProgress = -1; // last pin progress the content departure saw
 		let pinTop = 0;
 		let pinDist = 1; // scroll distance the hero stays pinned for
 		let scrollGain = 0; // px scrolled → u advanced (a whole pin drains the field)
 		let refillGain = 0; // px scrolled up → parked tiles drawn back in
 		let activeCount = STAR_COUNT; // tiles currently in the field (not parked)
+		let narrow = false; // the ≤767px viewport, where CSS hides tiles 13+
+		// frame-time bookkeeping for the low-fx trip — the first window is a
+		// warm-up (hydration and image decode land there) and never convicts
+		let fxFrames = 0;
+		let fxLong = 0;
+		let fxWarmup = true;
 
 		// pin geometry only shifts on resize — measure it then, not per frame
 		function measure() {
 			const hero = document.getElementById('hero');
+			narrow = window.matchMedia('(max-width: 767px)').matches;
 			if (!pinRef || !hero) return;
 			pinTop = pinRef.getBoundingClientRect().top + window.scrollY;
 			pinDist = Math.max(1, pinRef.offsetHeight - hero.offsetHeight);
@@ -279,7 +321,8 @@
 				lastT = now;
 			}
 
-			const dt = Math.min(now - lastT, 50);
+			const rawDt = now - lastT;
+			const dt = Math.min(rawDt, 50);
 			lastT = now;
 
 			const d = pendingScroll;
@@ -347,6 +390,14 @@
 						// recycle the very same image and element: the zoom is
 						// fast enough to hide the repeat, and it spares a load
 						u[i] -= 1;
+					} else if (lowFx && !narrow && activeCount > LOWFX_CAP) {
+						// low-fx thins the field the same way the drain does —
+						// each surplus tile leaves through the far end of its
+						// own pass, so nothing on screen ever pops out. Not on
+						// narrow viewports: CSS already halves the field there.
+						parked[i] = true;
+						activeCount--;
+						swapContent(i);
 					} else {
 						// idle drift / up-scroll flow → a fresh, unseen image
 						u[i] -= 1;
@@ -361,6 +412,11 @@
 			if (up) {
 				refillBudget += -d * refillGain;
 				while (refillBudget >= 1) {
+					// low-fx: full for this mode IS the cap — stop refilling there
+					if (lowFx && !narrow && activeCount >= LOWFX_CAP) {
+						refillBudget = 0;
+						break;
+					}
 					const p = parked.indexOf(true);
 					if (p === -1) {
 						refillBudget = 0;
@@ -375,14 +431,15 @@
 
 			// at rest at the very top the field is simply full — top up any
 			// stragglers, spread through the tunnel rather than bunched deep
+			// (under low-fx, "full" means the cap)
 			if (window.scrollY <= pinTop + 4) {
 				for (let i = 0; i < stars.length; i++) {
-					if (parked[i]) {
-						parked[i] = false;
-						u[i] = Math.random();
-					}
+					if (!parked[i]) continue;
+					if (lowFx && !narrow && activeCount >= LOWFX_CAP) break;
+					parked[i] = false;
+					u[i] = Math.random();
+					activeCount++;
 				}
-				activeCount = stars.length;
 			}
 
 			const tiles = warpRef?.children;
@@ -393,16 +450,21 @@
 					// still the browser's to paint — leave it entirely alone, an
 					// inline style it half-owns is worse than one it does not
 					if (!owned[i]) continue;
+					// display:none'd by the mobile nth-child rule — a style write
+					// on a tile that cannot paint is pure main-thread cost
+					if (narrow && i >= 12 && !stars[i].spawned) continue;
 					// an animation beats an inline style, so the CSS drift has to
 					// go the first time the loop paints a tile, or it fights the
 					// loop for the rest of that tile's life
 					if (el.style.animation !== 'none') el.style.animation = 'none';
 					if (parked[i]) {
-						el.style.visibility = 'hidden';
+						if (el.style.visibility !== 'hidden') el.style.visibility = 'hidden';
 						continue;
 					}
-					el.style.visibility = 'visible';
-					const v = starVisual(u[i], stars[i].rot);
+					if (el.style.visibility !== 'visible') el.style.visibility = 'visible';
+					// low-fx coarsens the filter ramp 4× — same look, a quarter
+					// of the filter invalidations
+					const v = starVisual(u[i], stars[i].rot, lowFx ? 0.2 : 0.05);
 
 					// a clicked tile swells out of the pixel it was struck at.
 					// z is 0 at that moment, so this scale is honest screen-space
@@ -413,17 +475,50 @@
 						const s = 0.3 + 0.7 * easeOutBack(t);
 						el.style.transform = `${v.transform} scale(${s.toFixed(3)})`;
 						el.style.opacity = (+v.opacity * Math.min(1, t / 0.28)).toFixed(3);
+						lastOp[i] = ''; // the intro owns opacity — force the next write
 						if (t >= 1) introAt[i] = 0;
 					} else {
 						el.style.transform = v.transform;
-						el.style.opacity = v.opacity;
+						if (lastOp[i] !== v.opacity) {
+							el.style.opacity = v.opacity;
+							lastOp[i] = v.opacity;
+						}
 					}
-					el.style.filter = v.filter;
+					if (lastFil[i] !== v.filter) {
+						el.style.filter = v.filter;
+						lastFil[i] = v.filter;
+					}
 				}
 			}
 
-			// the headline, badge, copy and button ride up with the scroll
-			applyContentDeparture(progress);
+			// the headline, badge, copy and button ride up with the scroll —
+			// idle frames (no scroll) leave it exactly where it already is
+			if (progress !== lastProgress) {
+				applyContentDeparture(progress);
+				lastProgress = progress;
+			}
+
+			// THE LOW-FX TRIP. Judged in whole windows rather than per frame so
+			// one stray hitch (a GC, a tab switch) convicts nobody; a device
+			// that misses 10 frames in ~2s is judged on a pattern. One-way for
+			// the session — flapping between the two looks is worse than either.
+			if (!lowFx) {
+				fxFrames++;
+				if (rawDt > LONG_FRAME_MS) fxLong++;
+				if (fxFrames >= FX_WINDOW) {
+					if (!fxWarmup && fxLong >= FX_TRIP) {
+						lowFx = true;
+						try {
+							sessionStorage.setItem('hero_low_fx', '1');
+						} catch {
+							// storage denied — this visit still degrades live
+						}
+					}
+					fxWarmup = false;
+					fxFrames = 0;
+					fxLong = 0;
+				}
+			}
 
 			raf = heroVisible ? requestAnimationFrame(tick) : 0;
 		}
@@ -484,6 +579,8 @@
 			u.push(U_SPAWN);
 			parked.push(false);
 			owned.push(true);
+			lastOp.push('');
+			lastFil.push('');
 			introAt.push(performance.now());
 			activeCount++;
 			stars.push(s);
@@ -1203,6 +1300,7 @@
 		data-section-label="Delivering Delight"
 		data-section-year={currentYear}
 		class:shake={phase === 'boom'}
+		class:low-fx={lowFx}
 		data-phase={phase}>
 		<div
 			class="starfield"
@@ -1692,6 +1790,31 @@
 			filter: saturate(1.1) brightness(1.25);
 		}
 	}
+	/* ---- ADAPTIVE LOW-FX MODE ----
+	   Flipped on by the warp loop when the device keeps missing frames (and
+	   remembered for the session). The starfield zoom itself is untouched;
+	   what goes is the per-frame GPU spend around it, each swapped for a
+	   static stand-in a viewer at 30fps was never going to tell apart. */
+
+	/* Both backdrop blurs sit directly over the animating field, so the
+	   browser re-blurs their backdrops EVERY frame, full-time. A slightly
+	   stronger plain fill reads the same at a glance and costs nothing. */
+	.hero.low-fx .badge {
+		backdrop-filter: none;
+		background: rgba(255, 255, 255, 0.1);
+	}
+	.hero.low-fx .boom-btn-skin {
+		backdrop-filter: none;
+		background-color: rgb(255 255 255 / 0.92);
+	}
+	/* The teal glow is a large-blur shadow rasterised around every tile —
+	   the single most expensive pixel in each tile's layer. The dark drop
+	   shadow stays: it is what seats a tile IN the tunnel. */
+	.hero.low-fx .star {
+		box-shadow: 0 calc(var(--star-unit) * 0.076) calc(var(--star-unit) * 0.242)
+			rgba(0, 0, 0, 0.5);
+	}
+
 	/* Mobile keeps the GPU happy by skipping the back half of the field —
 	   display:none drops them out of compositing entirely. Anchors are
 	   still placed against all 24 so the visible 12 stay well-spread. */
