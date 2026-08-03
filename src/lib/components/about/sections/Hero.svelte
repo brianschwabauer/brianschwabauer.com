@@ -7,6 +7,7 @@
 	import { Callout } from '@delightstack/components/feedback';
 	import { createStarField, STAR_COUNT, type Star } from '../starfield-core';
 	import type { SeededField } from '../starfield-build';
+	import type { StarfieldPainter, TileFrame } from '../starfield-canvas';
 	// The mascot and the explosion are the two heaviest artifacts on the page
 	// (HeroMascot alone is ~120KB of CSS + a 170-node SVG rig) and neither is
 	// visible until the button is pushed — so neither ships in the initial
@@ -22,7 +23,14 @@
 	// `field` IS the seeded opening field — built in +page.server.ts (see
 	// starfield-build.ts) and shipped in the load data, so the client hydrates
 	// from the finished stars without ever downloading the 503-name pool.
-	let { isMobile = false, field }: { isMobile?: boolean; field: SeededField } = $props();
+	let {
+		isMobile = false,
+		field,
+		// overridable so the standalone dev harness can proxy the images through
+		// its own origin (the CDN's CORS allowlist covers only the production
+		// origin, and the canvas painter needs CORS-clean pixels)
+		mediaBase = 'https://cdn.brianschwabauer.com/media/',
+	}: { isMobile?: boolean; field: SeededField; mediaBase?: string } = $props();
 
 	// ---- starfield ---------------------------------------------------------
 	// A 3D "warp" field of past-work thumbnails. A fixed seed renders the whole
@@ -180,6 +188,20 @@
 	const LOWFX_CAP = 16; // live tiles under low-fx (desktop; mobile shows 12)
 	let lowFx = $state(false);
 
+	// ---- the canvas takeover ------------------------------------------------
+	// The DOM field is 24 composited layers, each an image with a corner mask
+	// and shadows under a 3D transform — and the scroll zoom changes every
+	// layer's scale at once, which makes the browser re-rasterise all of them
+	// mid-scroll. That re-raster storm IS the scroll jank. So once the lazy
+	// painter chunk and every tile's CORS-clean pixels have arrived, the first
+	// scroll frame hands the whole field to a single <canvas>: same simulation,
+	// same projection math, one blit per tile per frame, nothing to re-raster.
+	// The DOM tiles stay in the markup — they are the SSR first paint, the
+	// reduced-motion field, the boom blast, and the fallback if the painter
+	// ever fails (no 2D context, a fetch/decode error, a CORS misconfig).
+	let canvasRef = $state<HTMLCanvasElement>();
+	let canvasActive = $state(false); // drives the CSS swap (warp hidden ↔ canvas shown)
+
 	// set by the warp loop once it owns the field; the click handler below goes
 	// through it so a spawned tile lands in the loop's arrays and not beside them
 	let addStar: ((x: number, y: number) => void) | undefined;
@@ -231,6 +253,15 @@
 		let refillGain = 0; // px scrolled up → parked tiles drawn back in
 		let activeCount = STAR_COUNT; // tiles currently in the field (not parked)
 		let narrow = false; // the ≤767px viewport, where CSS hides tiles 13+
+		// the canvas painter, loaded during idle time. `canvasMode` is the
+		// loop's own switch (canvasActive is its CSS shadow) — flipped on by
+		// tryActivateCanvas, off by fallbackToDom or the boom restore.
+		let painter: StarfieldPainter | null = null;
+		let canvasMode = false;
+		let fieldW = 1; // the warp box, CSS px
+		let fieldH = 1;
+		let unitPx = 100; // --star-unit resolved to px
+		let perspectivePx = 448; // .star-warp's perspective resolved to px
 		// frame-time bookkeeping for the low-fx trip — the first window is a
 		// warm-up (hydration and image decode land there) and never convicts
 		let fxFrames = 0;
@@ -246,6 +277,20 @@
 			pinDist = Math.max(1, pinRef.offsetHeight - hero.offsetHeight);
 			scrollGain = 1.15 / pinDist;
 			refillGain = (STAR_COUNT + 4) / pinDist;
+			// the canvas projection's constants — resolved here, not per frame.
+			// unitPx mirrors the CSS `--star-unit: clamp(62px, 9vw, max(132px,
+			// 6.875vw))` exactly (clientWidth IS 1vw×100: no scrollbar), so a
+			// tile is the same size on canvas as it was in layout.
+			if (warpRef) {
+				fieldW = warpRef.clientWidth || 1;
+				fieldH = warpRef.clientHeight || 1;
+				const vw = document.documentElement.clientWidth;
+				unitPx = Math.min(Math.max(62, vw * 0.09), Math.max(132, vw * 0.06875));
+				perspectivePx = parseFloat(getComputedStyle(warpRef).perspective) || 448;
+			}
+			// keep the backing store pre-allocated so the activation frame —
+			// which is a scroll frame — only flips classes
+			painter?.resize(fieldW, fieldH, window.devicePixelRatio || 1);
 		}
 
 		// give tile i fresh work (image, place, tilt) in place — its id stays,
@@ -263,6 +308,92 @@
 			s.ar = fresh.ar;
 			s.rot = fresh.rot;
 			s.drift = fresh.drift;
+			// start baking the new sprite now, while the tile is invisible —
+			// the same head start the DOM path gets from the <img> src swap
+			painter?.request(s.src, s.ar);
+		}
+
+		/**
+		 * THE HANDOVER, in one frame. Requires every live tile to be drawable
+		 * (a partial swap deletes tiles from the field), reads the CSS drift's
+		 * exact position for anything the loop had not yet claimed, and stops
+		 * the drift animations under the now-hidden DOM field. Called on a
+		 * scroll frame whenever possible: the field is sweeping, which masks
+		 * the sub-pixel truth that the document timeline runs a frame behind
+		 * the compositor.
+		 */
+		function tryActivateCanvas() {
+			if (!painter || painter.failed || !warpRef) return;
+			for (let i = 0; i < stars.length; i++) {
+				if (parked[i]) continue;
+				if (narrow && i >= 12 && !stars[i].spawned) continue;
+				if (!painter.has(stars[i].src, stars[i].ar)) return;
+			}
+			const tiles = warpRef.children;
+			for (let i = 0; i < stars.length; i++) {
+				const el = tiles[i] as HTMLElement | undefined;
+				if (!el) continue;
+				if (!owned[i]) {
+					const prog = el.getAnimations()[0]?.effect?.getComputedTiming()?.progress;
+					if (typeof prog === 'number') u[i] = prog;
+					owned[i] = true;
+				}
+				el.style.animation = 'none';
+			}
+			canvasMode = true;
+			canvasActive = true;
+		}
+
+		/** canvas → DOM, after a painter failure. Every tile is owned by now,
+		 *  so the DOM painter repaints the whole field on the next frame. */
+		function fallbackToDom() {
+			canvasMode = false;
+			canvasActive = false;
+			painter?.clear();
+			lastOp.fill('');
+			lastFil.fill('');
+		}
+
+		/** the canvas frame — the same projection starVisual() encodes, in
+		 *  numbers instead of style strings */
+		function paintCanvas(now: number) {
+			if (!painter) return;
+			const frames: TileFrame[] = [];
+			const cx = fieldW / 2;
+			const cy = fieldH / 2;
+			for (let i = 0; i < stars.length; i++) {
+				if (parked[i]) continue;
+				if (narrow && i >= 12 && !stars[i].spawned) continue;
+				const uu = u[i];
+				if (uu <= 0 || uu >= 1) continue;
+				const s = stars[i];
+				const z = Z_FAR + uu * (Z_NEAR - Z_FAR);
+				const f = perspectivePx / (perspectivePx - z);
+				const fadeIn = Math.min(1, uu / 0.12);
+				const fadeOut = Math.min(1, (1 - uu) / 0.28);
+				let alpha = 0.9 * Math.min(fadeIn, fadeOut);
+				let w = s.w * unitPx * f;
+				if (introAt[i]) {
+					const t = Math.min(1, (now - introAt[i]) / INTRO_MS);
+					w *= 0.3 + 0.7 * easeOutBack(t);
+					alpha *= Math.min(1, t / 0.28);
+					if (t >= 1) introAt[i] = 0;
+				}
+				frames.push({
+					src: s.src,
+					ar: s.ar,
+					u: uu,
+					sx: cx + ((s.x / 100) * fieldW - cx) * f,
+					sy: cy + ((s.y / 100) * fieldH - cy) * f,
+					w,
+					rot: s.rot * (Math.PI / 180),
+					alpha,
+					dim: Math.max(0, 1 - (0.7 + 0.55 * uu)),
+				});
+			}
+			// far→near, the paint order preserve-3d gave the DOM for free
+			frames.sort((a, b) => a.u - b.u);
+			painter.draw(frames);
 		}
 
 		// the hero's badge, headline, copy and CTA ride up out of the pin at the
@@ -295,6 +426,24 @@
 			// once the button is pushed, release the tiles to the CSS blast
 			// animation (clear the inline `animation: none`) and stop the loop
 			if (phase === 'boom' || phase === 'aftermath') {
+				// the blast is a DOM show — if the canvas owns the field, write
+				// the field's current state back onto the (hidden, stale) tiles
+				// first, so the blast starts from what was actually on screen
+				if (canvasMode) {
+					const tiles = warpRef?.children;
+					for (let i = 0; tiles && i < stars.length; i++) {
+						const el = tiles[i] as HTMLElement | undefined;
+						if (!el) continue;
+						const v = starVisual(u[i], stars[i].rot);
+						el.style.transform = v.transform;
+						el.style.opacity = v.opacity;
+						el.style.filter = v.filter;
+						el.style.visibility = parked[i] ? 'hidden' : 'visible';
+					}
+					canvasMode = false;
+					canvasActive = false;
+					painter?.clear();
+				}
 				const blasting = warpRef?.children;
 				if (blasting) {
 					for (let i = 0; i < blasting.length; i++) {
@@ -442,7 +591,18 @@
 				}
 			}
 
-			const tiles = warpRef?.children;
+			// hand the field to the canvas the moment it can take it — on a
+			// scroll frame for choice (the sweep masks the swap), or once every
+			// tile is loop-owned anyway and there is no CSS position to miss
+			if (!canvasMode && painter && !painter.failed && (advance > 0 || owned.every(Boolean))) {
+				tryActivateCanvas();
+			}
+			if (canvasMode) {
+				if (painter?.failed) fallbackToDom();
+				else paintCanvas(now);
+			}
+
+			const tiles = canvasMode ? undefined : warpRef?.children;
 			if (tiles) {
 				for (let i = 0; i < stars.length; i++) {
 					const el = tiles[i] as HTMLElement | undefined;
@@ -508,6 +668,9 @@
 				if (fxFrames >= FX_WINDOW) {
 					if (!fxWarmup && fxLong >= FX_TRIP) {
 						lowFx = true;
+						// sprites baked from here on skip the glow; the ones
+						// already on screen keep theirs until recycled
+						if (painter) painter.glow = false;
 						try {
 							sessionStorage.setItem('hero_low_fx', '1');
 						} catch {
@@ -538,6 +701,35 @@
 		measure();
 		window.addEventListener('scroll', onScroll, { passive: true });
 		window.addEventListener('resize', measure);
+
+		// Load the painter off the critical path, the same way the image pool
+		// and the destruction assets are warmed. Its sprites re-fetch the tile
+		// images CORS-mode (the <img> cache entry varies on Origin, so it is a
+		// second download) — small avif thumbs, and the DOM field carries the
+		// show until every one of them has arrived.
+		let cancelPainterIdle = () => {};
+		{
+			const warmPainter = () => {
+				if (!canvasRef) return;
+				import('../starfield-canvas')
+					.then((m) => {
+						painter = new m.StarfieldPainter(canvasRef!, mediaBase);
+						painter.glow = !lowFx;
+						for (const s of stars) painter.request(s.src, s.ar);
+						measure(); // size the backing store before activation
+					})
+					.catch(() => {
+						// chunk failed to load — the DOM field simply keeps the job
+					});
+			};
+			if ('requestIdleCallback' in window) {
+				const id = requestIdleCallback(warmPainter, { timeout: 3000 });
+				cancelPainterIdle = () => cancelIdleCallback(id);
+			} else {
+				const id = setTimeout(warmPainter, 2000);
+				cancelPainterIdle = () => clearTimeout(id);
+			}
+		}
 
 		// pause the whole loop whenever the hero is off screen — no warp work,
 		// no graphics resources spent while the field can't be seen
@@ -584,6 +776,7 @@
 			introAt.push(performance.now());
 			activeCount++;
 			stars.push(s);
+			painter?.request(s.src, s.ar);
 			pump(); // in case the field had been let go idle
 		};
 
@@ -593,6 +786,9 @@
 			window.removeEventListener('resize', measure);
 			io?.disconnect();
 			if (raf) cancelAnimationFrame(raf);
+			cancelPainterIdle();
+			painter?.dispose();
+			painter = null;
 		};
 	});
 
@@ -1306,12 +1502,12 @@
 			class="starfield"
 			class:scattering={phase === 'boom' || phase === 'aftermath'}
 			aria-hidden="true">
-			<div class="star-warp" bind:this={warpRef}>
+			<div class="star-warp" class:ghost={canvasActive} bind:this={warpRef}>
 				{#each stars as star, i (star.id)}
 					<img
 						class="star"
 						class:spawned={star.spawned}
-						src="https://cdn.brianschwabauer.com/media/{star.src}"
+						src="{mediaBase}{star.src}"
 						alt=""
 						loading={i < 8 ? 'eager' : 'lazy'}
 						fetchpriority={i < 4 ? 'high' : 'auto'}
@@ -1330,6 +1526,11 @@
 						style:--blast-delay="{(i % 9) * 22}ms" />
 				{/each}
 			</div>
+			<!-- the canvas the warp loop paints once its sprites are ready; the
+			     DOM field above goes `ghost` (visibility, not display — the
+			     boom blast needs its layout intact) the same frame -->
+			<canvas class="warp-canvas" class:on={canvasActive} bind:this={canvasRef}
+			></canvas>
 			<div class="vignette"></div>
 		</div>
 
@@ -1790,6 +1991,23 @@
 			filter: saturate(1.1) brightness(1.25);
 		}
 	}
+	/* The canvas half of the handover: both live in the DOM the whole time,
+	   and one class flip swaps which is visible. */
+	.warp-canvas {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		visibility: hidden;
+	}
+	.warp-canvas.on {
+		visibility: visible;
+	}
+	.star-warp.ghost {
+		visibility: hidden;
+	}
+
 	/* ---- ADAPTIVE LOW-FX MODE ----
 	   Flipped on by the warp loop when the device keeps missing frames (and
 	   remembered for the session). The starfield zoom itself is untouched;
