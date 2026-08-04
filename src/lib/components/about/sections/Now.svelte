@@ -13,25 +13,6 @@
 	const flapEggs = ['HELLO', 'YOU', 'FOUND', 'THE', 'EASTER', 'EGG :)'];
 
 	/**
-	 * The toolkit under everything else in this section — and under this page.
-	 * Deliberately typographic: the package list *is* the artwork, so there are no
-	 * screenshots here.
-	 */
-	const PACKAGES = [
-		{ name: 'components', role: 'Svelte 5 component library' },
-		{ name: 'styles', role: 'OKLCH design tokens & base CSS' },
-		{ name: 'utilities', role: 'shared utilities & DelightError' },
-		{ name: 'editor', role: 'rich-text block editor' },
-		{ name: 'auth', role: 'edge-native sessions & OAuth' },
-		{ name: 'database', role: 'reactive SQLite on Durable Objects' },
-		{ name: 'websocket', role: 'real-time presence & messaging' },
-		{ name: 'rate-limiter', role: 'sliding-window rate limiting' },
-		{ name: 'images', role: 'image processing & uploads' },
-		{ name: 'ai', role: 'embeddings, gateway, streaming' },
-		{ name: 'stripe', role: 'billing & metered usage' },
-	];
-
-	/**
 	 * The side projects, minus SCRMBLD — that one is the breakout above and keeps
 	 * its own treatment. Everything in here renders through one card shape:
 	 * cover, name, tagline, a paragraph, one button. Adding the next project is
@@ -251,36 +232,12 @@
 					A full-stack toolkit for building delightful apps on Cloudflare.
 				</p>
 				<p class="body">
-					Twenty years of building things leaves you with opinions about how software
-					should feel. Delightstack is where mine ended up: Svelte 5 components,
-					edge-native auth, a reactive database on Durable Objects, real-time websockets,
-					image processing, billing, AI — eleven packages designed to work together and
-					usable on their own. It runs under this site, under my side projects, and under
-					everything I start now.
+					Every opinion I've formed about how software should feel, extracted into code.
+					It runs under this site and everything I start now.
 				</p>
 			</Reveal>
 
-			<!-- Cells divided by hairlines rather than eleven little boxes: the block
-			     is supposed to read as one system, and a grid of bordered chips inside
-			     a bordered panel is just cards inside cards. -->
 			<Reveal variant="up" delay={100}>
-				<ul class="packages">
-					{#each PACKAGES as pkg (pkg.name)}
-						<li class="pkg">
-							<!-- Both halves are elements, and the `code` is a flex container, so
-							     the formatter is free to break the line without a space
-							     appearing in the middle of the package name. -->
-							<code>
-								<span class="scope">@delightstack/</span>
-								<span class="name">{pkg.name}</span>
-							</code>
-							<span class="role">{pkg.role}</span>
-						</li>
-					{/each}
-				</ul>
-			</Reveal>
-
-			<Reveal variant="up" delay={160}>
 				<div class="links">
 					<a href="https://thedelight.co" target="_blank" rel="noopener">
 						thedelight.co
@@ -548,7 +505,7 @@
 		margin-bottom: clamp(5rem, 10vw, 8rem);
 	}
 	.title {
-		font-size: clamp(2.4rem, 6vw, 4.2rem);
+		font-size: clamp(2.4rem, 7vw, 5rem);
 		font-weight: 900;
 		line-height: 1.02;
 		letter-spacing: -0.03em;
@@ -598,59 +555,6 @@
 		max-width: 46rem;
 		color: rgba(255, 255, 255, 0.8);
 		margin: 0 0 2rem;
-	}
-	/* One panel ruled into cells. The rules are box-shadows rather than a 1px
-	   grid gap showing the container through: eleven packages never fill the last
-	   row evenly, and with the gap trick the leftover cell showed up as a bright
-	   rectangle. Shadows take no layout space, the container clips the outermost
-	   ones, and an empty cell simply stays empty. */
-	.packages {
-		--rule: rgba(0, 242, 195, 0.16);
-		list-style: none;
-		margin: 0 0 1.8rem;
-		padding: 0;
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-		background: #071417;
-		border: 1px solid var(--rule);
-		border-radius: 10px;
-		overflow: hidden;
-	}
-	.pkg {
-		display: flex;
-		flex-direction: column;
-		gap: 0.2rem;
-		padding: 0.8rem 1rem;
-		box-shadow:
-			-1px 0 0 var(--rule),
-			0 -1px 0 var(--rule);
-		transition: background 250ms ease;
-	}
-	.pkg:hover {
-		transition-duration: 0s;
-		background: #0a2027;
-	}
-	.pkg code {
-		/* The global `code` rule dresses inline code as a chip; in here that would
-		   be a box inside a cell inside a panel. */
-		background: none;
-		padding: 0;
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		font-family: var(--font-mono);
-		font-size: 0.88rem;
-		color: #00f2c3;
-		font-weight: 700;
-	}
-	.scope {
-		opacity: 0.45;
-		font-weight: 400;
-	}
-	.role {
-		font-size: 0.82rem;
-		line-height: 1.4;
-		color: rgba(255, 255, 255, 0.62);
 	}
 	.links {
 		display: flex;

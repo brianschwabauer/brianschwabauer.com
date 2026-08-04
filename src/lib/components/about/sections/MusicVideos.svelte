@@ -260,7 +260,7 @@
 
 	<div class="container">
 		<Reveal>
-			<YearMark year="2009" subtitle="Music Videos" color="#ff7ad0" />
+			<YearMark year="2009" subtitle="Music Videos" color="#ff66cc" />
 		</Reveal>
 
 		<div class="hero-grid">
@@ -285,7 +285,7 @@
 				</p>
 				<p class="lede">
 					Our first attempts were honestly just "stand in front of a tripod and lip-sync".
-					By 2010 we'd graduated to writing the songs ourselves, recording in our own
+					Eventually we graduated to writing the songs ourselves, recording in our own
 					awful little home studio, and building a music video concept around the lyrics.
 					The audio-mixing skills we built here later carried into the sound design of
 					every short film.
@@ -293,7 +293,7 @@
 			</Reveal>
 
 			<Reveal variant="right" delay={120}>
-				<Turntable tracks={TRACKS} color="#ff7ad0" />
+				<Turntable tracks={TRACKS} color="#ff66cc" />
 			</Reveal>
 		</div>
 
@@ -416,7 +416,7 @@
 <style>
 	:global([data-theme='audio']) {
 		background:
-			radial-gradient(ellipse at 80% 0%, rgba(255, 122, 208, 0.12), transparent 50%),
+			radial-gradient(ellipse at 80% 0%, rgba(255, 102, 204, 0.12), transparent 50%),
 			radial-gradient(ellipse at 0% 100%, rgba(0, 200, 255, 0.1), transparent 50%),
 			linear-gradient(180deg, #0c0316, #16071f 50%, #08041a);
 		color: #ffe9f6;
@@ -444,7 +444,7 @@
 	}
 	.waves path {
 		fill: none;
-		stroke: #ff7ad0;
+		stroke: #ff66cc;
 		stroke-linecap: round;
 		animation: drift var(--dur) linear infinite;
 	}
@@ -510,7 +510,7 @@
 		max-width: 38rem;
 	}
 	.lede em {
-		color: #ff7ad0;
+		color: #ff66cc;
 		font-style: italic;
 	}
 
@@ -534,7 +534,7 @@
 		font-size: clamp(2.6rem, 5vw, 4rem);
 		font-weight: 900;
 		color: transparent;
-		-webkit-text-stroke: 2px #ff7ad0;
+		-webkit-text-stroke: 2px #ff66cc;
 		letter-spacing: -0.02em;
 		line-height: 1;
 	}
@@ -562,7 +562,7 @@
 		margin: 0 0 0.5rem;
 	}
 	.dot {
-		color: #ff7ad0;
+		color: #ff66cc;
 	}
 	/* The player carries the same corners and lift the poster tiles used to, so
 	   swapping a still for a real film changed the behaviour and not the look. */
@@ -582,7 +582,7 @@
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
 		letter-spacing: 0.32em;
-		color: #ff7ad0;
+		color: #ff66cc;
 		margin: 1.5rem 0 0.7rem;
 	}
 </style>

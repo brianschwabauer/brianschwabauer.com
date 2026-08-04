@@ -492,8 +492,8 @@
 			src: 'https://cdn.brianschwabauer.com/media/2012-04-27_facebook_short_film-zolly_shot_of_main_character_falling_in_love.avif',
 			width: 480,
 			height: 270,
-			caption: 'Facebook IRL — the zolly shot',
-			alt: 'Facebook IRL — the zolly shot',
+			caption: 'Facebook IRL — the dolly-zoom shot',
+			alt: 'Facebook IRL — the dolly-zoom shot',
 		},
 		{
 			type: 'video',
@@ -691,7 +691,7 @@
 					<div class="fb-card">
 						<LazyMedia
 							src="https://cdn.brianschwabauer.com/media/2012-04-27_facebook_short_film-zolly_shot_of_main_character_falling_in_love.avif"
-							alt="Facebook IRL — the zolly shot"
+							alt="Facebook IRL — the dolly-zoom shot"
 							ratio="16 / 9"
 							onclick={(e) => gallery?.open(0, e.currentTarget)} />
 					</div>
@@ -856,11 +856,9 @@
 						<strong>SATO 48</strong>
 						is the region's 48-hour film race: you're handed a genre, a prop, and a line of
 						dialogue at kickoff, then get 48 sleepless hours to write, shoot, score, and cut
-						a finished short. I wanted to do something nobody had done before. So I made a film
-						with
+						a finished short. I wanted to do something nobody had done before. So I made
 						<strong>
-							two oner-shot perspectives, shown side-by-side at the same time, in real
-							time.
+							a film shot as two unbroken takes, shown side-by-side in real time.
 						</strong>
 					</p>
 				</div>

@@ -458,11 +458,8 @@
 						and no tutorials, and learn by failing in public.
 					</p>
 					<p>
-						The "everything I make is a thinly disguised pretext to try one new technical
-						thing" habit never really left me. Pac-Attack was about a greenscreen trick.
-						Nuisance-B-Gone was about cleanplate rotoscope. The "Calamity" film a year
-						later (a few sections from now) was about stop-motion. Everything was an
-						excuse.
+						Pac-Attack was about a greenscreen trick. Nuisance-B-Gone was about cleanplate
+						rotoscope. Calamity, a year later, was about stop-motion.
 					</p>
 				</div>
 			</Reveal>
