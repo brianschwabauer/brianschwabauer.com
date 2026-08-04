@@ -4,6 +4,7 @@
 	// the page. Rewind stays eager too: it is the first thing under the fold
 	// and a flick of the wheel reaches it before any lazy chunk could land.
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	import Hero from '$lib/components/about/sections/Hero.svelte';
 	import Rewind from '$lib/components/about/sections/Rewind.svelte';
 	import YearScrubber from '$lib/components/about/primitives/YearScrubber.svelte';
@@ -22,34 +23,95 @@
 	// flicker, no layout shift. SvelteKit also emits the CSS of SSR-executed
 	// dynamic imports as eager <link>s, so the HTML never paints unstyled.
 	//
-	// TWO RULES, both load-bearing:
+	// THREE RULES, all load-bearing:
 	// 1. NO `pending` snippet on these boundaries — with one, the SERVER
 	//    renders the pending snippet instead of the section and the SSR HTML
 	//    (and SEO) is gone.
-	// 2. Loaders stay module-scope arrows so the awaited expression is
-	//    referentially stable and never re-runs.
+	// 2. Loaders stay stable arrows whose awaited promise is memoized, so the
+	//    awaited expression is referentially stable and never re-runs.
+	// 3. Hydration is STAGGERED: with 17 chunks resolving at once, Svelte
+	//    hydrates them in one burst of long tasks right as the visitor starts
+	//    their first scroll through the (eager, scroll-driven) Hero/Rewind.
+	//    The SSR DOM is already painted, so nothing visual waits on these —
+	//    each gated loader just takes its turn in an idle-callback queue.
+	//    SSR and hash deep-links bypass the queue: the server must await
+	//    everything inline, and the curtain lift wants every chunk ASAP.
+	const sectionGate = (() => {
+		if (!browser || location.hash) return () => Promise.resolve();
+		const idle: (cb: () => void) => void =
+			typeof requestIdleCallback === 'function'
+				? (cb) => requestIdleCallback(cb, { timeout: 300 })
+				: (cb) => setTimeout(cb, 50);
+		const queue: (() => void)[] = [];
+		let pumping = false;
+		const pump = () => {
+			const release = queue.shift();
+			if (!release) {
+				pumping = false;
+				return;
+			}
+			release();
+			idle(pump);
+		};
+		return () =>
+			new Promise<void>((resolve) => {
+				queue.push(resolve);
+				if (!pumping) {
+					pumping = true;
+					idle(pump);
+				}
+			});
+	})();
+	function lazySection<T>(load: () => Promise<T>): () => Promise<T> {
+		let chunk: Promise<T> | undefined;
+		return () => (chunk ??= sectionGate().then(load));
+	}
+	// The first two stay ungated: they sit directly under the fold, and a
+	// single flick of the wheel reaches them before the idle queue would.
 	const humbleBeginnings = () =>
 		import('$lib/components/about/sections/HumbleBeginnings.svelte');
 	const greenScreen = () => import('$lib/components/about/sections/GreenScreen.svelte');
-	const featureLength = () =>
-		import('$lib/components/about/sections/FeatureLength.svelte');
-	const takingItSeriously = () =>
-		import('$lib/components/about/sections/TakingItSeriously.svelte');
-	const musicVideos = () => import('$lib/components/about/sections/MusicVideos.svelte');
-	const animation = () => import('$lib/components/about/sections/Animation.svelte');
-	const festivals = () => import('$lib/components/about/sections/Festivals.svelte');
-	const college = () => import('$lib/components/about/sections/College.svelte');
-	const spunksters = () => import('$lib/components/about/sections/Spunksters.svelte');
-	const whatMakesUsHuman = () =>
-		import('$lib/components/about/sections/WhatMakesUsHuman.svelte');
-	const freelancer = () => import('$lib/components/about/sections/Freelancer.svelte');
-	const entrepreneurship = () =>
-		import('$lib/components/about/sections/Entrepreneurship.svelte');
-	const showAndTour = () => import('$lib/components/about/sections/ShowAndTour.svelte');
-	const now = () => import('$lib/components/about/sections/Now.svelte');
-	const creed = () => import('$lib/components/about/sections/Creed.svelte');
-	const theEnd = () => import('$lib/components/about/sections/TheEnd.svelte');
-	const credits = () => import('$lib/components/about/sections/Credits.svelte');
+	const featureLength = lazySection(
+		() => import('$lib/components/about/sections/FeatureLength.svelte'),
+	);
+	const takingItSeriously = lazySection(
+		() => import('$lib/components/about/sections/TakingItSeriously.svelte'),
+	);
+	const musicVideos = lazySection(
+		() => import('$lib/components/about/sections/MusicVideos.svelte'),
+	);
+	const animation = lazySection(
+		() => import('$lib/components/about/sections/Animation.svelte'),
+	);
+	const festivals = lazySection(
+		() => import('$lib/components/about/sections/Festivals.svelte'),
+	);
+	const college = lazySection(
+		() => import('$lib/components/about/sections/College.svelte'),
+	);
+	const spunksters = lazySection(
+		() => import('$lib/components/about/sections/Spunksters.svelte'),
+	);
+	const whatMakesUsHuman = lazySection(
+		() => import('$lib/components/about/sections/WhatMakesUsHuman.svelte'),
+	);
+	const freelancer = lazySection(
+		() => import('$lib/components/about/sections/Freelancer.svelte'),
+	);
+	const entrepreneurship = lazySection(
+		() => import('$lib/components/about/sections/Entrepreneurship.svelte'),
+	);
+	const showAndTour = lazySection(
+		() => import('$lib/components/about/sections/ShowAndTour.svelte'),
+	);
+	const now = lazySection(() => import('$lib/components/about/sections/Now.svelte'));
+	const creed = lazySection(() => import('$lib/components/about/sections/Creed.svelte'));
+	const theEnd = lazySection(
+		() => import('$lib/components/about/sections/TheEnd.svelte'),
+	);
+	const credits = lazySection(
+		() => import('$lib/components/about/sections/Credits.svelte'),
+	);
 
 	let { data } = $props();
 
