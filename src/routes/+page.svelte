@@ -74,8 +74,8 @@
 	const featureLength = lazySection(
 		() => import('$lib/components/about/sections/FeatureLength.svelte'),
 	);
-	const takingItSeriously = lazySection(
-		() => import('$lib/components/about/sections/TakingItSeriously.svelte'),
+	const firstWebsites = lazySection(
+		() => import('$lib/components/about/sections/FirstWebsites.svelte'),
 	);
 	const musicVideos = lazySection(
 		() => import('$lib/components/about/sections/MusicVideos.svelte'),
@@ -126,7 +126,7 @@
 			humbleBeginnings,
 			greenScreen,
 			featureLength,
-			takingItSeriously,
+			firstWebsites,
 			musicVideos,
 			animation,
 			festivals,
@@ -155,13 +155,13 @@
 		{ id: 'humble-beginnings', year: '2006', label: 'Humble Beginnings' },
 		{ id: 'green-screen', year: '2007', label: 'Green Screen' },
 		{ id: 'feature-length', year: '2008', label: 'Feature Length' },
-		{ id: 'taking-it-seriously', year: '2009', label: 'First Websites' },
+		{ id: 'first-websites', year: '2009', label: 'First Websites' },
 		{ id: 'music-videos', year: '2009', label: 'Music Videos' },
 		{ id: 'animation', year: '2010', label: 'Animation & VFX' },
 		{ id: 'festivals-ksms', year: '2011', label: 'Festivals & KSMS' },
 		{ id: 'college', year: '2012', label: 'College' },
 		{ id: 'spunksters', year: '2013', label: 'The Spunksters' },
-		{ id: 'what-makes-us-human', year: '2015', label: 'Senior Thesis' },
+		{ id: 'senior-thesis', year: '2015', label: 'Senior Thesis' },
 		{ id: 'freelancer', year: '2016', label: 'Freelancer' },
 		{ id: 'entrepreneurship', year: '2017', label: 'Entrepreneurship' },
 		{ id: 'showandtour', year: '2019', label: 'Show&Tour' },
@@ -203,8 +203,8 @@
 		<FeatureLength />
 	</svelte:boundary>
 	<svelte:boundary>
-		{@const TakingItSeriously = (await takingItSeriously()).default}
-		<TakingItSeriously />
+		{@const FirstWebsites = (await firstWebsites()).default}
+		<FirstWebsites />
 	</svelte:boundary>
 	<svelte:boundary>
 		{@const MusicVideos = (await musicVideos()).default}

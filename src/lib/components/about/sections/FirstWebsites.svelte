@@ -112,7 +112,7 @@
 	});
 </script>
 
-<SectionShell id="taking-it-seriously" year="2009" label="First Websites" theme="flash">
+<SectionShell id="first-websites" year="2009" label="First Websites" theme="flash">
 	<div class="raster" aria-hidden="true"></div>
 
 	<div class="container">
@@ -235,7 +235,7 @@
 
 		<LightboxGallery
 			bind:this={gallery}
-			key="taking-it-seriously"
+			key="first-websites"
 			items={sectionExtras} />
 
 		<Reveal>

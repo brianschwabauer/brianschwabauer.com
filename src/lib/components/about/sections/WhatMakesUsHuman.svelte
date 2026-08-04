@@ -599,7 +599,7 @@
 	);
 </script>
 
-<SectionShell id="what-makes-us-human" year="2015" label="Senior Thesis" theme="thesis">
+<SectionShell id="senior-thesis" year="2015" label="Senior Thesis" theme="thesis">
 	<!--
 	  The beam. One element per band, all on the same keyframes at the same speed,
 	  each offset by a negative delay of `i` gaps — a single animation per band and
