@@ -267,25 +267,59 @@
 		overflow: hidden;
 		border-radius: 4px;
 		/*
-		 * The stock used to be near-black on a near-black section, which made the
-		 * strip read as "photos floating in a void" — the film itself was the part
-		 * you couldn't see. This is a lit grey with a warm top edge, so there is a
-		 * physical object under the pictures.
+		 * Film stock is dark — the near-black original was right about that and
+		 * wrong about everything else: with no lighting it read as "photos
+		 * floating in a void". The flat lit-grey replacement was visible but
+		 * looked like clip art. This is dark charcoal base made visible by
+		 * LIGHT, not lightness: rolled highlights where the strip curves toward
+		 * the light at its edges, a static specular sheen the film travels
+		 * under (::after), and grain in the emulsion (::before).
 		 */
+		--stock: oklch(0.29 0.012 300);
 		background: linear-gradient(
 			180deg,
-			#4a4a55 0%,
-			#33333d 12%,
-			#3d3d48 50%,
-			#33333d 88%,
-			#4a4a55 100%
+			oklch(from var(--stock) calc(l + 0.09) c h) 0%,
+			oklch(from var(--stock) calc(l - 0.03) c h) 9%,
+			var(--stock) 50%,
+			oklch(from var(--stock) calc(l - 0.04) c h) 91%,
+			oklch(from var(--stock) calc(l + 0.07) c h) 100%
 		);
 		box-shadow:
-			inset 0 0 0 1px rgba(255, 255, 255, 0.1),
-			0 10px 40px rgba(0, 0, 0, 0.55);
+			inset 0 1px 0 oklch(1 0 0 / 0.12),
+			inset 0 -1px 0 oklch(1 0 0 / 0.07),
+			0 10px 40px oklch(0 0 0 / 0.55);
 		cursor: grab;
 		/* Horizontal drags are ours; vertical ones still scroll the page. */
 		touch-action: pan-y;
+	}
+	/*
+	 * The two overlays that sell the strip as a physical object. Both sit above
+	 * the moving frames — the sheen is the room's light reflecting off the
+	 * base, so it stays put while the film slides beneath it, and the grain is
+	 * in the emulsion, so it belongs on the pictures too.
+	 */
+	.film-reel::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+		opacity: 0.05;
+	}
+	.film-reel::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		background: linear-gradient(
+			115deg,
+			transparent 32%,
+			oklch(1 0 0 / 0.055) 46%,
+			oklch(1 0 0 / 0.015) 54%,
+			transparent 68%
+		);
 	}
 	.film-reel.dragging {
 		cursor: grabbing;
@@ -304,32 +338,24 @@
 	}
 
 	/*
-	 * Sprocket holes, as a repeating gradient rather than elements: the pattern is
+	 * Sprocket holes, as a repeating background rather than elements: the tile is
 	 * painted from the strip's own left edge, so it travels with the frames for
-	 * free and there is no per-hole DOM to keep in sync. The wider, darker layer
-	 * underneath gives each hole a punched edge.
+	 * free and there is no per-hole DOM to keep in sync.
+	 *
+	 * One SVG tile per pitch instead of hard-edged gradient bars — the flat
+	 * sharp-cornered rectangles were most of the clip-art look. Each hole is a
+	 * rounded rect (real perforations are die-cut with rounded corners), lit
+	 * through from behind — dimmer at the top, brighter at the bottom — with a
+	 * punched shadow riding its top edge and a sliver of bevel highlight under
+	 * its bottom lip. The tile is drawn at 46px and stretched to --perf-pitch;
+	 * the pitch only ever snaps within a few percent of 46, so the stretch is
+	 * invisible.
 	 */
 	.perforations {
-		height: 11px;
-		background:
-			repeating-linear-gradient(
-				90deg,
-				#efece2 1px,
-				#efece2 23px,
-				transparent 23px,
-				transparent var(--perf-pitch)
-			),
-			repeating-linear-gradient(
-				90deg,
-				rgba(0, 0, 0, 0.6) 0,
-				rgba(0, 0, 0, 0.6) 1px,
-				transparent 1px,
-				transparent 23px,
-				rgba(0, 0, 0, 0.6) 23px,
-				rgba(0, 0, 0, 0.6) 24px,
-				transparent 24px,
-				transparent var(--perf-pitch)
-			);
+		height: 12px;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='12'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23cbc6b6'/%3E%3Cstop offset='1' stop-color='%23f6f1e2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='11.5' y='1.4' width='23' height='9.2' rx='3.1' fill='rgb(0 0 0 / 0.5)'/%3E%3Crect x='12' y='2.2' width='22' height='8' rx='2.6' fill='url(%23g)'/%3E%3Crect x='13' y='10.7' width='20' height='0.9' rx='0.45' fill='rgb(255 255 255 / 0.16)'/%3E%3C/svg%3E");
+		background-size: var(--perf-pitch) 12px;
+		background-repeat: repeat-x;
 	}
 
 	.frames,
@@ -349,11 +375,14 @@
 		padding: 0;
 		position: relative;
 		overflow: hidden;
-		/* The bright hairline is the cut between frames; on the lighter stock it's
-		   what makes each picture look seated in the film rather than beside it. */
+		border-radius: 1.5px;
+		/* Seat each picture IN the stock instead of outlining it on top: a dark
+		   inner edge where the image meets its aperture, and only the faintest
+		   catch-light around the cut. The old bright hairline read as a sticker
+		   border. */
 		box-shadow:
-			inset 0 0 0 1px rgba(0, 0, 0, 0.85),
-			0 0 0 1px rgba(255, 255, 255, 0.16);
+			inset 0 0 0 1px oklch(0 0 0 / 0.85),
+			0 0 0 1px oklch(1 0 0 / 0.06);
 	}
 	.frame img {
 		height: 100%;
