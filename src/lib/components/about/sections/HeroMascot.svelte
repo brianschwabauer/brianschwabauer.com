@@ -1316,8 +1316,15 @@
 		height: clamp(190px, 27vw, 366px);
 		/* Staged to the LEFT of the CTA so he faces it, the pump sits between
 		   them, and the hose runs off-frame right straight into the button's
-		   nozzle. The gag only reads if pump → hose → button is one line. */
-		translate: -126% 20%;
+		   nozzle. The gag only reads if pump → hose → button is one line.
+
+		   THE STAGING X LIVES IN ONE VARIABLE. The entrance keyframes fill
+		   `both` and the boom rule re-asserts the mark, so any hard-coded X in
+		   them silently beats a media-query override of `translate` — which is
+		   exactly how the phone build ended up performing at the desktop offset,
+		   mostly off the left edge. Every rule and keyframe below reads this. */
+		--stage-x: -126%;
+		translate: var(--stage-x) 20%;
 		rotate: -12deg;
 		opacity: 0;
 		pointer-events: none;
@@ -1349,7 +1356,7 @@
 	}
 	@keyframes arrive {
 		0% {
-			translate: -122% -196%;
+			translate: calc(var(--stage-x) + 4%) -196%;
 			rotate: 7deg;
 			scale: 0.91 1.099;
 			opacity: 0;
@@ -1357,7 +1364,7 @@
 		}
 		/* in frame and already moving */
 		4% {
-			translate: -122.4% -168%;
+			translate: calc(var(--stage-x) + 3.6%) -168%;
 			rotate: 6.2deg;
 			scale: 0.91 1.099;
 			opacity: 1;
@@ -1365,14 +1372,14 @@
 		}
 		/* he squares up over his mark on the way down */
 		14% {
-			translate: -124.6% -62%;
+			translate: calc(var(--stage-x) + 1.4%) -62%;
 			rotate: 2deg;
 			scale: 0.94 1.064;
 			animation-timing-function: cubic-bezier(0.62, 0, 0.92, 0.44);
 		}
 		/* CONTACT — no ease into the floor */
 		20% {
-			translate: -126% 20%;
+			translate: var(--stage-x) 20%;
 			rotate: -1.4deg;
 			scale: 1 1;
 			animation-timing-function: cubic-bezier(0.1, 0.85, 0.35, 1);
@@ -1380,26 +1387,26 @@
 		/* the only squash the root is allowed: two frames, 3 %, and it is gone
 		   before the knees reach the bottom of their fold at 27 % */
 		24% {
-			translate: -126% 22.6%;
+			translate: var(--stage-x) 22.6%;
 			rotate: 0.9deg;
 			scale: 1.03 0.971;
 			animation-timing-function: cubic-bezier(0.35, 0, 0.4, 1);
 		}
 		34% {
-			translate: -126% 19.4%;
+			translate: var(--stage-x) 19.4%;
 			rotate: -0.5deg;
 			scale: 0.994 1.006;
 			animation-timing-function: cubic-bezier(0.3, 0, 0.35, 1);
 		}
 		44% {
-			translate: -126% 20.5%;
+			translate: var(--stage-x) 20.5%;
 			rotate: 0.2deg;
 			scale: 1 1;
 			animation-timing-function: cubic-bezier(0.3, 0, 0.3, 1);
 		}
 		56%,
 		100% {
-			translate: -126% 20%;
+			translate: var(--stage-x) 20%;
 			rotate: 0deg;
 			scale: 1;
 			opacity: 1;
@@ -1407,7 +1414,7 @@
 	}
 	.root[data-phase='pumping'] {
 		animation: none;
-		translate: -126% 20%;
+		translate: var(--stage-x) 20%;
 		rotate: 0deg;
 		opacity: 1;
 	}
@@ -1422,7 +1429,7 @@
 	   +22 % of height = +75 u. */
 	.root[data-phase='boom'] {
 		animation: none;
-		translate: -126% 20%;
+		translate: var(--stage-x) 20%;
 		rotate: 0deg;
 		scale: 1;
 		opacity: 1;
@@ -1467,10 +1474,15 @@
 		animation: none;
 	}
 
+	/* On a phone there is no wing to stand in — at the desktop offset he falls,
+	   pumps and flees almost entirely past the left edge. The CTA shrinks at
+	   this breakpoint (see Hero.svelte), and he steps in toward the middle:
+	   mostly on screen, deliberately overlapping the button's left side. One
+	   variable moves EVERY phase — entrance keyframes, pumping and boom all
+	   read it, so there is no snap between beats. */
 	@media (max-width: 767px) {
-		.root,
-		.root[data-phase='pumping'] {
-			translate: -74% 20%;
+		.root {
+			--stage-x: -74%;
 		}
 	}
 
@@ -5411,7 +5423,7 @@
 		.root[data-phase='pumping'],
 		.root[data-phase='boom'] {
 			animation: none;
-			translate: -126% 20%;
+			translate: var(--stage-x) 20%;
 			rotate: 0deg;
 			scale: 1;
 			transition: opacity 200ms ease;

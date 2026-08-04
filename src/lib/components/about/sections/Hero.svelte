@@ -905,6 +905,13 @@
 	let strokeKind = $state<'light' | 'fail' | 'reset' | 'heavy'>('light');
 	let explosionTick = $state(0);
 	let warned = $state(false); // user hovered/peeked
+	// CAPABILITY, NOT WIDTH: on a touch screen the tap that pushes the button
+	// synthesizes mouseenter and focus in the same gesture as the click, so the
+	// "Seriously, don't" peek would flash for a single frame and read as a
+	// glitch. The warning only arms where hover is a real, separate gesture.
+	let can_hover = $state(false);
+	// the ≤767px stage, where the CTA starts smaller and inflates less
+	let small_stage = $state(false);
 	let prePress = $state(false); // momentary squish on click
 	// the button pivots on its centre until the press has fully settled, then
 	// on `0% 100%` for the rest of the shot — see ORIGIN_SWITCH_AT
@@ -918,8 +925,14 @@
 	let tick_parity = $state(false);
 
 	// Button scale is purely derived from pump count (no transition during scale —
-	// we apply a per-pump spring via .pulse class instead)
-	const buttonScale = $derived(1 + pumpCount * 0.55);
+	// we apply a per-pump spring via .pulse class instead). The per-pump gain is
+	// smaller on a phone: 3.2× of even the reduced footprint shoves most of the
+	// balloon off the right edge, and 2.6× already reads as about-to-burst there.
+	// The resting scale stays 1 on BOTH stages — the origin handover at
+	// ORIGIN_SWITCH_AT is only invisible while the computed transform is the
+	// identity, so "starts smaller on mobile" is done with the footprint
+	// (`--btn-w`/`--btn-h`), never with this scale.
+	const buttonScale = $derived(1 + pumpCount * (small_stage ? 0.4 : 0.55));
 
 	/**
 	 * THE BUTTON IS INSTRUMENTATION, NOT A CHARACTER — and there are only THREE
@@ -933,7 +946,9 @@
 	 * progress readout — see PERCENT / `.boom-btn-count` below.
 	 *
 	 *   idle              "Don't push this button"
-	 *   idle, peeked      "Seriously, don't"
+	 *   idle, peeked      "Seriously, don't"   (hover-capable pointers only —
+	 *                     a touch tap peeks and pushes in one gesture, so the
+	 *                     warning would be a one-frame flash; see `can_hover`)
 	 *   awake             "Demolition started"
 	 *   pumping → boom    the counter: "42% Complete"
 	 *
@@ -1365,6 +1380,8 @@
 	 * flag would detonate the button with no click — every time, forever.
 	 */
 	onMount(() => {
+		can_hover = window.matchMedia('(hover: hover)').matches;
+		small_stage = window.matchMedia('(max-width: 767px)').matches;
 		const w = window as unknown as {
 			__earlyClick?: string;
 			__earlyClickOff?: () => void;
@@ -1630,12 +1647,12 @@
 							type="button"
 							data-early-click="boom"
 							onmouseenter={() => {
-								warned = true;
+								if (can_hover) warned = true;
 								preloadDestruction();
 							}}
 							onmouseleave={() => (warned = phase !== 'idle')}
 							onfocus={() => {
-								warned = true;
+								if (can_hover) warned = true;
 								preloadDestruction();
 							}}
 							onpointerdown={() => preloadDestruction()}
@@ -2210,6 +2227,7 @@
 		color: rgba(255, 255, 255, 0.75);
 		margin: 0;
 		transition: filter 420ms ease;
+		text-wrap: pretty;
 	}
 	/* Staging: the mascot stands in front of this paragraph for his whole
 	   performance, so the two most detailed things on the screen were stacked on
@@ -2224,6 +2242,12 @@
 
 	/* ---- The big red button ---- */
 	.button-stage {
+		/* THE BUTTON'S FOOTPRINT, DECLARED ONCE. `.boom-btn` and `.shards` must
+		   share the exact same box (the shards are die-cut copies of the skin),
+		   so both read these instead of repeating the values. Wide enough for
+		   the longest label ("Don't push this button"), capped to the viewport. */
+		--btn-w: min(280px, 80vw);
+		--btn-h: 56px;
 		position: relative;
 		display: inline-flex;
 		justify-content: center;
@@ -2238,6 +2262,23 @@
 		/* gives the button's :active z-translate something to recede into —
 		   same trick delightstack's <Button> wrapper uses. */
 		perspective: 100px;
+	}
+	/* On phones the CTA starts smaller — footprint, NOT resting scale, because
+	   the origin handover at ORIGIN_SWITCH_AT is only seam-free while the
+	   computed transform is the identity — which buys the mascot room to stand
+	   mostly on screen beside it (his mobile mark is `--stage-x` in
+	   HeroMascot.svelte, and he is allowed to overlap the button's left side).
+	   The per-pump inflation gain is also reduced here — see `buttonScale`.
+	   The type and padding step down with the box too, but that override is
+	   NESTED IN `.boom-btn` BELOW: a standalone media block up here sits
+	   earlier in the source than the base rule, and at equal specificity the
+	   later rule wins — which is exactly how the label shipped clipped once. */
+	@media (max-width: 767px) {
+		.button-stage {
+			--btn-w: min(210px, 64vw);
+			--btn-h: 50px;
+			min-width: 0;
+		}
 	}
 	/* The rig the button and its nozzle share. Its box is exactly the button's
 	   untransformed box, so the button's `scale()` about `0% 100%` leaves this
@@ -2268,11 +2309,10 @@
 		font-weight: 800;
 		font-size: 1rem;
 		letter-spacing: 0.02em;
-		/* fixed footprint so the label can swap without resizing; wide enough
-		   for the longest label ("Don't push this button"), and capped to the
-		   viewport so it never overflows a narrow phone */
-		width: min(280px, 80vw);
-		height: 56px;
+		/* fixed footprint so the label can swap without resizing — the value
+		   lives on `.button-stage` so the shards' box can never drift from it */
+		width: var(--btn-w);
+		height: var(--btn-h);
 		padding: 0 1.4rem;
 		border-radius: var(--_radius);
 		@supports (corner-shape: squircle) {
@@ -2299,6 +2339,15 @@
 			translate 140ms ease-out,
 			scale 140ms ease-out;
 		will-change: transform;
+		/* the type and padding follow the smaller `--btn-w`/`--btn-h` box.
+		   Measured, not guessed: the idle label is 146px of Nunito Sans 800 at
+		   0.95rem (+6px tracking) against 178px inside the padding — and the
+		   label container clips overflow evenly off BOTH ends, so a miss here
+		   eats exactly the first and last glyph. */
+		@media (max-width: 767px) {
+			padding: 0 1rem;
+			font-size: 0.95rem;
+		}
 	}
 	/* The press: a small squash plus a drop and a recede along z (against the
 	   stage's perspective), so the button sinks under the cursor. `translate`
@@ -2667,8 +2716,8 @@
 		z-index: 5;
 		left: 50%;
 		bottom: 0;
-		width: min(280px, 80vw);
-		height: 56px;
+		width: var(--btn-w);
+		height: var(--btn-h);
 		pointer-events: none;
 		opacity: 0;
 		/* `translate` composes BEFORE `transform`, so the box is centred exactly
