@@ -37,6 +37,15 @@
 		justify-content: center;
 	}
 
+	/* Registered so the press depth interpolates on its own transition
+	   entry — the hover rule's 0s durations can't touch it (see
+	   PostCard.svelte for the full recipe). */
+	@property --press {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+
 	.filter-btn {
 		/* position + overflow so the ripple overlay is anchored inside the chip
 		   and clipped to the pill shape. */
@@ -50,26 +59,33 @@
 		font-size: var(--text-sm);
 		font-weight: 500;
 		cursor: pointer;
+		/* Same press-down recipe as delightstack <Button>, but using the
+		   `perspective()` transform function so each chip is its own vanishing
+		   point — otherwise a shared `perspective` on the parent makes edge
+		   chips tip toward the row's center instead of pushing straight back. */
+		transform: perspective(100px)
+			translate3d(
+				0,
+				calc(var(--press) * 1px),
+				calc(var(--press) * clamp(-10px, 0.2em - 12px, -2px))
+			);
 		transition:
-			background-color var(--duration-fast),
-			color var(--duration-fast),
-			border-color var(--duration-fast),
-			transform 200ms ease;
+			background-color var(--duration-slow),
+			color var(--duration-slow),
+			border-color var(--duration-slow),
+			--press 200ms ease;
 	}
 
 	.filter-btn:hover {
-		transition-duration: 0s;
+		/* Instant hover-in for everything except --press, which keeps its
+		   duration so the :active depress animates even while hovered. */
+		transition-duration: 0s, 0s, 0s, 200ms;
 		background: var(--color-bg-muted);
 		color: var(--color-text);
 	}
 
-	/* Same press-down recipe as delightstack <Button>, but using the
-	   `perspective()` transform function so each chip is its own vanishing
-	   point — otherwise a shared `perspective` on the parent makes edge
-	   chips tip toward the row's center instead of pushing straight back. */
 	.filter-btn:active:not(:disabled) {
-		transform: perspective(100px)
-			translate3d(0, 1px, clamp(-10px, calc(0.2em - 12px), -2px));
+		--press: 1;
 	}
 
 	.filter-btn.active {

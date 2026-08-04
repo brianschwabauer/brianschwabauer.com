@@ -62,32 +62,51 @@
 </article>
 
 <style>
+	/* Registered so the press depth interpolates on its own transition
+	   entry — the hover rule's 0s durations can't touch it, which is
+	   what keeps the press smooth in both directions while hovered. */
+	@property --press {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+
 	.post-card {
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
 		overflow: hidden;
+		/* Hover lift and press depth live in one transform: --lift snaps
+		   with the hover rule, --press animates independently. Same
+		   press-down recipe as the tag chips and delightstack <Button> —
+		   `perspective()` inside the transform so each card is its own
+		   vanishing point. */
+		transform: translateY(var(--lift, 0px)) perspective(100px)
+			translate3d(
+				0,
+				calc(var(--press) * 1px),
+				calc(var(--press) * clamp(-10px, 0.2em - 12px, -2px))
+			);
 		transition:
-			border-color var(--duration-fast),
-			transform var(--duration-fast),
-			box-shadow var(--duration-fast);
+			border-color var(--duration-slow),
+			transform var(--duration-slow),
+			box-shadow var(--duration-slow),
+			--press var(--duration-slow);
 	}
 
 	.post-card:hover {
-		transition-duration: 0s;
+		/* Instant hover-in for everything except --press, which keeps its
+		   duration so the :active depress animates even while hovered. */
+		transition-duration: 0s, 0s, 0s, var(--duration-slow);
 		border-color: var(--color-action);
-		transform: translateY(-4px);
+		--lift: -4px;
 		box-shadow: var(--shadow-lg);
 	}
 
-	/* Same press-down recipe as the tag chips and delightstack <Button>:
-	   `perspective()` inside the transform so each card is its own
-	   vanishing point. :has(:active) lets us read the active state of
-	   the inner <a> from the article so the existing hover transform
-	   on .post-card cleanly cascades into the press. */
+	/* :has(:active) lets us read the active state of the inner <a> from
+	   the article so the hover lift composes with the press. */
 	.post-card:has(:active) {
-		transform: perspective(100px)
-			translate3d(0, 1px, clamp(-10px, calc(0.2em - 12px), -2px));
+		--press: 1;
 	}
 
 	.post-link {

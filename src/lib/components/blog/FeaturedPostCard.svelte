@@ -80,28 +80,42 @@
 </article>
 
 <style>
+	/* See PostCard.svelte — same animated-press recipe: --press has its
+	   own transition entry so the depress stays smooth while the hover
+	   rule zeroes the other durations. */
+	@property --press {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+
 	.featured-card {
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
 		overflow: hidden;
+		transform: translateY(var(--lift, 0px)) perspective(100px)
+			translate3d(
+				0,
+				calc(var(--press) * 1px),
+				calc(var(--press) * clamp(-10px, 0.2em - 12px, -2px))
+			);
 		transition:
 			border-color var(--duration-fast),
 			transform var(--duration-fast),
-			box-shadow var(--duration-fast);
+			box-shadow var(--duration-fast),
+			--press var(--duration-fast);
 	}
 
 	.featured-card:hover {
-		transition-duration: 0s;
+		transition-duration: 0s, 0s, 0s, var(--duration-fast);
 		border-color: var(--color-action);
-		transform: translateY(-4px);
+		--lift: -4px;
 		box-shadow: var(--shadow-lg);
 	}
 
-	/* See PostCard.svelte — same press-down recipe. */
 	.featured-card:has(:active) {
-		transform: perspective(100px)
-			translate3d(0, 1px, clamp(-10px, calc(0.2em - 12px), -2px));
+		--press: 1;
 	}
 
 	.featured-link {
