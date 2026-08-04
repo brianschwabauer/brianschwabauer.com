@@ -339,7 +339,7 @@
 						<p>
 							We wrote a rap song for a friend, made him "into a rapper", filmed my whole
 							family doing a goofy family dance to it — grandparents included — and shot
-							the music video. It placed in a local film festival. I think second.
+							the music video. It placed second in a local film festival.
 						</p>
 						<p>
 							I also built a whole Flash website for the fake artist. There was a game on
@@ -395,9 +395,6 @@
 		     they're what the strip hides. -->
 		<div class="stills-fold">
 			<DeletedScenes scenes={trackImages.length}>
-				<div class="roll-eyebrow bleed-head">
-					ALL THREE SHOOTS · {trackImages.length} STILLS
-				</div>
 				<div class="gallery-bleed">
 					<Gallery
 						items={trackImages}
@@ -577,12 +574,5 @@
 	   whatever section follows. */
 	.stills-fold {
 		margin-top: 4rem;
-	}
-	.roll-eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #ff66cc;
-		margin: 1.5rem 0 0.7rem;
 	}
 </style>
