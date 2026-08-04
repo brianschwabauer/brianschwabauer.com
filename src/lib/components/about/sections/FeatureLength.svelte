@@ -390,7 +390,7 @@
 					</p>
 
 					<aside class="casting-note">
-						<div class="note-eyebrow">CASTING NOTE</div>
+						<div class="note-eyebrow">[ CASTING NOTE ]</div>
 						<p>
 							One of the &ldquo;characters&rdquo; in the film was Zordon, the rangers'
 							leader. We thought it would be funny if he was played by Kevin's dog. So
@@ -677,31 +677,35 @@
 	}
 
 	/*
-	 * A note pinned to the script binder — a different voice from the section's
-	 * narration, so it gets a different surface rather than just italics.
+	 * A note in a different voice from the narration, so it gets a different
+	 * surface: a page out of the shooting script — courier, a bracketed slug,
+	 * and the sheet underneath peeking out at the edge. The page is kept dim
+	 * (paper hue, not paper brightness): a bright sheet was the loudest thing
+	 * in the chapter, and it's just a note.
 	 */
 	.casting-note {
 		margin-top: 1.6rem;
-		padding: 1rem 1.1rem;
-		border-left: 2px solid #ffd934;
-		border-radius: 0 6px 6px 0;
-		background: linear-gradient(
-			90deg,
-			oklch(from #ffd934 0.72 c h / 0.12),
-			oklch(from #ffd934 0.72 c h / 0.03)
-		);
+		padding: 1.05rem 1.3rem 1.15rem;
+		font-family: var(--font-mono);
+		background: oklch(from #f2eddc 0.26 calc(c * 0.6) h);
+		color: oklch(from #f2eddc 0.87 calc(c * 0.7) h);
+		border: 1px solid oklch(from #f2eddc 0.38 calc(c * 0.6) h / 0.6);
+		border-radius: 1px;
+		box-shadow:
+			3px 4px 0 oklch(from #f2eddc 0.17 calc(c * 0.6) h / 0.8),
+			0 12px 28px rgba(0, 0, 0, 0.35);
 	}
 	.note-eyebrow {
-		font-family: var(--font-mono);
 		font-size: 0.66rem;
+		font-weight: 700;
 		letter-spacing: 0.28em;
-		color: #ffd934;
+		color: oklch(from #ffd934 0.78 c h);
 		margin-bottom: 0.5rem;
 	}
 	.casting-note p {
 		margin: 0;
-		font-size: 0.95rem;
-		opacity: 0.92;
+		font-size: 0.92rem;
+		line-height: 1.6;
 	}
 
 	.pr2-media {

@@ -259,17 +259,18 @@
 	<!-- Brand teal and brand blue, so the two light sources in the room are the
 	     two Show&Tour accents rather than generic cyans. -->
 	<BokehField
-		tints={['51, 208, 193', '0, 128, 253']}
+		tints={['0, 242, 195', '0, 128, 253']}
 		mask="linear-gradient(90deg, #000, rgba(0, 0, 0, 0.32) 30%, rgba(0, 0, 0, 0.32) 70%, #000)" />
 
 	<div class="container">
 		<Reveal>
-			<YearMark year="2019" color="#33d0c1" />
+			<YearMark year="2019" subtitle="Co-founder" color="#00f2c3" />
 		</Reveal>
 
 		<div class="lockup">
 			<Reveal>
-				<div class="eyebrow">CO-FOUNDER</div>
+				<!-- No kicker: the year mark immediately above already reads as one,
+				     and it carries "Co-founder" as its subtitle. -->
 				<h2 bind:this={title_el} class="title" class:focused>
 					<span class="snt-mark">
 						<img
@@ -300,7 +301,7 @@
 						rel="noopener"
 						icon="arrow"
 						label="showandtour.com"
-						color="#33d0c1" />
+						color="#00f2c3" />
 				</div>
 			</Reveal>
 		</div>
@@ -359,7 +360,7 @@
 	  the photographer works in and the pages their clients land on — scrubbing
 	  past on the diagonal.
 	-->
-	<ShippedWall key="show-and-tour-wall" columns={WALL_COLUMNS} accent="#33d0c1" />
+	<ShippedWall key="show-and-tour-wall" columns={WALL_COLUMNS} accent="#00f2c3" />
 
 	<LightboxGallery bind:this={gallery} key="show-and-tour" items={heroShot} />
 </SectionShell>
@@ -414,13 +415,6 @@
 		margin-bottom: 3rem;
 		max-width: 64rem;
 	}
-	.eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #33d0c1;
-		margin-bottom: 1.2rem;
-	}
 	.title {
 		font-size: clamp(2.8rem, 9vw, 6rem);
 		font-weight: 900;
@@ -467,7 +461,7 @@
 		font-family: var(--font-mono);
 		font-size: 1.05rem;
 		letter-spacing: 0.06em;
-		color: #33d0c1;
+		color: #00f2c3;
 		margin: 0 0 1.2rem;
 	}
 	.lede {
@@ -477,7 +471,7 @@
 		margin-bottom: 1rem;
 	}
 	.lede a {
-		color: #33d0c1;
+		color: #00f2c3;
 		text-decoration: underline;
 		text-underline-offset: 4px;
 	}
@@ -549,7 +543,7 @@
 		font-family: var(--font-mono);
 		font-size: 1.4rem;
 		font-weight: 900;
-		color: #33d0c1;
+		color: #00f2c3;
 		line-height: 1;
 	}
 	.feature h4 {

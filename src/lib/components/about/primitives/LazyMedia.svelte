@@ -164,7 +164,16 @@
 		color: inherit;
 		font: inherit;
 		cursor: pointer;
-		transition: transform 200ms ease;
+		transition:
+			translate 200ms ease,
+			scale 200ms ease;
+	}
+	/* Press depress: instant on the way down (duration 0 while pressed), the
+	   base transition animates the release. */
+	.lazy-media-button:active {
+		transition-duration: 0s;
+		translate: 0 1px;
+		scale: 0.995;
 	}
 	.lazy-media-button:hover img {
 		transition-duration: 0s;
@@ -174,7 +183,7 @@
 		transition: transform 250ms ease;
 	}
 	.lazy-media-button:focus-visible {
-		outline: 2px solid #00e0ff;
+		outline: 2px solid #00d6ff;
 		outline-offset: 2px;
 	}
 	.play {

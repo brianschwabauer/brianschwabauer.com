@@ -400,7 +400,8 @@
 
 			<div class="lockup">
 				<Reveal class="lockup-copy">
-					<div class="eyebrow">POST-GRAD HUSTLE</div>
+					<!-- No kicker: the year mark immediately above already reads as
+					     one, and its subtitle names the era. -->
 					<h2 class="title">
 						I bought
 						<br />
@@ -652,13 +653,6 @@
 			grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
 			align-items: center;
 		}
-	}
-	.eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #ffb84d;
-		margin-bottom: 1rem;
 	}
 	.title {
 		font-size: clamp(2.4rem, 7vw, 5rem);

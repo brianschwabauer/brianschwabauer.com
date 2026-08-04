@@ -177,9 +177,9 @@
 					<strong>The Spunksters</strong>
 					— an awards show, modeled after the Oscars, for ourselves and our films. Awards in
 					every category. Speeches. Live-streamed. Projected on the side of my childhood house
-					— the same wall the Power Rangers premieres had played on. Forty friends in the backyard,
-					watching a live video feed of Kevin hosting from inside, so the host appeared on a
-					twenty-foot tall projection like a giant.
+					— the same backyard where the Power Rangers premieres had played. Forty friends watching
+					a live video feed of Kevin hosting from inside, so the host appeared on a twenty-foot
+					tall projection like a giant.
 				</p>
 				<PlayFilm
 					label="Play the show"
@@ -567,12 +567,20 @@
 		margin-bottom: 1rem;
 		max-width: 36rem;
 	}
+	/* The creed of the chapter gets engraved: serif italic on a dark plaque
+	   with a thin gold frame and inner bevel, same metal as the trophies. */
 	.aside {
-		padding: 1rem 1.2rem;
-		background: rgba(255, 217, 52, 0.06);
-		border-left: 3px solid #ffd934;
-		border-radius: 0 8px 8px 0;
+		padding: 1.2rem 1.4rem;
+		font-family: var(--font-serif);
 		font-style: italic;
+		color: oklch(from #ffd934 0.9 calc(c * 0.3) h);
+		background: linear-gradient(160deg, #241d0d, #2e2612 55%, #1f190b);
+		border: 1px solid oklch(from #ffd934 0.62 calc(c * 0.7) h / 0.55);
+		border-radius: 3px;
+		box-shadow:
+			inset 0 1px 0 rgba(255, 255, 255, 0.09),
+			inset 0 0 0 3px rgba(0, 0, 0, 0.35),
+			inset 0 0 0 4px oklch(from #ffd934 0.5 calc(c * 0.5) h / 0.35);
 	}
 
 	.phone {

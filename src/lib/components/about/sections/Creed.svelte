@@ -853,7 +853,7 @@
 		margin-bottom: 1.2rem;
 	}
 	.title {
-		font-size: clamp(2.2rem, 6vw, 4.5rem);
+		font-size: clamp(2.4rem, 7vw, 5rem);
 		font-weight: 900;
 		line-height: 1.02;
 		letter-spacing: -0.03em;

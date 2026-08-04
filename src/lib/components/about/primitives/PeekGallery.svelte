@@ -125,6 +125,19 @@
 	.peek {
 		display: block;
 	}
+	/* The library tile already scales down on press; this adds the 1px depress
+	   and teaches the base transition to animate the release. The transition
+	   list restates the library's own two properties so they keep working. */
+	.peek :global(.gallery-item) {
+		transition:
+			box-shadow 150ms ease,
+			scale 150ms ease,
+			translate 150ms ease;
+	}
+	.peek :global(.gallery-item:active) {
+		transition-duration: 0s;
+		translate: 0 1px;
+	}
 	/* Darken the last tile into the "+N more" control. It's still a real gallery
 	   item — role=button, focusable, Enter-activatable — so this is presentation
 	   over an existing control rather than a new one. */

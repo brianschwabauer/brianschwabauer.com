@@ -271,15 +271,15 @@
 		<div class="lockup">
 			<Reveal>
 				<h2 class="title">
-					Software gives you
+					Anything I could imagine,
 					<br />
-					<span class="grad">superpowers.</span>
+					<span class="grad">on screen.</span>
 				</h2>
 				<p class="lede">
 					Gone were the days of PowerPoint exports keyed onto live footage. By 2009 I was
 					deep into After Effects and learning Cinema 4D / 3ds Max. The software let me
-					build the things I could only dream of three years earlier. The "I can put
-					anything on screen" feeling didn't go away. It still hasn't.
+					build the things I could only dream of three years earlier. That feeling didn't
+					go away. It still hasn't.
 				</p>
 			</Reveal>
 		</div>
@@ -802,12 +802,34 @@
 		margin-bottom: 1rem;
 		max-width: 36rem;
 	}
+	/* The aside as a compositor's viewfinder note: corner brackets in the same
+	   language as the stage's [ EXPOSURE ] readout, with a mono slug. */
 	.aside {
-		padding: 1rem 1.2rem;
-		background: rgba(108, 99, 255, 0.08);
-		border-left: 3px solid #6c63ff;
-		border-radius: 0 8px 8px 0;
+		--vf: #6c63ff;
+		position: relative;
+		padding: 2rem 1.2rem 1rem;
 		font-style: italic;
+		background:
+			linear-gradient(var(--vf), var(--vf)) 0 0 / 14px 2px no-repeat,
+			linear-gradient(var(--vf), var(--vf)) 0 0 / 2px 14px no-repeat,
+			linear-gradient(var(--vf), var(--vf)) 100% 0 / 14px 2px no-repeat,
+			linear-gradient(var(--vf), var(--vf)) 100% 0 / 2px 14px no-repeat,
+			linear-gradient(var(--vf), var(--vf)) 0 100% / 14px 2px no-repeat,
+			linear-gradient(var(--vf), var(--vf)) 0 100% / 2px 14px no-repeat,
+			linear-gradient(var(--vf), var(--vf)) 100% 100% / 14px 2px no-repeat,
+			linear-gradient(var(--vf), var(--vf)) 100% 100% / 2px 14px no-repeat,
+			rgba(108, 99, 255, 0.06);
+	}
+	.aside::before {
+		content: "[ EDITOR'S NOTE ]";
+		position: absolute;
+		top: 0.7rem;
+		left: 1.2rem;
+		font-family: var(--font-mono);
+		font-style: normal;
+		font-size: 0.62rem;
+		letter-spacing: 0.24em;
+		color: var(--vf);
 	}
 	.iprez-compare {
 		margin-top: 2rem;

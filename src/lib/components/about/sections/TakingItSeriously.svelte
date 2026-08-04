@@ -122,7 +122,8 @@
 
 		<div class="grid">
 			<Reveal>
-				<div class="eyebrow">FROM FILM KID → WEB KID</div>
+				<!-- No kicker: the year mark immediately above already reads as one,
+				     and the title says the film-kid → web-kid turn itself. -->
 				<h2 class="title">
 					Real companies <br />
 					have
@@ -292,13 +293,6 @@
 			grid-template-columns: 1fr;
 		}
 	}
-	.eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #ff66cc;
-		margin-bottom: 1rem;
-	}
 	.title {
 		font-size: clamp(2.4rem, 7vw, 5rem);
 		font-weight: 900;
@@ -426,7 +420,7 @@
 		opacity: 0.75;
 	}
 	.year:focus-visible {
-		outline: 2px solid #00e0ff;
+		outline: 2px solid #00d6ff;
 		outline-offset: 2px;
 	}
 	@media (prefers-reduced-motion: reduce) {
@@ -489,11 +483,26 @@
 		font-weight: 800;
 		margin: 0 0 0.6rem;
 	}
+	/* The pull-quote reset as a period JS alert: the same chrome the browser
+	   deck wears, shrunk to a dialog box. */
 	.aside {
 		padding: 1rem 1.2rem;
-		background: rgba(255, 102, 204, 0.08);
-		border-left: 3px solid #ff66cc;
-		border-radius: 0 8px 8px 0;
+		background: rgba(255, 102, 204, 0.06);
+		border: 1px solid oklch(from #ff66cc l c h / 0.55);
+		border-radius: 6px;
+		overflow: hidden;
+	}
+	.aside::before {
+		content: 'WWW.HUNKYSPUNKY.COM SAYS:';
+		display: block;
+		margin: -1rem -1.2rem 0.9rem;
+		padding: 0.32rem 0.75rem;
+		background: linear-gradient(180deg, #ddd, #bbb);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+		color: #222;
+		font-family: var(--font-mono);
+		font-size: 0.6rem;
+		letter-spacing: 0.18em;
 	}
 	.aside em {
 		font-style: italic;

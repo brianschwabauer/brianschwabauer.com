@@ -21,7 +21,7 @@
 		meta = '',
 		/** Film title, used for the accessible name when the label is generic. */
 		title = '',
-		color = '#00e0ff',
+		color = '#00d6ff',
 		/**
 		 * Which transport control this is. `play` opens a film; `forward` skips
 		 * ahead, and gets the deck's double-triangle instead of the single one.

@@ -1048,11 +1048,22 @@
 		line-height: 1.65;
 		margin-bottom: 1rem;
 	}
+	/* The aside as a margin note on the Nth photocopy of the script: dashed
+	   rule, faint toner banding, stuck on slightly crooked. */
 	.aside {
 		padding: 1rem 1.2rem;
-		background: rgba(0, 242, 195, 0.06);
-		border-left: 3px solid #00f2c3;
-		border-radius: 0 8px 8px 0;
+		font-family: var(--font-mono);
+		font-size: 0.92rem;
+		line-height: 1.65;
+		color: rgba(255, 255, 255, 0.78);
+		border: 1.5px dashed rgba(255, 255, 255, 0.32);
+		rotate: -0.4deg;
+		background: repeating-linear-gradient(
+				0deg,
+				transparent 0 7px,
+				rgba(255, 255, 255, 0.02) 7px 8px
+			)
+			rgba(255, 255, 255, 0.03);
 	}
 	.aside strong {
 		color: #00f2c3;

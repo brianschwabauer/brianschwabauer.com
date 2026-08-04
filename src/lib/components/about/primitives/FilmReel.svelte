@@ -409,7 +409,7 @@
 		z-index: 2;
 	}
 	.frame-button:focus-visible {
-		outline: 2px solid #00e0ff;
+		outline: 2px solid #00d6ff;
 		outline-offset: 2px;
 	}
 	figcaption,

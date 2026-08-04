@@ -698,7 +698,7 @@
 							<p>
 								To promote it I made a trick-shot commercial: a member of KSMS hits a
 								basketball from an absurd distance. (Yes, the make is a VFX trick.) It got
-								people talking. It's the third source on the bus.
+								people talking — and it's the third camera source in the switcher demo.
 							</p>
 						</aside>
 					</Reveal>
@@ -1371,25 +1371,33 @@
 		margin-bottom: 0.75rem;
 	}
 
-	/* A note in a different voice from the section's narration, so it gets a
-	   different surface rather than just italics. */
+	/* A note in a different voice from the section's narration, styled as a
+	   broadcast lower-third: solid accent bar, angled trailing edge, and the
+	   slug set as a name-strap on live TV. */
 	.promo-note {
 		margin-top: 1.6rem;
-		padding: 1rem 1.1rem;
-		border-left: 2px solid var(--gold);
-		border-radius: 0 6px 6px 0;
+		padding: 0.9rem 2.6rem 0.9rem 1.1rem;
+		border-left: 6px solid var(--gold);
 		background: linear-gradient(
 			90deg,
-			oklch(from var(--gold) 0.72 c h / 0.12),
-			oklch(from var(--gold) 0.72 c h / 0.03)
+			oklch(from var(--gold) 0.72 c h / 0.16),
+			oklch(from var(--gold) 0.72 c h / 0.04) 70%,
+			transparent
 		);
+		clip-path: polygon(0 0, 100% 0, calc(100% - 1.4rem) 100%, 0 100%);
 	}
 	.note-eyebrow {
+		display: inline-block;
 		font-family: var(--font-mono);
 		font-size: 0.66rem;
+		font-weight: 700;
 		letter-spacing: 0.28em;
-		color: var(--gold);
-		margin-bottom: 0.5rem;
+		text-transform: uppercase;
+		color: oklch(from var(--gold) 0.24 c h);
+		background: var(--gold);
+		padding: 0.22rem 0.9rem 0.22rem 0.6rem;
+		clip-path: polygon(0 0, 100% 0, calc(100% - 0.5rem) 100%, 0 100%);
+		margin-bottom: 0.6rem;
 	}
 	.promo-note p {
 		margin: 0;

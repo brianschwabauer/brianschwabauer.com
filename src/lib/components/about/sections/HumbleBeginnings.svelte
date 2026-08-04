@@ -77,10 +77,20 @@
 		// let the frame field sit at :00 for them.
 		const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 		let frame = 0;
+		// The displayed string only changes 30 times a second (once a second
+		// under reduced motion), so a 60Hz rAF lands on the same timecode every
+		// other frame — skip the state write (and the DOM update behind it)
+		// unless the tape frame count has actually moved on.
+		let last_tape_frame = -1;
 		function tick() {
-			const ms = Date.now() - START;
-			elapsed_ms = reduced.matches ? Math.floor(ms / 1000) * 1000 : ms;
 			frame = requestAnimationFrame(tick);
+			const ms = Date.now() - START;
+			const tape_frame = reduced.matches
+				? Math.floor(ms / 1000)
+				: Math.floor((ms * 30) / 1000);
+			if (tape_frame === last_tape_frame) return;
+			last_tape_frame = tape_frame;
+			elapsed_ms = reduced.matches ? tape_frame * 1000 : ms;
 		}
 		const io = new IntersectionObserver(([entry]) => {
 			if (entry.isIntersecting) {
@@ -150,19 +160,19 @@
 								refX="3"
 								refY="3"
 								orient="auto">
-								<polygon points="0 0, 6 3, 0 6" fill="#00e0ff" />
+								<polygon points="0 0, 6 3, 0 6" fill="#00d6ff" />
 							</marker>
 						</defs>
 						<path
 							d="M 25,40 Q 30,80 120,120"
 							fill="none"
-							stroke="#00e0ff"
+							stroke="#00d6ff"
 							stroke-width="3.5"
 							marker-end="url(#arrowhead)" />
 						<text
 							x="20"
 							y="34"
-							fill="#00e0ff"
+							fill="#00d6ff"
 							font-family="ui-monospace, monospace"
 							font-size="20"
 							font-weight="700">
@@ -171,13 +181,13 @@
 						<path
 							d="M 380,50 Q 350,140 260,120"
 							fill="none"
-							stroke="#00e0ff"
+							stroke="#00d6ff"
 							stroke-width="3.5"
 							marker-end="url(#arrowhead)" />
 						<text
 							x="328"
 							y="44"
-							fill="#00e0ff"
+							fill="#00d6ff"
 							font-family="ui-monospace, monospace"
 							font-size="20"
 							font-weight="700">
@@ -309,7 +319,7 @@
 		--tape-bg: #1a120a;
 		--tape-ink: #f5e6cf;
 		--tape-accent: #ff9c4a;
-		--tape-accent-2: #00e0ff;
+		--tape-accent-2: #00d6ff;
 	}
 	.container {
 		max-width: 80rem;
@@ -372,7 +382,7 @@
 	}
 
 	.title {
-		font-size: clamp(2.2rem, 6vw, 4.5rem);
+		font-size: clamp(2.4rem, 7vw, 5rem);
 		font-weight: 800;
 		line-height: 1.04;
 		letter-spacing: -0.02em;
@@ -471,11 +481,16 @@
 			grid-template-columns: 1fr;
 		}
 	}
+	/* The pull-quote as a strip of masking tape stuck on the camcorder era:
+	   light tape stock, marker mono, slapped on at a slight angle. */
 	.problem {
-		background: rgba(255, 156, 74, 0.06);
-		border-left: 3px solid var(--tape-accent);
+		background: linear-gradient(100deg, #ead9b8, #f2e5c6 45%, #e6d5b2);
+		color: #2a1a08;
+		font-family: var(--font-mono);
 		padding: 1.25rem 1.5rem;
-		border-radius: 0 8px 8px 0;
+		rotate: -0.6deg;
+		border-radius: 2px;
+		box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
 	}
 	.answer {
 		margin: 0;
@@ -496,8 +511,10 @@
 	.problem-eyebrow {
 		font-family: var(--font-mono);
 		font-size: 0.7rem;
+		font-weight: 700;
 		letter-spacing: 0.32em;
-		color: var(--tape-accent);
+		/* Marker ink dark enough to read on the tape stock. */
+		color: oklch(from var(--tape-accent) 0.45 c h);
 		margin-bottom: 0.4rem;
 	}
 	.problem p {
