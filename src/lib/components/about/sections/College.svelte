@@ -28,41 +28,26 @@
 	// Every set photo from the Katie Bauer's Breakup shoot, keyed by shoot day.
 	const KATIE_BAUER_BTS: GalleryItem[] = (
 		[
-			[
-				'2014-02-22',
-				[
-					['093913', 1536],
-					['095449', 1536],
-				],
-			],
+			['2014-02-22', [['093913', 1536]]],
 			[
 				'2014-03-21',
 				[
-					['120858', 1536],
 					['125906', 1536],
-					['133051', 1536],
 					['184420', 1536],
-					['200723', 1536],
 				],
 			],
 			[
 				'2014-03-22',
 				[
-					['121722', 1536],
 					['121746', 1536],
 					['124155', 1536],
-					['163203', 1536],
-					['192230', 1536],
-					['192756', 1536],
 				],
 			],
 			[
 				'2014-03-23',
 				[
-					['095102', 1536],
 					['111947', 1536],
 					['161416', 1536],
-					['171312', 1536],
 					['190043', 1536],
 					['202421', 1536],
 				],
@@ -72,36 +57,18 @@
 				[
 					['140346', 1536],
 					['140431', 1536],
-					['140449', 1536],
-					['144028', 1536],
-					['151422', 1536],
-					['153144', 1536],
 					['153200', 1536],
 				],
 			],
 			[
 				'2014-03-29',
 				[
-					['131925', 1536],
-					['131941', 1536],
 					['172611', 1536],
 					['175106', 1536],
-					['182642', 1152],
 					['191231', 1536],
 				],
 			],
-			[
-				'2014-03-30',
-				[
-					['135911', 1536],
-					['135915', 1536],
-					['140832', 1536],
-					['141614', 1536],
-					['155731', 1536],
-					['155806', 1536],
-					['155814', 1536],
-				],
-			],
+			['2014-03-30', [['155731', 1536]]],
 		] as const
 	).flatMap(([day, times]) =>
 		times.map(([time, height]) =>
@@ -216,19 +183,7 @@
 		),
 		...KATIE_BAUER_BTS,
 		photo(
-			'2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_02.avif',
-			2048,
-			1536,
-			'NODE — behind the scenes',
-		),
-		photo(
 			'2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_06.avif',
-			2048,
-			1536,
-			'NODE — behind the scenes',
-		),
-		photo(
-			'2014-03-06_art_300_project-node-360_short_film-behind_the_scenes_07.avif',
 			2048,
 			1536,
 			'NODE — behind the scenes',
@@ -312,19 +267,6 @@
 			1536,
 			'Green screen music video shoot at church',
 		),
-		photo('2014-09-24_med_465-one_up-film_snapshot_1.jpg', 1920, 1080, 'One Up'),
-		photo(
-			'2014-09-24_med_465-one_up-close_up_shots_on_two_guys_staring_eachother_down.avif',
-			480,
-			270,
-			'One Up',
-		),
-		photo(
-			'2014-09-24_med_465-one_up-quick_cuts_between_two_character_close_ups.avif',
-			480,
-			204,
-			'One Up',
-		),
 		photo(
 			'2014-09-15_med_465-one_up-behind_the_scenes_set_photo_01.jpg',
 			2048,
@@ -392,28 +334,10 @@
 			'MED 465 film shoot',
 		),
 		photo(
-			'2015-04-12_split_life-sato_48-behind_the_scenes-group_meetup.avif',
-			2048,
-			1152,
-			'Split Life — the 48-hour crew',
-		),
-		photo(
-			'2015-04-12_split_life-sato_48-behind_the_scenes-group-planning_session_around_kitchen_table.avif',
-			2048,
-			1152,
-			'Split Life — planning around the kitchen table',
-		),
-		photo(
 			'2015-04-12_split_life-sato_48-behind_the_scenes-film_poster.jpg',
 			1167,
 			1803,
 			'Split Life — poster',
-		),
-		photo(
-			'2015-04-14_kats_film_project-behind_the_scenes_set_photo_1.avif',
-			537,
-			508,
-			"On set for Kat's film",
 		),
 		photo(
 			'2015-04-14_kats_film_project-behind_the_scenes_set_photo_2.avif',
@@ -422,21 +346,9 @@
 			"On set for Kat's film",
 		),
 		photo(
-			'2015-04-22_legacy-behind_the_scenes-fog_lighting_test_in_house.jpg',
-			2048,
-			1152,
-			'Legacy — fog lighting test',
-		),
-		photo(
 			'2015-05-15_missouri_state_university_graduation-brian_and_jordan_hold_diploma.avif',
 			2048,
 			1365,
-			'Graduation day',
-		),
-		photo(
-			'2015-05-15_missouri_state_university_graduation-brian_and_jordan_selfie.avif',
-			1920,
-			825,
 			'Graduation day',
 		),
 	];
@@ -985,8 +897,9 @@
 							One Up <span class="film-year">2014</span>
 						</h4>
 						<p>
-							Cinematography-class short. Two guys try to one-up each other to land the
-							same job. Real lighting setups, real coverage.
+							Cinematography-class short film. Two guys try to one-up each other to land
+							the same job. This film was really about practicing my lighting &amp; camera
+							skills. Of course, I couldn't help but to make the story a little silly.
 						</p>
 						<Video
 							src="https://cdn.brianschwabauer.com/media/2014-09-24_med_465-one_up/master.m3u8"
@@ -1017,8 +930,10 @@
 							Legacy <span class="film-year">2015</span>
 						</h4>
 						<p>
-							A quiet 2-character short for my directing class. A husband obsessed with
-							his career, a wife who wants him home. Conversation as conflict.
+							A quiet 2-character short for my directing class that I wrote/directed/shot.
+							A husband obsessed with his career, a wife who wants him home. At the time,
+							I was really obsessed with what it means to leave a legacy and this was my
+							attempt to explore that concept.
 						</p>
 						<Video
 							src="https://cdn.brianschwabauer.com/media/2015-04-22_legacy/master.m3u8"
