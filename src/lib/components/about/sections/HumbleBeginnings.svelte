@@ -52,60 +52,6 @@
 			alt: 'The karate-chop apple split',
 		},
 	];
-
-	// The REC readout above the heading is a real deck: it starts rolling when
-	// the page hydrates and counts how long you've been here, in tape timecode.
-	// It only ticks while the section is on screen — off screen there is nobody
-	// reading it, so there is no reason to burn a frame loop on it.
-	const START = Date.now();
-	let elapsed_ms = $state(0);
-	let rec_el = $state<HTMLElement>();
-
-	function pad(n: number) {
-		return String(Math.floor(n)).padStart(2, '0');
-	}
-	const timecode = $derived.by(() => {
-		const s = elapsed_ms / 1000;
-		return `${pad(s / 3600)}:${pad((s / 60) % 60)}:${pad(s % 60)}:${pad((s * 30) % 30)}`;
-	});
-
-	$effect(() => {
-		const el = rec_el;
-		if (!el) return;
-		// Frames tick 30 times a second, which is exactly the kind of motion
-		// reduced-motion readers asked us not to make — drop to whole seconds and
-		// let the frame field sit at :00 for them.
-		const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-		let frame = 0;
-		// The displayed string only changes 30 times a second (once a second
-		// under reduced motion), so a 60Hz rAF lands on the same timecode every
-		// other frame — skip the state write (and the DOM update behind it)
-		// unless the tape frame count has actually moved on.
-		let last_tape_frame = -1;
-		function tick() {
-			frame = requestAnimationFrame(tick);
-			const ms = Date.now() - START;
-			const tape_frame = reduced.matches
-				? Math.floor(ms / 1000)
-				: Math.floor((ms * 30) / 1000);
-			if (tape_frame === last_tape_frame) return;
-			last_tape_frame = tape_frame;
-			elapsed_ms = reduced.matches ? tape_frame * 1000 : ms;
-		}
-		const io = new IntersectionObserver(([entry]) => {
-			if (entry.isIntersecting) {
-				if (!frame) frame = requestAnimationFrame(tick);
-			} else {
-				cancelAnimationFrame(frame);
-				frame = 0;
-			}
-		});
-		io.observe(el);
-		return () => {
-			io.disconnect();
-			cancelAnimationFrame(frame);
-		};
-	});
 </script>
 
 <SectionShell id="humble-beginnings" year="2006" label="Humble Beginnings" theme="tape">
@@ -119,11 +65,6 @@
 
 		<Reveal variant="up">
 			<h2 class="title">
-				<span bind:this={rec_el} class="rec" aria-hidden="true">
-					<span class="rec-dot"></span>
-					REC
-					<span class="tc">{timecode}</span>
-				</span>
 				A bedroom, two kids,
 				<br />
 				and a tape that had to rewind.
@@ -389,48 +330,6 @@
 		max-width: 50rem;
 		margin: 0 0 2rem;
 	}
-	.rec {
-		display: flex;
-		width: fit-content;
-		align-items: center;
-		gap: 0.5rem;
-		font-family: var(--font-mono);
-		font-size: 0.75rem;
-		color: var(--tape-accent);
-		background: rgba(255, 156, 74, 0.1);
-		border: 1px solid rgba(255, 156, 74, 0.35);
-		padding: 0.25rem 0.7rem;
-		border-radius: 4px;
-		margin-bottom: 0.9rem;
-		letter-spacing: 0.18em;
-	}
-	.rec-dot {
-		display: inline-block;
-		width: 9px;
-		height: 9px;
-		border-radius: 50%;
-		background: #ff3535;
-		box-shadow: 0 0 12px #ff3535;
-		animation: blink 1.4s infinite;
-	}
-	@keyframes blink {
-		0%,
-		60% {
-			opacity: 1;
-		}
-		70%,
-		100% {
-			opacity: 0.25;
-		}
-	}
-	/* It counts, so the digits have to hold still — proportional numerals would
-	   make the whole REC chip twitch 30 times a second. */
-	.tc {
-		opacity: 0.7;
-		margin-left: 0.4rem;
-		font-variant-numeric: tabular-nums;
-	}
-
 	.lede-grid {
 		display: grid;
 		grid-template-columns: 1.2fr 1fr;
