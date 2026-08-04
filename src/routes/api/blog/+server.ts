@@ -29,6 +29,7 @@ interface CreateBody {
 	content?: TipTapDoc;
 	contentText?: string;
 	summary?: string | null;
+	teaser?: string | null;
 	tags?: unknown;
 	status?: 'draft' | 'published';
 	slug?: string;
@@ -43,7 +44,17 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 	if (!platform?.env?.KV) throw error(500, 'KV not available');
 
 	const data = (await request.json()) as CreateBody;
-	const { title, content, contentText, summary, tags, status, slug, publishedAt } = data;
+	const {
+		title,
+		content,
+		contentText,
+		summary,
+		teaser,
+		tags,
+		status,
+		slug,
+		publishedAt,
+	} = data;
 
 	if (!title || typeof title !== 'string') throw error(400, 'Title is required');
 	if (!content || typeof content !== 'object')
@@ -77,6 +88,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			content,
 			contentText,
 			summary: summary || null,
+			teaser: teaser || null,
 			aiSummary,
 			tags: Array.isArray(tags)
 				? tags.filter((t): t is string => typeof t === 'string')

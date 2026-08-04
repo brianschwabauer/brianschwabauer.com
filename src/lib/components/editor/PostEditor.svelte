@@ -44,6 +44,7 @@
 
 	let title = $state(initial?.title ?? '');
 	let summary = $state(initial?.summary ?? initial?.aiSummary ?? '');
+	let teaser = $state(initial?.teaser ?? '');
 	let tags = $state<string[]>(initial?.tags ?? []);
 	let status = $state<'draft' | 'published'>(
 		initial?.status === 'published' ? 'published' : 'draft',
@@ -72,6 +73,7 @@
 		snapshotOf({
 			title: initial?.title ?? '',
 			summary: initial?.summary ?? initial?.aiSummary ?? '',
+			teaser: initial?.teaser ?? '',
 			tags: initial?.tags ?? [],
 			status: initial?.status === 'published' ? 'published' : 'draft',
 			content: initialContent,
@@ -88,6 +90,7 @@
 		snapshotOf({
 			title,
 			summary,
+			teaser,
 			tags,
 			status,
 			content,
@@ -159,6 +162,7 @@
 					body: JSON.stringify({
 						title: title.trim(),
 						summary: summary.trim() || null,
+						teaser: teaser.trim() || null,
 						tags,
 						content,
 						contentText,
@@ -194,6 +198,7 @@
 				body: JSON.stringify({
 					title: title.trim(),
 					summary: summary.trim() || null,
+					teaser: teaser.trim() || null,
 					tags,
 					content,
 					contentText,
@@ -367,6 +372,7 @@
 	bind:open={settingsOpen}
 	bind:slug
 	bind:summary
+	bind:teaser
 	canDelete={mode === 'edit'}
 	{deleting}
 	onDelete={handleDelete} />

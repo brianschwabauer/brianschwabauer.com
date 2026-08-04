@@ -132,6 +132,7 @@
 	});
 
 	const summary = $derived(data.post?.summary ?? data.post?.aiSummary ?? '');
+	const teaser = $derived(data.post?.teaser ?? '');
 	const tags = $derived(data.post?.tags ?? []);
 	const featured = $derived(data.post?.featuredImage ?? null);
 	const focalX = $derived(data.post?.coverFocalX ?? 50);
@@ -196,8 +197,8 @@
 				{data.post.title}
 			</h1>
 
-			{#if summary}
-				<p class="post-excerpt">{summary}</p>
+			{#if teaser}
+				<p class="post-teaser">{teaser}</p>
 			{/if}
 
 			{#if tags.length > 0}
@@ -354,7 +355,7 @@
 		}
 	}
 
-	.post-excerpt {
+	.post-teaser {
 		font-size: 1.25rem;
 		color: var(--color-text-muted);
 		line-height: 1.5;

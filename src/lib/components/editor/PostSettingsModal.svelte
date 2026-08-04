@@ -6,6 +6,7 @@
 		open: boolean;
 		slug: string;
 		summary: string;
+		teaser: string;
 		canDelete: boolean;
 		deleting?: boolean;
 		onSlugChange?: (s: string) => void;
@@ -17,6 +18,7 @@
 		open = $bindable(false),
 		slug = $bindable(''),
 		summary = $bindable(''),
+		teaser = $bindable(''),
 		canDelete,
 		deleting = false,
 		onSlugChange,
@@ -58,6 +60,14 @@
 				bind:value={summary}
 				placeholder="Brief summary (leave blank to auto-generate from content)…"
 				description="Used for SEO, social previews, and the post listings." />
+		</div>
+		<div class="field">
+			<Input
+				type="textarea"
+				label="Teaser"
+				bind:value={teaser}
+				placeholder="Optional hook shown under the title (leave blank to show nothing)…"
+				description="A one-liner that pulls readers in without giving away the point. Never used for SEO or listings." />
 		</div>
 		<div class="actions">
 			<Button onclick={() => (open = false)}>Done</Button>

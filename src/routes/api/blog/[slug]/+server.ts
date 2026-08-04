@@ -24,6 +24,7 @@ interface UpdateBody {
 	content?: TipTapDoc;
 	contentText?: string;
 	summary?: string | null;
+	teaser?: string | null;
 	tags?: unknown;
 	status?: 'draft' | 'published';
 	slug?: string;
@@ -92,6 +93,7 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 		content: nextContent,
 		contentText: nextContentText,
 		summary: userSummary,
+		teaser: data.teaser === undefined ? existing.teaser : data.teaser,
 		aiSummary,
 		tags: Array.isArray(data.tags)
 			? data.tags.filter((t): t is string => typeof t === 'string')

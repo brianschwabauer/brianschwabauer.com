@@ -14,6 +14,9 @@ export interface BlogPost {
 	title: string;
 	summary: string | null;
 	aiSummary: string | null;
+	/** Optional hand-written hook shown under the title on the post page.
+	    Unlike `summary`, it should tease without giving away the point. */
+	teaser: string | null;
 	/** Plain-text extract of `content` — used by search + AI summary. */
 	contentText: string;
 	/** TipTap JSON document — the source of truth for the post body. */
@@ -142,6 +145,7 @@ export interface SavePostInput {
 	contentText: string;
 	summary?: string | null;
 	aiSummary?: string | null;
+	teaser?: string | null;
 	tags?: string[];
 	status?: BlogStatus;
 	featuredImage?: ImageRecord | null;
@@ -170,6 +174,7 @@ export async function savePost(kv: KVNamespace, input: SavePostInput): Promise<B
 		title: input.title,
 		summary: input.summary ?? existing?.summary ?? null,
 		aiSummary: input.aiSummary ?? existing?.aiSummary ?? null,
+		teaser: input.teaser === undefined ? (existing?.teaser ?? null) : input.teaser,
 		contentText: input.contentText,
 		content: input.content,
 		tags: normalizeTagList(input.tags ?? existing?.tags ?? []),
