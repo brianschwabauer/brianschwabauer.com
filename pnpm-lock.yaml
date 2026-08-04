@@ -21,8 +21,8 @@ importers:
         specifier: ^0.1.0
         version: 0.1.1
       '@delightstack/components':
-        specifier: ^1.1.1
-        version: 1.1.1(@delightstack/styles@1.1.0)(hls.js@1.6.16)(svelte@5.54.0)
+        specifier: ^1.2.0
+        version: 1.2.0(@delightstack/styles@1.1.0)(hls.js@1.6.16)(svelte@5.54.0)
       '@delightstack/images':
         specifier: ^1.0.1
         version: 1.0.1(svelte@5.54.0)
@@ -205,8 +205,8 @@ packages:
   '@daybrush/utils@1.13.0':
     resolution: {integrity: sha512-ALK12C6SQNNHw1enXK+UO8bdyQ+jaWNQ1Af7Z3FNxeAwjYhQT7do+TRE4RASAJ3ObaS2+TJ7TXR3oz2Gzbw0PQ==}
 
-  '@delightstack/components@1.1.1':
-    resolution: {integrity: sha512-PyByDnGsn6/q4sMYhR/Xb79S0w2ysOTc37kMzLw4tGzoCHlm3Z/vnEVNPoOA/sbvvVYl1J0DPQ9poS+wRnTaRw==}
+  '@delightstack/components@1.2.0':
+    resolution: {integrity: sha512-ZUh+10W6ouce011c5nlWHA7gYCB397gD1q/gNQ+m5/H2LWGzqgoH7aQAsle0HDsitvAag9TQrYXI31GU5h/kcQ==}
     hasBin: true
     peerDependencies:
       '@delightstack/styles': ^1.1.0
@@ -2313,7 +2313,7 @@ snapshots:
 
   '@daybrush/utils@1.13.0': {}
 
-  '@delightstack/components@1.1.1(@delightstack/styles@1.1.0)(hls.js@1.6.16)(svelte@5.54.0)':
+  '@delightstack/components@1.2.0(@delightstack/styles@1.1.0)(hls.js@1.6.16)(svelte@5.54.0)':
     dependencies:
       '@delightstack/styles': 1.1.0
       '@delightstack/utilities': 1.0.1(svelte@5.54.0)

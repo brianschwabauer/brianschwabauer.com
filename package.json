@@ -22,7 +22,7 @@
 		"@auth/core": "^0.37.0",
 		"@auth/sveltekit": "^1.7.0",
 		"@cloudflare/containers": "^0.1.0",
-		"@delightstack/components": "^1.1.1",
+		"@delightstack/components": "^1.2.0",
 		"@delightstack/images": "^1.0.1",
 		"@delightstack/styles": "^1.1.0",
 		"@delightstack/utilities": "^1.0.1",
