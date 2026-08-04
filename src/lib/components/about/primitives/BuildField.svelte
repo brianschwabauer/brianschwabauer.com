@@ -58,7 +58,7 @@
 	 *  the picture, and cells that vanish until the front arrives read as an empty
 	 *  frame filling in rather than as work accumulating across a field. */
 	const FLOOR = 0.42;
-	const SMALL = 0.62;
+	const SMALL = 0.52;
 
 	/** How fast one cell completes its pop, in reciprocal scrub-units: 14 is about
 	 *  a fourteenth of the scrub, ~55px of scroll. */
@@ -66,7 +66,7 @@
 	/** The most a cell's arrival can be pushed back, in scrub-units. Roughly the
 	 *  width of one cell's own animation, which is enough to break the line up
 	 *  without the front smearing into a general fade. */
-	const SCATTER = 0.07;
+	const SCATTER = 0.15;
 	/**
 	 * How much of the scrub the front itself travels across. The scatter and one
 	 * cell's own pop both happen *after* a cell's column is reached, so the front
@@ -77,7 +77,7 @@
 
 	/** Back-out overshoot. `C3 = C1 + 1`; these peak at ~1.2, so a cell swells
 	 *  about 8% past its final size before settling. */
-	const C1 = 2.6;
+	const C1 = 3.6;
 	const C3 = C1 + 1;
 
 	/** Alpha levels the cells are quantised into before drawing. Enough that the
