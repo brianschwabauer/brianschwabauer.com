@@ -23,6 +23,24 @@
 // opacity climbing out of 0, where it had nothing to show itself on.
 // (ctx.filter would reproduce both exactly, but it is not supported in
 // WebKit and is a per-draw cost everywhere else.)
+//
+// ANIMATED AVIFS. createImageBitmap only ever yields an animated image's
+// first frame, so as first shipped the canvas froze every animated thumb the
+// DOM field used to play. Where WebCodecs ImageDecoder exists (Chromium
+// today; probed once by animatedAvifSupported), an animated sprite keeps its
+// decoder and re-composes its own canvas in place at the file's frame
+// timing. The shadows never change frame to frame, so they are baked once
+// per tile shape as a PLATE shared by every sprite of that shape — a step is
+// one plate blit plus one clipped cover-draw, and only sprites actually
+// blitted this frame step at all: parked tiles freeze and decode nothing.
+// Steps are also confined to frames the scroll is NOT sweeping (the caller's
+// `step` flag): a frozen frame is invisible inside a zoom, so the scroll
+// keeps its whole budget — which is why animation plays even under low-fx,
+// where it costs only idle frames that carried 24 animating <img> layers in
+// the DOM era anyway. Everywhere else — no ImageDecoder, any decode hiccup —
+// the sprite is (or quietly becomes) the static first frame the canvas
+// always had. Animation can never latch `failed`: losing motion must not
+// cost the canvas.
 
 /** the sprite cache key — a recycled image can return with a different tile
  *  ratio, so the ratio is part of the identity */
@@ -50,8 +68,26 @@ export type TileFrame = {
 	dim: number;
 };
 
+type SpriteAnim = {
+	decoder: ImageDecoder;
+	frame_count: number;
+	/** index of the most recently requested frame — the one `next` holds */
+	index: number;
+	/** decoded and waiting to be shown, with its display time in ms */
+	next: { frame: VideoFrame; dur: number } | null;
+	/** when the frame currently composed into the sprite is up */
+	next_at: number;
+	decoding: boolean;
+	/** a decode failed — freeze on the composed frame, forever and silently */
+	failed: boolean;
+};
+
 type Sprite = {
 	canvas: HTMLCanvasElement;
+	/** the sprite's own 2d context — animation re-composes through it */
+	ctx: CanvasRenderingContext2D;
+	/** the baked shadow/glow under the image, shared per tile shape */
+	plate: HTMLCanvasElement | null;
 	/** tile box size in sprite px (excludes the shadow margin) */
 	bw: number;
 	bh: number;
@@ -61,6 +97,8 @@ type Sprite = {
 	radius: number;
 	/** LRU stamp — draw() refreshes it, evict() reads it */
 	used: number;
+	/** present only while an animated AVIF plays through this sprite */
+	anim?: SpriteAnim;
 };
 
 /** tile box width every sprite is baked at */
@@ -69,11 +107,42 @@ const SPRITE_W = 512;
 const NOMINAL_W = 1.5;
 /** sprite cache cap — 24 on screen + parked/recycled stragglers */
 const MAX_SPRITES = 48;
+// bake geometry — constant, because every sprite is baked at SPRITE_W:
+// everything the DOM sized off --star-unit is sized off the nominal unit
+// here: unit = tileWidth / star.w
+const UNIT = SPRITE_W / NOMINAL_W;
+const GLOW_BLUR = UNIT * 0.258;
+const DROP_BLUR = UNIT * 0.242;
+const DROP_Y = UNIT * 0.076;
+const RADIUS = UNIT * 0.053;
+const MARGIN = Math.ceil(Math.max(GLOW_BLUR, DROP_BLUR + DROP_Y) * 1.5);
+/** floor for a frame's display time — a 0/absent duration in the file must
+ *  not spin the decoder flat out */
+const MIN_FRAME_MS = 20;
+
+/** a VideoFrame's display time in ms (duration is µs, sometimes absent) */
+function frameMs(f: VideoFrame): number {
+	return Math.max(MIN_FRAME_MS, (f.duration ?? 0) / 1000 || 100);
+}
+
+// can this browser decode animated AVIF frames? Probed once per page —
+// ImageDecoder is Chromium-only today, and everyone else takes the static
+// first-frame path they were already on.
+let anim_support: Promise<boolean> | undefined;
+function animatedAvifSupported(): Promise<boolean> {
+	anim_support ??=
+		typeof ImageDecoder === 'undefined'
+			? Promise.resolve(false)
+			: ImageDecoder.isTypeSupported('image/avif').catch(() => false);
+	return anim_support;
+}
 
 export class StarfieldPainter {
 	private ctx: CanvasRenderingContext2D | null;
 	private sprites = new Map<string, Sprite>();
 	private pending = new Set<string>();
+	/** shadow/glow plates by tile shape — 3 ratios × at most 2 glow states */
+	private plates = new Map<string, HTMLCanvasElement | null>();
 	private dpr = 1;
 	private stamp = 0;
 	/** bake glow into new sprites — Hero clears it under low-fx */
@@ -129,12 +198,9 @@ export class StarfieldPainter {
 			});
 		load('default')
 			.catch(() => load('reload'))
-			.then((blob) => createImageBitmap(blob))
-			.then((bmp) => {
+			.then((blob) => this.bakeBlob(src, ar, blob))
+			.then(() => {
 				this.pending.delete(key);
-				if (this.failed) return;
-				this.bake(key, ar, bmp);
-				bmp.close();
 			})
 			.catch(() => {
 				this.pending.delete(key);
@@ -143,28 +209,114 @@ export class StarfieldPainter {
 			});
 	}
 
-	private bake(key: string, ar: number, bmp: ImageBitmap) {
-		const bw = SPRITE_W;
+	/** decode + bake — animated where the browser and the file allow it, the
+	 *  static single-frame bake everywhere else (and as the rescue path) */
+	private async bakeBlob(src: string, ar: number, blob: Blob) {
+		const key = spriteKey(src, ar);
+		const is_avif = blob.type === 'image/avif' || /\.avif$/i.test(src);
+		if (is_avif && (await animatedAvifSupported())) {
+			try {
+				await this.bakeAnimated(key, ar, blob);
+				return;
+			} catch {
+				// any WebCodecs hiccup falls through to the static bake below —
+				// losing animation must never latch `failed` and cost the canvas
+			}
+		}
+		const bmp = await createImageBitmap(blob);
+		if (!this.failed) this.bake(key, ar, bmp, bmp.width, bmp.height);
+		bmp.close();
+	}
+
+	private async bakeAnimated(key: string, ar: number, blob: Blob) {
+		const data = await blob.arrayBuffer();
+		const decoder = new ImageDecoder({ data, type: blob.type || 'image/avif' });
+		try {
+			await decoder.tracks.ready;
+			const track = decoder.tracks.selectedTrack;
+			const frame_count = track?.animated ? track.frameCount : 1;
+			const { image } = await decoder.decode({ frameIndex: 0 });
+			const s = this.failed ? null : this.makeSprite(key, ar);
+			if (!s) {
+				image.close();
+				decoder.close();
+				return;
+			}
+			this.compose(s, image, image.displayWidth, image.displayHeight);
+			const dur = frameMs(image);
+			image.close();
+			if (frame_count > 1) {
+				// the decoder stays with the sprite; repetitionCount is ignored
+				// on purpose — the thumbs are endless loops by design
+				s.anim = {
+					decoder,
+					frame_count,
+					index: 0,
+					next: null,
+					next_at: performance.now() + dur,
+					decoding: false,
+					failed: false,
+				};
+				this.decodeAhead(s.anim);
+			} else {
+				decoder.close();
+			}
+		} catch (e) {
+			decoder.close();
+			throw e;
+		}
+	}
+
+	/** register an empty sprite canvas of this shape in the cache */
+	private makeSprite(key: string, ar: number): Sprite | null {
 		const bh = Math.round(SPRITE_W / ar);
-		// everything the DOM sized off --star-unit is sized off the nominal
-		// unit here: unit = tileWidth / star.w
-		const unit = bw / NOMINAL_W;
-		const glowBlur = unit * 0.258;
-		const dropBlur = unit * 0.242;
-		const dropY = unit * 0.076;
-		const radius = unit * 0.053;
-		const m = Math.ceil(Math.max(glowBlur, dropBlur + dropY) * 1.5);
-
 		const c = document.createElement('canvas');
-		c.width = bw + 2 * m;
-		c.height = bh + 2 * m;
+		c.width = SPRITE_W + 2 * MARGIN;
+		c.height = bh + 2 * MARGIN;
 		const ctx = c.getContext('2d');
-		if (!ctx) return;
+		if (!ctx) return null;
+		const s: Sprite = {
+			canvas: c,
+			ctx,
+			plate: this.plate(bh),
+			bw: SPRITE_W,
+			bh,
+			m: MARGIN,
+			radius: RADIUS,
+			used: this.stamp,
+		};
+		this.sprites.set(key, s);
+		if (this.sprites.size > MAX_SPRITES) this.evict();
+		return s;
+	}
 
-		const box = (x = m, y = m) => {
+	private bake(key: string, ar: number, img: CanvasImageSource, iw: number, ih: number) {
+		const s = this.makeSprite(key, ar);
+		if (s) this.compose(s, img, iw, ih);
+	}
+
+	/**
+	 * The baked shadow + glow that sits under every sprite of this shape. The
+	 * image is drawn OVER the whole box region, so one plate serves every
+	 * image — and every frame of an animated one, which is what makes a
+	 * per-frame compose cheap: the blurs are painted once per shape, ever.
+	 */
+	private plate(bh: number): HTMLCanvasElement | null {
+		const pkey = `${bh}|${this.glow ? 1 : 0}`;
+		const hit = this.plates.get(pkey);
+		if (hit !== undefined) return hit;
+		const p = document.createElement('canvas');
+		p.width = SPRITE_W + 2 * MARGIN;
+		p.height = bh + 2 * MARGIN;
+		const ctx = p.getContext('2d');
+		if (!ctx) {
+			this.plates.set(pkey, null);
+			return null;
+		}
+		const box = (x: number, y: number) => {
 			ctx.beginPath();
-			if (typeof ctx.roundRect === 'function') ctx.roundRect(x, y, bw, bh, radius);
-			else ctx.rect(x, y, bw, bh);
+			if (typeof ctx.roundRect === 'function') ctx.roundRect(x, y, SPRITE_W, bh, RADIUS);
+			else ctx.rect(x, y, SPRITE_W, bh);
 		};
 		// shadows via the offset trick — the shape is drawn far off-canvas and
 		// only its shadow lands in frame, so no fill fringes the image edge
@@ -175,26 +327,91 @@ export class StarfieldPainter {
 			ctx.shadowBlur = blur;
 			ctx.shadowOffsetX = OFF;
 			ctx.shadowOffsetY = dy;
-			box(m - OFF, m);
+			box(MARGIN - OFF, MARGIN);
 			ctx.fillStyle = '#000';
 			ctx.fill();
 			ctx.restore();
 		};
-		shadow('rgba(0, 0, 0, 0.5)', dropBlur, dropY);
-		if (this.glow) shadow('rgba(0, 244, 195, 0.22)', glowBlur, 0);
+		shadow('rgba(0, 0, 0, 0.5)', DROP_BLUR, DROP_Y);
+		if (this.glow) shadow('rgba(0, 244, 195, 0.22)', GLOW_BLUR, 0);
+		this.plates.set(pkey, p);
+		return p;
+	}
 
-		// the image, object-fit: cover into the rounded box
+	/** (re)paint a sprite: its plate, then the image cover-fit into the
+	 *  rounded box. One blit + one clipped draw — cheap enough per animation
+	 *  frame, and the static bake is simply this called once. */
+	private compose(s: Sprite, img: CanvasImageSource, iw: number, ih: number) {
+		const ctx = s.ctx;
+		ctx.clearRect(0, 0, s.canvas.width, s.canvas.height);
+		if (s.plate) ctx.drawImage(s.plate, 0, 0);
 		ctx.save();
-		box();
+		ctx.beginPath();
+		if (typeof ctx.roundRect === 'function')
+			ctx.roundRect(MARGIN, MARGIN, s.bw, s.bh, RADIUS);
+		else ctx.rect(MARGIN, MARGIN, s.bw, s.bh);
 		ctx.clip();
-		const scale = Math.max(bw / bmp.width, bh / bmp.height);
-		const sw = bw / scale;
-		const sh = bh / scale;
-		ctx.drawImage(bmp, (bmp.width - sw) / 2, (bmp.height - sh) / 2, sw, sh, m, m, bw, bh);
+		const scale = Math.max(s.bw / iw, s.bh / ih);
+		const sw = s.bw / scale;
+		const sh = s.bh / scale;
+		ctx.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, MARGIN, MARGIN, s.bw, s.bh);
 		ctx.restore();
+	}
 
-		this.sprites.set(key, { canvas: c, bw, bh, m, radius, used: this.stamp });
-		if (this.sprites.size > MAX_SPRITES) this.evict();
+	/** keep the NEXT frame decoded and waiting while the current one shows */
+	private decodeAhead(a: SpriteAnim) {
+		if (a.decoding || a.next || a.failed) return;
+		a.decoding = true;
+		a.index = (a.index + 1) % a.frame_count;
+		a.decoder
+			.decode({ frameIndex: a.index })
+			.then(({ image }) => {
+				a.decoding = false;
+				if (a.failed) {
+					// killAnim won the race — the decoder is gone, drop the frame
+					image.close();
+					return;
+				}
+				a.next = { frame: image, dur: frameMs(image) };
+			})
+			.catch(() => {
+				a.decoding = false;
+				a.failed = true;
+			});
+	}
+
+	/** step a sprite's animation once its composed frame's time is up */
+	private advance(s: Sprite, now: number) {
+		const a = s.anim;
+		if (!a || a.failed) return;
+		if (!a.next) {
+			this.decodeAhead(a); // belt and braces — normally already in flight
+			return;
+		}
+		if (now < a.next_at) return;
+		this.compose(s, a.next.frame, a.next.frame.displayWidth, a.next.frame.displayHeight);
+		const dur = a.next.dur;
+		a.next.frame.close();
+		a.next = null;
+		// from now, not next_at: after a stall (off screen, a slow decode) the
+		// loop plays on at its natural rate instead of racing to catch up
+		a.next_at = now + dur;
+		this.decodeAhead(a);
+	}
+
+	/** stop and release a sprite's animation machinery */
+	private killAnim(s: Sprite) {
+		const a = s.anim;
+		if (!a) return;
+		a.failed = true; // a decode resolving after this must drop its frame
+		a.next?.frame.close();
+		a.next = null;
+		try {
+			a.decoder.close();
+		} catch {
+			// already closed
+		}
+		s.anim = undefined;
 	}
 
 	private evict() {
@@ -206,11 +423,18 @@ export class StarfieldPainter {
 				oldest = key;
 			}
 		}
-		if (oldest) this.sprites.delete(oldest);
+		if (oldest) {
+			const s = this.sprites.get(oldest);
+			if (s) this.killAnim(s);
+			this.sprites.delete(oldest);
+		}
 	}
 
-	/** one frame — `frames` already depth-sorted far→near by the caller */
-	draw(frames: TileFrame[]) {
+	/** one frame — `frames` already depth-sorted far→near by the caller, `now`
+	 *  is the caller's rAF timestamp (drives the animated sprites), and
+	 *  `step` is false on frames the scroll is sweeping, so animation cedes
+	 *  its compose cost to the zoom (where a held frame cannot be seen) */
+	draw(frames: TileFrame[], now: number, step = true) {
 		const ctx = this.ctx;
 		if (!ctx) return;
 		this.stamp++;
@@ -255,6 +479,13 @@ export class StarfieldPainter {
 		}
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.globalAlpha = 1;
+		// step the animated sprites that were actually on screen this frame —
+		// parked and occluded ones sit frozen and cost no decodes at all
+		if (step) {
+			for (const s of this.sprites.values()) {
+				if (s.anim && s.used === this.stamp) this.advance(s, now);
+			}
+		}
 	}
 
 	clear() {
@@ -265,8 +496,10 @@ export class StarfieldPainter {
 	}
 
 	dispose() {
+		for (const s of this.sprites.values()) this.killAnim(s);
 		this.sprites.clear();
 		this.pending.clear();
+		this.plates.clear();
 		this.onFailure = undefined;
 	}
 }

@@ -361,8 +361,10 @@
 		}
 
 		/** the canvas frame — the same projection starVisual() encodes, in
-		 *  numbers instead of style strings */
-		function paintCanvas(now: number) {
+		 *  numbers instead of style strings. `step` lets the painter advance
+		 *  its animated sprites — false while the scroll is sweeping, so the
+		 *  zoom keeps the whole frame budget (a held frame is invisible in it) */
+		function paintCanvas(now: number, step: boolean) {
 			if (!painter) return;
 			const frames: TileFrame[] = [];
 			const cx = fieldW / 2;
@@ -380,7 +382,9 @@
 				let alpha = 0.9 * Math.min(fadeIn, fadeOut);
 				let w = s.w * unitPx * f;
 				if (introAt[i]) {
-					const t = Math.min(1, (now - introAt[i]) / INTRO_MS);
+					// clamped at 0: a top-up intro is scheduled in the FUTURE, and
+					// the tile must sit at opacity 0 until its turn in the cascade
+					const t = Math.min(1, Math.max(0, (now - introAt[i]) / INTRO_MS));
 					w *= 0.3 + 0.7 * easeOutBack(t);
 					alpha *= Math.min(1, t / 0.28);
 					if (t >= 1) introAt[i] = 0;
@@ -399,7 +403,7 @@
 			}
 			// far→near, the paint order preserve-3d gave the DOM for free
 			frames.sort((a, b) => a.u - b.u);
-			painter.draw(frames);
+			painter.draw(frames, now, step);
 		}
 
 		// the hero's badge, headline, copy and CTA ride up out of the pin at the
@@ -545,6 +549,11 @@
 						// recycle the very same image and element: the zoom is
 						// fast enough to hide the repeat, and it spares a load
 						u[i] -= 1;
+						// a hard fling advances u faster than the deep-space fade
+						// window can absorb — the wrapped tile would pop in at
+						// full opacity partway down the tunnel. Give it the
+						// spawn intro so it swells and fades into view instead.
+						if (advance > 0.02) introAt[i] = now;
 					} else if (lowFx && !narrow && activeCount > LOWFX_CAP) {
 						// low-fx thins the field the same way the drain does —
 						// each surplus tile leaves through the far end of its
@@ -557,6 +566,8 @@
 						// idle drift / up-scroll flow → a fresh, unseen image
 						u[i] -= 1;
 						swapContent(i);
+						// same fast-scroll pop guard as the down-scroll wrap
+						if (advance > 0.02) introAt[i] = now;
 					}
 				}
 			}
@@ -580,19 +591,32 @@
 					parked[p] = false;
 					activeCount++;
 					u[p] = -Math.random() * 0.04;
+					// harmless when the scroll is gentle (the intro ends while the
+					// tile is still at opacity ~0 in deep space), and the thing
+					// that keeps a hard fling from sweeping it straight past the
+					// fade-in window at full opacity
+					introAt[p] = now;
 					refillBudget -= 1;
 				}
 			}
 
 			// at rest at the very top the field is simply full — top up any
 			// stragglers, spread through the tunnel rather than bunched deep
-			// (under low-fx, "full" means the cap)
+			// (under low-fx, "full" means the cap). A fast trip back up arrives
+			// with MOST of the field still parked (the loop banks no scroll while
+			// the hero is off screen, so the metered refill never ran), so each
+			// straggler gets the spawn intro on a small stagger: a cascade of
+			// tiles swelling into view instead of the whole field popping in on
+			// one frame.
 			if (window.scrollY <= pinTop + 4) {
+				let wave = 0;
 				for (let i = 0; i < stars.length; i++) {
 					if (!parked[i]) continue;
 					if (lowFx && !narrow && activeCount >= LOWFX_CAP) break;
 					parked[i] = false;
-					u[i] = Math.random();
+					u[i] = Math.random() * 0.9;
+					introAt[i] = now + wave * 110 + Math.random() * 80;
+					wave++;
 					activeCount++;
 				}
 			}
@@ -610,7 +634,7 @@
 			}
 			if (canvasMode) {
 				if (painter?.failed) fallbackToDom();
-				else paintCanvas(now);
+				else paintCanvas(now, advance === 0);
 			}
 
 			const tiles = canvasMode ? undefined : warpRef?.children;
@@ -642,7 +666,9 @@
 					// scale about the cursor rather than something the projection
 					// will drag off somewhere else.
 					if (introAt[i]) {
-						const t = Math.min(1, (now - introAt[i]) / INTRO_MS);
+						// clamped at 0 for the same future-scheduled top-up intros
+						// the canvas path handles above
+						const t = Math.min(1, Math.max(0, (now - introAt[i]) / INTRO_MS));
 						const s = 0.3 + 0.7 * easeOutBack(t);
 						el.style.transform = `${v.transform} scale(${s.toFixed(3)})`;
 						el.style.opacity = (+v.opacity * Math.min(1, t / 0.28)).toFixed(3);
@@ -680,7 +706,10 @@
 					if (!fxWarmup && fxLong >= FX_TRIP) {
 						lowFx = true;
 						// sprites baked from here on skip the glow; the ones
-						// already on screen keep theirs until recycled
+						// already on screen keep theirs until recycled. AVIF
+						// animation stays ON — it only ever steps on unscrolled
+						// frames, which even this device has budget for (they
+						// carried 24 animating <img> layers before the canvas)
 						if (painter) painter.glow = false;
 						try {
 							sessionStorage.setItem('hero_low_fx', '1');
