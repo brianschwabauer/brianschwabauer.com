@@ -5,18 +5,22 @@
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import { theme } from '$lib/stores/theme';
 	import { page } from '$app/state';
-	import { beforeNavigate, onNavigate } from '$app/navigation';
+	import { onNavigate } from '$app/navigation';
 
 	let { children } = $props();
 
 	const isRootPage = $derived(page.url.pathname === '/');
 	const isAdminPage = $derived(page.url.pathname.startsWith('/admin'));
 
-	// Swap theme BEFORE the new page mounts so the first paint is correct.
-	// Initial load is handled by the bootstrap script in app.html.
-	beforeNavigate(({ to }) => {
-		if (!to) return;
-		const path = to.url.pathname;
+	// The theme follows the CURRENT page, reactively — not a navigation hook.
+	// Hooks all fire too early: with preloaded data, even onNavigate runs the
+	// moment you click, and the OLD page then sits on screen for as long as the
+	// destination's chunks take to load, wearing the NEW page's theme (a very
+	// visible flash of mixed styles). An effect on page.url runs in the same
+	// flush as the DOM swap itself, so the theme flip and the new page commit
+	// in one painted frame. Initial load is handled by app.html's bootstrap.
+	$effect(() => {
+		const path = page.url.pathname;
 		if (path === '/admin' || path.startsWith('/admin/')) {
 			theme.forceTheme(null);
 		} else if (path === '/') {

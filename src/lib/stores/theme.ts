@@ -12,7 +12,7 @@ function readStoredPreference(): Theme {
 function createThemeStore() {
 	// Initial value comes from the DOM, which the bootstrap script in app.html
 	// has already set for the current route. Don't touch the DOM here — that
-	// would race with the bootstrap and any beforeNavigate-driven theme swap.
+	// would race with the bootstrap and any onNavigate-driven theme swap.
 	const initial: Theme = browser
 		? ((document.documentElement.dataset.theme as Theme | undefined) ?? 'light')
 		: 'light';
