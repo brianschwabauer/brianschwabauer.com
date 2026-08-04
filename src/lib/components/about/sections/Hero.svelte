@@ -246,7 +246,16 @@
 		let lastY = window.scrollY;
 		let pendingScroll = 0; // signed px scrolled since the last frame
 		let refillBudget = 0; // fractional count of parked tiles owed re-entry
-		let lastProgress = -1; // last pin progress the content departure saw
+		// Last pin progress the content departure saw. Starts at 0, NOT a
+		// sentinel: at the top of the page the first tick after hydration would
+		// otherwise call applyContentDeparture(0), stamping an inline
+		// translate3d on the hero column and inline opacity on the headline/
+		// lede/button. That first write re-layerises text that was already
+		// painted correctly — a visible couple-of-frames font shimmer right as
+		// the page hydrates. Progress 0 means "exactly where SSR put it", so
+		// leave the DOM untouched until the number actually moves (a mid-pin
+		// scroll restore lands with progress > 0 and still gets its write).
+		let lastProgress = 0;
 		let pinTop = 0;
 		let pinDist = 1; // scroll distance the hero stays pinned for
 		let scrollGain = 0; // px scrolled → u advanced (a whole pin drains the field)
@@ -2788,6 +2797,18 @@
 	/* fragments fly outward on boom */
 	.before {
 		transition: filter 300ms ease;
+		/*
+		 * Composited from the very first (server-rendered) paint. The scroll
+		 * loop drives this column with an inline translate3d; if the element
+		 * only became a layer when that first inline write landed, the text
+		 * would be re-rasterised right after hydration — a couple-of-frames
+		 * font shimmer on the headline, lede and button. Declaring the resting
+		 * transform + will-change here means the layer (and its glyph raster)
+		 * exists from the start, so the JS write changes a number on an
+		 * existing layer instead of creating one.
+		 */
+		transform: translate3d(0, 0, 0);
+		will-change: transform;
 	}
 	.before.exploding [data-frag] {
 		animation: frag-fly 1100ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
