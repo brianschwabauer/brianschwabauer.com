@@ -7,8 +7,6 @@
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { Gallery, Video, type GalleryItem } from '@delightstack/components/media';
-	import { Button } from '@delightstack/components/actions';
-	import { Expand } from '@delightstack/components/display';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const CDN = 'https://cdn.brianschwabauer.com/media/';
@@ -639,18 +637,8 @@
 			caption: 'Legacy (2015)',
 			alt: 'Legacy (2015)',
 		},
-		{
-			type: 'video',
-			src: 'https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/master.m3u8',
-			poster: 'https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/poster.jpg',
-			width: 1920,
-			height: 1080,
-			caption: 'Fugue (2014) — 48-hour film',
-			alt: 'Fugue (2014) — 48-hour film',
-		},
 	];
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
-	let split_life_notes = $state(false);
 </script>
 
 <SectionShell id="college" year="2012" label="College" theme="college">
@@ -857,89 +845,101 @@
 			</div>
 		</Reveal>
 
-		<!-- The two SATO 48 films, side by side: same race, one year apart, and
-		     the pairing is the point — Fugue is the swing that set up Split
-		     Life. -->
-		<div class="sato-pair">
-			<div class="sato-col">
-				<Reveal>
-					<h3 class="sub">Fugue — my first 48-hour film (2014)</h3>
-					<p>
-						<strong>Fugue</strong>
-						was my first crack at
-						<strong>SATO 48</strong>
-						— the region's 48-hour film race. You're handed a genre, a prop, and a line of dialogue
-						at kickoff, then get 48 sleepless hours to write, shoot, score, and cut a finished
-						short. It taught me how much you can actually pull off in two days — and set up
-						the bigger swing I took the next year.
-					</p>
-				</Reveal>
-				<Reveal variant="up" delay={100}>
-					<Video
-						src="https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/master.m3u8"
-						poster="https://cdn.brianschwabauer.com/media/2014-04-14_fugue-sato_48/poster.jpg"
-						title="Fugue (2014) — 48-hour film"
-						aspect_ratio="16 / 9"
-						preload="none" />
-				</Reveal>
-			</div>
-
-			<div class="sato-col">
-				<Reveal>
+		<!-- Split Life borrows the film's own grammar: the synopsis plays as two
+		     screens on a hard seam, the 2.35:1 frame runs full bleed, and the
+		     production notes are set as the cue sheet that ran the shoot. -->
+		<div class="split-life">
+			<Reveal>
+				<div class="split-head">
 					<h3 class="sub">Split Life — a 48-hour film, in stereo (2015)</h3>
 					<p>
-						The next year, back at SATO 48, I wanted to do something nobody had done
-						before. So I made a film with
+						<strong>SATO 48</strong>
+						is the region's 48-hour film race: you're handed a genre, a prop, and a line of
+						dialogue at kickoff, then get 48 sleepless hours to write, shoot, score, and cut
+						a finished short. I wanted to do something nobody had done before. So I made a film
+						with
 						<strong>
 							two oner-shot perspectives, shown side-by-side at the same time, in real
 							time.
 						</strong>
-						One: the protagonist leaves her house. Two: a man hidden outside breaks in while
-						she's gone. She comes back. He gets stuck. They turn out to know each other. It
-						ends.
 					</p>
-					<!-- The button collapses away as the notes expand — a one-way door,
-					     so no "Read less" state to manage. -->
-					<Expand show={!split_life_notes}>
-						<div>
-							<Button transparent size="1" onclick={() => (split_life_notes = true)}>
-								Read more
-							</Button>
-						</div>
-					</Expand>
-					<Expand bind:show={split_life_notes}>
-						<div class="split-notes">
-							<p>
-								To make the two shots line up frame-perfect over multiple minutes, I built
-								a master spreadsheet of every event in the film with exact timecodes. I
-								then recorded my own voice giving every cue ("3, 2, 1, open the door") at
-								those exact timecodes, and blasted that audio through the house during
-								filming so every actor and operator knew exactly what should be happening.
-							</p>
-							<p>
-								The actors had to be at exact locations at exact times. Plus a handful of
-								hidden cuts I had to fix in VFX. Plus I scored the music myself, late at
-								night, on the deadline. Plus all the cue audio had to be replaced in post.
-							</p>
-							<p>
-								The story is okay. The lighting is okay. The script is okay. But I did the
-								thing I set out to do, which was: invent a new kind of edit. I'm still
-								proud of that.
-							</p>
-						</div>
-					</Expand>
-				</Reveal>
-				<!-- No stills: the poster already IS the split screen, so a pair of
-				     stillframes above it only said the same thing twice. -->
-				<Reveal variant="up" delay={100}>
+				</div>
+			</Reveal>
+
+			<!-- The synopsis staged the way the film is: both screens at once. -->
+			<Reveal variant="up" delay={100}>
+				<div class="screens">
+					<article class="screen">
+						<div class="screen-label">PERSPECTIVE A</div>
+						<p>The protagonist leaves her house. Later, she comes back.</p>
+					</article>
+					<article class="screen">
+						<div class="screen-label">PERSPECTIVE B</div>
+						<p>A man hidden outside breaks in while she's gone.</p>
+					</article>
+					<p class="convergence">They turn out to know each other. It ends.</p>
+				</div>
+			</Reveal>
+
+			<!-- No stills: the poster already IS the split screen, so a pair of
+			     stillframes above it only said the same thing twice. -->
+			<Reveal variant="up" delay={150}>
+				<div class="film-strip">
 					<Video
 						src="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48/master.m3u8"
 						poster="https://cdn.brianschwabauer.com/media/2015-04-12_split_life-sato_48/poster.jpg"
 						title="Split Life (2015) — 48-hour dual-perspective oner"
 						aspect_ratio="2534 / 1080"
 						preload="none" />
-				</Reveal>
-			</div>
+				</div>
+			</Reveal>
+
+			<Reveal variant="up">
+				<div class="cue-sheet">
+					<div class="strip-eyebrow">THE CUE SHEET — HOW TWO ONERS STAYED IN SYNC</div>
+					<div class="cue-row">
+						<div class="cue-key">SYNC</div>
+						<div class="cue-body">
+							<p>
+								To make the two shots line up frame-perfect over multiple minutes, I built
+								a master spreadsheet of every event in the film with exact timecodes —
+								then recorded my own voice giving every cue at those exact timecodes:
+							</p>
+							<p class="cue-call">"3, 2, 1, open the door"</p>
+							<p>
+								…and blasted that audio through the house during filming, so every actor
+								and operator knew exactly what should be happening at every moment.
+							</p>
+						</div>
+					</div>
+					<div class="cue-row">
+						<div class="cue-key">SET</div>
+						<div class="cue-body">
+							<p>
+								The actors had to be at exact locations at exact times — plus a handful of
+								hidden cuts I knew I'd have to fix later.
+							</p>
+						</div>
+					</div>
+					<div class="cue-row">
+						<div class="cue-key">POST</div>
+						<div class="cue-body">
+							<p>
+								The hidden cuts fixed in VFX. The score written myself, late at night, on
+								the deadline. Every trace of the cue audio replaced.
+							</p>
+						</div>
+					</div>
+				</div>
+			</Reveal>
+
+			<Reveal>
+				<p class="split-close">
+					The story is okay. The lighting is okay. The script is okay. But I did the thing
+					I set out to do, which was: <em>invent a new kind of edit.</em>
+					I'm still proud of that.
+				</p>
+			</Reveal>
 		</div>
 
 		<Reveal variant="up">
@@ -1065,6 +1065,14 @@
 		padding: 0 clamp(1rem, 3vw, 2rem);
 		position: relative;
 		z-index: 1;
+
+		/* #7a4dff is the section's violet, but at ~L 0.54 it only manages about
+		   2.4:1 against the room's dark ground — fine as a surface (.lab-tag),
+		   too dim as ink. Text derives lifted tints from it instead: labels get
+		   the most light (they're small), inline strongs a bit less so they
+		   still read as saturated emphasis. */
+		--violet-label: oklch(from #7a4dff 0.78 calc(c * 0.72) h);
+		--violet-strong: oklch(from #7a4dff 0.7 calc(c * 0.88) h);
 	}
 	.lockup {
 		margin-bottom: 4rem;
@@ -1088,7 +1096,7 @@
 		max-width: 44rem;
 	}
 	.lede strong {
-		color: #7a4dff;
+		color: var(--violet-strong);
 	}
 	/* Title and lede side by side rather than stacked — the third section in a
 	   row to open with the same left-column block starts to read as a template
@@ -1136,7 +1144,7 @@
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
 		letter-spacing: 0.32em;
-		color: #7a4dff;
+		color: var(--violet-label);
 		margin-bottom: 0.8rem;
 	}
 
@@ -1206,7 +1214,7 @@
 		margin-bottom: 1rem;
 	}
 	.node-head strong {
-		color: #7a4dff;
+		color: var(--violet-strong);
 	}
 	.node-rig {
 		display: grid;
@@ -1224,7 +1232,7 @@
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
 		letter-spacing: 0.32em;
-		color: #7a4dff;
+		color: var(--violet-label);
 		margin-bottom: 0.6rem;
 	}
 	.rig-steps {
@@ -1295,38 +1303,147 @@
 		}
 	}
 
-	.sato-pair {
+	.split-life {
+		margin: 8rem 0 10rem;
+	}
+	.split-head {
+		width: 100vw;
+		margin-inline: calc(50% - 50vw);
+		padding-inline: clamp(1rem, 3vw, 2rem);
+		box-sizing: border-box;
+		h3 {
+			max-width: 56rem;
+		}
+		p {
+			line-height: 1.65;
+			max-width: 56rem;
+		}
+	}
+
+	/* The synopsis staged the way the film plays: two screens running at the
+	   same time, divided by the seam, breaking out to the full viewport (same
+	   breakout as .gallery-bleed) like a frame of the film itself. */
+	.screens {
+		width: 100vw;
+		margin-inline: calc(50% - 50vw);
+		padding-inline: clamp(1rem, 3vw, 2rem);
+		box-sizing: border-box;
+		margin-top: 2rem;
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-		grid-template-rows: auto auto;
-		align-items: start;
-		gap: clamp(1.5rem, 4vw, 3.5rem);
-		margin: 5rem 0;
 	}
-	/* Subgrid so both columns share the copy row: whichever film has the taller
-	   block sets the height, and the two players start on the same line rather
-	   than stepping down wherever the prose happens to end. */
-	.sato-col {
+	.screen {
+		background: oklch(0.14 0.05 290 / 0.6);
+		padding: clamp(1.5rem, 3.5vw, 2.75rem) clamp(1.25rem, 4vw, 3.5rem);
 		display: grid;
-		grid-row: span 2;
-		grid-template-rows: subgrid;
-		align-content: start;
+		gap: 0.7rem;
+		align-content: center;
+		justify-items: center;
+		text-align: center;
+		min-height: clamp(8rem, 15vw, 12rem);
+	}
+	/* The seam. */
+	.screen + .screen {
+		border-left: 2px solid oklch(0.92 0.02 290 / 0.4);
+	}
+	.screen-label {
+		font-family: var(--font-mono);
+		font-size: 0.65rem;
+		letter-spacing: 0.3em;
+		color: var(--violet-label);
+	}
+	.screen p {
+		font-size: clamp(1.02rem, 1.5vw, 1.2rem);
+		line-height: 1.55;
+		max-width: 38rem;
+		margin: 0;
+	}
+	.convergence {
+		grid-column: 1 / -1;
+		text-align: center;
+		margin-top: 1.1rem;
+		font-style: italic;
+		opacity: 0.85;
+	}
+
+	/* The 2.35:1 frame gets the whole viewport — it's the section's hero. */
+	.film-strip {
+		width: 100vw;
+		margin-inline: calc(50% - 50vw);
+		padding-inline: clamp(1rem, 3vw, 2rem);
+		box-sizing: border-box;
+		margin-top: 2.5rem;
+	}
+
+	/* The production notes set as the document that ran the shoot: a ruled
+	   sheet with a mono key gutter, not another run of plain paragraphs. */
+	.cue-sheet {
+		max-width: 56rem;
+		margin: 3.5rem auto 0;
+		padding: 0.5rem 1.5rem;
+		border-radius: 1rem;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+	}
+	.cue-sheet .strip-eyebrow {
+		padding-top: 0.8rem;
+	}
+	.cue-row {
+		display: grid;
+		grid-template-columns: 6rem minmax(0, 1fr);
 		gap: 1.5rem;
+		padding-block: 1.1rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
 	}
-	.sato-col p {
-		line-height: 1.65;
+	.cue-key {
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.25em;
+		color: var(--violet-label);
+		font-weight: 700;
+		padding-top: 0.35em;
 	}
-	/* The production notes live behind the Read More button; a little air above
-	   the paragraphs once they've expanded. */
-	.split-notes {
-		padding-top: 0.75rem;
+	.cue-body p {
+		line-height: 1.6;
+		margin: 0;
+		max-width: 44rem;
 	}
-	.split-notes p {
-		margin-bottom: 1rem;
+	.cue-body p + p {
+		margin-top: 0.6rem;
 	}
-	@media (max-width: 860px) {
-		.sato-pair {
+	/* The one cue everyone on set actually heard, at the size it was heard. */
+	.cue-body .cue-call {
+		font-family: var(--font-mono);
+		font-size: clamp(1.15rem, 2vw, 1.5rem);
+		font-weight: 700;
+		color: #ff5fb3;
+		border-left: 3px solid #ff5fb3;
+		padding-left: 0.9rem;
+		margin-block: 0.9rem;
+	}
+
+	.split-close {
+		max-width: 40rem;
+		margin: 5rem auto 0;
+		text-align: center;
+		font-size: clamp(1.05rem, 2vw, 1.5rem);
+		line-height: 1.7;
+	}
+	.split-close em {
+		color: #ff5fb3;
+	}
+
+	@media (max-width: 700px) {
+		.screens {
 			grid-template-columns: minmax(0, 1fr);
+		}
+		/* Stacked, the seam turns horizontal. */
+		.screen + .screen {
+			border-left: none;
+			border-top: 2px solid oklch(0.92 0.02 290 / 0.4);
+		}
+		.cue-row {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 0.4rem;
 		}
 	}
 
@@ -1362,7 +1479,7 @@
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
 		letter-spacing: 0.2em;
-		color: #7a4dff;
+		color: var(--violet-label);
 		font-weight: 700;
 	}
 	.film-quad-card p {
