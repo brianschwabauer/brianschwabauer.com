@@ -260,7 +260,7 @@
 						<div class="key-marker tr"></div>
 						<div class="key-marker bl"></div>
 						<div class="key-marker br"></div>
-						<div class="key-label">CHROMA · 0x22FF90</div>
+						<div class="key-label">CHROMAKEY</div>
 					</div>
 					<LazyMedia
 						src="https://cdn.brianschwabauer.com/media/2007-08-09_xyz_news_episode_i-brian_gives_thumbs_up_while_floating_with_green_screen_2.avif"
