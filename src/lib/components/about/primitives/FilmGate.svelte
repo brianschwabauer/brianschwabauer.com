@@ -233,16 +233,6 @@
 			drawFrame();
 		};
 
-		// Nothing to simulate while the gate is off screen.
-		let onscreen = true;
-		const io = new IntersectionObserver(
-			(entries) => (onscreen = entries.some((e) => e.isIntersecting)),
-			{
-				rootMargin: '20%',
-			},
-		);
-		io.observe(host);
-
 		let raf = 0;
 		let last = performance.now();
 		let acc = 0;
@@ -250,7 +240,6 @@
 			raf = requestAnimationFrame(tick);
 			const dt = now - last;
 			last = now;
-			if (!onscreen) return;
 			// Never try to catch up more than a couple of frames after a stall —
 			// a burst of simulated frames would read as a glitch, not as film.
 			acc = Math.min(acc + dt, FRAME_MS * 3);
@@ -258,12 +247,34 @@
 			acc -= FRAME_MS;
 			step();
 		};
-		raf = requestAnimationFrame(tick);
+		const start = () => {
+			if (raf) return;
+			// Reset the clock so the first resumed frame doesn't swallow the whole
+			// off-screen stretch as one giant dt.
+			last = performance.now();
+			raf = requestAnimationFrame(tick);
+		};
+		const stop = () => {
+			cancelAnimationFrame(raf);
+			raf = 0;
+		};
+		// Nothing to simulate while the gate is off screen — the loop stops
+		// outright rather than idling. Fail open without IO.
+		let io: IntersectionObserver | null = null;
+		if (typeof IntersectionObserver === 'undefined') {
+			start();
+		} else {
+			io = new IntersectionObserver(
+				(entries) => (entries.some((e) => e.isIntersecting) ? start() : stop()),
+				{ rootMargin: '20%' },
+			);
+			io.observe(host);
+		}
 
 		return () => {
-			cancelAnimationFrame(raf);
+			stop();
 			ro.disconnect();
-			io.disconnect();
+			io?.disconnect();
 		};
 	});
 </script>

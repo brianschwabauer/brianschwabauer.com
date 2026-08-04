@@ -1,5 +1,6 @@
 <script lang="ts">
 	import BuildField from './BuildField.svelte';
+	import { onScrollProgress } from './scrollProgress';
 
 	let {
 		years,
@@ -19,14 +20,14 @@
 	let stage_h = $state(0);
 	let progress = $state(0);
 
+	// The shared scroll bus does the listener/rAF/IO bookkeeping (and the rect
+	// read) once for the whole page — this just maps the rect to progress.
 	$effect(() => {
 		if (!el) return;
-		const onScroll = () => {
-			const rect = el!.getBoundingClientRect();
+		return onScrollProgress(el, (rect) => {
 			// The numerals' type size, for the field's clearing. Taken here rather
 			// than with `bind:clientHeight` because that binding is delivered by a
-			// ResizeObserver, and the field draws nothing at all until this arrives —
-			// this handler has already forced layout, so the read is free.
+			// ResizeObserver, and the field draws nothing at all until this arrives.
 			if (stageEl) stage_h = stageEl.offsetHeight;
 			// Measure the sticky window itself (100svh) instead of
 			// window.innerHeight, which changes when the mobile URL bar collapses
@@ -38,36 +39,7 @@
 			const t = -rect.top;
 			const span = rect.height - vh;
 			progress = span > 0 ? Math.max(0, Math.min(1, t / span)) : 0;
-		};
-		// Only track scroll while the cycler is near the viewport.
-		let listening = false;
-		const listen = (on: boolean) => {
-			if (on === listening) return;
-			listening = on;
-			if (on) {
-				onScroll();
-				window.addEventListener('scroll', onScroll, { passive: true });
-				window.addEventListener('resize', onScroll);
-			} else {
-				window.removeEventListener('scroll', onScroll);
-				window.removeEventListener('resize', onScroll);
-			}
-		};
-		// Fail-open: start listening immediately; the observer only *pauses*
-		// tracking once it has actually reported the cycler as off-screen.
-		listen(true);
-		if (typeof IntersectionObserver === 'undefined') {
-			return () => listen(false);
-		}
-		const io = new IntersectionObserver(
-			(entries) => listen(entries.some((e) => e.isIntersecting)),
-			{ rootMargin: '100% 0px' },
-		);
-		io.observe(el);
-		return () => {
-			io.disconnect();
-			listen(false);
-		};
+		});
 	});
 
 	const virtualIndex = $derived(years.length > 1 ? progress * (years.length - 1) : 0);

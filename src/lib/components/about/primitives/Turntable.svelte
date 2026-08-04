@@ -25,7 +25,7 @@
 
 	let {
 		tracks,
-		color = '#ff7ad0',
+		color = '#ff66cc',
 		/** Label copy — the record's own identity, not the cued track's. */
 		label_top = '33⅓',
 		label_bottom = '2007—2010',
@@ -236,6 +236,12 @@
 			</radialGradient>
 		</defs>
 
+		<!-- The shadow, cast by its own static circle rather than by a filter on
+		     the svg root: a root filter contains the spinning disc, so it was
+		     re-evaluated on every frame of playback. This circle never moves, the
+		     record covers it exactly, and its drop-shadow rasterizes once. -->
+		<circle class="shadow" cx={CX} cy={CY} r={R_DISC} fill="#08070b" />
+
 		<!-- The record. Everything in here turns together, so the sheen and the
 		     label are what make the rotation legible — the grooves are concentric
 		     and would look identical at any angle. -->
@@ -409,8 +415,10 @@
 		max-width: 400px;
 		aspect-ratio: 1;
 		overflow: visible;
-		/* Neutral, not a coloured halo — the record is a black object on a dark
-		   page and wants weight under it, not a glow around it. */
+	}
+	/* Neutral, not a coloured halo — the record is a black object on a dark
+	   page and wants weight under it, not a glow around it. */
+	.shadow {
 		filter: drop-shadow(0 18px 26px rgba(0, 0, 0, 0.55));
 	}
 
@@ -427,11 +435,11 @@
 			rotate: 360deg;
 		}
 	}
-	/* No `mix-blend-mode` here. The svg carries a drop-shadow filter, and a
-	   blended child inside a filtered group composites against the filter
-	   region rather than the disc — which paints the group's whole bounding box
-	   as a visible lighter rectangle the moment the spin animation promotes a
-	   layer. The gradient is white-into-transparent anyway, so plain
+	/* No `mix-blend-mode` here. When the svg carried a drop-shadow filter, a
+	   blended child inside the filtered group composited against the filter
+	   region rather than the disc — which painted the group's whole bounding
+	   box as a visible lighter rectangle the moment the spin animation promoted
+	   a layer. The gradient is white-into-transparent anyway, so plain
 	   source-over looks the same without the artefact. */
 	.glint {
 		pointer-events: none;

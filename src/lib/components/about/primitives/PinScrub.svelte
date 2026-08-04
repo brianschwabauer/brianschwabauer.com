@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { onScrollProgress } from './scrollProgress';
 
 	let {
 		children,
@@ -20,10 +21,11 @@
 	// length instead of to the reader's actual scrolling.
 	let scrolled = $state(0);
 
+	// The shared scroll bus does the listener/rAF/IO bookkeeping (and the rect
+	// read) once for the whole page — this just maps the rect to progress.
 	$effect(() => {
 		if (!outer) return;
-		const update = () => {
-			const rect = outer!.getBoundingClientRect();
+		return onScrollProgress(outer, (rect) => {
 			// Measure the sticky window itself rather than window.innerHeight —
 			// the sticky is 100svh, which stays constant while the mobile URL bar
 			// collapses, so the progress mapping doesn't lurch mid-scrub.
@@ -32,36 +34,7 @@
 			const traversed = -rect.top;
 			scrolled = Math.max(0, Math.min(total, traversed));
 			progress = Math.max(0, Math.min(1, traversed / Math.max(1, total)));
-		};
-		// Only track scroll while the pin is anywhere near the viewport.
-		let listening = false;
-		const listen = (on: boolean) => {
-			if (on === listening) return;
-			listening = on;
-			if (on) {
-				update();
-				window.addEventListener('scroll', update, { passive: true });
-				window.addEventListener('resize', update);
-			} else {
-				window.removeEventListener('scroll', update);
-				window.removeEventListener('resize', update);
-			}
-		};
-		// Fail-open: start listening immediately; the observer only *pauses*
-		// tracking once it has actually reported the pin as off-screen.
-		listen(true);
-		if (typeof IntersectionObserver === 'undefined') {
-			return () => listen(false);
-		}
-		const io = new IntersectionObserver(
-			(entries) => listen(entries.some((e) => e.isIntersecting)),
-			{ rootMargin: '100% 0px' },
-		);
-		io.observe(outer);
-		return () => {
-			io.disconnect();
-			listen(false);
-		};
+		});
 	});
 </script>
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { onScrollProgress } from './scrollProgress';
 
 	let {
 		children,
@@ -10,20 +11,14 @@
 	let el = $state<HTMLElement | null>(null);
 	let y = $state(0);
 
+	// The shared scroll bus does the listener/rAF/IO bookkeeping (and the rect
+	// read) once for the whole page — this just maps the rect to an offset.
 	$effect(() => {
 		if (!el) return;
-		const update = () => {
-			const rect = el!.getBoundingClientRect();
+		return onScrollProgress(el, (rect) => {
 			const center = rect.top + rect.height / 2 - (window.innerHeight || 0) / 2;
 			y = -center * speed;
-		};
-		update();
-		window.addEventListener('scroll', update, { passive: true });
-		window.addEventListener('resize', update);
-		return () => {
-			window.removeEventListener('scroll', update);
-			window.removeEventListener('resize', update);
-		};
+		});
 	});
 </script>
 

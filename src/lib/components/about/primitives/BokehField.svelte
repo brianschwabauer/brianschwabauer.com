@@ -71,6 +71,24 @@
 	let bands = $state(2);
 
 	/*
+	 * Phones can't afford the full field: every disc is an infinitely-animating
+	 * layer, and up to 4 bands × ~48 of them is a desktop budget. On small
+	 * screens the band count caps at 2 and the density halves. The cap is
+	 * applied where the values are consumed rather than where they're measured,
+	 * so a rotation across the breakpoint re-clamps without a re-measure — and
+	 * the server (no matchMedia) renders the desktop field, corrected on mount.
+	 */
+	let small_screen = $state(false);
+	$effect(() => {
+		const mq = window.matchMedia('(max-width: 768px)');
+		const sync = () => (small_screen = mq.matches);
+		sync();
+		mq.addEventListener('change', sync);
+		return () => mq.removeEventListener('change', sync);
+	});
+	const shown_bands = $derived(small_screen ? Math.min(2, bands) : bands);
+
+	/*
 	 * Parallax, driven from the scroll position rather than from a CSS
 	 * `view()` timeline. The timeline version was wired correctly — the right
 	 * subject, the right keyframes — but its `currentTime` never left `null`,
@@ -255,8 +273,9 @@
 	 * still lands on two of the four.
 	 */
 	const discs = $derived.by(() => {
-		if (density >= 1) return BOKEH;
-		const stride = Math.max(2, Math.round(1 / Math.max(0.01, density)));
+		const d = small_screen ? density / 2 : density;
+		if (d >= 1) return BOKEH;
+		const stride = Math.max(2, Math.round(1 / Math.max(0.01, d)));
 		const kept = BOKEH.filter((_, i) => i % stride === 0);
 		return kept.some((d) => d.near) ? kept : [...kept, BOKEH.findLast((d) => d.near)!];
 	});
@@ -273,7 +292,7 @@
 	 */
 	const hash = (n: number) => ((n * 2654435761) % 4294967296) / 4294967296;
 	const band_list = $derived(
-		Array.from({ length: bands }, (_, b) => ({
+		Array.from({ length: shown_bands }, (_, b) => ({
 			b,
 			mirror: b % 2 === 1,
 			dx: (hash(b + 1) - 0.5) * 14,
@@ -293,8 +312,8 @@
 	{#each band_list as band (band.b)}
 		<div
 			class="band"
-			style:--top="{(band.b * 100) / bands}%"
-			style:--height="{100 / bands}%">
+			style:--top="{(band.b * 100) / shown_bands}%"
+			style:--height="{100 / shown_bands}%">
 			{#each discs as ball, i (i)}
 				<span
 					class="bokeh"

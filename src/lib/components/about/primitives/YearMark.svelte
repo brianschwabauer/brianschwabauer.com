@@ -39,12 +39,22 @@
 
 	$effect(() => {
 		if (!el) return;
+		// Everything downstream of `--p` is paint — the gradient wipe under
+		// background-clip, the clone blurs, the foil's drop-shadow — so the value
+		// is QUANTIZED to 200 steps (well under what the wipe can show) and frames
+		// where the step hasn't changed write nothing at all, the same trade
+		// Hero's starVisual() makes.
+		let last_p = -1;
 		return onScrollProgress(el, (rect) => {
 			const vh = window.innerHeight || 1;
 			const navbarHeight = 350;
 			const total = rect.height + vh - navbarHeight;
 			const traversed = vh - rect.top;
-			progress = Math.max(0, Math.min(1, traversed / total));
+			const p = Math.max(0, Math.min(1, traversed / total));
+			const q = Math.round(p * 200) / 200;
+			if (q === last_p) return;
+			last_p = q;
+			progress = q;
 		});
 	});
 
@@ -271,8 +281,10 @@
 		/* Later generations drift a little larger, the way a copy never quite
 		   registers at the same size. */
 		scale: calc(1 + var(--p) * var(--g) * 0.014);
-		/* Loss of detail is the degradation you can actually see. */
-		filter: blur(calc(var(--p) * var(--g) * 1.15px));
+		/* Loss of detail is the degradation you can actually see. Stepped to
+		   quarter-pixels: a blur radius that changes by less than that isn't a
+		   visible change, but it is a fresh rasterization of five copies. */
+		filter: blur(round(var(--p) * var(--g) * 1.15px, 0.25px));
 		/*
 		 * Nothing at the start, strongest around the middle of the travel, gone by
 		 * the end — the copies emerge, separate, and are lost. `sin()` gives that
