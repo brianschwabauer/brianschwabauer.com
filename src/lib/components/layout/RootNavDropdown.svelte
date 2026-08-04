@@ -253,8 +253,8 @@
 		z-index: 250; /* above header (--layer-sticky: 200) */
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		padding: 0 var(--space-3);
+		gap: 2px;
+		padding: 0 var(--space-2);
 		max-width: var(--breakpoint-xl);
 		margin: 0 auto;
 		pointer-events: none;
@@ -264,6 +264,7 @@
 	@media (min-width: 768px) {
 		.bar {
 			padding: 0 var(--space-7);
+			gap: 0.5rem;
 		}
 	}
 
@@ -532,7 +533,7 @@
 		.mobile-actions {
 			display: inline-flex;
 			align-items: center;
-			gap: 0.5rem;
+			gap: 2px;
 			flex-shrink: 0;
 		}
 		.dropdown-root {
