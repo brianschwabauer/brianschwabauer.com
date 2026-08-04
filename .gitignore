@@ -45,3 +45,6 @@ TODO.md
 # Content is uploaded to R2/KV directly and intentionally not committed.
 /legacy-content/
 /scripts/legacy-migrate/
+
+# Archive index — lists private projects; lives in KV only (see scripts/archive/upload.sh)
+/scripts/archive/archive-index.json
