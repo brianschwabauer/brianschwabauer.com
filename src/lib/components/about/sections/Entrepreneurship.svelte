@@ -223,8 +223,7 @@
 					Somewhere in this stretch I stopped thinking of myself as a freelancer and
 					started thinking of myself as an entrepreneur. I wanted to build products, not
 					deliver projects. I wanted to make things that could keep running without me
-					there. Some worked. Some didn't. Almost all of them taught me a thing I used in
-					the next one.
+					there.
 				</p>
 			</Reveal>
 		</div>
@@ -353,6 +352,28 @@
 					]} />
 			</Reveal>
 		</div>
+
+		<!-- The honest accounting comes after the products, once the reader has
+		     met the things being accounted for. Dressed as the section's own
+		     furniture: circled on the whiteboard in the same red marker that
+		     crossed out "selling time." in the title. -->
+		<Reveal>
+			<aside class="lessons">
+				<h3 class="lessons-title">The post-mortem</h3>
+				<p>
+					Mostly, they didn't make it. These were partnerships — the losses were shared,
+					but the lessons I kept were mine.
+				</p>
+				<p>
+					TapNotion was a decent product that nobody ever paid for, and I still can't
+					untangle how much of that was the build and how much was the sell. Engagement
+					Grower taught me the harder one: a well-built product that doesn't solve a
+					problem people actually feel isn't a marketing problem — it's the wrong idea,
+					executed well.
+				</p>
+				<p>Every one of them donated parts to the next thing.</p>
+			</aside>
+		</Reveal>
 	</div>
 
 	<LightboxGallery bind:this={gallery} key="entrepreneurship" items={sectionExtras} />
@@ -455,6 +476,44 @@
 		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
 		line-height: 1.6;
 		max-width: 44rem;
+	}
+	.lessons {
+		margin: 6rem auto 1rem;
+		max-width: 44rem;
+		padding: 2rem 2.4rem 2.2rem;
+		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+		line-height: 1.6;
+		/* Hand-drawn ellipse: mismatched radii wobble the stroke the way a
+		   marker circle never quite closes evenly. Same red as .cross above. */
+		border: 2.5px solid rgba(255, 102, 136, 0.55);
+		border-radius: 255px 25px 225px 25px / 25px 225px 25px 255px;
+		rotate: -0.5deg;
+
+		p {
+			margin: 0 0 1em;
+		}
+		p:last-child {
+			margin-bottom: 0;
+		}
+	}
+	.lessons-title {
+		margin: 0 0 1.2rem;
+		font-size: 1.5rem;
+		font-weight: 900;
+		letter-spacing: -0.02em;
+		display: inline-block;
+		position: relative;
+
+		&::after {
+			content: '';
+			position: absolute;
+			left: 0;
+			right: -0.3em;
+			bottom: -0.1em;
+			height: 4px;
+			background: #ff6688;
+			transform: skewY(-2deg);
+		}
 	}
 
 	.card {

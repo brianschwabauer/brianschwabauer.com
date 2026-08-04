@@ -167,6 +167,13 @@
 		'gone, but still loading… 87%',
 	)}
 
+	<div class="entry">
+		<p class="role">Next project</p>
+		<p class="name">
+			<a class="casting" href="/contact">could be yours — get in touch</a>
+		</p>
+	</div>
+
 	<div class="colophon">
 		<p>This website was shot entirely on Svelte 5 and Cloudflare.</p>
 		<p>Built by the director.</p>
@@ -177,7 +184,6 @@
 	</div>
 
 	<p class="joke">Based on a true story. All of it, unfortunately.</p>
-	<p class="joke">No pixels were harmed in the making of this website.</p>
 
 	<p class="fin">FIN</p>
 
@@ -493,6 +499,11 @@
 		word-break: break-word;
 	}
 	.colophon a {
+		color: inherit;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+	.casting {
 		color: inherit;
 		text-decoration: underline;
 		text-underline-offset: 3px;
