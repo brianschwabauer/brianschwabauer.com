@@ -159,20 +159,13 @@
 	/** One lightbox per project, indexed alongside `PROJECTS`. */
 	let galleries = $state<Array<ReturnType<typeof LightboxGallery> | undefined>>([]);
 
-	/**
-	 * The one photograph in this section, and the only non-screenshot on it.
-	 *
-	 * TODO(brian): add family photo — a snapshot, not a product shot. Shape:
-	 * `{ src: string; width: number; height: number; alt: string }`. The block is
-	 * designed to read as finished without it, so leaving this `null` is a valid
-	 * shipping state rather than a gap.
-	 */
-	const bio_photo = null as {
-		src: string;
-		width: number;
-		height: number;
-		alt: string;
-	} | null;
+	/** The one photograph in this section, and the only non-screenshot on it. */
+	const bio_photo = {
+		src: 'https://cdn.brianschwabauer.com/media/2026-07-17_family_photo_in_arkansas.avif',
+		width: 2048,
+		height: 1536,
+		alt: 'Schwabauer family photo on a small mountain in Arkansas',
+	};
 
 	/**
 	 * Motes rising through the light. Hand-placed across the width, with no two
@@ -393,7 +386,6 @@
 		     folded away behind a "learn more". -->
 		<div class="bio" class:with-photo={Boolean(bio_photo)}>
 			<Reveal variant="up">
-				<div class="eyebrow">OFF THE CLOCK</div>
 				<p>
 					When I'm not shipping, I'm in Kansas City with my wife and our four kids —
 					building them a treehouse, camping, out on a run, or halfway through the next
@@ -585,13 +577,6 @@
 		border: 1px solid rgba(0, 242, 195, 0.2);
 		border-radius: 18px;
 		background: rgba(0, 242, 195, 0.03);
-	}
-	.eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #00f2c3;
-		margin-bottom: 1rem;
 	}
 	.toolkit h3 {
 		font-size: clamp(2.2rem, 5.5vw, 3.4rem);
