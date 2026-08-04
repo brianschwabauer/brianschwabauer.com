@@ -550,15 +550,6 @@
 		position: relative;
 		z-index: 1;
 	}
-	.playback {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.16em;
-		text-transform: uppercase;
-		opacity: 0.6;
-		margin: 0 0 1.1rem;
-	}
-
 	/* ── Show&Tour, present tense ───────────────────────────────────────── */
 	.snt {
 		max-width: 44rem;

@@ -105,6 +105,7 @@
 		if (paused || !visible || reduced_motion) return;
 		// Reading `front` restarts the dwell after every change, so a manual pick
 		// gets a full 4s before the deck takes over again.
+		// oxlint-disable-next-line no-unused-expressions
 		front;
 		const timer = setTimeout(() => (front = (front + 1) % sites.length), DWELL_MS);
 		return () => clearTimeout(timer);
@@ -135,11 +136,11 @@
 				</p>
 				<p class="lede">
 					I fired up Apple's <strong>iWeb,</strong>
-					which let me drag boxes onto a page and call it a website. It was perfect for
-					someone who had no idea what HTML was. Pretty soon I outgrew it and moved to
+					which let me drag boxes onto a page and call it a website. It was perfect for someone
+					who had no idea what HTML was. Pretty soon I outgrew it and moved to
 					<strong>Adobe Dreamweaver.</strong>
-					 That meant I was actually writing code. Mostly badly. But I had crossed a line —
-					I could make pixels do what I wanted, and the pixels could now do things on click.
+					That meant I was actually writing code. Mostly badly. But I had crossed a line — I
+					could make pixels do what I wanted, and the pixels could now do things on click.
 				</p>
 				<p class="lede">
 					Soon I was writing Flash. A custom Flash header for the homepage with faces that

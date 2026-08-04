@@ -479,13 +479,6 @@
 </SectionShell>
 
 <style>
-	.lb-img {
-		display: block;
-		max-width: min(1400px, 92vw);
-		max-height: calc(95svh - 8rem);
-		object-fit: contain;
-		border-radius: 6px;
-	}
 	:global([data-theme='green']) {
 		background:
 			radial-gradient(ellipse at top, rgba(34, 255, 144, 0.06), transparent 50%),
@@ -795,11 +788,6 @@
 		line-height: 1.65;
 		margin-bottom: 1rem;
 	}
-	.closing em {
-		color: #22ff90;
-		font-style: italic;
-	}
-
 	.pac-tunnel {
 		--pac-size: clamp(220px, 30vw, 400px);
 		--stage-height: calc(var(--pac-size) + clamp(20px, 3vw, 48px));

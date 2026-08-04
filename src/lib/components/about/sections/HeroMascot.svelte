@@ -381,6 +381,7 @@
 
 	$effect(() => {
 		// re-resolve whenever the rig remounts or he leaves the stage
+		// oxlint-disable-next-line no-unused-expressions
 		rig_key;
 		const root = rig_el;
 		if (!root || !on_stage) return;

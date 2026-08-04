@@ -494,11 +494,6 @@
 		line-height: 1.6;
 		margin-bottom: 1rem;
 	}
-	.archive-lead {
-		margin: 0 0 0.9rem;
-		line-height: 1.6;
-	}
-
 	.bts-row {
 		display: grid;
 		grid-template-columns: 1fr 1fr;

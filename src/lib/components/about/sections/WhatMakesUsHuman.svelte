@@ -830,13 +830,6 @@
 </SectionShell>
 
 <style>
-	.lb-img {
-		display: block;
-		max-width: min(1400px, 92vw);
-		max-height: calc(95svh - 8rem);
-		object-fit: contain;
-		border-radius: 6px;
-	}
 	:global([data-theme='thesis']) {
 		background:
 			radial-gradient(ellipse at top, rgba(0, 242, 195, 0.06), transparent 50%),

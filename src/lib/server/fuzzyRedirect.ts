@@ -59,7 +59,7 @@ export function pathToQuery(pathname: string): string {
 	if (!stripped) return '';
 	return stripped
 		.replace(/\.[a-z0-9]{2,5}$/i, '')
-		.replace(/[\/\-_]+/g, ' ')
+		.replace(/[/\-_]+/g, ' ')
 		.replace(/\s+/g, ' ')
 		.trim()
 		.toLowerCase();

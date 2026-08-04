@@ -288,6 +288,7 @@
 	let was_visible = false;
 	$effect(() => {
 		const showing = visible;
+		// oxlint-disable-next-line no-unused-expressions -- $effect dependency
 		letters;
 		untrack(() => {
 			if (!container || !showing) {

@@ -18,6 +18,9 @@
 
 	let track_el = $state<HTMLElement>();
 
+	/* Deliberately the initial value: `stops` is static and activeId is driven
+	   by scroll/clicks from here on. */
+	// svelte-ignore state_referenced_locally
 	let activeId = $state(stops[0]?.id ?? '');
 	/** 0–1 along the rail, measured in stops rather than in scrolled pixels. */
 	let railProgress = $state(0);

@@ -90,7 +90,7 @@ const redirectHandle: Handle = async ({ event, resolve }) => {
 	// but that one is matched by Cloudflare's static asset layer and doesn't
 	// catch the trailing-slash variant on every config, so handle it here as
 	// a safety net.
-	const legacyDate = /^\/blog\/(\d{4})\/(\d{1,2})\/([^\/]+)\/?$/.exec(pathname);
+	const legacyDate = /^\/blog\/(\d{4})\/(\d{1,2})\/([^/]+)\/?$/.exec(pathname);
 	if (legacyDate) {
 		return new Response(null, {
 			status: 301,

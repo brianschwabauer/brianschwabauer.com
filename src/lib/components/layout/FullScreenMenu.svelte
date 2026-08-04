@@ -29,7 +29,7 @@
 
 {#if open}
 	<div class="menu-backdrop" onclick={() => (open = false)} role="presentation"></div>
-	<nav class="menu" role="navigation">
+	<nav class="menu">
 		<ul class="menu-list">
 			{#each links as link, i}
 				<li class="menu-item" style="--delay: {i * 50}ms">

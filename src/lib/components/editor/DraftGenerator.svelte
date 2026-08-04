@@ -87,23 +87,6 @@
 		font-size: var(--text-sm);
 	}
 
-	.field {
-		margin-bottom: var(--space-5);
-	}
-
-	.field label {
-		display: block;
-		font-size: var(--text-sm);
-		font-weight: 500;
-		margin-bottom: var(--space-2);
-	}
-
-	.field textarea {
-		width: 100%;
-		resize: vertical;
-		min-height: 150px;
-	}
-
 	.actions {
 		display: flex;
 		gap: var(--space-2);

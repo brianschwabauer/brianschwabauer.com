@@ -509,13 +509,6 @@
 </SectionShell>
 
 <style>
-	.lb-img {
-		display: block;
-		max-width: min(1400px, 92vw);
-		max-height: calc(95svh - 8rem);
-		object-fit: contain;
-		border-radius: 6px;
-	}
 	:global([data-theme='vfx']) {
 		background:
 			radial-gradient(circle at 20% 0%, rgba(108, 99, 255, 0.15), transparent 50%),

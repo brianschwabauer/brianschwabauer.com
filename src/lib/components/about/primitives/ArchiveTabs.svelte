@@ -20,7 +20,7 @@
 	   archived site keeps whatever scroll position you left it at. */
 	let visited = $state<number[]>([]);
 	let loaded = $state<number[]>([]);
-	let tab_els: HTMLButtonElement[] = [];
+	let tab_els = $state<HTMLButtonElement[]>([]);
 
 	const current = $derived(tabs[active] ?? tabs[0]);
 	const hosts = $derived(

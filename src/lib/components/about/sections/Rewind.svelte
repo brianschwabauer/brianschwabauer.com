@@ -602,9 +602,6 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.rew-icon.running {
-			animation: none;
-		}
 		/* The pin has collapsed to one static scene, so the bio has nothing left to
 		   scroll away from — it becomes an ordinary block stacked above it. */
 		:global(.rewind-pin .pin-inner) {
