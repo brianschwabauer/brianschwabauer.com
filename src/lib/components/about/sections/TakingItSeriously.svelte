@@ -207,16 +207,15 @@
 				<h3 class="sub">A site for every film, eventually</h3>
 				<p>
 					When we released <strong>Calamity</strong>
-					(a stop-motion lego film I'll get to in a later section), I built it its own little
-					Flash website. It even had a Facebook "app" that embedded the same Flash player inside
-					Facebook. Players could move a lego character around and watch its walk cycle animate.
-					There were no objectives. No scoring. No win condition. That wasn't the point.
+					(a stop-motion lego film), I built it its own little Flash website. Players could
+					move a lego character around and watch its walk cycle animate. There were no objectives.
+					No scoring. No win condition. That wasn't the point.
 				</p>
 				<p class="aside">
 					The point was: <em>
-						I could write code, and the code could make things appear on a screen.
+						I could write code, and the code would make things appear on a screen.
 					</em>
-					I was hooked. I have not really stopped since.
+					It was magic. And I was hooked — I still am.
 				</p>
 			</Reveal>
 
