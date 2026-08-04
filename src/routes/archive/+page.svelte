@@ -333,6 +333,8 @@
 
 		.badge {
 			position: absolute;
+			/* Above the Image component's layers (main img is z-index 1, fallback 2). */
+			z-index: 2;
 			top: 0.5rem;
 			left: 0.5rem;
 			padding: 0.15rem 0.5rem;
