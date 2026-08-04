@@ -190,15 +190,9 @@
 		},
 		{
 			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party_live_show_006.jpg',
+			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party_live_show_007.jpg',
 			caption: 'Block Party · live show #6',
 			alt: 'Block Party · live show #6',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2011-04-14_ksms_block_party_live_show_007.jpg',
-			caption: 'Block Party · live show #7',
-			alt: 'Block Party · live show #7',
 		},
 	];
 
@@ -471,21 +465,6 @@
 				onframeclick={({ index, element }) => reelGallery?.open(index, element)} />
 		</Reveal>
 
-		<!-- The film that started the reel above. Orphaned under the Yard Sale
-		     stills it read as an afterthought; here it's the first entry in the
-		     festival run the banner just counted. -->
-		<Reveal variant="up" delay={140}>
-			<div class="first-submission">
-				<span class="fs-eyebrow">Where the run started</span>
-				<PlayFilm
-					label="Play Austin Fender"
-					title="Austin Fender (2008) — our first festival submission"
-					meta="2008 · first submission"
-					color="#ff3a3a"
-					onclick={(e) => extrasGallery?.open(1, e.currentTarget)} />
-			</div>
-		</Reveal>
-
 		<!-- Copy pinned, stills scrolling past it — the same shape the other film
 		     with two months of photographs behind it gets. -->
 		<div class="yard-sale">
@@ -514,9 +493,6 @@
 			</div>
 			<div class="media">
 				<Reveal variant="up" delay={120}>
-					<div class="gal-eyebrow">
-						YARD SALE · {yardSaleImages.length} STILLS
-					</div>
 					<div class="gallery-contained">
 						<LightboxGallery
 							key="festivals-yard-sale"
@@ -654,7 +630,7 @@
 									src="https://cdn.brianschwabauer.com/media/2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip/master.m3u8"
 									poster="https://cdn.brianschwabauer.com/media/2011-01-14_ksms_live_broadcast-boys_basketball_vs_smnw-broadcast_beginning_clip/poster.jpg"
 									title="KSMS live broadcast · basketball vs SM-NW (2011)"
-									aspect_ratio="3 / 2"
+									aspect_ratio="16 / 9"
 									preload="none"
 									onplay={() => {
 										armed = true;
@@ -669,9 +645,6 @@
 
 				<Reveal variant="up" delay={150}>
 					<div class="booth">
-						<div class="gal-eyebrow">
-							FROM THE BOOTH · {liveBroadcastImages.length} STILLS
-						</div>
 						<div class="gallery-contained">
 							<LightboxGallery
 								key="festivals-live-broadcast"
@@ -713,7 +686,7 @@
 										src={SOURCES[source].src}
 										poster={SOURCES[source].poster}
 										title={SOURCES[source].title}
-										aspect_ratio="3 / 2"
+										aspect_ratio="1.35"
 										preload="none" />
 								{/key}
 								<span class="flash" aria-hidden="true"></span>
@@ -740,9 +713,6 @@
 
 					<Reveal variant="up" delay={150}>
 						<div class="bp-stills">
-							<div class="gal-eyebrow">
-								THE BLOCK PARTY · {blockPartyImages.length} PHOTOS
-							</div>
 							<div class="gallery-contained">
 								<PeekGallery
 									key="festivals-block-party"
@@ -764,7 +734,9 @@
 					<h4 class="lb-title">A MidWestSide Story (2010)</h4>
 					<p>
 						A parody short film for KSMS about life in the midwest. Just a fun one with
-						Kevin and a handful of KSMS regulars.
+						Kevin and a handful of KSMS regulars. We made this as part of "KSMSmas" where
+						we each made fun films around Christmas time - for no reason other than to
+						make each other laugh.
 					</p>
 				</Reveal>
 				<Reveal variant="up" delay={120}>
@@ -773,7 +745,7 @@
 							src="https://cdn.brianschwabauer.com/media/2010-03-20_a_midwestside_story/master.m3u8"
 							poster="https://cdn.brianschwabauer.com/media/2010-03-20_a_midwestside_story/poster.jpg"
 							title="A MidWestSide Story (2010)"
-							aspect_ratio="3 / 2"
+							aspect_ratio="16 / 9"
 							preload="none" />
 					</div>
 				</Reveal>
@@ -1360,15 +1332,6 @@
 
 	.booth {
 		margin-top: clamp(1.6rem, 3vw, 2.4rem);
-	}
-
-	.gal-eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		text-transform: uppercase;
-		color: var(--gold);
-		margin-bottom: 0.75rem;
 	}
 
 	/* A note in a different voice from the section's narration, styled as a
