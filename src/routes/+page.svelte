@@ -104,7 +104,7 @@
 		{ id: 'freelancer', year: '2016', label: 'Freelancer' },
 		{ id: 'entrepreneurship', year: '2017', label: 'Entrepreneurship' },
 		{ id: 'showandtour', year: '2019', label: 'Show&Tour' },
-		{ id: 'now', year: 'Now', label: 'Now' },
+		{ id: 'now', year: new Date().getFullYear().toString(), label: 'Now' },
 		{ id: 'creed', year: 'Always', label: 'The Creed' },
 		{ id: 'credits', year: 'Fin', label: 'Credits' },
 	];

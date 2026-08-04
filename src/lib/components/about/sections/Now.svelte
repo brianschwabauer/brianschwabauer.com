@@ -200,7 +200,7 @@
 	];
 </script>
 
-<SectionShell id="now" year="Now" label="Now" theme="now">
+<SectionShell id="now" year={new Date().getFullYear().toString()} label="Now" theme="now">
 	<!--
 	  Not the bokeh field. That belongs to 2019 and to the awards show, and using
 	  it a third time made "now" read as a reprise of a chapter you'd already had.
