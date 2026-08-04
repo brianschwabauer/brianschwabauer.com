@@ -48,8 +48,12 @@
 		return onScrollProgress(el, (rect) => {
 			const vh = window.innerHeight || 1;
 			const navbarHeight = 350;
-			const total = rect.height + vh - navbarHeight;
-			const traversed = vh - rect.top;
+			// The reveal starts only once the mark's bottom edge has cleared the
+			// viewport — the outlined year must be fully on screen before it begins
+			// to fill, otherwise it's already part-revealed by the time you notice
+			// it. Ends as before, with the bottom reaching the navbar line.
+			const total = vh - navbarHeight;
+			const traversed = vh - rect.bottom;
 			const p = Math.max(0, Math.min(1, traversed / total));
 			const q = Math.round(p * 200) / 200;
 			if (q === last_p) return;
