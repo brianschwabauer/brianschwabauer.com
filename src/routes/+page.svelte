@@ -52,7 +52,6 @@
 	const credits = () => import('$lib/components/about/sections/Credits.svelte');
 
 	let { data } = $props();
-	const signedIn = $derived(Boolean(data.signedIn));
 
 	// Lift the deep-link curtain (raised by the inline hash-pin script in
 	// app.html) once every lazy section chunk has resolved. The loaders are the
@@ -131,11 +130,11 @@
 	<ChapterCard act={1} />
 	<svelte:boundary>
 		{@const HumbleBeginnings = (await humbleBeginnings()).default}
-		<HumbleBeginnings {signedIn} />
+		<HumbleBeginnings />
 	</svelte:boundary>
 	<svelte:boundary>
 		{@const GreenScreen = (await greenScreen()).default}
-		<GreenScreen {signedIn} />
+		<GreenScreen />
 	</svelte:boundary>
 	<svelte:boundary>
 		{@const FeatureLength = (await featureLength()).default}
@@ -155,7 +154,7 @@
 	</svelte:boundary>
 	<svelte:boundary>
 		{@const Festivals = (await festivals()).default}
-		<Festivals {signedIn} />
+		<Festivals />
 	</svelte:boundary>
 	<ChapterCard act={2} />
 	<svelte:boundary>

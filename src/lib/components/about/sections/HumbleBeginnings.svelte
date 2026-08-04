@@ -3,87 +3,14 @@
 	import YearMark from '../primitives/YearMark.svelte';
 	import Reveal from '../primitives/Reveal.svelte';
 	import LazyMedia from '../primitives/LazyMedia.svelte';
-	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import ViewfinderFrame from '../primitives/ViewfinderFrame.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
-	let { signedIn = false }: { signedIn?: boolean } = $props();
-
 	let gallery = $state<ReturnType<typeof LightboxGallery>>();
 
-	// Every one of these is unlisted — the whole vault only exists for signed-in
-	// visitors. Signed out, the films are not rendered, listed, or counted at all.
-	const privateFilms: Array<{
-		slug: string;
-		title: string;
-		date: string;
-		blurb: string;
-	}> = [
-		{
-			slug: REDACTED,
-			title: 'Quanesha',
-			date: '2006-08-10',
-			blurb: 'No script. No actors. Just two kids and a pile of stuffed animals.',
-		},
-		{
-			slug: REDACTED,
-			title: 'Bobby McQueen',
-			date: '2006-08-30',
-			blurb:
-				'A third friend joins. The plot? Mostly Turbana, a guy in a comically large turban.',
-		},
-		{
-			slug: REDACTED,
-			title: 'The Fight Scene',
-			date: '2006-10-21',
-			blurb:
-				'We tried to act in slow motion so we could "speed it up" later. It does not work.',
-		},
-		{
-			slug: REDACTED,
-			title: 'Super Swatter 3001',
-			date: '2006-12-22',
-			blurb:
-				'A class assignment "invention" — a 3-headed fly swatter — sold via fake infomercial.',
-		},
-		{
-			slug: REDACTED,
-			title: 'Noggin Saver',
-			date: '2007-01-05',
-			blurb: "Kevin's invention: a device that stops chairs from tipping over.",
-		},
-		{
-			slug: REDACTED,
-			title: 'Ninja Men',
-			date: '2007-09-09',
-			blurb:
-				'A year later. Pre-cut apple + toothpick = a karate-chop split that holds up.',
-		},
-		{
-			slug: REDACTED,
-			title: 'Spatula Story',
-			date: '2007-09-06',
-			blurb: "A quest. For a spatula. Don't ask.",
-		},
-		{
-			slug: REDACTED,
-			title: 'Rush for an Idea',
-			date: '2008-02-23',
-			blurb:
-				'Our first film with a real script. Greenscreen, a soundtrack, multiple takes.',
-		},
-		{
-			slug: REDACTED,
-			title: '02.29.08',
-			date: '2008-02-29',
-			blurb:
-				'Newspaper contest: a 29-second short for leap day. Got 2nd place — and taught us quick cuts.',
-		},
-	];
-
 	// Every clickable piece of media in this section, in document order. The lightbox cycles through them all.
-	const baseImages: GalleryItem[] = [
+	const sectionMedia: GalleryItem[] = [
 		{
 			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/1998-05-01_brian_and_kevin_at_preschool_graduation.jpg',
@@ -125,19 +52,6 @@
 			alt: 'The karate-chop apple split',
 		},
 	];
-	const FILM_BASE_INDEX = baseImages.length;
-	const sectionMedia = $derived<GalleryItem[]>([
-		...baseImages,
-		...(signedIn
-			? privateFilms.map((film) => ({
-					type: 'video' as const,
-					src: `https://cdn.brianschwabauer.com/media/${film.slug}/master.m3u8`,
-					poster: `https://cdn.brianschwabauer.com/media/${film.slug}/poster.jpg`,
-					caption: `${film.title} (${film.date})`,
-					alt: film.title,
-				}))
-			: []),
-	]);
 
 	// The REC readout above the heading is a real deck: it starts rolling when
 	// the page hydrates and counts how long you've been here, in tape timecode.
@@ -351,9 +265,8 @@
 					</h3>
 					<p>
 						A year after The Fight Scene we made <strong>Ninja Men.</strong>
-						 We pre-cut an apple, jammed a toothpick into it to hold it together, and let a
-						karate chop "split" it cleanly. Seventh-grade ingenuity I'm still a little proud
-						of.
+						We pre-cut an apple, jammed a toothpick into it to hold it together, and let a karate
+						chop "split" it cleanly. Seventh-grade ingenuity I'm still a little proud of.
 					</p>
 				</div>
 				<LazyMedia
@@ -386,46 +299,9 @@
 				</p>
 			</div>
 		</Reveal>
-
-		{#if signedIn}
-			<Reveal variant="up">
-				<h3 class="vault-heading">
-					<span class="vault-line"></span>
-					The vault
-				</h3>
-				<p class="vault-sub">
-					These are bad. Some of them are wonderful-bad. They are <em>
-						where every other section of this page came from.
-					</em>
-				</p>
-			</Reveal>
-
-			<ul class="films">
-				{#each privateFilms as film, i}
-					<Reveal variant="up" delay={50 + (i % 3) * 80}>
-						<li class="film">
-							<div class="film-head">
-								<span class="film-index">№ {String(i + 1).padStart(2, '0')}</span>
-								<span class="film-date">{film.date}</span>
-							</div>
-							<h4 class="film-title">{film.title}</h4>
-							<p class="film-blurb">{film.blurb}</p>
-							<PlayFilm
-								title={film.title}
-								color="#ff9c4a"
-								onclick={(e) => gallery?.open(FILM_BASE_INDEX + i, e.currentTarget)} />
-						</li>
-					</Reveal>
-				{/each}
-			</ul>
-		{/if}
 	</div>
 
-	<LightboxGallery
-		bind:this={gallery}
-		key="humble-beginnings"
-		items={sectionMedia}
-		autoplay_video />
+	<LightboxGallery bind:this={gallery} key="humble-beginnings" items={sectionMedia} />
 </SectionShell>
 
 <style>
@@ -679,76 +555,6 @@
 	}
 	.karate-text p {
 		line-height: 1.6;
-	}
-
-	.vault-heading {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		font-size: clamp(1.4rem, 2.4vw, 2rem);
-		margin: 4rem 0 0.5rem;
-	}
-	.vault-line {
-		display: block;
-		flex: 1;
-		height: 1px;
-		background: linear-gradient(90deg, var(--tape-accent), transparent);
-	}
-	.vault-sub {
-		opacity: 0.75;
-		max-width: 40rem;
-		margin: 0 0 2rem;
-	}
-
-	.films {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-		gap: 1.25rem;
-	}
-	.film {
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(255, 255, 255, 0.07);
-		border-radius: 10px;
-		padding: 1.2rem 1.3rem;
-		transition:
-			transform 220ms ease,
-			border-color 220ms ease,
-			background 220ms ease;
-	}
-	.film:hover {
-		transition-duration: 0s;
-		transform: translateY(-3px);
-		border-color: rgba(255, 156, 74, 0.45);
-		background: rgba(255, 156, 74, 0.06);
-	}
-	.film-head {
-		display: flex;
-		gap: 0.75rem;
-		align-items: center;
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		text-transform: uppercase;
-		letter-spacing: 0.16em;
-		color: rgba(245, 230, 207, 0.6);
-		margin-bottom: 0.6rem;
-	}
-	.film-index {
-		color: var(--tape-accent);
-		font-weight: 700;
-	}
-	.film-title {
-		font-size: 1.2rem;
-		font-weight: 700;
-		margin: 0 0 0.4rem;
-	}
-	.film-blurb {
-		font-size: 0.95rem;
-		line-height: 1.5;
-		opacity: 0.82;
-		margin: 0;
 	}
 
 	/* Closes the section the way the lede opened it — same type, same colour,

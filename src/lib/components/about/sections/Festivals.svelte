@@ -10,8 +10,6 @@
 	import { ripple } from '@delightstack/utilities';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
-	let { signedIn = false }: { signedIn?: boolean } = $props();
-
 	const reelImages = [
 		{
 			type: 'image',

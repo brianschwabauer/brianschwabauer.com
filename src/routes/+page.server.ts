@@ -1,8 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { buildSeededField } from '$lib/components/about/starfield-build';
 
-export const load: PageServerLoad = async ({ locals, request }) => {
-	const signedIn = Boolean(locals.session?.user);
+export const load: PageServerLoad = async ({ request }) => {
 	// Detect a phone from the User-Agent so the starfield seed can be placed
 	// with the mobile exclusion zone on the server itself — a client-side
 	// viewport check would differ from the server and break hydration.
@@ -20,5 +19,5 @@ export const load: PageServerLoad = async ({ locals, request }) => {
 	// finished stars — it never re-derives them, so the 503-name image pool
 	// stays out of the initial client bundle entirely.
 	const starField = buildSeededField(starSeed, isMobile);
-	return { signedIn, isMobile, starField };
+	return { isMobile, starField };
 };

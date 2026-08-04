@@ -10,8 +10,6 @@
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 	import { onScrollProgress } from '../primitives/scrollProgress';
 
-	let { signedIn = false }: { signedIn?: boolean } = $props();
-
 	let pacTunnel = $state<HTMLElement | null>(null);
 	let pacProgress = $state(0);
 	let pelletTargets = $state([0.2, 0.31, 0.42, 0.54, 0.66, 0.77]);
