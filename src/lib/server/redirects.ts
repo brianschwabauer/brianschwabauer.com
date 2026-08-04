@@ -69,6 +69,31 @@ function isValidStatus(n: unknown): n is RedirectStatus {
 }
 
 /**
+ * Merge a single redirect into the stored map — used when a published post's
+ * slug changes, so the old URL keeps resolving. Reads without `cacheTtl` so
+ * back-to-back renames don't merge onto a stale copy of the map.
+ */
+export async function addRedirect(
+	kv: KVNamespace,
+	from: string,
+	to: string,
+	note?: string,
+): Promise<void> {
+	const key = normalizePath(from);
+	if (!key || key === '/') return;
+	const raw = (await kv.get(REDIRECTS_KEY, 'json')) as RedirectFile | null;
+	const redirects =
+		raw?.redirects && typeof raw.redirects === 'object' ? raw.redirects : {};
+	const entry: RedirectEntry = { to, status: 301 };
+	if (note) entry.note = note;
+	const file: RedirectFile = {
+		updatedAt: Date.now(),
+		redirects: { ...redirects, [key]: entry },
+	};
+	await kv.put(REDIRECTS_KEY, JSON.stringify(file));
+}
+
+/**
  * Validate + persist the full redirect map (replaces the previous one). The
  * admin UI sends the entire map on each save — simple to reason about and
  * the map is small enough that diffing isn't worth it.

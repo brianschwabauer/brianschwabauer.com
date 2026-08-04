@@ -8,6 +8,8 @@
 		summary: string;
 		teaser: string;
 		canDelete: boolean;
+		/** Archived posts get a real (permanent) delete; everything else archives. */
+		archived?: boolean;
 		deleting?: boolean;
 		onSlugChange?: (s: string) => void;
 		onSummaryChange?: (s: string) => void;
@@ -20,6 +22,7 @@
 		summary = $bindable(''),
 		teaser = $bindable(''),
 		canDelete,
+		archived = false,
 		deleting = false,
 		onSlugChange,
 		onSummaryChange,
@@ -38,8 +41,16 @@
 <Modal bind:open title="Post Settings" width="min(640px, 100vw - 2rem)">
 	{#snippet headerEnd()}
 		{#if canDelete}
-			<Button size="0" error transparent loading={deleting} onclick={() => onDelete?.()}>
-				Delete Post
+			<Button
+				size="0"
+				error={archived}
+				transparent
+				loading={deleting}
+				tooltip={archived
+					? 'Permanently delete this archived post'
+					: 'Archive the post — it can be restored later'}
+				onclick={() => onDelete?.()}>
+				{archived ? 'Delete Permanently' : 'Archive Post'}
 			</Button>
 		{/if}
 	{/snippet}

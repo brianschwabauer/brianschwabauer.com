@@ -4,6 +4,7 @@ import type {
 	SendEmail,
 	R2Bucket,
 	Fetcher,
+	ExecutionContext,
 } from '@cloudflare/workers-types';
 
 declare global {
@@ -26,6 +27,7 @@ declare global {
 				AUTH_GOOGLE_SECRET: string;
 				ANTHROPIC_API_KEY: string;
 			};
+			context: ExecutionContext;
 		}
 		interface Locals {
 			session: import('@auth/sveltekit').Session | null;

@@ -151,7 +151,11 @@
 		});
 	}
 
-	async function togglePinned(post: BlogPostMeta) {
+	async function patchPost(
+		post: BlogPostMeta,
+		body: Record<string, unknown>,
+		failMessage: string,
+	) {
 		if (busySlug) return;
 		busySlug = post.slug;
 		actionError = null;
@@ -159,21 +163,51 @@
 			const res = await fetch(`/api/blog/${post.slug}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ pinned: !post.pinned }),
+				// updatedAt from the list is the concurrency token — if an editor
+				// tab changed the post since this list loaded, the server 409s
+				// instead of silently overwriting.
+				body: JSON.stringify({ ...body, expectedUpdatedAt: post.updatedAt }),
 			});
-			if (!res.ok) throw new Error(`Pin failed (${res.status})`);
+			if (res.status === 409) {
+				throw new Error('This post changed elsewhere — the list has been refreshed.');
+			}
+			if (!res.ok) throw new Error(failMessage);
 			await invalidateAll();
 		} catch (err) {
-			actionError = err instanceof Error ? err.message : 'Failed to update pin state';
+			actionError = err instanceof Error ? err.message : failMessage;
+			await invalidateAll();
 		} finally {
 			busySlug = null;
 		}
 	}
 
+	function togglePinned(post: BlogPostMeta) {
+		return patchPost(post, { pinned: !post.pinned }, 'Failed to update pin state');
+	}
+
+	async function archivePost(post: BlogPostMeta) {
+		if (busySlug) return;
+		// Archiving is reversible, but pulling a live post off the site deserves
+		// a confirmation; drafts archive with a single click.
+		if (post.status === 'published') {
+			const ok = await alert({
+				title: 'Archive this post?',
+				message: `“${post.title}” will be removed from the site. You can restore it later.`,
+				continue_text: 'Archive',
+			});
+			if (!ok) return;
+		}
+		await patchPost(post, { status: 'archived' }, 'Failed to archive post');
+	}
+
+	function restorePost(post: BlogPostMeta) {
+		return patchPost(post, { status: 'draft' }, 'Failed to restore post');
+	}
+
 	async function deletePost(post: BlogPostMeta) {
 		if (busySlug) return;
 		const ok = await alert({
-			title: 'Delete this post?',
+			title: 'Permanently delete this post?',
 			message: `“${post.title}” will be removed permanently. This can’t be undone.`,
 			continue_text: 'Delete',
 			destructive: true,
@@ -315,44 +349,84 @@
 						</svg>
 						{#snippet menu()}
 							<div class="menu">
-								<button
-									type="button"
-									class="menu-item"
-									onclick={() => togglePinned(post)}>
-									<svg
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										aria-hidden="true"
-										class="menu-icon">
-										<line x1="12" x2="12" y1="17" y2="22" />
-										<path
-											d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
-									</svg>
-									{post.pinned ? 'Unpin from top' : 'Pin to top'}
-								</button>
-								<button
-									type="button"
-									class="menu-item danger"
-									onclick={() => deletePost(post)}>
-									<svg
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										aria-hidden="true"
-										class="menu-icon">
-										<polyline points="3 6 5 6 21 6" />
-										<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-										<path d="M10 11v6" />
-										<path d="M14 11v6" />
-										<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-									</svg>
-									Delete post
-								</button>
+								{#if post.status !== 'archived'}
+									<button
+										type="button"
+										class="menu-item"
+										onclick={() => togglePinned(post)}>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+											class="menu-icon">
+											<line x1="12" x2="12" y1="17" y2="22" />
+											<path
+												d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
+										</svg>
+										{post.pinned ? 'Unpin from top' : 'Pin to top'}
+									</button>
+									<button
+										type="button"
+										class="menu-item"
+										onclick={() => archivePost(post)}>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+											class="menu-icon">
+											<rect x="2" y="3" width="20" height="5" rx="1" />
+											<path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+											<path d="M10 12h4" />
+										</svg>
+										Archive post
+									</button>
+								{:else}
+									<button
+										type="button"
+										class="menu-item"
+										onclick={() => restorePost(post)}>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											aria-hidden="true"
+											class="menu-icon">
+											<path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+											<path d="M3 3v5h5" />
+										</svg>
+										Restore to draft
+									</button>
+									<button
+										type="button"
+										class="menu-item danger"
+										onclick={() => deletePost(post)}>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											aria-hidden="true"
+											class="menu-icon">
+											<polyline points="3 6 5 6 21 6" />
+											<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+											<path d="M10 11v6" />
+											<path d="M14 11v6" />
+											<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+										</svg>
+										Delete permanently
+									</button>
+								{/if}
 							</div>
 						{/snippet}
 					</Button>

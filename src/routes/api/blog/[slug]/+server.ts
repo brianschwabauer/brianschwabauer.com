@@ -11,7 +11,8 @@ import {
 import { rebuildIndex, rebuildVectorIndex } from '$lib/server/searchIndex';
 import { invalidateFuzzyCache } from '$lib/server/fuzzyRedirect';
 import { refreshAdminTags } from '$lib/server/adminData';
-import { augmentWithAi } from '$lib/server/blogAi';
+import { finishSaveInBackground } from '$lib/server/blogAi';
+import { addRedirect } from '$lib/server/redirects';
 import type { TipTapDoc } from '$lib/server/renderDoc';
 import type { ImageRecord } from '$lib/types/images';
 
@@ -26,8 +27,11 @@ interface UpdateBody {
 	summary?: string | null;
 	teaser?: string | null;
 	tags?: unknown;
-	status?: 'draft' | 'published';
+	status?: 'draft' | 'published' | 'archived';
 	slug?: string;
+	/** Optimistic-concurrency token: the `updatedAt` the client last saw.
+	    A mismatch means the post changed elsewhere (another tab) → 409. */
+	expectedUpdatedAt?: number;
 	publishedAt?: number | null;
 	featuredImage?: ImageRecord | null;
 	coverFocalX?: number;
@@ -57,6 +61,17 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 
 	const data = (await request.json()) as UpdateBody;
 	const env = platform.env;
+
+	if (
+		typeof data.expectedUpdatedAt === 'number' &&
+		data.expectedUpdatedAt !== existing.updatedAt
+	) {
+		throw error(
+			409,
+			'This post was changed elsewhere (another tab?). Reload to get the latest version.',
+		);
+	}
+
 	const nextTitle = data.title ?? existing.title;
 	const nextContent = data.content ?? existing.content;
 	const nextContentText = data.contentText ?? existing.contentText;
@@ -71,6 +86,16 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 				const renamed = await renamePost(env.KV, existing.slug, requested);
 				if (!renamed) throw error(404, 'Post not found');
 				workingSlug = requested;
+				// The old URL is public once the post has been published — keep it
+				// resolving instead of 404ing.
+				if (existing.status === 'published') {
+					await addRedirect(
+						env.KV,
+						`/blog/${existing.slug}`,
+						`/blog/${requested}`,
+						'auto: post slug renamed',
+					);
+				}
 			} catch (err) {
 				if (err instanceof SlugConflictError) {
 					throw error(409, 'A post with this slug already exists');
@@ -80,13 +105,6 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 		}
 	}
 
-	const { aiSummary, embedding, contentHash } = await augmentWithAi(env, {
-		title: nextTitle,
-		content: nextContentText,
-		userSummary,
-		existing: { ...existing, contentText: nextContentText, content: nextContent },
-	});
-
 	const updated = await savePost(env.KV, {
 		slug: workingSlug,
 		title: nextTitle,
@@ -94,7 +112,6 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 		contentText: nextContentText,
 		summary: userSummary,
 		teaser: data.teaser === undefined ? existing.teaser : data.teaser,
-		aiSummary,
 		tags: Array.isArray(data.tags)
 			? data.tags.filter((t): t is string => typeof t === 'string')
 			: existing.tags,
@@ -112,15 +129,8 @@ export const PATCH: RequestHandler = async ({ params, request, platform, locals 
 					: data.publishedAt === null
 						? null
 						: undefined,
-		contentHash,
-		embedding,
 	});
-	await Promise.all([
-		rebuildIndex(env.KV),
-		rebuildVectorIndex(env.KV),
-		refreshAdminTags(env.KV),
-	]);
-	invalidateFuzzyCache();
+	finishSaveInBackground(platform, updated, userSummary);
 
 	return json({ post: updated });
 };
@@ -130,11 +140,20 @@ export const DELETE: RequestHandler = async ({ params, platform, locals }) => {
 	if (!platform?.env?.KV) throw error(500, 'KV not available');
 
 	await deletePost(platform.env.KV, params.slug);
-	await Promise.all([
-		rebuildIndex(platform.env.KV),
-		rebuildVectorIndex(platform.env.KV),
-		refreshAdminTags(platform.env.KV),
-	]);
-	invalidateFuzzyCache();
+	const kv = platform.env.KV;
+	platform.context?.waitUntil(
+		(async () => {
+			try {
+				await Promise.all([
+					rebuildIndex(kv),
+					rebuildVectorIndex(kv),
+					refreshAdminTags(kv),
+				]);
+				invalidateFuzzyCache();
+			} catch (err) {
+				console.error('Background post-delete work failed:', err);
+			}
+		})(),
+	);
 	return json({ success: true });
 };

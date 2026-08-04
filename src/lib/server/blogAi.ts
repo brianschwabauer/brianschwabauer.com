@@ -1,7 +1,10 @@
 import type { Ai } from '@cloudflare/workers-types';
-import type { BlogPost } from './blog';
+import { applyAiFields, type BlogPost } from './blog';
 import { generateAiSummary } from './aiSummary';
 import { embedText, hashContent } from './embeddings';
+import { rebuildIndex, rebuildVectorIndex } from './searchIndex';
+import { refreshAdminTags } from './adminData';
+import { invalidateFuzzyCache } from './fuzzyRedirect';
 
 const DRIFT_THRESHOLD = 0.05;
 
@@ -60,4 +63,42 @@ export async function augmentWithAi(
 	}
 
 	return { aiSummary, embedding, contentHash: newHash };
+}
+
+/**
+ * Run AI augmentation + index rebuilds after the response has been sent
+ * (via `platform.context.waitUntil`). The editor doesn't consume any of
+ * this data, so making every save wait on an Anthropic call plus three
+ * index rebuilds only slows the UI down.
+ */
+export function finishSaveInBackground(
+	platform: App.Platform,
+	saved: BlogPost,
+	userSummary: string | null,
+): void {
+	const env = platform.env;
+	const work = (async () => {
+		try {
+			const ai = await augmentWithAi(env, {
+				title: saved.title,
+				content: saved.contentText,
+				userSummary,
+				existing: saved,
+			});
+			const changed =
+				ai.aiSummary !== saved.aiSummary ||
+				ai.embedding !== saved.embedding ||
+				ai.contentHash !== saved.contentHash;
+			if (changed) await applyAiFields(env.KV, saved.slug, ai);
+			await Promise.all([
+				rebuildIndex(env.KV),
+				rebuildVectorIndex(env.KV),
+				refreshAdminTags(env.KV),
+			]);
+			invalidateFuzzyCache();
+		} catch (err) {
+			console.error('Background post-save work failed:', err);
+		}
+	})();
+	platform.context?.waitUntil(work);
 }

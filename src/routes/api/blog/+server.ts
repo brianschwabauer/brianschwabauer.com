@@ -1,10 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listLatest, listAllAdmin, savePost, getPost, slugify } from '$lib/server/blog';
-import { rebuildIndex, rebuildVectorIndex } from '$lib/server/searchIndex';
-import { invalidateFuzzyCache } from '$lib/server/fuzzyRedirect';
-import { refreshAdminTags } from '$lib/server/adminData';
-import { augmentWithAi } from '$lib/server/blogAi';
+import { finishSaveInBackground } from '$lib/server/blogAi';
 import type { TipTapDoc } from '$lib/server/renderDoc';
 import type { ImageRecord } from '$lib/types/images';
 
@@ -31,7 +28,7 @@ interface CreateBody {
 	summary?: string | null;
 	teaser?: string | null;
 	tags?: unknown;
-	status?: 'draft' | 'published';
+	status?: 'draft' | 'published' | 'archived';
 	slug?: string;
 	publishedAt?: number | null;
 	featuredImage?: ImageRecord | null;
@@ -71,17 +68,7 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 		if (conflict) throw error(409, 'A post with this slug already exists');
 	}
 
-	const targetSlug = explicitSlug ?? slugify(title);
-	const existing = targetSlug ? await getPost(env.KV, targetSlug) : null;
-
 	try {
-		const { aiSummary, embedding, contentHash } = await augmentWithAi(env, {
-			title,
-			content: contentText,
-			userSummary: summary ?? null,
-			existing,
-		});
-
 		const post = await savePost(env.KV, {
 			slug: explicitSlug,
 			title,
@@ -89,7 +76,6 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 			contentText,
 			summary: summary || null,
 			teaser: teaser || null,
-			aiSummary,
 			tags: Array.isArray(tags)
 				? tags.filter((t): t is string => typeof t === 'string')
 				: [],
@@ -103,15 +89,8 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 					: publishedAt === null
 						? null
 						: undefined,
-			contentHash,
-			embedding,
 		});
-		await Promise.all([
-			rebuildIndex(env.KV),
-			rebuildVectorIndex(env.KV),
-			refreshAdminTags(env.KV),
-		]);
-		invalidateFuzzyCache();
+		finishSaveInBackground(platform, post, summary ?? null);
 		return json({ post });
 	} catch (err) {
 		console.error('Failed to create blog post:', err);

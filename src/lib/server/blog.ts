@@ -207,6 +207,31 @@ export async function savePost(kv: KVNamespace, input: SavePostInput): Promise<B
 	return post;
 }
 
+/**
+ * Merge background-generated AI fields into a stored post WITHOUT bumping
+ * `updatedAt` — a bump here would trip the editor's optimistic-concurrency
+ * check on its next save. The indexes are rewritten because the public
+ * summary falls back to `aiSummary`.
+ */
+export async function applyAiFields(
+	kv: KVNamespace,
+	slug: string,
+	fields: {
+		aiSummary: string | null;
+		embedding: number[] | null;
+		contentHash: string | null;
+	},
+): Promise<BlogPost | null> {
+	const post = await getPost(kv, slug);
+	if (!post) return null;
+	const merged: BlogPost = { ...post, ...fields };
+	await kv.put(postKey(slug), JSON.stringify(merged));
+	const allIndex = await readIndex(kv, ALL_INDEX_KEY);
+	const others = allIndex.posts.filter((p) => p.slug !== slug);
+	await writeIndexes(kv, [...others, toMeta(merged)]);
+	return merged;
+}
+
 export async function deletePost(kv: KVNamespace, slug: string): Promise<void> {
 	await kv.delete(postKey(slug));
 	const allIndex = await readIndex(kv, ALL_INDEX_KEY);

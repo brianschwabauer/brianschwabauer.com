@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { onMount, untrack } from 'svelte';
+	import { beforeNavigate, goto } from '$app/navigation';
 	import { Button, alert } from '@delightstack/components/actions';
 	import TitleEditor from './TitleEditor.svelte';
 	import BodyEditor from './BodyEditor.svelte';
@@ -46,9 +46,7 @@
 	let summary = $state(initial?.summary ?? initial?.aiSummary ?? '');
 	let teaser = $state(initial?.teaser ?? '');
 	let tags = $state<string[]>(initial?.tags ?? []);
-	let status = $state<'draft' | 'published'>(
-		initial?.status === 'published' ? 'published' : 'draft',
-	);
+	let status = $state<'draft' | 'published' | 'archived'>(initial?.status ?? 'draft');
 	let content = $state<JSONContent>(initialContent);
 	let contentText = $state(initial?.contentText ?? '');
 	let featuredImage = $state<ImageRecord | null>(initial?.featuredImage ?? null);
@@ -56,6 +54,10 @@
 	let coverFocalY = $state<number>(initial?.coverFocalY ?? 50);
 	let slug = $state(initial?.slug ?? '');
 	let publishedAt = $state<number | null>(initial?.publishedAt ?? null);
+	// Optimistic-concurrency token: the updatedAt of the version this editor
+	// last loaded or saved. Sent with every PATCH; a mismatch means another
+	// tab changed the post and the server answers 409 instead of clobbering.
+	let currentUpdatedAt = $state<number | null>(initial?.updatedAt ?? null);
 
 	let deleting = $state(false);
 	let error = $state('');
@@ -75,7 +77,7 @@
 			summary: initial?.summary ?? initial?.aiSummary ?? '',
 			teaser: initial?.teaser ?? '',
 			tags: initial?.tags ?? [],
-			status: initial?.status === 'published' ? 'published' : 'draft',
+			status: initial?.status ?? 'draft',
 			content: initialContent,
 			featuredImagePath: initial?.featuredImage?.path ?? null,
 			featuredImageAlt: initial?.featuredImage?.alt_text ?? null,
@@ -107,9 +109,164 @@
 	// available — `hasChanges` would otherwise be false for an empty draft.
 	const hasChanges = $derived(mode === 'new' ? true : savedSnapshot !== currentSnapshot);
 
+	// "Would leaving lose work?" — differs from `hasChanges` in new mode, where
+	// an untouched empty draft shouldn't trip the guard or get backed up.
+	const dirty = $derived(
+		mode === 'new'
+			? Boolean(title.trim() || summary.trim() || teaser.trim() || contentText.trim())
+			: savedSnapshot !== currentSnapshot,
+	);
+
+	// Set right before an intentional navigation (post-save redirect, delete,
+	// user confirming "Discard") so the guard doesn't block it.
+	let bypassGuard = false;
+
+	beforeNavigate((nav) => {
+		if (!dirty || bypassGuard) return;
+		if (nav.type === 'leave') {
+			// Tab close / hard reload — the browser shows its own generic prompt.
+			nav.cancel();
+			return;
+		}
+		nav.cancel();
+		const dest = nav.to?.url;
+		(async () => {
+			const ok = await alert({
+				title: 'Discard unsaved changes?',
+				message:
+					'You have unsaved changes that will be lost if you leave. (A local backup is kept just in case.)',
+				continue_text: 'Discard',
+				destructive: true,
+			});
+			if (ok && dest) {
+				bypassGuard = true;
+				goto(dest);
+			}
+		})();
+	});
+
+	// ——— Local draft backup ———————————————————————————————————————————————
+	// Debounced copy of the working state in localStorage so a crashed tab or
+	// discarded browser session never loses a draft. Cleared on save/delete.
+	const BACKUP_KEY = untrack(
+		() => `admin-post-backup:${mode === 'new' ? 'new' : (initial?.slug ?? 'unknown')}`,
+	);
+
+	interface BackupData {
+		title: string;
+		summary: string;
+		teaser: string;
+		tags: string[];
+		status: 'draft' | 'published' | 'archived';
+		content: JSONContent;
+		contentText: string;
+		featuredImage: ImageRecord | null;
+		coverFocalX: number;
+		coverFocalY: number;
+		slug: string;
+		publishedAt: number | null;
+	}
+
+	function clearBackup() {
+		try {
+			localStorage.removeItem(BACKUP_KEY);
+		} catch {
+			// localStorage unavailable (private mode quota etc.) — backups are
+			// best-effort only.
+		}
+	}
+
+	$effect(() => {
+		// Read both so the effect re-runs on any edit or save.
+		const snap = currentSnapshot;
+		const saved = savedSnapshot;
+		const isDirty = mode === 'new' ? dirty : snap !== saved;
+		const timeout = setTimeout(() => {
+			try {
+				if (!isDirty) {
+					localStorage.removeItem(BACKUP_KEY);
+					return;
+				}
+				const data: BackupData = {
+					title,
+					summary,
+					teaser,
+					tags,
+					status,
+					content,
+					contentText,
+					featuredImage,
+					coverFocalX,
+					coverFocalY,
+					slug,
+					publishedAt,
+				};
+				localStorage.setItem(BACKUP_KEY, JSON.stringify({ savedAt: Date.now(), data }));
+			} catch {
+				// Best-effort only.
+			}
+		}, 800);
+		return () => clearTimeout(timeout);
+	});
+
+	onMount(async () => {
+		let backup: { savedAt: number; data: BackupData } | null = null;
+		try {
+			const raw = localStorage.getItem(BACKUP_KEY);
+			if (raw) backup = JSON.parse(raw);
+		} catch {
+			backup = null;
+		}
+		if (!backup?.data) return;
+		// Only offer a restore when the backup actually differs from what the
+		// server already has (stale backups from a completed save are noise).
+		const d = backup.data;
+		const backupSnapshot = snapshotOf({
+			title: d.title,
+			summary: d.summary,
+			teaser: d.teaser,
+			tags: d.tags,
+			status: d.status,
+			content: d.content,
+			featuredImagePath: d.featuredImage?.path ?? null,
+			featuredImageAlt: d.featuredImage?.alt_text ?? null,
+			coverFocalX: d.coverFocalX,
+			coverFocalY: d.coverFocalY,
+			slug: d.slug,
+			publishedAt: d.publishedAt,
+		});
+		if (backupSnapshot === savedSnapshot) {
+			clearBackup();
+			return;
+		}
+		const ok = await alert({
+			title: 'Restore unsaved draft?',
+			message: `A local backup from ${new Date(backup.savedAt).toLocaleString()} has changes that were never saved. Restore it?`,
+			continue_text: 'Restore',
+		});
+		if (!ok) {
+			clearBackup();
+			return;
+		}
+		title = d.title;
+		summary = d.summary;
+		teaser = d.teaser;
+		tags = d.tags;
+		status = d.status;
+		content = d.content;
+		contentText = d.contentText;
+		featuredImage = d.featuredImage;
+		coverFocalX = d.coverFocalX;
+		coverFocalY = d.coverFocalY;
+		slug = d.slug;
+		publishedAt = d.publishedAt;
+		bodyEditor?.setContent(d.content);
+	});
+
 	const saveLabel = $derived.by(() => {
 		const willPublish = status === 'published';
 		if (mode === 'new') return willPublish ? 'Publish Post' : 'Create Draft';
+		if (status === 'archived') return hasChanges ? 'Save Changes' : 'Archived';
 		if (hasChanges) return willPublish ? 'Publish Changes' : 'Save Changes';
 		return willPublish ? 'Published' : 'Saved';
 	});
@@ -183,6 +340,8 @@
 					throw new Error(body.message || 'Failed to create post');
 				}
 				const { post } = (await res.json()) as { post: { slug: string } };
+				clearBackup();
+				bypassGuard = true;
 				// Replace the URL so Back doesn't return to /new with no content.
 				await goto(`/admin/blog/${post.slug}`, {
 					replaceState: true,
@@ -208,6 +367,7 @@
 					status,
 					slug,
 					publishedAt,
+					expectedUpdatedAt: currentUpdatedAt ?? undefined,
 				}),
 			});
 			if (!res.ok) {
@@ -218,7 +378,10 @@
 			}
 			const { post } = await res.json();
 			savedSnapshot = currentSnapshot;
+			if (typeof post?.updatedAt === 'number') currentUpdatedAt = post.updatedAt;
+			clearBackup();
 			if (post?.slug && post.slug !== initial?.slug) {
+				bypassGuard = true;
 				goto(`/admin/blog/${post.slug}`, { invalidateAll: true });
 			}
 		} catch (err) {
@@ -229,12 +392,37 @@
 
 	async function handleDelete() {
 		if (mode === 'new') {
-			// No server-side row yet — just leave the page.
+			// No server-side row yet — just leave the page (the guard will ask
+			// about unsaved content if there is any).
 			goto('/admin');
 			return;
 		}
+
+		// Non-archived posts get archived (soft, reversible) instead of deleted.
+		// Only an already-archived post can be permanently removed.
+		if (status !== 'archived') {
+			const ok = await alert({
+				title: 'Archive this post?',
+				message:
+					'The post will be hidden from the site but kept in the admin — you can restore or permanently delete it later.',
+				continue_text: 'Archive',
+			});
+			if (!ok) return;
+			deleting = true;
+			try {
+				status = 'archived';
+				await handleSave();
+				settingsOpen = false;
+			} catch {
+				// handleSave already set `error` — just stay on the page.
+			} finally {
+				deleting = false;
+			}
+			return;
+		}
+
 		const ok = await alert({
-			title: 'Delete this post?',
+			title: 'Permanently delete this post?',
 			message: 'This can’t be undone — the post will be removed permanently.',
 			continue_text: 'Delete',
 			destructive: true,
@@ -246,6 +434,8 @@
 				method: 'DELETE',
 			});
 			if (!res.ok) throw new Error('Failed to delete');
+			clearBackup();
+			bypassGuard = true;
 			goto('/admin');
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to delete';
@@ -374,6 +564,7 @@
 	bind:summary
 	bind:teaser
 	canDelete={mode === 'edit'}
+	archived={status === 'archived'}
 	{deleting}
 	onDelete={handleDelete} />
 

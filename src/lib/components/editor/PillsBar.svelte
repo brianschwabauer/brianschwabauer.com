@@ -2,13 +2,15 @@
 	import { tick } from 'svelte';
 	import { normalizeTag, sanitizeTagInputChar } from '$lib/utils/tags';
 
+	type Status = 'draft' | 'published' | 'archived';
+
 	interface Props {
-		status: 'draft' | 'published';
+		status: Status;
 		publishedAt: number | null;
 		tags: string[];
 		/** Pool of previously-used tags shown as autocomplete suggestions. */
 		tagSuggestions?: string[];
-		onStatusChange?: (s: 'draft' | 'published') => void;
+		onStatusChange?: (s: Status) => void;
 		onPublishedAtChange?: (ts: number | null) => void;
 		onTagsChange?: (tags: string[]) => void;
 	}
@@ -30,7 +32,9 @@
 	let activeSuggestion = $state(0);
 
 	function toggleStatus() {
-		const next = status === 'draft' ? 'published' : 'draft';
+		// archived → draft (restore); otherwise flip draft ↔ published.
+		const next: Status =
+			status === 'archived' ? 'draft' : status === 'draft' ? 'published' : 'draft';
 		status = next;
 		if (next === 'published' && publishedAt == null) {
 			const now = Date.now();
@@ -221,11 +225,30 @@
 		type="button"
 		class="pill status-pill"
 		class:published={status === 'published'}
+		class:archived={status === 'archived'}
 		onclick={toggleStatus}
 		title={status === 'draft'
 			? 'Currently a draft — click to publish'
-			: 'Currently published — click to revert to draft'}>
-		{#if status === 'published'}
+			: status === 'archived'
+				? 'Currently archived — click to restore to draft'
+				: 'Currently published — click to revert to draft'}>
+		{#if status === 'archived'}
+			<svg
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				width="14"
+				height="14"
+				aria-hidden="true">
+				<rect x="2" y="3" width="20" height="5" rx="1" />
+				<path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+				<path d="M10 12h4" />
+			</svg>
+			Archived
+		{:else if status === 'published'}
 			<svg
 				viewBox="0 0 24 24"
 				fill="none"
@@ -394,6 +417,11 @@
 
 	.status-pill.published svg {
 		color: var(--color-action);
+	}
+
+	.status-pill.archived {
+		background: rgba(120, 120, 120, 0.12);
+		color: var(--color-text-muted);
 	}
 
 	.date-pill {
