@@ -339,6 +339,12 @@
 					owned[i] = true;
 				}
 				el.style.animation = 'none';
+				// the DOM paint loop may have run before the sprites were ready
+				// (a cold cache plus an early scroll), and the inline
+				// `visibility: visible` it wrote on each live tile beats the
+				// .ghost wrapper's INHERITED hidden — clear it, or those tiles
+				// stay on screen frozen under the canvas field
+				el.style.visibility = '';
 			}
 			canvasMode = true;
 			canvasActive = true;
@@ -594,7 +600,12 @@
 			// hand the field to the canvas the moment it can take it — on a
 			// scroll frame for choice (the sweep masks the swap), or once every
 			// tile is loop-owned anyway and there is no CSS position to miss
-			if (!canvasMode && painter && !painter.failed && (advance > 0 || owned.every(Boolean))) {
+			if (
+				!canvasMode &&
+				painter &&
+				!painter.failed &&
+				(advance > 0 || owned.every(Boolean))
+			) {
 				tryActivateCanvas();
 			}
 			if (canvasMode) {
@@ -703,10 +714,11 @@
 		window.addEventListener('resize', measure);
 
 		// Load the painter off the critical path, the same way the image pool
-		// and the destruction assets are warmed. Its sprites re-fetch the tile
-		// images CORS-mode (the <img> cache entry varies on Origin, so it is a
-		// second download) — small avif thumbs, and the DOM field carries the
-		// show until every one of them has arrived.
+		// and the destruction assets are warmed. Its sprite fetches normally
+		// come straight out of the <img> tiles' cache entries; an entry cached
+		// without CORS headers costs one re-download instead (see the retry in
+		// StarfieldPainter.request) — small avif thumbs, and the DOM field
+		// carries the show until every one of them has arrived.
 		let cancelPainterIdle = () => {};
 		{
 			const warmPainter = () => {
@@ -1529,8 +1541,7 @@
 			<!-- the canvas the warp loop paints once its sprites are ready; the
 			     DOM field above goes `ghost` (visibility, not display — the
 			     boom blast needs its layout intact) the same frame -->
-			<canvas class="warp-canvas" class:on={canvasActive} bind:this={canvasRef}
-			></canvas>
+			<canvas class="warp-canvas" class:on={canvasActive} bind:this={canvasRef}></canvas>
 			<div class="vignette"></div>
 		</div>
 

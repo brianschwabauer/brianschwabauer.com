@@ -109,16 +109,26 @@ export class StarfieldPainter {
 	 * canvas fed a non-CORS image is tainted and unusable; the CDN allows the
 	 * site origin. Any failure latches `failed` — the Hero never activates on
 	 * a partial field, and deactivates if already live.
+	 *
+	 * THE RETRY IS THE LOAD-BEARING PART. The DOM field's plain <img> tiles
+	 * usually reach the HTTP cache first, and a no-Origin request stores the
+	 * response WITHOUT its CORS headers — so this fetch, hitting that entry,
+	 * fails even though the CDN allows us, and one such failure used to
+	 * disable the canvas for the whole session. `reload` bypasses the
+	 * poisoned entry, goes to the network with an Origin, and overwrites the
+	 * entry with a CORS-clean copy — healing the cache for next time too.
 	 */
 	request(src: string, ar: number) {
 		const key = spriteKey(src, ar);
 		if (this.failed || this.sprites.has(key) || this.pending.has(key)) return;
 		this.pending.add(key);
-		fetch(this.mediaBase + src, { mode: 'cors' })
-			.then((res) => {
+		const load = (cache: RequestCache) =>
+			fetch(this.mediaBase + src, { mode: 'cors', cache }).then((res) => {
 				if (!res.ok) throw new Error(`${res.status}`);
 				return res.blob();
-			})
+			});
+		load('default')
+			.catch(() => load('reload'))
 			.then((blob) => createImageBitmap(blob))
 			.then((bmp) => {
 				this.pending.delete(key);
@@ -180,17 +190,7 @@ export class StarfieldPainter {
 		const scale = Math.max(bw / bmp.width, bh / bmp.height);
 		const sw = bw / scale;
 		const sh = bh / scale;
-		ctx.drawImage(
-			bmp,
-			(bmp.width - sw) / 2,
-			(bmp.height - sh) / 2,
-			sw,
-			sh,
-			m,
-			m,
-			bw,
-			bh,
-		);
+		ctx.drawImage(bmp, (bmp.width - sw) / 2, (bmp.height - sh) / 2, sw, sh, m, m, bw, bh);
 		ctx.restore();
 
 		this.sprites.set(key, { canvas: c, bw, bh, m, radius, used: this.stamp });
