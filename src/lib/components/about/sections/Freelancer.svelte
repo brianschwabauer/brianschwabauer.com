@@ -312,8 +312,8 @@
 				},
 				{
 					file: '2015-08-13_blue_tape_estate_sales-website_redesign_mockup-contact_page.avif',
-					width: 562,
-					height: 2048,
+					width: 561,
+					height: 663,
 					caption: 'Blue Tape Estate Sales · contact page',
 				},
 			],
@@ -324,8 +324,8 @@
 			shots: [
 				{
 					file: '2018-01-01_bassless_ideas_website_design_v2.avif',
-					width: 599,
-					height: 2048,
+					width: 597,
+					height: 1648,
 					caption: 'Bassless Ideas · site design, v2',
 				},
 				{
