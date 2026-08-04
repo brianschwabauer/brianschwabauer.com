@@ -149,27 +149,11 @@
 		},
 		{
 			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-3d_camera_model_wireframe.avif',
-			width: 2048,
-			height: 1365,
-			caption: 'The camera, modeled from scratch — wireframe',
-			alt: 'Wireframe of the 3D camera model',
-		},
-		{
-			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-behind_the_scenes-brian_controls_rc_car_with_camera_mounted_for_robot_pov_shot.avif',
 			width: 480,
 			height: 320,
 			caption: 'Behind the scenes — a camera strapped to an RC car for the POV shots',
 			alt: 'Brian driving an RC car with a camera mounted on it',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2011-03-01_exposure-behind_the_scenes-brian_films_scene_of_actors.avif',
-			width: 480,
-			height: 320,
-			caption: 'Behind the scenes — shooting the actors',
-			alt: 'Brian filming a scene with the actors',
 		},
 		{
 			type: 'image',
@@ -278,8 +262,7 @@
 				<p class="lede">
 					Gone were the days of PowerPoint exports keyed onto live footage. By 2009 I was
 					deep into After Effects and learning Cinema 4D / 3ds Max. The software let me
-					build the things I could only dream of three years earlier. That feeling didn't
-					go away. It still hasn't.
+					build the things I could only dream of three years earlier.
 				</p>
 			</Reveal>
 		</div>
@@ -288,8 +271,8 @@
 			<div class="cal-grid">
 				<Reveal>
 					<h3 class="sub">
-						<span class="brick-tag">LEGO</span>
 						Calamity
+						<span class="brick-tag">LEGO</span>
 					</h3>
 					<p>
 						<strong>Calamity</strong>
@@ -322,13 +305,12 @@
 
 			<Reveal variant="up" delay={100}>
 				<div class="storyboard">
-					<div class="story-eyebrow bleed-head">FROM THE SHOT LIST</div>
 					<div class="gallery-bleed">
 						<LightboxGallery
 							key="animation-calamity"
 							items={calamityImages}
 							display="masonry"
-							size="2" />
+							size="1" />
 					</div>
 				</div>
 			</Reveal>
@@ -438,8 +420,8 @@
 						<PeekGallery
 							key="animation-exposure"
 							items={exposureImages}
-							peek={6}
-							size="2" />
+							peek={8}
+							size="1" />
 					</div>
 				</div>
 			</Reveal>
@@ -450,11 +432,11 @@
 				<Reveal>
 					<h3 class="sub">XYZ News &middot; iPrez</h3>
 					<p>
-						The XYZ News bit, again — three years on. By 2011 our skills were
-						"professional" enough that it could've passed for a real Onion segment at the
-						time. A 3D virtual newsroom set with actual jib-style camera moves. Proper
-						greenscreen lighting. The whole thing centered around one fake story: a new
-						iPhone app for the U.S. president that gives him unlimited power.
+						The XYZ News bit, again. By 2011 our skills were "professional" enough that it
+						could've passed for a real Onion segment at the time. A 3D virtual newsroom
+						set with actual jib-style camera moves. Proper greenscreen lighting. The whole
+						thing centered around one fake story: a new iPhone app for the U.S. president
+						that gives him unlimited power.
 					</p>
 					<p class="aside">
 						This is, embarrassingly, still one of the funnier things I've ever made.
@@ -585,13 +567,6 @@
 		box-shadow:
 			0 2px 0 #b88500,
 			inset 0 -2px 0 rgba(0, 0, 0, 0.1);
-	}
-	.story-eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #6c63ff;
-		margin: 2rem 0 0.6rem;
 	}
 	.storyboard {
 		margin: 2rem 0;
@@ -821,7 +796,7 @@
 			rgba(108, 99, 255, 0.06);
 	}
 	.aside::before {
-		content: "[ EDITOR'S NOTE ]";
+		content: "EDITOR'S NOTE";
 		position: absolute;
 		top: 0.7rem;
 		left: 1.2rem;
