@@ -160,7 +160,6 @@
 
 		<div class="lockup">
 			<Reveal>
-				<div class="eyebrow">CLOSING CREDITS · CHILDHOOD</div>
 				<h2 class="title">
 					<span class="grow w1">Hunky</span>
 					<span class="grow w2">Spunky's</span>
@@ -476,13 +475,6 @@
 	.lockup {
 		text-align: center;
 		margin-bottom: 3rem;
-	}
-	.eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #ffd934;
-		margin-bottom: 1rem;
 	}
 	.title {
 		display: flex;
