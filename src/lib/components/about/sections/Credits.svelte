@@ -179,18 +179,6 @@
 	<p class="joke">Based on a true story. All of it, unfortunately.</p>
 	<p class="joke">No pixels were harmed in the making of this website.</p>
 
-	<div class="rating">
-		<p class="rating-top">The following life has been rated</p>
-		<p class="rating-letter">D — Delightful</p>
-		<p class="rating-bottom">Some scenes of excessive craft</p>
-	</div>
-
-	<p class="thanks">
-		The director would like to thank YOU —
-		<br />
-		for scrolling all twenty years.
-	</p>
-
 	<p class="fin">FIN</p>
 
 	<div class="stinger">
@@ -421,7 +409,7 @@
 	}
 	/* The breath between the sign-off and the heading coming round again. */
 	.loop {
-		padding-bottom: 35cqh;
+		padding-bottom: 90cqh;
 	}
 	/* The name column gets the extra room: the roles are short and fixed, the
 	   names carry the long location and camera lists. */
@@ -484,8 +472,6 @@
 	}
 	.colophon,
 	.joke,
-	.rating,
-	.thanks,
 	.fin,
 	.stinger {
 		text-align: center;
@@ -520,42 +506,6 @@
 		font-size: 1em;
 	}
 
-	.rating {
-		box-sizing: border-box;
-		margin: 4em auto 0;
-		max-width: 26em;
-		padding: 1.1em 1.4em;
-		border: 0.12em solid #2f8f4e;
-		border-radius: 2px;
-		background: rgba(47, 143, 78, 0.08);
-		text-transform: uppercase;
-	}
-	.rating p {
-		margin: 0;
-		font-family: var(--font-mono);
-		line-height: 1.5;
-	}
-	.rating-top,
-	.rating-bottom {
-		font-size: 0.56em;
-		letter-spacing: 0.2em;
-		color: rgba(246, 242, 232, 0.7);
-	}
-	.rating .rating-letter {
-		margin: 0.35em 0;
-		font-size: 1em;
-		font-weight: 700;
-		letter-spacing: 0.14em;
-	}
-
-	.thanks {
-		margin: 4em auto 0;
-		max-width: 34em;
-		padding: 0 6%;
-		font-family: var(--font-display, 'Playfair Display', serif);
-		font-size: 1.25em;
-		line-height: 1.6;
-	}
 	.fin {
 		margin: 5em auto 0;
 		font-family: var(--font-display, 'Playfair Display', serif);
