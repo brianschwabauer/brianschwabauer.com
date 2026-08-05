@@ -407,7 +407,7 @@
 					<Gallery
 						items={upgradeGalleryItems(trackImages, clips_to_video)}
 						display="masonry"
-						size="2"
+						size="0"
 						disable_fullscreen
 						onclick={onStillClick} />
 				</div>
