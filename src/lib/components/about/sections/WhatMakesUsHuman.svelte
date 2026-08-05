@@ -952,6 +952,7 @@
 		opacity: 0.8;
 		max-width: 40rem;
 		margin: 0 auto;
+		text-wrap: balance;
 	}
 
 	.synopsis {
