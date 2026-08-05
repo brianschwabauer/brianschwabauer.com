@@ -66,6 +66,22 @@
 		return `00:00:${ss}:${ff}`;
 	}
 
+	// ── Act 2: the slate ────────────────────────────────────────────────────
+	// Chalked on one field at a time during the lead-in, so the scroll before
+	// the clap is never dead — each field wipes on over ~0.12 of progress,
+	// staggered so the last finishes just before the arm snaps shut at 0.46.
+	const SLATE_FIELDS = [
+		['Prod', 'Real life'],
+		['Scene', 'Film school'],
+		['Take', '2'],
+		['Director', 'B. Schwabauer'],
+		['Date', '2012'],
+	];
+
+	function chalkAt(p: number, i: number) {
+		return Math.min(1, Math.max(0, (p - (0.04 + i * 0.07)) / 0.12));
+	}
+
 	// ── Act 3: the type-on ──────────────────────────────────────────────────
 	const LINES = [
 		'The medium changed. The job didn’t.',
@@ -120,38 +136,33 @@
 			</FilmGate>
 		</ViewfinderFrame>
 	{:else if act === 2}
+		<!-- The lead-in is the arm being lifted: it rises continuously from shut to
+		     raised across the whole approach, so there is always motion under the
+		     scroll, then snaps closed at 0.46. -->
+		{@const lift = 1 - Math.pow(1 - Math.min(1, p / 0.42), 2)}
+		{@const settle = 1 - Math.pow(1 - Math.min(1, p / 0.3), 3)}
 		{@const shut = Math.min(1, Math.max(0, (p - 0.46) / 0.04))}
 		{@const clapped = p >= 0.5}
 		{@const shake =
 			clapped && p < 0.53 ? Math.sin((p - 0.5) * 260) * 4 * (1 - (p - 0.5) / 0.03) : 0}
-		<div class="slate-stage" style:translate="0 {shake}px">
-			<div class="slate">
-				<div class="clapper" style:rotate="{-18 * (1 - shut)}deg">
+		{@const drift = clapped ? ((p - 0.5) / 0.5) * -32 : 0}
+		<div class="slate-stage" style:translate="0 {shake + drift}px">
+			<div
+				class="slate"
+				style:scale={0.94 + 0.06 * settle}
+				style:translate="0 {(1 - settle) * 26}px">
+				<div class="clapper" style:rotate="{-22 * lift * (1 - shut)}deg">
 					<div class="stripes"></div>
 				</div>
 				<div class="board">
 					<div class="stripes bottom"></div>
 					<dl>
-						<div>
-							<dt>Prod</dt>
-							<dd>Real life</dd>
-						</div>
-						<div>
-							<dt>Scene</dt>
-							<dd>Film school</dd>
-						</div>
-						<div>
-							<dt>Take</dt>
-							<dd>2</dd>
-						</div>
-						<div>
-							<dt>Director</dt>
-							<dd>B. Schwabauer</dd>
-						</div>
-						<div>
-							<dt>Date</dt>
-							<dd>2012</dd>
-						</div>
+						{#each SLATE_FIELDS as [term, value], i}
+							<div style:--chalk={chalkAt(p, i)}>
+								<dt>{term}</dt>
+								<dd>{value}</dd>
+							</div>
+						{/each}
 					</dl>
 				</div>
 			</div>
@@ -412,6 +423,10 @@
 		/* Chalk, not type — a hair off true. */
 		rotate: -0.6deg;
 		color: #f4f1e8;
+		/* Chalked on left-to-right by scroll; the -2% slack keeps the rotated
+		   glyph edges from clipping once fully revealed. */
+		clip-path: inset(-10% calc((1 - var(--chalk, 1)) * 102%) -10% -2%);
+		opacity: calc(0.35 + 0.65 * var(--chalk, 1));
 	}
 
 	/* ── Act 3 · the editor ─────────────────────────────────────────────── */
