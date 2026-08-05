@@ -32,56 +32,126 @@
 	} = $props();
 
 	let loaded = $state(false);
+	let retried = false;
 	const interactive = $derived(typeof onclick === 'function');
 
 	let frame = $state<HTMLElement | null>(null);
 	let image = $state<HTMLImageElement | null>(null);
 
 	/*
-	 * The fade waits on `loaded`, so anything that swallows the load event leaves
-	 * the image invisible for good. Two ways that happens, both fixed here:
-	 *
-	 * 1. A cached image can finish before hydration attaches `onload`, so the
-	 *    event never arrives — check `complete` as soon as we have the element.
-	 * 2. A `loading="lazy"` image inside a `content-visibility: auto` subtree
-	 *    (which is every frame on this page) does not reliably start fetching
-	 *    when it arrives on screen *without a scroll*: landing on a `#hash`, a
-	 *    year-scrubber jump, or a lazily-imported section mounting already inside
-	 *    the viewport all leave the fetch un-triggered. So watch the frame — it
-	 *    keeps its box even while its contents are skipped, unlike the `img`
-	 *    inside it — and promote to eager the moment it comes near, which kicks
-	 *    off the normal load path.
+	 * A failed fetch (flaky mobile network, tab backgrounded mid-download) fires
+	 * `error` instead of `load`, which would leave the image at opacity 0 forever.
+	 * Retry the fetch once; if it fails again, reveal anyway so the broken/alt
+	 * state is at least visible instead of an invisible box.
 	 */
-	$effect(() => {
+	function retryOrReveal() {
 		const img = image;
 		if (!img) return;
+		if (retried) {
+			loaded = true;
+			return;
+		}
+		retried = true;
+		img.loading = 'eager';
+		img.src = '';
+		img.src = src;
+		watchDecode(img);
+	}
+
+	/* `decode()` is a promise, so unlike the load event it cannot be missed by
+	 * attaching too late or swallowed by an engine quirk — use it as a second,
+	 * positive "pixels are ready" signal. Rejections are ignored: the failure
+	 * path is `onerror`'s job, and Safari rejects decode() spuriously under
+	 * memory pressure even for images that display fine. */
+	function watchDecode(img: HTMLImageElement) {
+		img.decode().then(
+			() => {
+				if (img.naturalWidth > 0) loaded = true;
+			},
+			() => {},
+		);
+	}
+
+	/*
+	 * The fade waits on `loaded`, so anything that swallows the load event leaves
+	 * the image invisible for good. The ways that happens, all covered here:
+	 *
+	 * 1. A cached image can finish before hydration attaches `onload`, so the
+	 *    event never arrives — check `complete` as soon as we have the element,
+	 *    and re-check it on every observer callback after that.
+	 * 2. A `loading="lazy"` image inside a `content-visibility: auto` subtree
+	 *    (which is every frame on this page — SectionShell skips whole sections)
+	 *    does not reliably start fetching when it arrives on screen *without a
+	 *    scroll*: landing on a `#hash`, a year-scrubber jump, or a lazily-imported
+	 *    section mounting already inside the viewport all leave the fetch
+	 *    un-triggered. So watch the frame — it keeps its box even while its
+	 *    contents are skipped, unlike the `img` inside it — and promote to eager
+	 *    the moment it comes near.
+	 * 3. Flipping the `loading` attribute alone does not reliably restart a
+	 *    deferred fetch in WebKit, so promotion also reassigns `src`, which forces
+	 *    it everywhere — and the observer stays alive until `loaded` is actually
+	 *    true instead of betting on a single promotion.
+	 * 4. The fetch itself can die (flaky mobile network, tab backgrounded
+	 *    mid-download) — `onerror` retries once, then reveals the broken state.
+	 */
+	$effect(() => {
+		if (loaded) return;
+		const img = image;
+		const box = frame;
+		if (!img || !box) return;
 		if (img.complete && img.naturalWidth > 0) {
 			loaded = true;
 			return;
 		}
-		if (!frame || img.loading !== 'lazy') return;
+		// Broke before hydration attached `onerror` (complete but no pixels) —
+		// the error event is already gone, so recover here.
+		if (img.complete && img.getAttribute('src')) {
+			retryOrReveal();
+			return;
+		}
+		if (img.loading !== 'lazy') {
+			watchDecode(img);
+			return;
+		}
+		const promote = () => {
+			if (img.loading !== 'lazy') return;
+			img.loading = 'eager';
+			img.src = src;
+			watchDecode(img);
+		};
 		// Roughly Chrome's own lazy threshold, so this stays lazy loading — it only
 		// takes over deciding *when* the fetch starts.
 		const NEAR = 600;
 		// Already on screen at mount — which is the whole reason this exists, since
 		// that is the case the browser misses. Checked synchronously rather than
 		// left to the observer: the first observer callback needs a frame, and a
-		// section that mounts in view may not get one until the user moves.
-		const rect = frame.getBoundingClientRect();
-		if (rect.bottom > -NEAR && rect.top < window.innerHeight + NEAR) {
-			img.loading = 'eager';
-			return;
+		// section that mounts in view may not get one until the user moves. A zero
+		// rect means an ancestor content-visibility subtree is currently skipped
+		// and there is no layout to measure — leave that to the observer.
+		const rect = box.getBoundingClientRect();
+		if (
+			rect.width > 0 &&
+			rect.height > 0 &&
+			rect.bottom > -NEAR &&
+			rect.top < window.innerHeight + NEAR
+		) {
+			promote();
 		}
 		if (typeof IntersectionObserver === 'undefined') return;
 		const obs = new IntersectionObserver(
 			(entries) => {
+				// Safety net for a missed load event: the image may already be done.
+				if (img.complete && img.naturalWidth > 0) {
+					loaded = true;
+					obs.disconnect();
+					return;
+				}
 				if (!entries.some((entry) => entry.isIntersecting)) return;
-				img.loading = 'eager';
-				obs.disconnect();
+				promote();
 			},
 			{ rootMargin: `${NEAR}px 0px` },
 		);
-		obs.observe(frame);
+		obs.observe(box);
 		return () => obs.disconnect();
 	});
 </script>
@@ -105,7 +175,8 @@
 			decoding="async"
 			class:loaded
 			style:object-fit={fit}
-			onload={() => (loaded = true)} />
+			onload={() => (loaded = true)}
+			onerror={retryOrReveal} />
 		{#if video}
 			<span class="play" aria-hidden="true">
 				<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
@@ -131,7 +202,8 @@
 			decoding="async"
 			class:loaded
 			style:object-fit={fit}
-			onload={() => (loaded = true)} />
+			onload={() => (loaded = true)}
+			onerror={retryOrReveal} />
 		{#if caption}
 			<figcaption>{caption}</figcaption>
 		{/if}
