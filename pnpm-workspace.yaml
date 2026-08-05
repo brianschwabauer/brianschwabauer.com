@@ -1,0 +1,5 @@
+minimumReleaseAgeExclude:
+  - '@delightstack/auth'
+  - '@delightstack/components'
+  - '@delightstack/database'
+  - '@delightstack/images'
