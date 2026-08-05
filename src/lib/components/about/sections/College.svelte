@@ -855,9 +855,7 @@
 
 		<Reveal variant="up">
 			<div class="strip">
-				<div class="strip-eyebrow bleed-head">
-					A WHIRLWIND OF CLASS PROJECTS — THE CAMERA ROLL
-				</div>
+				<div class="strip-eyebrow bleed-head">A WHIRLWIND OF CLASS PROJECTS</div>
 				<div class="gallery-bleed">
 					<PeekGallery
 						key="college-camera-roll"
@@ -990,6 +988,9 @@
 	}
 	.lockup {
 		margin-bottom: 4rem;
+		@media (max-width: 768px) {
+			margin-bottom: 2rem;
+		}
 	}
 	.title {
 		font-size: clamp(2.4rem, 7vw, 5rem);
@@ -1060,15 +1061,24 @@
 		letter-spacing: 0.32em;
 		color: var(--violet-label);
 		margin-bottom: 0.8rem;
+		@media (max-width: 768px) {
+			letter-spacing: 0;
+		}
 	}
 
 	.fb-block,
 	.node-block,
 	.more-projects {
 		margin: 5rem 0;
+		@media (max-width: 768px) {
+			margin: 3rem 0;
+		}
 	}
 	.side-projects {
 		margin: 5rem auto;
+		@media (max-width: 768px) {
+			margin: 3rem 0;
+		}
 	}
 	.sub {
 		font-size: clamp(1.5rem, 2.6vw, 2.1rem);
@@ -1219,6 +1229,9 @@
 
 	.split-life {
 		margin: 8rem 0 10rem;
+		@media (max-width: 768px) {
+			margin: 5rem 0 5rem;
+		}
 	}
 	.split-head {
 		width: 100vw;
