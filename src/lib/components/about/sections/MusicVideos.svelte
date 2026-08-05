@@ -300,9 +300,14 @@
 				</p>
 			</Reveal>
 
-			<Reveal variant="right" delay={120}>
-				<Turntable tracks={TRACKS} color="#ff66cc" />
-			</Reveal>
+			<!-- Desktop-only: stacked under the copy on a phone, the deck reads as a
+			     mystery widget rather than a track list, so it doesn't earn its
+			     screenful there. -->
+			<div class="deck">
+				<Reveal variant="right" delay={120}>
+					<Turntable tracks={TRACKS} color="#ff66cc" />
+				</Reveal>
+			</div>
 		</div>
 
 		<!-- The three songs themselves, each with its film playing where it sits:
@@ -497,6 +502,9 @@
 	@media (max-width: 768px) {
 		.hero-grid {
 			grid-template-columns: 1fr;
+		}
+		.deck {
+			display: none;
 		}
 	}
 	.title {
