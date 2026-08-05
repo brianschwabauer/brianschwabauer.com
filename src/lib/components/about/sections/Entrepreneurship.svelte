@@ -582,6 +582,10 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 		gap: 1rem;
+		@media (max-width: 768px) {
+			grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+			gap: 0.5rem;
+		}
 	}
 	.phone-mini {
 		background: #000;
