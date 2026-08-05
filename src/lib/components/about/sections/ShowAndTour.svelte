@@ -459,7 +459,6 @@
 	.tagline {
 		font-family: var(--font-mono);
 		font-size: 1.05rem;
-		letter-spacing: 0.06em;
 		color: #00f2c3;
 		margin: 0 0 1.2rem;
 	}
