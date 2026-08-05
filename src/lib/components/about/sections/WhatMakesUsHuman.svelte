@@ -322,19 +322,7 @@
 		},
 		{
 			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-brian_schwabauer_close_up.jpg',
-			width: 2048,
-			height: 1365,
-		},
-		{
-			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-what_makes_us_human_crew_group_photo.avif',
-			width: 2048,
-			height: 1365,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2015-05-11_missouri_state_electronic_arts_showcase-what_makes_us_human_premier-brian_schwabauer_3.jpg',
 			width: 2048,
 			height: 1365,
 		},
@@ -748,7 +736,7 @@
 					key="what-makes-us-human-premiere"
 					items={premiereImages}
 					display="masonry-row"
-					size="2" />
+					size="1" />
 			</Reveal>
 		</div>
 	</div>
