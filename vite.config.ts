@@ -1,6 +1,12 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
+// This config runs in Node, but the project deliberately has no @types/node:
+// pulling it in would put Buffer/process/NodeJS.Timeout into the global scope
+// of the worker and browser code too, where they don't exist. Declare the one
+// Node global this file actually uses instead — it's local to this module.
+declare const process: { env: Record<string, string | undefined> };
+
 // In development, /api/images/* and /cdn/image/* are proxied to a separate
 // wrangler dev instance (see wrangler.images.toml + `pnpm dev:images`) that
 // can run the @delightstack/images Cloudflare Container locally. In
