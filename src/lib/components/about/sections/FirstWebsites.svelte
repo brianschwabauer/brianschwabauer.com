@@ -81,6 +81,74 @@
 	let reduced_motion = $state(false);
 	let stack = $state<HTMLElement>();
 
+	/** Pointer offset while the top card is being dragged; null when at rest. */
+	let drag = $state<{ dx: number; dy: number } | null>(null);
+	let drag_from = { x: 0, y: 0, id: NaN };
+	let drag_pending = false;
+	/** False right after a real drag so the trailing click doesn't open the lightbox. */
+	let click_allowed = true;
+	let velocity_samples: { x: number; t: number }[] = [];
+
+	/** Movement below this is a click, not a drag. */
+	const DRAG_SLOP = 6;
+	/** px/ms of horizontal speed that counts as a flick even on a short drag. */
+	const FLING_VELOCITY = 0.55;
+
+	function dragStart(e: PointerEvent, i: number) {
+		if (depthOf(i) !== 0 || !e.isPrimary) return;
+		drag_pending = true;
+		drag_from = { x: e.clientX, y: e.clientY, id: e.pointerId };
+		velocity_samples = [{ x: e.clientX, t: e.timeStamp }];
+	}
+
+	function dragMove(e: PointerEvent) {
+		if (!drag_pending || e.pointerId !== drag_from.id) return;
+		const dx = e.clientX - drag_from.x;
+		const dy = e.clientY - drag_from.y;
+		if (!drag) {
+			// Arm only on a mostly-horizontal pull: vertical movement belongs to
+			// page scroll (touch-action: pan-y hands it back to the browser).
+			if (Math.abs(dx) < DRAG_SLOP || Math.abs(dx) < Math.abs(dy)) return;
+			// Capture only once armed — capturing on pointerdown would retarget
+			// the tap's click away from the card's own open-lightbox button.
+			(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+			// Pointer capture doesn't stop native text selection from tracking
+			// the mouse, so shut it off page-wide for the duration of the drag.
+			document.getSelection()?.removeAllRanges();
+			document.documentElement.style.userSelect = 'none';
+		}
+		drag = { dx, dy };
+		velocity_samples.push({ x: e.clientX, t: e.timeStamp });
+		while (velocity_samples.length > 2 && e.timeStamp - velocity_samples[0].t > 100) {
+			velocity_samples.shift();
+		}
+	}
+
+	function dragEnd(e: PointerEvent, cancelled = false) {
+		if (!drag_pending || e.pointerId !== drag_from.id) return;
+		drag_pending = false;
+		if (!drag) return;
+		document.documentElement.style.userSelect = '';
+		const { dx } = drag;
+		// Dropping the inline transform hands the card back to the CSS
+		// transition, which plays from wherever the pointer let go.
+		drag = null;
+		// The click that fires after a drag is the tail of the same gesture.
+		click_allowed = false;
+		setTimeout(() => (click_allowed = true));
+		if (cancelled) return;
+		const first = velocity_samples[0];
+		const last = velocity_samples[velocity_samples.length - 1];
+		const vx = last.t > first.t ? (last.x - first.x) / (last.t - first.t) : 0;
+		const width = stack?.clientWidth ?? 540;
+		// A long pull or a quick flick both count; anything less springs back.
+		if (dx < -width * 0.3 || vx < -FLING_VELOCITY) {
+			front = (front + 1) % sites.length;
+		} else if (dx > width * 0.3 || vx > FLING_VELOCITY) {
+			front = (front - 1 + sites.length) % sites.length;
+		}
+	}
+
 	$effect(() => {
 		const query = matchMedia('(prefers-reduced-motion: reduce)');
 		const sync = () => (reduced_motion = query.matches);
@@ -102,7 +170,7 @@
 	});
 
 	$effect(() => {
-		if (paused || !visible || reduced_motion) return;
+		if (paused || !visible || reduced_motion || drag) return;
 		// Reading `front` restarts the dwell after every change, so a manual pick
 		// gets a full 4s before the deck takes over again.
 		// oxlint-disable-next-line no-unused-expressions
@@ -162,7 +230,26 @@
 					onfocusout={() => (paused = false)}>
 					<div class="browser-stack" bind:this={stack}>
 						{#each sites as site, i (site.year)}
-							<div class="browser" data-depth={depthOf(i)}>
+							<!-- Dragging is a pointer-only enhancement: clicks live on the card's
+							     own button, and keyboard users switch cards via the deck-nav. -->
+							<div
+								class="browser"
+								role="presentation"
+								data-depth={depthOf(i)}
+								class:dragging={drag !== null && depthOf(i) === 0}
+								style={drag !== null && depthOf(i) === 0
+									? `transform: translate(calc(${drag.dx}px + 3%), calc(${drag.dy * 0.35}px - 3%)) rotate(${drag.dx * 0.04}deg) scale(1.02)`
+									: undefined}
+								onpointerdown={(e) => dragStart(e, i)}
+								onpointermove={dragMove}
+								onpointerup={(e) => dragEnd(e)}
+								onpointercancel={(e) => dragEnd(e, true)}
+								onclickcapture={(e) => {
+									if (click_allowed) return;
+									e.preventDefault();
+									e.stopPropagation();
+								}}
+								ondragstart={(e) => e.preventDefault()}>
 								<div class="chrome">
 									<div class="lights">
 										<span></span>
@@ -341,6 +428,28 @@
 			transform 420ms var(--ease-deck),
 			filter 420ms ease;
 		--ease-deck: cubic-bezier(0.34, 1.2, 0.64, 1);
+		/* Horizontal pulls drag the card; vertical swipes stay page scroll. */
+		touch-action: pan-y;
+		user-select: none;
+		-webkit-user-select: none;
+	}
+	.browser :global(img) {
+		-webkit-user-drag: none;
+	}
+	/* The top card is grabbable, and says so. */
+	.browser[data-depth='0'],
+	.browser[data-depth='0'] :global(.lazy-media-button) {
+		cursor: grab;
+	}
+	/* Mid-drag the card is glued to the pointer — no transition, above the
+	   whole deck, and lifted slightly so it reads as picked up. */
+	.browser.dragging,
+	.browser.dragging :global(.lazy-media-button) {
+		cursor: grabbing;
+	}
+	.browser.dragging {
+		transition: filter 420ms ease;
+		z-index: 4;
 	}
 	/* The three resting slots. Cards cycle through them; they never swap places
 	   pairwise, so the stack always reads as one deck. */
