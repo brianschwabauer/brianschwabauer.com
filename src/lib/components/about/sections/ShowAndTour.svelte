@@ -341,7 +341,6 @@
 		<div class="brand-block">
 			<Reveal class="bleed-head">
 				<h3 class="sub">Brand</h3>
-				<p>The identity the whole product is dressed in.</p>
 			</Reveal>
 			<Reveal variant="up" delay={100}>
 				<div class="gallery-bleed">
