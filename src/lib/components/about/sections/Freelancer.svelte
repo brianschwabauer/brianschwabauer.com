@@ -135,12 +135,6 @@
 			'Holy Cross Lutheran · a t-shirt commercial, complete with an angel',
 		),
 		img(
-			'2013-02-23_schwikes_studios_pricing_graphics_for_website.avif',
-			1920,
-			1024,
-			'Schwikes Studios · the pricing graphics for the wedding business Kevin and I tried to start',
-		),
-		img(
 			'2016-01-01_one_part_laugh_one_part_life_podcast_website_design_mockup_with_tablet_and_phone.avif',
 			1920,
 			1080,
@@ -191,18 +185,6 @@
 	];
 
 	const weddingImages: GalleryItem[] = [
-		img(
-			'2015-08-24_brian_demo_reel_2015-wedding_footage_of_bride_in_dress_smiling.avif',
-			480,
-			204,
-			'The bride, before the doors open',
-		),
-		img(
-			'2015-08-24_brian_demo_reel_2015-wedding_footage_bride_walks_towards_smiling_groom.avif',
-			480,
-			204,
-			'The walk down the aisle',
-		),
 		img(
 			'2015-08-24_brian_demo_reel_2015-wedding_footage_of_bride_smiling.avif',
 			480,
@@ -277,6 +259,24 @@
 		{
 			direction: -1,
 			speed: 1,
+			shots: [
+				{
+					file: '2015-08-13_blue_tape_estate_sales-website_redesign_mockup-services_page.avif',
+					width: 562,
+					height: 2048,
+					caption: 'Blue Tape Estate Sales · services page',
+				},
+				{
+					file: '2015-08-13_blue_tape_estate_sales-website_redesign_mockup-home_page.avif',
+					width: 874,
+					height: 2048,
+					caption: 'Blue Tape Estate Sales · home page',
+				},
+			],
+		},
+		{
+			direction: 1,
+			speed: 1,
 			// The only 1907px-wide capture here; it goes illegible on a phone.
 			drop_on_phone: true,
 			shots: [
@@ -289,36 +289,6 @@
 			],
 		},
 		{
-			direction: 1,
-			speed: 1,
-			shots: [
-				{
-					file: '2015-08-13_blue_tape_estate_sales-website_redesign_mockup-home_page.avif',
-					width: 874,
-					height: 2048,
-					caption: 'Blue Tape Estate Sales · home page',
-				},
-				{
-					file: '2015-08-13_blue_tape_estate_sales-website_redesign_mockup-services_page.avif',
-					width: 562,
-					height: 2048,
-					caption: 'Blue Tape Estate Sales · services page',
-				},
-				{
-					file: '2015-08-13_blue_tape_estate_sales-website_redesign_mockup-sales_page.avif',
-					width: 562,
-					height: 2048,
-					caption: 'Blue Tape Estate Sales · sales page',
-				},
-				{
-					file: '2015-08-13_blue_tape_estate_sales-website_redesign_mockup-contact_page.avif',
-					width: 561,
-					height: 663,
-					caption: 'Blue Tape Estate Sales · contact page',
-				},
-			],
-		},
-		{
 			direction: -1,
 			speed: 0.75,
 			shots: [
@@ -327,12 +297,6 @@
 					width: 597,
 					height: 1648,
 					caption: 'Bassless Ideas · site design, v2',
-				},
-				{
-					file: '2018-01-01_bassless_ideas_website_design_v1.avif',
-					width: 933,
-					height: 2048,
-					caption: 'Bassless Ideas · site design, v1',
 				},
 				{
 					file: '2018-01-01_tapkeep_v4-dashboard_phone_mockup-tasks_page-create_task–details.png',
