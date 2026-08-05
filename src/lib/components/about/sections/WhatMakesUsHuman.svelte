@@ -56,55 +56,6 @@
 			width: 480,
 			height: 204,
 		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-logo_animation.avif',
-			width: 480,
-			height: 204,
-		},
-	];
-
-	const conceptImages: GalleryItem[] = [
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-concept_art-telescan_building.avif',
-			width: 2048,
-			height: 1536,
-			caption: 'Telescan headquarters · concept art',
-			alt: 'Telescan headquarters · concept art',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-concept_art-disposal_room.jpg',
-			width: 843,
-			height: 474,
-			caption: 'Disposal room',
-			alt: 'Disposal room',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-concept_art-teleporter.jpg',
-			width: 738,
-			height: 960,
-			caption: 'The teleporter',
-			alt: 'The teleporter',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-concept_art-handcuffs.jpg',
-			width: 843,
-			height: 474,
-			caption: 'Hi-tech restraints',
-			alt: 'Hi-tech restraints',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-concept_art-main_characters_eye_recorder_close_up.jpg',
-			width: 1920,
-			height: 818,
-			caption: 'Eye-recorder UI',
-			alt: 'Eye-recorder UI',
-		},
 	];
 
 	const btsImages: GalleryItem[] = [
@@ -404,19 +355,11 @@
 	const posterImages: GalleryItem[] = [
 		{
 			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-film_poster-minimalistic.jpg',
+			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-film_poster_with_text.avif',
 			width: 648,
 			height: 960,
-			caption: 'The minimalist cut',
-			alt: 'What Makes Us Human — minimalist poster',
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2014-06-04_what_makes_us_human-film_poster-villian.avif',
-			width: 1167,
-			height: 1803,
-			caption: 'The villain one-sheet',
-			alt: 'What Makes Us Human — villain poster',
+			caption: 'What Makes Us Human Poster',
+			alt: 'What Makes Us Human — poster',
 		},
 		{
 			type: 'image',
@@ -701,8 +644,8 @@
 					nobody finds out. She eventually exposes the secret to the world.
 				</p>
 				<p class="aside">
-					<strong>The question the film never quite answers:</strong>
-					if a perfect 1:1 copy of you exists, is the original still "you"? What does this technology
+					<strong>The question the film explores:</strong>
+					if a perfect 1:1 copy of you exists, is the copy still "you"? What does this technology
 					do to the meaning of being a person? We didn't try to solve that on screen. We tried
 					to let it sit in your stomach.
 				</p>
@@ -738,25 +681,9 @@
 			</Reveal>
 		</div>
 
-		<div class="concept-grid">
-			<Reveal variant="up">
-				<div class="eyebrow">CONCEPT ART · PRE-PRODUCTION</div>
-				<LightboxGallery
-					key="what-makes-us-human-concept"
-					items={conceptImages}
-					display="masonry-row"
-					size="2" />
-			</Reveal>
-		</div>
-
 		<div class="poster-grid">
 			<Reveal variant="up">
 				<div class="eyebrow">THE POSTER SERIES</div>
-				<p class="poster-note">
-					Part of treating it like a real release: a set of one-sheets — including an
-					in-world <em>Times</em>
-					cover we mocked up as a prop for the film itself.
-				</p>
 				<LightboxGallery
 					key="what-makes-us-human-posters"
 					items={posterImages}
@@ -792,9 +719,7 @@
 				<p class="bleed-head">
 					A 15-minute short, but with craft services, extras, multiple locations, a
 					casting call, an Indiegogo fundraising campaign, real camera rigs, multiple
-					revisions on the script over months of preproduction. Not because we needed all
-					of that to deliver — but because we wanted to know what it felt like to actually
-					do it.
+					revisions on the script over months of preproduction.
 				</p>
 			</Reveal>
 			<Reveal variant="up" delay={120}>
@@ -802,7 +727,7 @@
 					<PeekGallery
 						key="what-makes-us-human-bts"
 						items={btsImages}
-						peek={8}
+						peek={9}
 						size="2" />
 				</div>
 			</Reveal>
@@ -1070,7 +995,6 @@
 	}
 
 	.film-grid,
-	.concept-grid,
 	.poster-grid,
 	.bts-block,
 	.premiere-block {
