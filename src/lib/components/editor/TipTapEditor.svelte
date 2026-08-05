@@ -57,8 +57,10 @@
 				// - / * / + bullet lists, 1. ordered lists, ``` code blocks,
 				// and --- horizontal rules. Heading is supplied separately
 				// below so we can shift `#` markdown shortcuts down by one
-				// level (reserving H1 for the post title).
-				StarterKit.configure({ heading: false }),
+				// level (reserving H1 for the post title). Link is also
+				// supplied separately (StarterKit v3 bundles it, but we need
+				// openOnClick disabled), so disable the bundled copy.
+				StarterKit.configure({ heading: false, link: false }),
 				ShiftedHeading,
 				Link.configure({ openOnClick: false }),
 				BlogImage,

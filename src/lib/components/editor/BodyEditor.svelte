@@ -119,7 +119,10 @@
 		const next = new Editor({
 			element: editorElement,
 			extensions: [
-				StarterKit.configure({ heading: false }),
+				// Heading and Link are supplied separately below (shifted `#`
+				// shortcuts; openOnClick disabled), so disable the copies
+				// StarterKit v3 bundles to avoid duplicate extension names.
+				StarterKit.configure({ heading: false, link: false }),
 				ShiftedHeading,
 				Link.configure({ openOnClick: false }),
 				BlogImage,
