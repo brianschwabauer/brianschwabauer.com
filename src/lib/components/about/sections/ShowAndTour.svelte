@@ -559,9 +559,10 @@
 	   so a gap here would just read as the section running out. */
 	.brand-block {
 		margin: 4rem 0 0;
-	}
-	.brand-block p {
-		line-height: 1.55;
-		opacity: 0.9;
+		:global(.gallery-bleed .gallery.display-masonry.size-2) {
+			@media (max-width: 768px) {
+				--cols: 4;
+			}
+		}
 	}
 </style>
