@@ -450,6 +450,9 @@
 		letter-spacing: -0.03em;
 		margin: 0 0 1rem;
 		text-wrap: balance;
+		@media (max-width: 768px) {
+			line-height: 1.1;
+		}
 		/* The authored breaks split the sentence for wide screens; on a phone
 		   each piece wraps again and strands a word alone on a line — drop the
 		   breaks there and let `balance` find even lines on its own. */
@@ -462,6 +465,9 @@
 	.cross {
 		position: relative;
 		opacity: 0.6;
+		@media (max-width: 768px) {
+			opacity: 1;
+		}
 	}
 	.cross::after {
 		content: '';
@@ -472,6 +478,9 @@
 		height: 4px;
 		background: #ff6688;
 		transform: skewY(-3deg);
+		@media (max-width: 768px) {
+			display: none;
+		}
 	}
 	.grad {
 		color: oklch(from #00f2c3 0.82 calc(c * 0.9) h);
