@@ -45,9 +45,9 @@
 	// Four numerals, not seven: after the rewind the reader has just watched one
 	// count already, and this one is the tape *starting* rather than a second
 	// countdown. The COUNT_END/STEP math sizes itself to the array.
-	const NUMERALS = [5, 4, 3, 2];
+	const NUMERALS = [3, 2, 1];
 	/** Progress at which the countdown gives way to the title card. */
-	const COUNT_END = 0.8;
+	const COUNT_END = 0.6;
 	const STEP = COUNT_END / NUMERALS.length;
 
 	function countdownAt(p: number) {
