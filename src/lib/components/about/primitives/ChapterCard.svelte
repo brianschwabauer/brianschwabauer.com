@@ -438,6 +438,7 @@
 		width: 100%;
 		height: 100%;
 		padding: clamp(1rem, 4vw, 2.5rem);
+		padding-bottom: calc(clamp(1rem, 4vw, 2.5rem) + 8rem);
 		color: #fff;
 	}
 	.editor {
