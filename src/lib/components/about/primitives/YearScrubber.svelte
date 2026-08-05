@@ -220,10 +220,13 @@
 			railProgress = tops.length > 1 ? Math.min(1, (i + within) / (tops.length - 1)) : 0;
 
 			const current = tops[i] === Infinity ? '' : (stops[i]?.id ?? '');
-			if (current && current !== activeId) {
-				activeId = current;
-				if (!jumping) queueHash(current);
-			}
+			if (current && current !== activeId) activeId = current;
+			// Queue on every settle, not only on section *change*: a write that
+			// got dropped (mid-jump, Safari's history rate limit, pre-router
+			// hydration) used to stay wrong until the next section crossing.
+			// setSectionHash no-ops when the URL is already right, so re-queuing
+			// is free.
+			if (current && !jumping) queueHash(current);
 			queueSave();
 		});
 		const onResize = () => measureRail();

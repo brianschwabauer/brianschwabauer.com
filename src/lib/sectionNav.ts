@@ -162,10 +162,16 @@ export function savedScrollWithin(id: string): number {
  * Keeps the pathname and any query string (such as an open modal) intact.
  */
 export function setSectionHash(id: string | null) {
-	const current = page.url.hash.replace(/^#/, '');
+	// Compare against `location`, never `page.url`: SvelteKit's shallow
+	// `replaceState` updates the address bar and `page.state` but NOT
+	// `page.url`, so `page.url.hash` is frozen at whatever the last real
+	// navigation was. Comparing against it silently dropped writes — most
+	// visibly, the hash never cleared (or updated) when scrolling back to the
+	// section the page was loaded on, and stayed stuck there.
+	const current = location.hash.replace(/^#/, '');
 	const next = id ?? '';
 	if (current === next) return;
-	const base = page.url.pathname + page.url.search;
+	const base = location.pathname + location.search;
 	const url = next ? `${base}#${next}` : base;
 	try {
 		replaceState(url, page.state);
@@ -175,6 +181,12 @@ export function setSectionHash(id: string | null) {
 		// scroll position and fires the scroll-spy mid-hydration. The hash is
 		// cosmetic at that instant, so fall back to native history (preserving
 		// SvelteKit's own history state) rather than crash the effect flush.
-		history.replaceState(history.state, '', url);
+		try {
+			history.replaceState(history.state, '', url);
+		} catch {
+			// Safari rate-limits history writes (SecurityError past ~100/30s).
+			// The scroll spy re-queues on the next settle, so a dropped write
+			// heals itself.
+		}
 	}
 }
