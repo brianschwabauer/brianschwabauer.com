@@ -20,6 +20,12 @@
 
 	let open = $state(false);
 	let modal_open = $state(false);
+	/* One flag pair for both frames — inline and modal load the same src, so
+	   one loading tells us the other would too. A refused iframe (mixed
+	   content, X-Frame-Options) fails with no event at all, so a deadline is
+	   the only way to notice; `loaded` still wins if the site limps in late. */
+	let loaded = $state(false);
+	let failed = $state(false);
 	const displayHost = $derived.by(() => {
 		if (host) return host;
 		try {
@@ -35,8 +41,33 @@
 	function activate() {
 		if (window.matchMedia('(max-width: 768px)').matches) modal_open = true;
 		else open = true;
+		setTimeout(() => {
+			if (!loaded) failed = true;
+		}, 10_000);
 	}
 </script>
+
+<!-- Covers the (blank) frame once the deadline passes, and gets out of the way
+     again on the off chance the site still arrives. -->
+{#snippet loadFailed()}
+	{#if failed && !loaded}
+		<div class="load-failed" role="alert">
+			<p>The archived site didn't load.</p>
+			<a href={src} target="_blank" rel="noopener noreferrer">
+				Open it in a new tab
+				<svg viewBox="0 0 24 24" aria-hidden="true" width="15" height="15">
+					<path
+						d="M7 17L17 7M9 7h8v8"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round" />
+				</svg>
+			</a>
+		</div>
+	{/if}
+{/snippet}
 
 <div class="archive-frame">
 	<div class="chrome">
@@ -81,8 +112,10 @@
 				title="{title} (archived)"
 				loading="lazy"
 				referrerpolicy="no-referrer"
-				sandbox="allow-scripts allow-same-origin allow-popups allow-forms">
+				sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+				onload={() => (loaded = true)}>
 			</iframe>
+			{@render loadFailed()}
 		{:else}
 			<div class="placeholder">
 				<div class="placeholder-grid">
@@ -125,8 +158,10 @@
 				{src}
 				title="{title} (archived)"
 				referrerpolicy="no-referrer"
-				sandbox="allow-scripts allow-same-origin allow-popups allow-forms">
+				sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+				onload={() => (loaded = true)}>
 			</iframe>
+			{@render loadFailed()}
 			<button
 				class="modal-close"
 				type="button"
@@ -249,6 +284,45 @@
 		width: 100%;
 		height: 100%;
 		border: 0;
+		background: #fff;
+	}
+	/* Sits over the frame the browser left blank; solid, because the "content"
+	   underneath is nothing. */
+	.load-failed {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-content: center;
+		justify-items: center;
+		gap: 1rem;
+		padding: 1.5rem;
+		text-align: center;
+		background: #101116;
+		color: rgba(255, 255, 255, 0.75);
+		font-family: var(--font-mono);
+		font-size: 0.85rem;
+	}
+	.load-failed p {
+		margin: 0;
+	}
+	.load-failed a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.55rem 1.1rem;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.92);
+		color: #111;
+		text-decoration: none;
+		font-weight: 600;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+		transition:
+			transform 200ms ease,
+			background 200ms ease;
+	}
+	.load-failed a:hover {
+		transition-duration: 0s;
+		transform: translateY(-2px);
 		background: #fff;
 	}
 	.placeholder {

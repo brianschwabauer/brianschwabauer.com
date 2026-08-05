@@ -24,7 +24,14 @@
 	   archived site keeps whatever scroll position you left it at. */
 	let visited = $state<number[]>([]);
 	let loaded = $state<number[]>([]);
+	/* Tabs whose iframe hadn't fired `load` within the timeout. An iframe the
+	   browser refuses to load (mixed content, X-Frame-Options) fails silently —
+	   no error event, no load event — so a deadline is the only way to notice.
+	   `loaded` still wins if the site limps in afterwards. */
+	let failed = $state<number[]>([]);
 	let tab_els = $state<HTMLButtonElement[]>([]);
+
+	const LOAD_TIMEOUT = 10_000;
 
 	const current = $derived(tabs[active] ?? tabs[0]);
 	const hosts = $derived(
@@ -39,7 +46,11 @@
 	);
 
 	function visit(index: number) {
-		if (!visited.includes(index)) visited.push(index);
+		if (visited.includes(index)) return;
+		visited.push(index);
+		setTimeout(() => {
+			if (!loaded.includes(index)) failed.push(index);
+		}, LOAD_TIMEOUT);
 	}
 
 	function show(index: number) {
@@ -74,6 +85,28 @@
 	}
 </script>
 
+<!-- Covers the (blank) frame once the deadline passes, and gets out of the way
+     again on the off chance the site still arrives. -->
+{#snippet loadFailed(tab: Tab, i: number)}
+	{#if failed.includes(i) && !loaded.includes(i)}
+		<div class="load-failed" role="alert">
+			<p>The archived site didn't load.</p>
+			<a href={tab.src} target="_blank" rel="noopener noreferrer">
+				Open it in a new tab
+				<svg viewBox="0 0 24 24" aria-hidden="true" width="15" height="15">
+					<path
+						d="M7 17L17 7M9 7h8v8"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round" />
+				</svg>
+			</a>
+		</div>
+	{/if}
+{/snippet}
+
 <div class="archive-tabs">
 	<div class="tab-strip" role="tablist" aria-label="Archived sites">
 		{#each tabs as tab, i (tab.src)}
@@ -90,8 +123,10 @@
 				style:--i={i}
 				onclick={() => show(i)}
 				{onkeydown}>
-				{#if visited.includes(i) && !loaded.includes(i)}
+				{#if visited.includes(i) && !loaded.includes(i) && !failed.includes(i)}
 					<span class="spinner" aria-hidden="true"></span>
+				{:else if visited.includes(i) && !loaded.includes(i)}
+					<span class="favicon warn" aria-hidden="true">!</span>
 				{:else}
 					<span class="favicon" aria-hidden="true">{tab.title.trim().charAt(0)}</span>
 				{/if}
@@ -151,6 +186,7 @@
 								if (!loaded.includes(i)) loaded.push(i);
 							}}>
 						</iframe>
+						{@render loadFailed(tab, i)}
 					</div>
 				{/if}
 			{/each}
@@ -205,8 +241,10 @@
 							class:active={i === active}
 							style:--i={i}
 							onclick={() => show(i)}>
-							{#if visited.includes(i) && !loaded.includes(i)}
+							{#if visited.includes(i) && !loaded.includes(i) && !failed.includes(i)}
 								<span class="spinner" aria-hidden="true"></span>
+							{:else if visited.includes(i) && !loaded.includes(i)}
+								<span class="favicon warn" aria-hidden="true">!</span>
 							{:else}
 								<span class="favicon" aria-hidden="true">
 									{tab.title.trim().charAt(0)}
@@ -250,6 +288,7 @@
 									if (!loaded.includes(i)) loaded.push(i);
 								}}>
 							</iframe>
+							{@render loadFailed(tab, i)}
 						</div>
 					{/if}
 				{/each}
@@ -332,6 +371,10 @@
 		text-transform: uppercase;
 		background: oklch(0.72 0.15 calc(45 + var(--i) * 47));
 		color: oklch(0.2 0.05 calc(45 + var(--i) * 47));
+	}
+	.favicon.warn {
+		background: oklch(0.78 0.16 85);
+		color: oklch(0.25 0.06 85);
 	}
 	.spinner {
 		flex-shrink: 0;
@@ -466,6 +509,45 @@
 		width: 100%;
 		height: 100%;
 		border: 0;
+		background: #fff;
+	}
+	/* Sits over the frame the browser left blank; solid, because the "content"
+	   underneath is nothing. */
+	.load-failed {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-content: center;
+		justify-items: center;
+		gap: 1rem;
+		padding: 1.5rem;
+		text-align: center;
+		background: #101116;
+		color: rgba(255, 255, 255, 0.75);
+		font-family: var(--font-mono);
+		font-size: 0.85rem;
+	}
+	.load-failed p {
+		margin: 0;
+	}
+	.load-failed a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.55rem 1.1rem;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.92);
+		color: #111;
+		text-decoration: none;
+		font-weight: 600;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+		transition:
+			transform 200ms ease,
+			background 200ms ease;
+	}
+	.load-failed a:hover {
+		transition-duration: 0s;
+		transform: translateY(-2px);
 		background: #fff;
 	}
 	.placeholder {
