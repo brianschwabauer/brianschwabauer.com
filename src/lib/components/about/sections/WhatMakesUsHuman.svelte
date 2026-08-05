@@ -942,6 +942,15 @@
 		line-height: 0.95;
 		letter-spacing: 0.02em;
 		margin: 0 0 1rem;
+		text-wrap: balance;
+		/* The authored break splits the poster lockup for wide screens; on a
+		   phone each half wraps again and strands a word alone on a line — drop
+		   the break there and let `balance` find even lines on its own. */
+		br {
+			@media (width < 48rem) {
+				display: none;
+			}
+		}
 		background: linear-gradient(180deg, #fff 30%, #00f2c3 100%);
 		-webkit-background-clip: text;
 		background-clip: text;

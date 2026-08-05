@@ -990,6 +990,15 @@
 		line-height: 1;
 		letter-spacing: -0.03em;
 		margin: 0 0 1rem;
+		text-wrap: balance;
+		/* The authored break splits the sentence for wide screens; on a phone
+		   each half wraps again and strands a word alone on a line — drop the
+		   break there and let `balance` find even lines on its own. */
+		br {
+			@media (width < 48rem) {
+				display: none;
+			}
+		}
 	}
 	.ksms-grad {
 		color: oklch(from #ff5a2a 0.82 calc(c * 0.9) h);

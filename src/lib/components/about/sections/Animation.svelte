@@ -516,6 +516,15 @@
 		line-height: 1;
 		letter-spacing: -0.03em;
 		margin: 0 0 1rem;
+		text-wrap: balance;
+		/* The authored break splits the sentence for wide screens; on a phone
+		   each half wraps again and strands a word alone on a line — drop the
+		   break there and let `balance` find even lines on its own. */
+		br {
+			@media (width < 48rem) {
+				display: none;
+			}
+		}
 	}
 	.grad {
 		color: oklch(from #00f2c3 0.82 calc(c * 0.9) h);
@@ -748,6 +757,15 @@
 		/* Tall enough to nearly fill the pin — that's the scale this shot has
 		   always been played at — but never so wide it runs into the copy. */
 		--frame: min(230svh, calc((100cqw - var(--reserved)) * 1.85));
+		/* On a phone there's no copy beside the robot to protect, and the frame
+		   carries wide transparent margins — oversize it further so the robot
+		   itself fills the screen, even though the (empty) frame edges run off
+		   both sides. The centring math below keeps the robot centred. */
+		@media (max-width: 768px) {
+			--frame: min(230svh, calc((100cqw - var(--reserved)) * 3.2));
+			--content-center-x: 0.34;
+			--content-center-y: 0.38;
+		}
 		width: var(--frame);
 		height: calc(var(--frame) * 9 / 16);
 		left: calc(

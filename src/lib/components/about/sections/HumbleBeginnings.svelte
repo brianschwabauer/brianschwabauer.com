@@ -329,6 +329,15 @@
 		letter-spacing: -0.02em;
 		max-width: 50rem;
 		margin: 0 0 2rem;
+		text-wrap: balance;
+		/* The authored break splits the sentence for wide screens; on a phone
+		   each half wraps again and strands a word alone on a line — drop the
+		   break there and let `balance` find even lines on its own. */
+		br {
+			@media (width < 48rem) {
+				display: none;
+			}
+		}
 	}
 	.lede-grid {
 		display: grid;

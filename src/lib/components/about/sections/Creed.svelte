@@ -858,6 +858,15 @@
 		line-height: 1.02;
 		letter-spacing: -0.03em;
 		margin: 0 0 1.6rem;
+		text-wrap: balance;
+		/* The authored break splits the sentence for wide screens. On a phone
+		   each half wraps again and strands a word alone on a line — drop the
+		   break there and let `balance` find even lines on its own. */
+		br {
+			@media (width < 48rem) {
+				display: none;
+			}
+		}
 	}
 	.title-accent {
 		color: rgba(255, 255, 255, 0.55);
@@ -1326,7 +1335,10 @@
 	}
 	/* a dark cloud behind the copy so planes passing under it stay legible */
 	.t3-copy {
-		padding: 3rem 4rem;
+		/* The inline padding is part of the cloud, not the measure — at fixed
+		   4rem it squeezed this tenet's copy visibly narrower than the others
+		   on a phone. Scale it down with the viewport instead. */
+		padding: 3rem clamp(1rem, 5vw, 4rem);
 		background: radial-gradient(
 			ellipse closest-side,
 			rgba(6, 6, 10, 0.92) 45%,

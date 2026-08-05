@@ -449,6 +449,15 @@
 		line-height: 1;
 		letter-spacing: -0.03em;
 		margin: 0 0 1rem;
+		text-wrap: balance;
+		/* The authored breaks split the sentence for wide screens; on a phone
+		   each piece wraps again and strands a word alone on a line — drop the
+		   breaks there and let `balance` find even lines on its own. */
+		br {
+			@media (width < 48rem) {
+				display: none;
+			}
+		}
 	}
 	.cross {
 		position: relative;
