@@ -12,7 +12,7 @@
 		type GalleryDisplay,
 	} from '@delightstack/components/media';
 	import LightboxGallery from './LightboxGallery.svelte';
-	import { upgradeGalleryItems } from '../media-variants';
+	import { av1VideoSupported, upgradeGalleryItems } from '../media-variants';
 
 	let {
 		key,
@@ -44,13 +44,21 @@
 	// A quoted string, because it lands in `content:` on the overlay.
 	const more_label = $derived(`"+${hidden} more"`);
 
+	// Where the browser can play AV1, clip tiles render as muted looping mp4
+	// <video> (hardware decode) instead of the animated AVIF <img>. Flipped in
+	// an effect so server and hydration markup agree — same as LightboxGallery.
+	let clips_to_video = $state(false);
+	$effect(() => {
+		clips_to_video = av1VideoSupported();
+	});
+
 	// Mirror `caption` into `name` so thumbnails carry the same text the
 	// fullscreen carousel shows — same convention as LightboxGallery.
-	// Stills pick up their -thumb srcset; clips stay animated <img> tiles here
-	// (the clip governor caps them) — the mp4 upgrade happens in the
-	// LightboxGallery below, which owns the fullscreen slides.
+	// Stills pick up their -thumb srcset; clip tiles become mp4 `poster_video`
+	// tiles where AV1 plays (the clip governor caps both pipelines) — the
+	// fullscreen slides belong to the LightboxGallery below.
 	const shown = $derived(
-		upgradeGalleryItems(items.slice(0, visible), false).map((item) =>
+		upgradeGalleryItems(items.slice(0, visible), clips_to_video).map((item) =>
 			item && typeof item === 'object' && item.caption && !item.name
 				? { ...item, name: item.caption }
 				: item,

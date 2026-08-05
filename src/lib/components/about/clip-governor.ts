@@ -15,10 +15,11 @@
  *   frame drawn onto an overlay canvas and the <img> flipped to
  *   `visibility: hidden`, which stops Chromium advancing (and decoding) the
  *   animation.
- * - `<video data-clip>` clips (the AV1 mp4 twins, hardware-decoded) beyond
- *   VIDEO_CAP are simply paused — a paused video keeps its frame on screen
- *   for free — and off-screen ones are paused too, since a playing video
- *   holds a scarce Android decoder session even when unseen.
+ * - `<video data-clip>` clips (the AV1 mp4 twins, hardware-decoded) and the
+ *   Gallery's `.thumbnail-video` tiles (the same mp4s as looping grid
+ *   thumbnails) beyond VIDEO_CAP are simply paused — a paused video keeps its
+ *   frame on screen for free — and off-screen ones are paused too, since a
+ *   playing video holds a scarce Android decoder session even when unseen.
  *
  * Scrolling re-ranks, so clips take turns playing as they pass the middle of
  * the screen rather than all grinding together.
@@ -187,12 +188,18 @@ export function governClips(root: HTMLElement) {
 				clips.set(img, { img, frozen: null });
 			}
 		}
+		// `.thumbnail-video` is the delightstack Gallery's looping tile video —
+		// this page only feeds those tiles clip mp4s, so they're governed too.
+		const isClipVideo = (el: HTMLVideoElement) =>
+			el.hasAttribute('data-clip') || el.classList.contains('thumbnail-video');
 		const vids =
 			node instanceof HTMLVideoElement
-				? node.hasAttribute('data-clip')
+				? isClipVideo(node)
 					? [node]
 					: []
-				: node.querySelectorAll<HTMLVideoElement>('video[data-clip]');
+				: node.querySelectorAll<HTMLVideoElement>(
+						'video[data-clip], video.thumbnail-video',
+					);
 		for (const vid of vids) videos.add(vid);
 	}
 	collect(root);

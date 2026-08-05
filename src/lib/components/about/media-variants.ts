@@ -64,8 +64,11 @@ export function av1VideoSupported(): boolean {
 /**
  * Upgrade a gallery's items: stills pick up their thumb srcset (always safe),
  * and — when `clips_to_video` — animated clips become `custom` slides playing
- * the mp4, with the animated AVIF kept as the grid-tile poster so thumbnails
- * look exactly as they always did.
+ * the mp4, with the same mp4 as `poster_video` so grid/masonry tiles render a
+ * muted looping <video> too. The animated AVIF is deliberately NOT kept as a
+ * poster: as a `<video poster>` it would download and software-decode the
+ * whole animation, which is exactly the cost the mp4 swap avoids. Tiles show
+ * their thumbhash blur until the video's first frame arrives.
  */
 export function upgradeGalleryItems(
 	items: GalleryItem[],
@@ -80,7 +83,7 @@ export function upgradeGalleryItems(
 				...item,
 				type: 'custom' as const,
 				src: clipVideoUrl(item.src),
-				poster: item.src,
+				poster_video: clipVideoUrl(item.src),
 			};
 		}
 		const upgraded = responsiveSrc(item.src);

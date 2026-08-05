@@ -5,7 +5,7 @@
 	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import Turntable, { type Track } from '../primitives/Turntable.svelte';
 	import { Gallery, Video, type GalleryItem } from '@delightstack/components/media';
-	import { upgradeGalleryItems } from '../media-variants';
+	import { av1VideoSupported, upgradeGalleryItems } from '../media-variants';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	// The record's three bands, outermost first — the order a record actually
@@ -233,6 +233,13 @@
 	// LightboxGallery inside a fold loses its `?media=` links.)
 	let stills = $state<ReturnType<typeof LightboxGallery>>();
 
+	// Clip tiles render as looping mp4 <video> (hardware decode) where AV1
+	// plays; flipped in an effect so server and hydration markup agree.
+	let clips_to_video = $state(false);
+	$effect(() => {
+		clips_to_video = av1VideoSupported();
+	});
+
 	function onStillClick(event: MouseEvent | KeyboardEvent, index: number) {
 		const tile = (event.target as HTMLElement | null)?.closest?.('.gallery-item');
 		stills?.open(index, (tile as HTMLElement) ?? undefined);
@@ -398,7 +405,7 @@
 			<DeletedScenes scenes={trackImages.length}>
 				<div class="gallery-bleed">
 					<Gallery
-						items={upgradeGalleryItems(trackImages, false)}
+						items={upgradeGalleryItems(trackImages, clips_to_video)}
 						display="masonry"
 						size="2"
 						disable_fullscreen
