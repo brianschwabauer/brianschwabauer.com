@@ -471,15 +471,6 @@
 						snaps={[50]} />
 				</div>
 			</Reveal>
-
-			<Reveal variant="up" delay={170}>
-				<PlayFilm
-					label="Also watch — XYZ News Special Report"
-					title="XYZ News Special Report (2011)"
-					meta="2011"
-					color="#6c63ff"
-					onclick={(e) => gallery?.open(5, e.currentTarget)} />
-			</Reveal>
 		</div>
 	</div>
 
