@@ -306,7 +306,7 @@
 				<PlayFilm
 					label="Play the trailer"
 					title="Power Rangers 360 III — fake trailer (2013)"
-					meta="2013 · in 3D"
+					meta="2013"
 					color="#ffd934"
 					onclick={(e) => gallery?.open(6, e.currentTarget)} />
 			</Reveal>
