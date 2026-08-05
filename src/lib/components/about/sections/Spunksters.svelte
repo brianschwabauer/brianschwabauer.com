@@ -65,7 +65,7 @@
 		{ from: '+1 (816) ••• 8210', text: 'Why is Zordon a dog' },
 		{ from: '+1 (913) ••• 2199', text: 'cried laughing at the PR3 trailer' },
 		{ from: '+1 (785) ••• 0772', text: 'I love this so much' },
-		{ from: '+1 (816) ••• 5621', text: 'Brian and Kevin forever ❤️' },
+		{ from: '+1 (816) ••• 5621', text: 'Hunky Spunky Productions forever ❤️' },
 		{ from: '+1 (913) ••• 9088', text: 'Oscars who?' },
 	];
 
@@ -175,10 +175,9 @@
 					So we came home that summer and sent it off the only way we knew how:
 					<strong>The Spunksters</strong>
 					— an awards show, modeled after the Oscars, for ourselves and our films. Awards in
-					every category. Speeches. Live-streamed. Projected on the side of my childhood house
-					— the same backyard where the Power Rangers premieres had played. Forty friends watching
-					a live video feed of Kevin hosting from inside, so the host appeared on a twenty-foot
-					tall projection like a giant.
+					every category. Speeches. Live-streamed. It was hilarious sitting a few feet away
+					from a live video feed of speeches projected to the size of a house (in the same backyard
+					where the Power Rangers premieres had played).
 				</p>
 				<PlayFilm
 					label="Play the show"
@@ -215,7 +214,7 @@
 			<Reveal>
 				<div class="sms-grid">
 					<div class="sms-text">
-						<div class="sms-eyebrow">A SMALL, RIDICULOUS THING I'M PROUD OF</div>
+						<div class="sms-eyebrow">A SMALL, RIDICULOUS THING</div>
 						<h3 class="sub">
 							An SMS feature, hacked together because Google Voice doesn't have an API.
 						</h3>
@@ -223,13 +222,16 @@
 							I wanted viewers to be able to text in their reactions and have them appear
 							on the projected wall. Google Voice didn't (and doesn't) expose an API. But
 							it can forward incoming texts to email. So: text → Google Voice → email → my
-							little polling script → OBS overlay. Untested until the moment it had to
-							work. It worked.
+							little polling script → OBS overlay. It was untested until the moment it had
+							to work. It worked.
 						</p>
 						<p class="aside">
 							I deeply believe in this: live life all the way through, even the parts that
-							don't matter. Backyard awards shows are nothing. It's so much more fun to
-							take them seriously than to phone them in.
+							don't matter. Backyard awards shows for ~40 people are silly — some might
+							say pointless. But there's something special about taking <strong>
+								"fun"
+							</strong>
+							seriously. Put in the effort — even for the things that don't matter.
 						</p>
 					</div>
 					<div class="phone">
@@ -251,9 +253,6 @@
 
 		<Reveal variant="up">
 			<div class="bts">
-				<div class="bts-eyebrow bleed-head">
-					BEHIND THE SCENES · {spunkstersImages.length} PHOTOS
-				</div>
 				<DriftStrip
 					items={spunkstersImages}
 					speed={90}
@@ -331,7 +330,7 @@
 				<div class="endcap-line"></div>
 				<div class="endcap-text">
 					<span>END OF THE HUNKY SPUNKY CHAPTER</span>
-					<strong>We never made another film together. That was the point.</strong>
+					<strong>We never made another film together. And that's okay.</strong>
 				</div>
 				<div class="endcap-line"></div>
 			</div>
@@ -635,13 +634,6 @@
 
 	.bts {
 		margin: 4rem 0;
-	}
-	.bts-eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.32em;
-		color: #ffd934;
-		margin-bottom: 1rem;
 	}
 
 	.bubbly-bros {
