@@ -330,7 +330,7 @@
 							src="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/master.m3u8"
 							poster="https://cdn.brianschwabauer.com/media/2007-08-26_flashlight/poster.jpg"
 							title="Flashlight (2007)"
-							aspect_ratio="352/240"
+							aspect_ratio="1.33"
 							preload="none" />
 					</div>
 				</Reveal>
@@ -363,7 +363,7 @@
 							src="https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/master.m3u8"
 							poster="https://cdn.brianschwabauer.com/media/2010-03-25_do_da_flava_g/poster.jpg"
 							title="Do Da Flava G (2010)"
-							aspect_ratio="3/2"
+							aspect_ratio="16 / 9"
 							preload="none" />
 					</div>
 				</Reveal>
@@ -392,7 +392,7 @@
 							src="https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/master.m3u8"
 							poster="https://cdn.brianschwabauer.com/media/2010-08-10_you_derive_me_crazy/poster.jpg"
 							title="You Derive Me Crazy (2010)"
-							aspect_ratio="3/2"
+							aspect_ratio="16 / 9"
 							preload="none" />
 					</div>
 				</Reveal>
