@@ -907,22 +907,6 @@
 		}
 	}
 
-	.first-submission {
-		--play-film-offset: 0;
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.5rem 1.1rem;
-		margin-top: 1.75rem;
-	}
-	.fs-eyebrow {
-		font-family: var(--font-mono);
-		font-size: 0.65rem;
-		letter-spacing: 0.28em;
-		text-transform: uppercase;
-		opacity: 0.55;
-	}
-
 	.sub {
 		font-size: clamp(1.5rem, 2.6vw, 2.1rem);
 		font-weight: 800;
@@ -980,7 +964,6 @@
 	.ksms-eyebrow {
 		font-family: var(--font-mono);
 		font-size: 0.72rem;
-		letter-spacing: 0.32em;
 		color: var(--red);
 		margin: 4rem 0 1rem;
 	}
@@ -1363,11 +1346,12 @@
 		font-family: var(--font-mono);
 		font-size: 0.66rem;
 		font-weight: 700;
-		letter-spacing: 0.28em;
+		letter-spacing: 0.1em;
+		text-box: trim-both cap alphabetic;
 		text-transform: uppercase;
 		color: oklch(from var(--gold) 0.24 c h);
 		background: var(--gold);
-		padding: 0.22rem 0.9rem 0.22rem 0.6rem;
+		padding: 0.4rem 0.9rem 0.4rem 0.6rem;
 		clip-path: polygon(0 0, 100% 0, calc(100% - 0.5rem) 100%, 0 100%);
 		margin-bottom: 0.6rem;
 	}
