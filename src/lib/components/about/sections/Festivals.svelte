@@ -891,7 +891,7 @@
 	}
 	.brag {
 		max-width: 24rem;
-		margin: 1rem auto 0;
+		margin: 1rem auto 1rem;
 		text-align: center;
 		font-size: 0.95rem;
 		line-height: 1.5;
