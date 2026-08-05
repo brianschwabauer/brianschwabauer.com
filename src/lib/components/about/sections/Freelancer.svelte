@@ -412,7 +412,7 @@
 						<svg viewBox="0 0 24 24" aria-hidden="true">
 							<polygon points="6,4 22,12 6,20" fill="currentColor" />
 						</svg>
-						<span>THE 2015 DEMO REEL · 1:32</span>
+						<span>THE 2015 DEMO REEL</span>
 					</div>
 					<h3 class="reel-headline">Ten years of work. Ninety seconds.</h3>
 					<p class="reel-copy">
@@ -732,7 +732,6 @@
 		gap: 0.55rem;
 		font-family: var(--font-mono);
 		font-size: 0.78rem;
-		letter-spacing: 0.28em;
 		color: #ffb84d;
 		margin-bottom: 0.85rem;
 	}
