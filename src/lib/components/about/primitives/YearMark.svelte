@@ -307,9 +307,12 @@
 	.subtitle {
 		font-family: var(--font-mono);
 		text-transform: uppercase;
-		letter-spacing: 0.4em;
 		font-size: 0.85rem;
 		opacity: 0.7;
 		padding-left: 0.4rem;
+		text-wrap: balance;
+		@media (min-width: 769px) {
+			letter-spacing: 0.3em;
+		}
 	}
 </style>
