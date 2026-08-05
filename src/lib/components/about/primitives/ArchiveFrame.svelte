@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { Modal, Portal } from '@delightstack/components';
+	import { ripple } from '@delightstack/utilities';
+
 	let {
 		src,
 		title,
@@ -16,6 +19,7 @@
 	} = $props();
 
 	let open = $state(false);
+	let modal_open = $state(false);
 	const displayHost = $derived.by(() => {
 		if (host) return host;
 		try {
@@ -24,6 +28,14 @@
 			return '';
 		}
 	});
+
+	// On a phone the inline stage is a few centimetres tall — an archived
+	// site squeezed into it is unreadable and unscrollable. Activating it
+	// there opens the site in a fullscreen modal instead.
+	function activate() {
+		if (window.matchMedia('(max-width: 768px)').matches) modal_open = true;
+		else open = true;
+	}
 </script>
 
 <div class="archive-frame">
@@ -55,7 +67,10 @@
 			     context for what loads, not a status badge. -->
 			<span class="page-title">{title}</span>
 		</div>
-		<button class="open-btn" type="button" onclick={() => (open = !open)}>
+		<button
+			class="open-btn"
+			type="button"
+			onclick={() => (open ? (open = false) : activate())}>
 			{open ? closeLabel : label}
 		</button>
 	</div>
@@ -75,7 +90,7 @@
 						<span style:animation-delay="{(i % 9) * 60}ms"></span>
 					{/each}
 				</div>
-				<button class="ghost-launch" type="button" onclick={() => (open = true)}>
+				<button class="ghost-launch" type="button" onclick={activate}>
 					<svg viewBox="0 0 24 24" aria-hidden="true" width="22" height="22">
 						<path
 							d="M5 12h14M13 6l6 6-6 6"
@@ -91,6 +106,45 @@
 		{/if}
 	</div>
 </div>
+
+<!-- Portaled to <body>: rendered in place, the fixed-position modal is
+     captured by the section's transformed/isolated ancestors (Reveal's
+     transform makes `fixed` behave like `absolute`, and the page root's
+     `isolation: isolate` puts it under the fixed nav bar). -->
+<Portal>
+	<Modal
+		bind:open={modal_open}
+		disable_close_icon
+		width="100vw"
+		height="100dvh"
+		max_width="100vw"
+		max_height="100dvh"
+		class="archive-modal">
+		<div class="modal-stage">
+			<iframe
+				{src}
+				title="{title} (archived)"
+				referrerpolicy="no-referrer"
+				sandbox="allow-scripts allow-same-origin allow-popups allow-forms">
+			</iframe>
+			<button
+				class="modal-close"
+				type="button"
+				aria-label="Close archived site"
+				onclick={() => (modal_open = false)}
+				{@attach ripple()}>
+				<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+					<path
+						d="M6 6l12 12M18 6L6 18"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.2"
+						stroke-linecap="round" />
+				</svg>
+			</button>
+		</div>
+	</Modal>
+</Portal>
 
 <style>
 	.archive-frame {
@@ -254,5 +308,57 @@
 		transition-duration: 0s;
 		transform: translateY(-2px);
 		background: #fff;
+	}
+
+	/* ---- fullscreen mobile modal ---- */
+	/* The Modal's panel keeps its dialog padding and rounded corners by
+	   default — strip both so the iframe truly owns the whole screen. */
+	:global(.modal.archive-modal .body) {
+		padding: 0;
+		border-radius: 0;
+		/* The iframe scrolls itself — the panel must not reserve a gutter or
+		   scroll on its own. */
+		overflow: hidden;
+		scrollbar-gutter: auto;
+	}
+	.modal-stage {
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+	.modal-stage iframe {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 0;
+		background: #fff;
+	}
+	.modal-close {
+		position: absolute;
+		top: calc(0.75rem + env(safe-area-inset-top));
+		right: 0.75rem;
+		width: 44px;
+		height: 44px;
+		display: grid;
+		place-items: center;
+		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, 0.25);
+		border-radius: 50%;
+		background: rgba(8, 10, 18, 0.72);
+		color: #fff;
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		cursor: pointer;
+		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+		transition:
+			background 200ms ease,
+			transform 200ms ease;
+	}
+	.modal-close:hover {
+		transition-duration: 0s;
+		background: rgba(20, 24, 36, 0.9);
+	}
+	.modal-close:active {
+		transform: scale(0.92);
 	}
 </style>

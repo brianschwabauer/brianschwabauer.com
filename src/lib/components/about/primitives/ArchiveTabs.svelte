@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { Modal, Portal } from '@delightstack/components';
+	import { ripple } from '@delightstack/utilities';
+
 	type Tab = { title: string; src: string; host?: string; ratio?: string };
 
 	let {
@@ -15,6 +18,7 @@
 
 	let active = $state(0);
 	let open = $state(false);
+	let modal_open = $state(false);
 	/* Tabs whose iframe has been mounted at least once. Mounted frames are never
 	   torn down while the stage is open — switching back is instant and the
 	   archived site keeps whatever scroll position you left it at. */
@@ -40,10 +44,18 @@
 
 	function show(index: number) {
 		active = index;
-		if (open) visit(index);
+		if (open || modal_open) visit(index);
 	}
 
 	function toggle() {
+		// On a phone the inline stage is a few centimetres tall — an archived
+		// site squeezed into it is unreadable. Opening it there goes to a
+		// fullscreen modal instead.
+		if (!open && window.matchMedia('(max-width: 768px)').matches) {
+			modal_open = true;
+			visit(active);
+			return;
+		}
 		open = !open;
 		if (open) visit(active);
 	}
@@ -165,6 +177,86 @@
 		{/if}
 	</div>
 </div>
+
+<!-- Portaled to <body>: rendered in place, the fixed-position modal is
+     captured by the section's transformed/isolated ancestors (Reveal's
+     transform makes `fixed` behave like `absolute`, and the page root's
+     `isolation: isolate` puts it under the fixed nav bar). -->
+<Portal>
+	<Modal
+		bind:open={modal_open}
+		disable_close_icon
+		width="100vw"
+		height="100dvh"
+		max_width="100vw"
+		max_height="100dvh"
+		class="archive-modal">
+		<div class="modal-stage">
+			<div class="modal-bar">
+				<div class="modal-bar-tabs" role="tablist" aria-label="Archived sites">
+					{#each tabs as tab, i (tab.src)}
+						<button
+							type="button"
+							role="tab"
+							id="{uid}-mtab-{i}"
+							aria-selected={i === active}
+							aria-controls="{uid}-mpanel-{i}"
+							class="tab"
+							class:active={i === active}
+							style:--i={i}
+							onclick={() => show(i)}>
+							{#if visited.includes(i) && !loaded.includes(i)}
+								<span class="spinner" aria-hidden="true"></span>
+							{:else}
+								<span class="favicon" aria-hidden="true">
+									{tab.title.trim().charAt(0)}
+								</span>
+							{/if}
+							<span class="tab-title">{tab.title}</span>
+						</button>
+					{/each}
+				</div>
+				<button
+					class="modal-close"
+					type="button"
+					aria-label="Close archived sites"
+					onclick={() => (modal_open = false)}
+					{@attach ripple()}>
+					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+						<path
+							d="M6 6l12 12M18 6L6 18"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.2"
+							stroke-linecap="round" />
+					</svg>
+				</button>
+			</div>
+			<div class="modal-frames">
+				{#each tabs as tab, i (tab.src)}
+					{#if visited.includes(i)}
+						<div
+							class="layer"
+							class:hidden={i !== active}
+							role="tabpanel"
+							id="{uid}-mpanel-{i}"
+							aria-labelledby="{uid}-mtab-{i}">
+							<iframe
+								src={tab.src}
+								title="{tab.title} (archived)"
+								referrerpolicy="no-referrer"
+								sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+								onload={() => {
+									if (!loaded.includes(i)) loaded.push(i);
+								}}>
+							</iframe>
+						</div>
+					{/if}
+				{/each}
+			</div>
+		</div>
+	</Modal>
+</Portal>
 
 <style>
 	.archive-tabs {
@@ -434,5 +526,71 @@
 		transition-duration: 0s;
 		transform: translateY(-2px);
 		background: #fff;
+	}
+
+	/* ---- fullscreen mobile modal ---- */
+	/* The Modal's panel keeps its dialog padding and rounded corners by
+	   default — strip both so the frames truly own the whole screen. */
+	:global(.modal.archive-modal .body) {
+		padding: 0;
+		border-radius: 0;
+		/* The iframe scrolls itself — the panel must not reserve a gutter or
+		   scroll on its own. */
+		overflow: hidden;
+		scrollbar-gutter: auto;
+	}
+	.modal-stage {
+		display: grid;
+		grid-template-rows: auto 1fr;
+		width: 100%;
+		height: 100%;
+		background: #101116;
+	}
+	.modal-bar {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: calc(0.4rem + env(safe-area-inset-top)) 0.4rem 0.4rem;
+	}
+	/* The tabs scroll in their own strip so the close button never scrolls
+	   out of reach with them. */
+	.modal-bar-tabs {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		align-items: center;
+		gap: 1px;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+	.modal-bar-tabs::-webkit-scrollbar {
+		display: none;
+	}
+	/* Free-floating pills in the bar — there's no chrome below for the tab's
+	   squared bottom corners to merge into here. */
+	.modal-bar .tab {
+		border-radius: 7px;
+	}
+	.modal-close {
+		position: relative;
+		flex-shrink: 0;
+		width: 36px;
+		height: 36px;
+		display: grid;
+		place-items: center;
+		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.08);
+		color: #fff;
+		cursor: pointer;
+		transition: background 200ms ease;
+	}
+	.modal-close:hover {
+		transition-duration: 0s;
+		background: rgba(255, 255, 255, 0.16);
+	}
+	.modal-frames {
+		position: relative;
 	}
 </style>
