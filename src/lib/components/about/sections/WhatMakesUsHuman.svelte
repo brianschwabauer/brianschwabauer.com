@@ -863,7 +863,7 @@
 		top: clamp(2rem, 6vw, 4rem);
 		left: clamp(1rem, 3vw, 2rem);
 		font-family: var(--font-mono);
-		font-weight: 900;
+		font-weight: 700;
 		font-size: clamp(7rem, 22vw, 18rem);
 		line-height: 0.85;
 		letter-spacing: -0.04em;
@@ -1032,7 +1032,7 @@
 	.stat-num {
 		font-family: var(--font-mono);
 		font-size: clamp(2rem, 4vw, 3rem);
-		font-weight: 900;
+		font-weight: 700;
 		color: #00f2c3;
 		line-height: 1;
 	}

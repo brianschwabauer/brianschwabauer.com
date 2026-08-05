@@ -529,7 +529,7 @@
 		top: calc(80px + 1.5rem);
 		font-family: var(--font-mono);
 		font-size: clamp(2.6rem, 5vw, 4rem);
-		font-weight: 900;
+		font-weight: 700;
 		color: transparent;
 		-webkit-text-stroke: 2px #ff66cc;
 		letter-spacing: -0.02em;

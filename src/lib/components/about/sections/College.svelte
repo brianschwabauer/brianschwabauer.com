@@ -1117,7 +1117,7 @@
 		border-radius: 4px;
 		background: #7a4dff;
 		color: #fff;
-		font-weight: 800;
+		font-weight: 700;
 	}
 	.node-head {
 		max-width: 56rem;

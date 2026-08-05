@@ -563,7 +563,7 @@
 		border-radius: 4px;
 		background: linear-gradient(180deg, #ffd934, #ffb800);
 		color: #2a1a00;
-		font-weight: 800;
+		font-weight: 700;
 		box-shadow:
 			0 2px 0 #b88500,
 			inset 0 -2px 0 rgba(0, 0, 0, 0.1);

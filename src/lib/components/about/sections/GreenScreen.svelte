@@ -759,7 +759,7 @@
 		height: 30px;
 		background: #22ff90;
 		color: #04130a;
-		font-weight: 800;
+		font-weight: 700;
 		font-family: var(--font-mono);
 		display: grid;
 		place-items: center;

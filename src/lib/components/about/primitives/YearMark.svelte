@@ -157,7 +157,7 @@
 	}
 	.year {
 		font-family: var(--font-mono);
-		font-weight: 900;
+		font-weight: 700;
 		font-size: var(--year-size);
 		line-height: 0.85;
 		letter-spacing: -0.04em;
@@ -266,7 +266,7 @@
 		top: 0;
 		left: 0;
 		font-family: var(--font-mono);
-		font-weight: 900;
+		font-weight: 700;
 		font-size: var(--year-size);
 		line-height: 0.85;
 		letter-spacing: -0.04em;

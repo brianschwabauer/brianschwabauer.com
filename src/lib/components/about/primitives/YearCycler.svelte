@@ -117,7 +117,7 @@
 		align-items: center;
 		justify-content: center;
 		font-family: var(--font-mono);
-		font-weight: 900;
+		font-weight: 700;
 		font-size: var(--gate);
 		line-height: 1;
 		letter-spacing: -0.04em;

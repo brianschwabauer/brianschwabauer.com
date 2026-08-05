@@ -5,8 +5,10 @@
 		<link rel="icon" href="%sveltekit.assets%/brandmark.svg" type="image/svg+xml" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<!-- Fonts are self-hosted (static/fonts/, @font-face in src/app.css). Preload
-		     the two families visible above the fold: Nunito Sans (hero/UI sans) and
-		     Merriweather (body serif). Italics and Playfair load on demand. -->
+		     the families visible above the fold: Nunito Sans (hero/UI sans),
+		     Merriweather (body serif), and Fira Code 400 (hero labels; the 500/700
+		     mono weights and the year marks load on demand below the fold).
+		     Italics and Playfair too. -->
 		<link
 			rel="preload"
 			href="%sveltekit.assets%/fonts/nunito-sans-latin.woff2"
@@ -16,6 +18,12 @@
 		<link
 			rel="preload"
 			href="%sveltekit.assets%/fonts/merriweather-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin />
+		<link
+			rel="preload"
+			href="%sveltekit.assets%/fonts/fira-code-latin-400.woff2"
 			as="font"
 			type="font/woff2"
 			crossorigin />

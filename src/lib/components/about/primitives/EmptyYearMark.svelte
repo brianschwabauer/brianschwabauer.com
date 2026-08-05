@@ -70,7 +70,7 @@
 	}
 	.year {
 		font-family: var(--font-mono);
-		font-weight: 900;
+		font-weight: 700;
 		font-size: clamp(7rem, 24vw, 20rem);
 		line-height: 0.85;
 		letter-spacing: -0.04em;

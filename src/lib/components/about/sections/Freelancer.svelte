@@ -573,7 +573,7 @@
 	.stamp {
 		position: absolute;
 		font-family: var(--font-mono);
-		font-weight: 800;
+		font-weight: 700;
 		font-size: clamp(0.8rem, 1.6vw, 1.25rem);
 		letter-spacing: 0.2em;
 		padding: 0.35em 0.7em;

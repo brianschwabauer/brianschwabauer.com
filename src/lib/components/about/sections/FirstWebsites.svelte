@@ -527,7 +527,7 @@
 		background: #ff66cc;
 		color: #1b0214;
 		font-family: var(--font-mono);
-		font-weight: 800;
+		font-weight: 700;
 		font-size: 0.7rem;
 		letter-spacing: 0.2em;
 		padding: 0.25rem 0.8rem;

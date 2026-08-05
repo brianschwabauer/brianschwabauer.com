@@ -541,7 +541,7 @@
 	.feature-num {
 		font-family: var(--font-mono);
 		font-size: 1.4rem;
-		font-weight: 900;
+		font-weight: 700;
 		color: #00f2c3;
 		line-height: 1;
 	}

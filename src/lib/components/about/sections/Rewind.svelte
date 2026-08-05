@@ -581,7 +581,7 @@
 	.year-fly {
 		position: absolute;
 		font-family: var(--font-mono);
-		font-weight: 900;
+		font-weight: 700;
 		font-size: clamp(7rem, 22vw, 17rem);
 		line-height: 1;
 		letter-spacing: -0.04em;

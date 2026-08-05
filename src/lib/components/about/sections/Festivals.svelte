@@ -863,7 +863,7 @@
 		align-items: flex-start;
 		font-family: var(--font-mono);
 		font-size: clamp(3.4rem, 8.5vw, 6.5rem);
-		font-weight: 900;
+		font-weight: 700;
 		line-height: 0.82;
 		letter-spacing: -0.03em;
 		color: transparent;
