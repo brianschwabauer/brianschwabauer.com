@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { imgSrcset } from '../media-variants';
+
 	// A row of photos that drifts continuously past the viewport and can be
 	// grabbed.
 	//
@@ -224,6 +226,8 @@
 							onclick={(e) => onitemclick?.({ index, element: e.currentTarget })}>
 							<img
 								src={item.src}
+								srcset={item.src ? imgSrcset(item.src) : undefined}
+								sizes="auto"
 								alt={item.alt ?? ''}
 								style:aspect-ratio={ratioOf(item)}
 								draggable="false"

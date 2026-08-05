@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { imgSrcset } from '../media-variants';
+
 	// A strip of celluloid that runs continuously past the viewport.
 	//
 	// The whole strip — sprocket holes and frames together — is one transformed
@@ -233,6 +235,8 @@
 								onclick={(e) => onframeclick?.({ index, element: e.currentTarget })}>
 								<img
 									src={item.src}
+									srcset={item.src ? imgSrcset(item.src) : undefined}
+									sizes="auto"
 									alt={item.caption ?? ''}
 									style:aspect-ratio={ratioOf(item)}
 									draggable="false"
@@ -244,6 +248,8 @@
 							<figure class="frame">
 								<img
 									src={item.src}
+									srcset={item.src ? imgSrcset(item.src) : undefined}
+									sizes="auto"
 									alt={item.caption ?? ''}
 									style:aspect-ratio={ratioOf(item)}
 									draggable="false"

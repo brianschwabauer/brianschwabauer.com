@@ -5,6 +5,7 @@
 	import DeletedScenes from '../primitives/DeletedScenes.svelte';
 	import Turntable, { type Track } from '../primitives/Turntable.svelte';
 	import { Gallery, Video, type GalleryItem } from '@delightstack/components/media';
+	import { upgradeGalleryItems } from '../media-variants';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	// The record's three bands, outermost first — the order a record actually
@@ -397,7 +398,7 @@
 			<DeletedScenes scenes={trackImages.length}>
 				<div class="gallery-bleed">
 					<Gallery
-						items={trackImages}
+						items={upgradeGalleryItems(trackImages, false)}
 						display="masonry"
 						size="2"
 						disable_fullscreen

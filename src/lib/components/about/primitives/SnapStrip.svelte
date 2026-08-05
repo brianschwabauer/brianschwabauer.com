@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { imgSrcset } from '../media-variants';
+
 	// A horizontally scroll-snapped strip of photos — the page's single
 	// horizontal moment. Items keep their natural aspect ratio at a shared
 	// height, like frames on a contact sheet.
@@ -40,6 +42,8 @@
 					onclick={(e) => onitemclick?.({ index: i, element: e.currentTarget })}>
 					<img
 						src={item.src}
+						srcset={item.src ? imgSrcset(item.src) : undefined}
+						sizes="auto"
 						alt={item.alt ?? ''}
 						style:aspect-ratio={ratioOf(item)}
 						loading="lazy"

@@ -8,13 +8,20 @@
  * on a mid-range phone two or three of them saturate the decode budget and
  * the whole viewport's framerate drops.
  *
- * So, on coarse-pointer devices: every governed <img> whose src is in the
- * generated ANIMATED_CLIPS manifest is ranked by distance to the viewport
- * center, the nearest CAP keep playing, and the rest are FROZEN — their
- * current frame drawn onto an overlay canvas and the <img> flipped to
- * `visibility: hidden`, which stops Chromium advancing (and decoding) the
- * animation. Scrolling re-ranks, so clips take turns playing as they pass the
- * middle of the screen rather than all grinding together.
+ * So, on coarse-pointer devices, clips are ranked by distance to the viewport
+ * center and only the nearest few play, per pipeline:
+ *
+ * - `<img>` clips (animated AVIF) beyond IMG_CAP are FROZEN — their current
+ *   frame drawn onto an overlay canvas and the <img> flipped to
+ *   `visibility: hidden`, which stops Chromium advancing (and decoding) the
+ *   animation.
+ * - `<video data-clip>` clips (the AV1 mp4 twins, hardware-decoded) beyond
+ *   VIDEO_CAP are simply paused — a paused video keeps its frame on screen
+ *   for free — and off-screen ones are paused too, since a playing video
+ *   holds a scarce Android decoder session even when unseen.
+ *
+ * Scrolling re-ranks, so clips take turns playing as they pass the middle of
+ * the screen rather than all grinding together.
  *
  * Under `prefers-reduced-motion` the cap is zero on every device — these are
  * infinite loops with no pause control, which is exactly what that setting
@@ -30,8 +37,16 @@
  */
 import { ANIMATED_CLIPS } from './animated-clips';
 
-/** clips allowed to play simultaneously on a governed device */
-const CAP = 10;
+/**
+ * Playing caps, per decode pipeline. `<img>` clips (animated AVIF — gallery
+ * grid tiles, and every clip on browsers without AV1 video) are per-frame
+ * SOFTWARE decodes, so their budget is small. `<video data-clip>` clips ride
+ * the AV1 hardware decoder, but Android caps concurrent MediaCodec sessions
+ * (typically ~6–8) — past that, decoders fail or silently fall back to
+ * software, so the video cap stays under it.
+ */
+const IMG_CAP = 4;
+const VIDEO_CAP = 6;
 /** how far past the viewport a clip still counts as "on screen" — matches the
  *  margin Chrome itself keeps animating within, so freezes happen just out of
  *  sight and a clip scrolling in is already resolved one way or the other */
@@ -48,6 +63,18 @@ type Clip = {
 	img: HTMLImageElement;
 	frozen: HTMLCanvasElement | null;
 };
+
+/** pause/play IS the freeze for the video pipeline — a paused <video> holds
+ *  its frame on screen at zero decode cost */
+function pauseVideo(el: HTMLVideoElement) {
+	if (!el.paused) el.pause();
+}
+function playVideo(el: HTMLVideoElement) {
+	// Never force a fetch: LazyMedia starts a clip only once it comes near the
+	// viewport. Until then preload is "none" and the governor leaves it alone.
+	if (el.preload === 'none') return;
+	if (el.paused) el.play().catch(() => {});
+}
 
 function clipName(src: string): string {
 	return decodeURIComponent(src.split('/').pop() ?? '').split('?')[0];
@@ -146,9 +173,11 @@ export function governClips(root: HTMLElement) {
 	const coarse = matchMedia('(pointer: coarse), (max-width: 767px)').matches;
 	const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 	if (!coarse && !reduce) return;
-	const cap = reduce ? 0 : CAP;
+	const img_cap = reduce ? 0 : IMG_CAP;
+	const video_cap = reduce ? 0 : VIDEO_CAP;
 
 	const clips = new Map<HTMLImageElement, Clip>();
+	const videos = new Set<HTMLVideoElement>();
 
 	function collect(node: Node) {
 		if (!(node instanceof Element)) return;
@@ -158,6 +187,13 @@ export function governClips(root: HTMLElement) {
 				clips.set(img, { img, frozen: null });
 			}
 		}
+		const vids =
+			node instanceof HTMLVideoElement
+				? node.hasAttribute('data-clip')
+					? [node]
+					: []
+				: node.querySelectorAll<HTMLVideoElement>('video[data-clip]');
+		for (const vid of vids) videos.add(vid);
 	}
 	collect(root);
 	const mo = new MutationObserver((records) => {
@@ -172,7 +208,14 @@ export function governClips(root: HTMLElement) {
 		const vw = window.innerWidth;
 		const margin = vh * NEAR;
 		const center = vh / 2;
-		const near: { clip: Clip; dist: number }[] = [];
+		const offscreen = (rect: DOMRect) =>
+			rect.width < 1 ||
+			rect.bottom < -margin ||
+			rect.top > vh + margin ||
+			rect.right < 0 ||
+			rect.left > vw;
+
+		const near_imgs: { clip: Clip; dist: number }[] = [];
 		for (const clip of clips.values()) {
 			const img = clip.img;
 			if (!img.isConnected) {
@@ -180,24 +223,38 @@ export function governClips(root: HTMLElement) {
 				continue;
 			}
 			const rect = img.getBoundingClientRect(); // hidden imgs keep their box
-			if (
-				rect.width < 1 ||
-				rect.bottom < -margin ||
-				rect.top > vh + margin ||
-				rect.right < 0 ||
-				rect.left > vw
-			) {
+			if (offscreen(rect)) {
 				// Off screen: Chrome pauses it by itself — drop our overlay so the
 				// frozen-frame canvases don't accumulate down the page.
 				thaw(clip);
 				continue;
 			}
-			near.push({ clip, dist: Math.abs((rect.top + rect.bottom) / 2 - center) });
+			near_imgs.push({ clip, dist: Math.abs((rect.top + rect.bottom) / 2 - center) });
 		}
-		near.sort((a, b) => a.dist - b.dist);
-		for (let i = 0; i < near.length; i++) {
-			if (i < cap) thaw(near[i].clip);
-			else freeze(near[i].clip);
+		near_imgs.sort((a, b) => a.dist - b.dist);
+		for (let i = 0; i < near_imgs.length; i++) {
+			if (i < img_cap) thaw(near_imgs[i].clip);
+			else freeze(near_imgs[i].clip);
+		}
+
+		const near_vids: { el: HTMLVideoElement; dist: number }[] = [];
+		for (const el of videos) {
+			if (!el.isConnected) {
+				videos.delete(el);
+				continue;
+			}
+			const rect = el.getBoundingClientRect();
+			if (offscreen(rect)) {
+				// An off-screen playing video still holds a decoder session.
+				pauseVideo(el);
+				continue;
+			}
+			near_vids.push({ el, dist: Math.abs((rect.top + rect.bottom) / 2 - center) });
+		}
+		near_vids.sort((a, b) => a.dist - b.dist);
+		for (let i = 0; i < near_vids.length; i++) {
+			if (i < video_cap) playVideo(near_vids[i].el);
+			else pauseVideo(near_vids[i].el);
 		}
 	}
 

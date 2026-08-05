@@ -1,4 +1,11 @@
 <script lang="ts">
+	import {
+		imgSrcset,
+		isAnimatedClip,
+		clipVideoUrl,
+		av1VideoSupported,
+	} from '../media-variants';
+
 	let {
 		src,
 		alt = '',
@@ -37,6 +44,24 @@
 
 	let frame = $state<HTMLElement | null>(null);
 	let image = $state<HTMLImageElement | null>(null);
+	let videoEl = $state<HTMLVideoElement | null>(null);
+
+	/*
+	 * Animated clips render as a muted looping <video> playing the AV1 mp4
+	 * encoded beside the AVIF — same codec, same look, but through the media
+	 * pipeline where the hardware decoder lives, instead of the image
+	 * pipeline's per-frame software decode. Flipped in an effect because
+	 * av1VideoSupported() is false during SSR and hydration must match; a
+	 * video error drops back to the animated-AVIF <img> path.
+	 */
+	let use_video = $state(false);
+	$effect(() => {
+		use_video = isAnimatedClip(src) && av1VideoSupported();
+	});
+
+	/* Large stills carry their -thumb variant as a srcset; `sizes="auto"` lets
+	 * the browser pick from the actual layout box (valid on lazy images). */
+	const srcset = $derived(use_video ? undefined : imgSrcset(src));
 
 	/*
 	 * A failed fetch (flaky mobile network, tab backgrounded mid-download) fires
@@ -154,7 +179,82 @@
 		obs.observe(box);
 		return () => obs.disconnect();
 	});
+
+	/*
+	 * The video branch's loading discipline: nothing is fetched until the
+	 * frame comes near the viewport (same 600px horizon as the image path),
+	 * then the clip loads and plays. On phones the clip governor may pause it
+	 * again — a paused video holds its frame at no decode cost — and it is
+	 * also the one that resumes it when the clip's turn comes back around.
+	 */
+	$effect(() => {
+		const vid = videoEl;
+		const box = frame;
+		if (!vid || !box || !use_video) return;
+		const start = () => {
+			if (vid.preload !== 'auto') vid.preload = 'auto';
+			vid.muted = true;
+			vid.play().catch(() => {});
+		};
+		const NEAR = 600;
+		const rect = box.getBoundingClientRect();
+		if (
+			rect.width > 0 &&
+			rect.height > 0 &&
+			rect.bottom > -NEAR &&
+			rect.top < window.innerHeight + NEAR
+		) {
+			start();
+			return;
+		}
+		if (typeof IntersectionObserver === 'undefined') {
+			start();
+			return;
+		}
+		const obs = new IntersectionObserver(
+			(entries) => {
+				if (!entries.some((entry) => entry.isIntersecting)) return;
+				start();
+				obs.disconnect();
+			},
+			{ rootMargin: `${NEAR}px 0px` },
+		);
+		obs.observe(box);
+		return () => obs.disconnect();
+	});
 </script>
+
+{#snippet media()}
+	{#if use_video}
+		<video
+			bind:this={videoEl}
+			src={clipVideoUrl(src)}
+			data-clip
+			muted
+			loop
+			playsinline
+			preload="none"
+			aria-label={alt || undefined}
+			class:loaded
+			style:object-fit={fit}
+			onloadeddata={() => (loaded = true)}
+			onerror={() => (use_video = false)}>
+		</video>
+	{:else}
+		<img
+			bind:this={image}
+			{src}
+			{srcset}
+			sizes={srcset && !eager ? 'auto' : undefined}
+			{alt}
+			loading={eager ? 'eager' : 'lazy'}
+			decoding="async"
+			class:loaded
+			style:object-fit={fit}
+			onload={() => (loaded = true)}
+			onerror={retryOrReveal} />
+	{/if}
+{/snippet}
 
 {#if interactive}
 	<button
@@ -167,16 +267,7 @@
 		{style}
 		aria-label={alt || 'Open image'}
 		onclick={(e) => onclick?.(e)}>
-		<img
-			bind:this={image}
-			{src}
-			{alt}
-			loading={eager ? 'eager' : 'lazy'}
-			decoding="async"
-			class:loaded
-			style:object-fit={fit}
-			onload={() => (loaded = true)}
-			onerror={retryOrReveal} />
+		{@render media()}
 		{#if video}
 			<span class="play" aria-hidden="true">
 				<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
@@ -194,16 +285,7 @@
 		class:shadow
 		style:aspect-ratio={ratio || undefined}
 		{style}>
-		<img
-			bind:this={image}
-			{src}
-			{alt}
-			loading={eager ? 'eager' : 'lazy'}
-			decoding="async"
-			class:loaded
-			style:object-fit={fit}
-			onload={() => (loaded = true)}
-			onerror={retryOrReveal} />
+		{@render media()}
 		{#if caption}
 			<figcaption>{caption}</figcaption>
 		{/if}
@@ -247,11 +329,11 @@
 		translate: 0 1px;
 		scale: 0.995;
 	}
-	.lazy-media-button:hover img {
+	.lazy-media-button:hover :is(img, video) {
 		transition-duration: 0s;
 		transform: scale(1.02);
 	}
-	.lazy-media-button img {
+	.lazy-media-button :is(img, video) {
 		transition: transform 250ms ease;
 	}
 	.lazy-media-button:focus-visible {
@@ -295,14 +377,16 @@
 			0 10px 30px rgba(0, 0, 0, 0.35),
 			0 2px 6px rgba(0, 0, 0, 0.25);
 	}
-	img {
+	img,
+	video {
 		display: block;
 		width: 100%;
 		height: 100%;
 		opacity: 0;
 		transition: opacity 500ms ease;
 	}
-	img.loaded {
+	img.loaded,
+	video.loaded {
 		opacity: 1;
 	}
 	figcaption,

@@ -7,6 +7,7 @@
 		type GalleryItem,
 		type GalleryDisplay,
 	} from '@delightstack/components/media';
+	import { av1VideoSupported, upgradeGalleryItems } from '../media-variants';
 
 	/**
 	 * A deep-linkable wrapper around the delightstack lightbox `Gallery`.
@@ -47,12 +48,23 @@
 		[prop: string]: unknown;
 	} = $props();
 
+	// Animated-clip slides switch from the software-decoded animated AVIF to
+	// the AV1 mp4 beside it (hardware decode) once we know the browser can play
+	// it. Flipped in an effect, not read inline: av1VideoSupported() is false
+	// during SSR and the server/hydration markup must agree.
+	let clips_to_video = $state(false);
+	$effect(() => {
+		clips_to_video = av1VideoSupported();
+	});
+
 	// The Gallery renders its thumbnail hover-overlay from `item.name`, but its
 	// fullscreen caption bar from `item.caption || item.name`. Our media data sets
 	// only `caption`, so mirror it into `name` (when absent) — that way the same
 	// caption shows both on thumbnail hover and in fullscreen, from one field.
+	// Stills also pick up their -thumb srcset, and animated clips become mp4
+	// `custom` slides (the clip snippet below) with the AVIF as grid poster.
 	const displayItems = $derived(
-		items.map((item) =>
+		upgradeGalleryItems(items, clips_to_video).map((item) =>
 			item && typeof item === 'object' && item.caption && !item.name
 				? { ...item, name: item.caption }
 				: item,
@@ -152,10 +164,49 @@
 	});
 </script>
 
+<!-- The fullscreen slide for an animated clip: the same endless muted loop
+     the animated AVIF was, but through the video pipeline where the AV1
+     hardware decoder lives. Deliberately no controls — it replaces an <img>
+     that had none. Paused whenever its slide isn't the active one. -->
+{#snippet clipSlide({
+	item,
+	onload,
+	active,
+}: {
+	item: { src: string };
+	onload: () => void;
+	active: boolean;
+})}
+	<video
+		class="clip-slide"
+		src={item.src}
+		muted
+		loop
+		playsinline
+		preload="auto"
+		onloadeddata={onload}
+		{@attach (el: HTMLVideoElement) => {
+			el.muted = true;
+			if (active) el.play().catch(() => {});
+			else el.pause();
+		}}>
+	</video>
+{/snippet}
+
 <Gallery
 	bind:this={inner}
 	bind:slide
 	items={displayItems}
 	{display}
 	{meta_display_fullscreen}
+	custom={clipSlide}
 	{...rest} />
+
+<style>
+	.clip-slide {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+</style>

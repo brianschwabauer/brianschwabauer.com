@@ -29,6 +29,7 @@
 	import PinScrub from './PinScrub.svelte';
 	import LightboxGallery from './LightboxGallery.svelte';
 	import { type GalleryItem } from '@delightstack/components/media';
+	import { imgSrcset } from '../media-variants';
 
 	const CDN = 'https://cdn.brianschwabauer.com/media/';
 	/** Must match the `scale` on `.wall` — the visible slice of a column is the
@@ -163,6 +164,8 @@
 							onclick={(e) => gallery?.open(STARTS[c] + s, e.currentTarget)}>
 							<img
 								src={CDN + shot.file}
+								srcset={imgSrcset(CDN + shot.file)}
+								sizes="auto"
 								alt={shot.caption}
 								width={shot.width}
 								height={shot.height}
@@ -199,6 +202,8 @@
 										onclick={(e) => gallery?.open(index, e.currentTarget)}>
 										<img
 											src={CDN + shot.file}
+											srcset={imgSrcset(CDN + shot.file)}
+											sizes={armed ? undefined : 'auto'}
 											alt={shot.caption}
 											width={shot.width}
 											height={shot.height}

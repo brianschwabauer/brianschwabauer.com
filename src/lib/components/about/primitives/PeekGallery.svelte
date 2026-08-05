@@ -12,6 +12,7 @@
 		type GalleryDisplay,
 	} from '@delightstack/components/media';
 	import LightboxGallery from './LightboxGallery.svelte';
+	import { upgradeGalleryItems } from '../media-variants';
 
 	let {
 		key,
@@ -45,14 +46,15 @@
 
 	// Mirror `caption` into `name` so thumbnails carry the same text the
 	// fullscreen carousel shows — same convention as LightboxGallery.
+	// Stills pick up their -thumb srcset; clips stay animated <img> tiles here
+	// (the clip governor caps them) — the mp4 upgrade happens in the
+	// LightboxGallery below, which owns the fullscreen slides.
 	const shown = $derived(
-		items
-			.slice(0, visible)
-			.map((item) =>
-				item && typeof item === 'object' && item.caption && !item.name
-					? { ...item, name: item.caption }
-					: item,
-			),
+		upgradeGalleryItems(items.slice(0, visible), false).map((item) =>
+			item && typeof item === 'object' && item.caption && !item.name
+				? { ...item, name: item.caption }
+				: item,
+		),
 	);
 
 	// Masonry lays out with `grid-auto-flow: dense`, so the last DOM node isn't

@@ -7,6 +7,7 @@
 	import PeekGallery from '../primitives/PeekGallery.svelte';
 	import PlayFilm from '../primitives/PlayFilm.svelte';
 	import { Gallery, Video, type GalleryItem } from '@delightstack/components/media';
+	import { upgradeGalleryItems } from '../media-variants';
 	import LightboxGallery from '../primitives/LightboxGallery.svelte';
 
 	const CDN = 'https://cdn.brianschwabauer.com/media/';
@@ -656,7 +657,7 @@
 					</div>
 					<div class="node-gallery">
 						<Gallery
-							items={nodeImages}
+							items={upgradeGalleryItems(nodeImages, false)}
 							display="slider"
 							aspect_ratio="16 / 10"
 							radius="2"
