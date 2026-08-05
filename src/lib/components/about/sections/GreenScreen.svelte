@@ -565,7 +565,7 @@
 	.grid-2 {
 		display: grid;
 		grid-template-columns: 1.1fr 1fr;
-		gap: clamp(1.5rem, 4vw, 3rem);
+		gap: 4rem clamp(1.5rem, 4vw, 3rem);
 		align-items: center;
 		margin-bottom: 4rem;
 	}
