@@ -315,7 +315,7 @@
 					key="entrepreneurship-engagement"
 					items={engagementImages}
 					display="masonry-row"
-					size="2" />
+					size="0" />
 			</Reveal>
 		</div>
 
