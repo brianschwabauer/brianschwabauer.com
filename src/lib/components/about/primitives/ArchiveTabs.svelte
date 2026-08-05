@@ -417,7 +417,6 @@
 	}
 	.archive-pill {
 		font-size: 0.65rem;
-		letter-spacing: 0.18em;
 		padding: 0.1rem 0.55rem;
 		border-radius: 999px;
 		background: rgba(255, 200, 0, 0.18);
