@@ -949,6 +949,7 @@
 		font-size: clamp(1.1rem, 1.7vw, 1.35rem);
 		line-height: 1.65;
 		color: rgba(255, 255, 255, 0.75);
+		text-wrap: pretty;
 	}
 	.fine {
 		font-family: var(--font-mono);
