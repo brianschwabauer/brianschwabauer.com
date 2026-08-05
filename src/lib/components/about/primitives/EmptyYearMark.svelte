@@ -67,6 +67,10 @@
 		pointer-events: none;
 		user-select: none;
 		contain: layout paint;
+		/* Mounted directly in the page root, outside every SectionShell — without
+		   this the giant stroked numeral keeps its raster resident for the whole
+		   page. The height is explicit, so skipping costs no layout shift. */
+		content-visibility: auto;
 	}
 	.year {
 		font-family: var(--font-mono);

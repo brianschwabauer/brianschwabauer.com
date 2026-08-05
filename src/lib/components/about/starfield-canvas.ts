@@ -147,6 +147,9 @@ export class StarfieldPainter {
 	private stamp = 0;
 	/** bake glow into new sprites — Hero clears it under low-fx */
 	glow = true;
+	/** parked = the hero is off screen and every graphics resource is released.
+	 *  Bumped generation lets in-flight bakes know their work is stale. */
+	private parked = false;
 	/** any fetch/decode failure latches this; Hero checks it before trusting us */
 	failed = false;
 	/** called on a failure AFTER activation, so Hero can fall back mid-flight */
@@ -161,6 +164,7 @@ export class StarfieldPainter {
 	}
 
 	resize(cssW: number, cssH: number, dpr: number) {
+		if (this.parked) return; // a resize while parked must not reallocate
 		this.dpr = Math.min(dpr, 2); // >2× is invisible and quadruples fill cost
 		const w = Math.max(1, Math.round(cssW * this.dpr));
 		const h = Math.max(1, Math.round(cssH * this.dpr));
@@ -189,7 +193,8 @@ export class StarfieldPainter {
 	 */
 	request(src: string, ar: number) {
 		const key = spriteKey(src, ar);
-		if (this.failed || this.sprites.has(key) || this.pending.has(key)) return;
+		if (this.failed || this.parked || this.sprites.has(key) || this.pending.has(key))
+			return;
 		this.pending.add(key);
 		const load = (cache: RequestCache) =>
 			fetch(this.mediaBase + src, { mode: 'cors', cache }).then((res) => {
@@ -269,6 +274,13 @@ export class StarfieldPainter {
 
 	/** register an empty sprite canvas of this shape in the cache */
 	private makeSprite(key: string, ar: number): Sprite | null {
+		// A fetch that resolved after park() must not repopulate the cache the
+		// park just emptied — bakeAnimated closes its decoder on a null sprite.
+		if (this.parked) return null;
+		// A re-request racing a stale in-flight bake can land the same key twice;
+		// overwriting would leak the first sprite's decoder.
+		const prev = this.sprites.get(key);
+		if (prev) this.killAnim(prev);
 		const bh = Math.round(SPRITE_W / ar);
 		const c = document.createElement('canvas');
 		c.width = SPRITE_W + 2 * MARGIN;
@@ -493,6 +505,34 @@ export class StarfieldPainter {
 		if (!ctx) return;
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	}
+
+	/**
+	 * Release every graphics resource while the hero is off screen: the sprite
+	 * cache (up to 48 × ~2 MB canvases), the shadow plates, every open
+	 * ImageDecoder + pre-decoded VideoFrame, and the backing store itself. On a
+	 * phone this is on the order of 100 MB of GPU memory that was previously
+	 * held for the rest of the page — enough to push Chrome's renderer into
+	 * dropping tiles for the sections actually on screen.
+	 *
+	 * unpark() + re-request() rebuilds everything; the fetches come out of the
+	 * HTTP cache, and the DOM field carries the hero until the bakes land —
+	 * the same handover the initial load already performs.
+	 */
+	park() {
+		if (this.parked) return;
+		this.parked = true;
+		for (const s of this.sprites.values()) this.killAnim(s);
+		this.sprites.clear();
+		this.plates.clear();
+		this.pending.clear();
+		this.canvas.width = 0;
+		this.canvas.height = 0;
+	}
+
+	/** ready to bake again — the caller re-requests srcs and re-resizes */
+	unpark() {
+		this.parked = false;
 	}
 
 	dispose() {

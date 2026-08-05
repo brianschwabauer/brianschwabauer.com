@@ -86,6 +86,12 @@
 		height: calc(100svh + var(--pin-height));
 		pointer-events: none;
 		user-select: none;
+		/* Mounted directly in the page root, outside every SectionShell. Skipping
+		   while far away drops the six will-change'd stroked numerals' layers.
+		   The height is explicit, so skipping costs no layout shift; sticky
+		   children inside content-visibility subtrees already work elsewhere on
+		   this page (see WhatMakesUsHuman's echoes). */
+		content-visibility: auto;
 	}
 	.sticky {
 		position: sticky;

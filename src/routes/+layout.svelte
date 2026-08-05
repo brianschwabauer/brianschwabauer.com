@@ -9,6 +9,25 @@
 
 	let { children } = $props();
 
+	// Stale-deploy recovery. Chunk URLs are content-hashed and old ones vanish
+	// from Cloudflare the moment a new version deploys, so a page loaded just
+	// before a deploy 404s on every dynamic import it hasn't fetched yet —
+	// lazy-loaded home sections just never appear. Vite reports exactly this via
+	// `vite:preloadError`; one reload gets fresh HTML with live chunk URLs (the
+	// home page's scroll pin restores the reader's place). Guarded per-session
+	// so a genuinely broken deploy degrades to the normal failure instead of a
+	// reload loop.
+	$effect(() => {
+		const RELOADED_KEY = 'preload-error-reloaded';
+		const onPreloadError = () => {
+			if (sessionStorage.getItem(RELOADED_KEY)) return;
+			sessionStorage.setItem(RELOADED_KEY, '1');
+			location.reload();
+		};
+		window.addEventListener('vite:preloadError', onPreloadError);
+		return () => window.removeEventListener('vite:preloadError', onPreloadError);
+	});
+
 	const isRootPage = $derived(page.url.pathname === '/');
 	const isAdminPage = $derived(page.url.pathname.startsWith('/admin'));
 

@@ -765,6 +765,14 @@
 					.then((m) => {
 						painter = new m.StarfieldPainter(canvasRef!, mediaBase);
 						painter.glow = !lowFx;
+						// arrived after the reader already scrolled past the hero —
+						// don't bake a 48-sprite cache nobody is looking at; the
+						// re-entry path unparks and requests everything then
+						if (!heroVisible) {
+							heroParked = true;
+							painter.park();
+							return;
+						}
 						for (const s of stars) painter.request(s.src, s.ar);
 						measure(); // size the backing store before activation
 					})
@@ -782,20 +790,47 @@
 		}
 
 		// pause the whole loop whenever the hero is off screen — no warp work,
-		// no graphics resources spent while the field can't be seen
+		// no graphics resources spent while the field can't be seen. Pausing is
+		// not enough on its own, though: the painter's sprite cache holds on the
+		// order of 100 MB of canvases and open AVIF decoders, and keeping that
+		// resident for the rest of the page starved Chrome's renderer on phones
+		// (blank sections, scroll-driven fills that stop painting). So after a
+		// grace period off screen the painter is PARKED — everything released —
+		// and re-entry rebuilds it from the HTTP cache while the DOM field
+		// carries the show, the same handover the initial load performs.
+		const PARK_MS = 4000;
+		let parkTimer = 0;
+		let heroParked = false;
 		const hero = document.getElementById('hero');
 		const io = hero
 			? new IntersectionObserver(([entry]) => {
 					heroVisible = entry.isIntersecting;
 					if (heroVisible) {
+						clearTimeout(parkTimer);
+						if (heroParked) {
+							heroParked = false;
+							painter?.unpark();
+							for (const s of stars) painter?.request(s.src, s.ar);
+						}
 						// re-entering: drop any scroll banked while away, resume
 						measure();
 						lastY = window.scrollY;
 						pendingScroll = 0;
 						pump();
-					} else if (raf) {
-						cancelAnimationFrame(raf);
-						raf = 0;
+					} else {
+						if (raf) {
+							cancelAnimationFrame(raf);
+							raf = 0;
+						}
+						clearTimeout(parkTimer);
+						parkTimer = window.setTimeout(() => {
+							if (heroVisible || !painter || heroParked) return;
+							// hand the field back to the DOM tiles first — they are
+							// what paints on re-entry until the sprites bake again
+							if (canvasMode) fallbackToDom();
+							heroParked = true;
+							painter.park();
+						}, PARK_MS);
 					}
 				})
 			: undefined;
@@ -835,6 +870,7 @@
 			window.removeEventListener('scroll', onScroll);
 			window.removeEventListener('resize', measure);
 			io?.disconnect();
+			clearTimeout(parkTimer);
 			if (raf) cancelAnimationFrame(raf);
 			cancelPainterIdle();
 			painter?.dispose();

@@ -95,6 +95,10 @@
 	let canvas = $state<HTMLCanvasElement | null>(null);
 	let box = $state({ w: 0, h: 0 });
 	let still = $state(false);
+	/** The sticky frame lives outside every content-visibility subtree, so this
+	 *  full-viewport backing store (~6 MB at dpr 2) would otherwise stay
+	 *  resident for the whole page. Far from the viewport it is released. */
+	let offscreen = $state(false);
 
 	/*
 	 * Deliberately plain variables, not `$state`: these are the drawing's own
@@ -316,6 +320,21 @@
 		return () => q.removeEventListener('change', sync);
 	});
 
+	// Release the backing store while the field is far from the viewport, and
+	// let the sizing effect below rebuild it (cheap — the grid is arithmetic)
+	// when it comes back near. A generous margin so the rebuild is done before
+	// the field can be seen.
+	$effect(() => {
+		const el = canvas;
+		if (!el || typeof IntersectionObserver === 'undefined') return;
+		const io = new IntersectionObserver(
+			([entry]) => (offscreen = !entry.isIntersecting),
+			{ rootMargin: '100% 0px' },
+		);
+		io.observe(el);
+		return () => io.disconnect();
+	});
+
 	// Rebuild whenever the frame or the clearing changes — and only then. The
 	// scrub position is read untracked so a scroll can't drag the whole field
 	// through a rebuild.
@@ -324,6 +343,11 @@
 		const { w, h } = box;
 		const g = gate;
 		if (!el || !w || !h || !g) return;
+		if (offscreen) {
+			el.width = 0;
+			el.height = 0;
+			return;
+		}
 		// Past 2 the extra resolution is invisible on a field of flat rectangles and
 		// only costs fill rate.
 		const dpr = Math.min(2, window.devicePixelRatio || 1);

@@ -12,9 +12,10 @@
 	import EmptyYearMark from '$lib/components/about/primitives/EmptyYearMark.svelte';
 	import YearCycler from '$lib/components/about/primitives/YearCycler.svelte';
 	import RootNavDropdown from '$lib/components/layout/RootNavDropdown.svelte';
+	import { governClips } from '$lib/components/about/clip-governor';
 
 	// ---- lazy: every section below the first fold ---------------------------
-	// Each loader is awaited inside a <svelte:boundary> below. With the
+	// Each loader is awaited inside a <svelte:boundary failed={sectionFailed}> below. With the
 	// experimental async compiler (already on in svelte.config.js) the server
 	// AWAITS these during SSR and renders the full HTML — the crawler sees
 	// everything — while the client ships each section as its own chunk.
@@ -64,7 +65,25 @@
 	})();
 	function lazySection<T>(load: () => Promise<T>): () => Promise<T> {
 		let chunk: Promise<T> | undefined;
-		return () => (chunk ??= sectionGate().then(load));
+		// A rejected import must NOT stay memoized: caching the rejection made a
+		// single flaky-network failure permanent for the whole session — the
+		// section stayed blank and even the jump menu couldn't recover it. One
+		// delayed retry absorbs transient flakes; if that also fails, clear the
+		// memo (so a boundary `reset` re-attempts) and let the failure surface.
+		const attempt = (): Promise<T> =>
+			load().catch(
+				() =>
+					new Promise<T>((resolve, reject) =>
+						setTimeout(() => load().then(resolve, reject), 1000),
+					),
+			);
+		return () =>
+			(chunk ??= sectionGate()
+				.then(attempt)
+				.catch((err) => {
+					chunk = undefined;
+					throw err;
+				}));
 	}
 	// The first two stay ungated: they sit directly under the fold, and a
 	// single flick of the wheel reaches them before the idle queue would.
@@ -182,48 +201,66 @@
 		content="For as long as I can remember, I've loved to make things — short films, Flash games, websites, products. I live to create. I work to delight." />
 </svelte:head>
 
+<!--
+  Last-resort fallback for a section whose chunk failed even after the retry in
+  `lazySection` and the layout's one guarded reload (e.g. offline mid-scroll).
+  Without it a failed boundary renders NOTHING — the chapter silently vanishes.
+  `reset` re-runs the await, and the loader's memo was cleared on failure, so
+  the button genuinely re-attempts the import.
+-->
+{#snippet sectionFailed(_error: unknown, reset: () => void)}
+	<div class="section-failed">
+		<p>This chapter didn't load.</p>
+		<button type="button" onclick={reset}>Try again</button>
+	</div>
+{/snippet}
+
 <RootNavDropdown />
 
-<div class="root">
+<!-- governClips: on phones, only the couple of animated clips nearest the
+     viewport center actually play; the rest hold a frozen frame. Animated AVIF
+     is software-decoded, and letting every visible clip run dropped the whole
+     viewport's framerate on mid-range phones. -->
+<div class="root" use:governClips>
 	<YearScrubber {stops} />
 
 	<Hero isMobile={data.isMobile} field={data.starField} />
 	<Rewind />
 	<ChapterCard act={1} />
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const HumbleBeginnings = (await humbleBeginnings()).default}
 		<HumbleBeginnings />
 	</svelte:boundary>
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const GreenScreen = (await greenScreen()).default}
 		<GreenScreen />
 	</svelte:boundary>
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const FeatureLength = (await featureLength()).default}
 		<FeatureLength />
 	</svelte:boundary>
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const FirstWebsites = (await firstWebsites()).default}
 		<FirstWebsites />
 	</svelte:boundary>
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const MusicVideos = (await musicVideos()).default}
 		<MusicVideos />
 	</svelte:boundary>
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const Animation = (await animation()).default}
 		<Animation />
 	</svelte:boundary>
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const Festivals = (await festivals()).default}
 		<Festivals />
 	</svelte:boundary>
 	<ChapterCard act={2} />
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const College = (await college()).default}
 		<College />
 	</svelte:boundary>
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const Spunksters = (await spunksters()).default}
 		<Spunksters />
 	</svelte:boundary>
@@ -231,16 +268,16 @@
 		year="2014"
 		color="#ffd934"
 		note="Nothing big shipped this year — just film sets, coursework, and a growing pile of notes, all quietly pointed at one thing: the senior thesis." />
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const WhatMakesUsHuman = (await whatMakesUsHuman()).default}
 		<WhatMakesUsHuman />
 	</svelte:boundary>
 	<ChapterCard act={3} />
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const Freelancer = (await freelancer()).default}
 		<Freelancer />
 	</svelte:boundary>
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const Entrepreneurship = (await entrepreneurship()).default}
 		<Entrepreneurship />
 	</svelte:boundary>
@@ -248,7 +285,7 @@
 		year="2018"
 		color="#00d6ff"
 		note="Heads-down year: client work paying the bills while the idea that became Show&Tour kept getting sketched and re-sketched." />
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const ShowAndTour = (await showAndTour()).default}
 		<ShowAndTour />
 	</svelte:boundary>
@@ -256,19 +293,19 @@
 		years={[2020, 2021, 2022, 2023, 2024, 2025]}
 		color="#00f2c3"
 		caption="Building Show&Tour" />
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const Now = (await now()).default}
 		<Now />
 	</svelte:boundary>
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const Creed = (await creed()).default}
 		<Creed />
 	</svelte:boundary>
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const TheEnd = (await theEnd()).default}
 		<TheEnd />
 	</svelte:boundary>
-	<svelte:boundary>
+	<svelte:boundary failed={sectionFailed}>
 		{@const Credits = (await credits()).default}
 		<Credits />
 	</svelte:boundary>
@@ -287,5 +324,29 @@
 	}
 	:global(html) {
 		scroll-padding-top: 80px;
+	}
+	.section-failed {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+		padding: clamp(4rem, 10vw, 8rem) 1.5rem;
+		font-family: var(--font-mono);
+		color: rgba(255, 255, 255, 0.7);
+	}
+	.section-failed button {
+		appearance: none;
+		font: inherit;
+		color: #fff;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.25);
+		border-radius: 8px;
+		padding: 0.5rem 1.25rem;
+		cursor: pointer;
+		transition: background 200ms ease;
+	}
+	.section-failed button:hover {
+		transition-duration: 0s;
+		background: rgba(255, 255, 255, 0.16);
 	}
 </style>

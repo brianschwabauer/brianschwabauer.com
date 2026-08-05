@@ -41,8 +41,16 @@ function flush() {
 	for (const [el, sub] of subscribers) {
 		if (sub.visible) measured.push([sub, el.getBoundingClientRect()]);
 	}
-	// Write phase: the callbacks.
-	for (const [sub, rect] of measured) sub.callback(rect);
+	// Write phase: the callbacks. Each is isolated: one subscriber throwing
+	// must not silently freeze every subscriber after it in the map — on every
+	// frame — which reads as "scroll effects stopped working" page-wide.
+	for (const [sub, rect] of measured) {
+		try {
+			sub.callback(rect);
+		} catch (err) {
+			console.error('scroll-progress subscriber failed:', err);
+		}
+	}
 }
 
 function schedule() {
@@ -62,7 +70,13 @@ function setup() {
 					if (!sub) continue;
 					sub.visible = entry.isIntersecting;
 					// Run once on entry so state is right before the next scroll.
-					if (sub.visible) sub.callback(entry.target.getBoundingClientRect());
+					if (sub.visible) {
+						try {
+							sub.callback(entry.target.getBoundingClientRect());
+						} catch (err) {
+							console.error('scroll-progress subscriber failed:', err);
+						}
+					}
 				}
 			},
 			{ rootMargin: '25% 0px' },
