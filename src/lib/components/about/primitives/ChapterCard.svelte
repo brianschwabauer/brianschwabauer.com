@@ -218,6 +218,10 @@
 		background: #05050a;
 		top: var(--nav-gutter);
 		height: calc(100svh - var(--nav-gutter));
+		@media (max-width: 768px) {
+			top: 0;
+			height: calc(100svh - var(--nav-gutter));
+		}
 	}
 	.act-3 :global(.pin-inner) {
 		background: #0b0d12;
