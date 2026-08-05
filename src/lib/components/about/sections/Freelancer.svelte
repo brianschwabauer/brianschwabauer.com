@@ -492,7 +492,7 @@
 								tabs={[
 									{
 										title: 'Schwikes',
-										src: 'http://cdn.brianschwabauer.com/site/schwikes/index.html',
+										src: 'https://cdn.brianschwabauer.com/site/schwikes/index.html',
 									},
 									{
 										title: 'Norton & Schmidt',
