@@ -19,21 +19,15 @@
 	const towerImages: GalleryItem[] = [
 		{
 			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_tower_of_the_americas_panorama-equirectangular.avif',
-			width: 2048,
-			height: 1024,
-		},
-		{
-			type: 'image',
-			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_tower_of_the_americas_panorama-little_planet.avif',
-			width: 2048,
-			height: 2048,
-		},
-		{
-			type: 'image',
 			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_tower_of_the_americas_panorama_app_screenshot_page_a1-home_page.avif',
 			width: 1920,
 			height: 1080,
+		},
+		{
+			type: 'image',
+			src: 'https://cdn.brianschwabauer.com/media/2016-01-01_tower_of_the_americas_panorama-equirectangular.avif',
+			width: 2048,
+			height: 1024,
 		},
 		{
 			type: 'image',
@@ -361,8 +355,9 @@
 			<aside class="lessons">
 				<h3 class="lessons-title">The post-mortem</h3>
 				<p>
-					Mostly, they didn't make it. These were partnerships — the losses were shared,
-					but the lessons I kept were mine.
+					For the most part, these products weren't successes. The failures weren't solely
+					on me — I built them in partnership with others. I did however learn a lot of
+					lessons.
 				</p>
 				<p>
 					TapNotion was a decent product that nobody ever paid for, and I still can't
@@ -371,7 +366,7 @@
 					problem people actually feel isn't a marketing problem — it's the wrong idea,
 					executed well.
 				</p>
-				<p>Every one of them donated parts to the next thing.</p>
+				<p>Every one of them donated lessons to my next project.</p>
 			</aside>
 		</Reveal>
 	</div>
