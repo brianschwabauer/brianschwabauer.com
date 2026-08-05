@@ -622,7 +622,9 @@
 	}
 	.exposure-head {
 		max-width: 56rem;
-		margin-bottom: 2rem;
+		@media (min-width: 769px) {
+			margin-bottom: 2rem;
+		}
 		@media (min-width: 1024px) {
 			/* Only as wide as the copy it holds, so the rest of the bleed stays
 			   free for the robot. */
@@ -773,6 +775,19 @@
 				var(--content-center-x)
 		);
 		top: calc(50% - var(--frame) * var(--content-center-y));
+	}
+
+	.transformer-stage {
+		@media (max-width: 768px) {
+			margin-top: -20rem;
+			margin-bottom: -20rem;
+		}
+	}
+	.transformer-stage :global(.pin-inner .gauge) {
+		@media (max-width: 768px) {
+			top: 5rem;
+			bottom: 5rem;
+		}
 	}
 
 	.exposure-grid {
