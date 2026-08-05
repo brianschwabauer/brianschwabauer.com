@@ -709,9 +709,9 @@
 						believable.
 					</p>
 					<PlayFilm
-						label="Play the gameplay"
+						label="Watch the gameplay"
 						title="Bear Bus Bash (2013) — full gameplay recording"
-						meta="2013 · full run"
+						meta="2013"
 						color="#7a4dff"
 						onclick={(e) => gallery?.open(9, e.currentTarget)} />
 					<div class="bb-grid">
