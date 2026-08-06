@@ -7,6 +7,23 @@
 	import PostCard from '$lib/components/blog/PostCard.svelte';
 	import FeaturedPostCard from '$lib/components/blog/FeaturedPostCard.svelte';
 	import PostFilters from '$lib/components/blog/PostFilters.svelte';
+	import Seo from '$lib/components/Seo.svelte';
+	import { SITE_URL, AUTHOR_NAME } from '$lib/seo';
+
+	// The tag filter lives in the query string (`?tag=…`), which is view state
+	// over the same collection — Seo canonicalizes every filtered view to
+	// /blog so they don't compete as duplicates.
+	const blogJsonLd = {
+		'@context': 'https://schema.org',
+		'@type': 'Blog',
+		'@id': `${SITE_URL}/blog#blog`,
+		url: `${SITE_URL}/blog`,
+		name: 'Brian Schwabauer — Blog',
+		description:
+			'Thoughts on software engineering, creativity, and the journey of building things.',
+		author: { '@type': 'Person', '@id': `${SITE_URL}/#person`, name: AUTHOR_NAME },
+		inLanguage: 'en-US',
+	};
 
 	let { data } = $props();
 
@@ -204,12 +221,11 @@
 	});
 </script>
 
-<svelte:head>
-	<title>Blog - Brian Schwabauer</title>
-	<meta
-		name="description"
-		content="Thoughts on software development, creativity, and the journey of building things." />
-</svelte:head>
+<Seo
+	title="Blog - Brian Schwabauer"
+	description="Thoughts on software engineering, creativity, and the journey of building things."
+	canonical="/blog"
+	json_ld={blogJsonLd} />
 
 <div class="blog-page">
 	<div class="blog-header">

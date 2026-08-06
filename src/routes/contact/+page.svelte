@@ -4,6 +4,18 @@
 	import { Form, Input } from '@delightstack/components/form';
 	import { Expand } from '@delightstack/components/display';
 	import { Callout } from '@delightstack/components/feedback';
+	import Seo from '$lib/components/Seo.svelte';
+	import { SITE_URL, AUTHOR_NAME } from '$lib/seo';
+
+	const contactJsonLd = {
+		'@context': 'https://schema.org',
+		'@type': 'ContactPage',
+		'@id': `${SITE_URL}/contact#contactpage`,
+		url: `${SITE_URL}/contact`,
+		name: 'Contact - Brian Schwabauer',
+		about: { '@type': 'Person', '@id': `${SITE_URL}/#person`, name: AUTHOR_NAME },
+		inLanguage: 'en-US',
+	};
 
 	// ---- rotating headline -------------------------------------------------
 	// The headline cycles every few seconds — gives the page a little life
@@ -140,12 +152,10 @@
 	});
 </script>
 
-<svelte:head>
-	<title>Contact - Brian Schwabauer</title>
-	<meta
-		name="description"
-		content="Send Brian Schwabauer a message — collaboration ideas, opportunities, or just a hello." />
-</svelte:head>
+<Seo
+	title="Contact - Brian Schwabauer"
+	description="Send Brian Schwabauer a message — collaboration ideas, opportunities, or just a hello."
+	json_ld={contactJsonLd} />
 
 <div class="contact-page">
 	<header class="contact-header">

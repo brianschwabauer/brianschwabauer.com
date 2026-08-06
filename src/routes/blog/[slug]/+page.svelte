@@ -5,6 +5,8 @@
 	import { page } from '$app/state';
 	import { bgStyle } from '$lib/client/images';
 	import { formatPostDate, isoPostDate } from '$lib/utils/date';
+	import Seo from '$lib/components/Seo.svelte';
+	import { SITE_URL, AUTHOR_NAME, absoluteUrl } from '$lib/seo';
 
 	let { data } = $props();
 
@@ -137,30 +139,61 @@
 	const featured = $derived(data.post?.featuredImage ?? null);
 	const focalX = $derived(data.post?.coverFocalX ?? 50);
 	const focalY = $derived(data.post?.coverFocalY ?? 50);
+	// Share-card image. Seo resolves this to an absolute URL and falls back to
+	// the site-wide card when a post has no cover — a relative og:image is not
+	// spec-compliant and X and LinkedIn simply drop it.
 	const ogImage = $derived(featured ? `/cdn/image/${featured.path}/default` : null);
 	const isAdmin = $derived(
 		(page.data.session?.user as { role?: string } | undefined)?.role === 'admin',
 	);
+
+	const publishedTime = $derived(
+		data.post?.publishedAt ? new Date(data.post.publishedAt).toISOString() : null,
+	);
+	const modifiedTime = $derived(
+		data.post?.updatedAt ? new Date(data.post.updatedAt).toISOString() : null,
+	);
+
+	const postJsonLd = $derived.by(() => {
+		if (!data.post) return undefined;
+		return {
+			'@context': 'https://schema.org',
+			'@type': 'BlogPosting',
+			'@id': `${SITE_URL}/blog/${data.post.slug}#post`,
+			mainEntityOfPage: `${SITE_URL}/blog/${data.post.slug}`,
+			url: `${SITE_URL}/blog/${data.post.slug}`,
+			headline: data.post.title,
+			...(summary ? { description: summary } : {}),
+			...(ogImage ? { image: absoluteUrl(ogImage) } : {}),
+			...(publishedTime ? { datePublished: publishedTime } : {}),
+			...(modifiedTime ? { dateModified: modifiedTime } : {}),
+			...(tags.length ? { keywords: tags.join(', ') } : {}),
+			author: { '@type': 'Person', '@id': `${SITE_URL}/#person`, name: AUTHOR_NAME },
+			publisher: { '@id': `${SITE_URL}/#person` },
+			isPartOf: { '@id': `${SITE_URL}/blog#blog` },
+			inLanguage: 'en-US',
+		};
+	});
 </script>
 
-<svelte:head>
-	<title>{data.post?.title ?? 'Post Not Found'} - Brian Schwabauer</title>
-	{#if summary}
-		<meta name="description" content={summary} />
-	{/if}
-	{#if data.post}
-		<meta property="og:title" content={data.post.title} />
-		{#if summary}
-			<meta property="og:description" content={summary} />
-		{/if}
-		<meta property="og:type" content="article" />
-		{#if ogImage}
-			<meta property="og:image" content={ogImage} />
-			<meta name="twitter:card" content="summary_large_image" />
-			<meta name="twitter:image" content={ogImage} />
-		{/if}
-	{/if}
-</svelte:head>
+{#if data.post}
+	<Seo
+		title="{data.post.title} - Brian Schwabauer"
+		description={summary || `${data.post.title} — a post by ${AUTHOR_NAME}.`}
+		image={ogImage}
+		og_type="article"
+		canonical="/blog/{data.post.slug}"
+		published_time={publishedTime}
+		modified_time={modifiedTime}
+		{tags}
+		json_ld={postJsonLd}
+		noindex={data.isDraftPreview} />
+{:else}
+	<Seo
+		title="Post Not Found - Brian Schwabauer"
+		description="This post could not be found."
+		noindex />
+{/if}
 
 <article class="post-page">
 	{#if data.post}

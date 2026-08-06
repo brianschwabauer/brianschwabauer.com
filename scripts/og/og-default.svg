@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="mark" x1="20" y1="100" x2="175" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0078a8"/>
+      <stop offset="1" stop-color="#10c5a3"/>
+    </linearGradient>
+    <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#10c5a3" stop-opacity="1"/>
+      <stop offset="1" stop-color="#10c5a3" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#00b4a0" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#00b4a0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="#06060a"/>
+  <ellipse cx="960" cy="230" rx="640" ry="520" fill="url(#glow)"/>
+
+  <g transform="translate(90,88) scale(0.60) translate(-15,-20)">
+    <path fill="url(#mark)" d="M173,94.85,96.91,50.92A6,6,0,0,0,88,56.07v87.85a6,6,0,0,0,8.92,5.15L173,105.15A6,6,0,0,0,173,94.85Z"/>
+    <path fill="url(#mark)" d="M72.17,123.26,49.48,104.41a4.9,4.9,0,0,1,0-7.56L72.15,78.28a4.9,4.9,0,0,0,1.79-3.79V52.41h0L20.87,97a4.9,4.9,0,0,0,0,7.5l53.06,44.72h0V127A4.9,4.9,0,0,0,72.17,123.26Z"/>
+  </g>
+
+  <text x="90" y="330" font-family="Nunito Sans 12pt ExtraLight 12pt" font-weight="900"
+        font-size="96" fill="#ffffff" letter-spacing="-2">Brian Schwabauer</text>
+
+  <rect x="90" y="378" width="420" height="3" fill="url(#rule)"/>
+
+  <text x="90" y="452" font-family="Fira Code Light" font-weight="700"
+        font-size="30" fill="#10c5a3" letter-spacing="10">DELIVERING DELIGHT</text>
+
+  <text x="90" y="556" font-family="Fira Code Light" font-weight="400"
+        font-size="24" fill="#ffffff" fill-opacity="0.40" letter-spacing="2">brianschwabauer.com</text>
+</svg>

@@ -1,0 +1,54 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "brianschwabauer",
+	// Entry point + static assets are produced by @sveltejs/adapter-cloudflare
+	// into .svelte-kit/cloudflare/ during `vite build`. `wrangler deploy` needs
+	// both pointed here, or it fails with "Missing entry-point to Worker script".
+	"main": ".svelte-kit/cloudflare/_worker.js",
+	"compatibility_date": "2024-09-23",
+	"compatibility_flags": ["nodejs_compat"],
+	"account_id": "92cb4bb9b2a55d24f5688f2f61864079",
+
+	"assets": {
+		"binding": "ASSETS",
+		"directory": ".svelte-kit/cloudflare",
+	},
+
+	"kv_namespaces": [
+		{
+			"binding": "KV",
+			"id": "0b2ff2ae425c43259c71f137972d3691",
+		},
+	],
+
+	"ai": {
+		"binding": "AI",
+	},
+
+	"r2_buckets": [
+		{
+			"binding": "R2",
+			"bucket_name": "brianschwabauer",
+		},
+	],
+
+	"send_email": [
+		{
+			"name": "SEND_EMAIL",
+			"destination_address": "brian@brianschwabauer.com",
+		},
+	],
+
+	// ── Image processor (separate worker via service binding) ───────────────────
+	// The actual Cloudflare Container running @delightstack/images lives in a
+	// dedicated worker (brianschwabauer-images, see wrangler.images.jsonc). The
+	// main site forwards /api/images/* and /cdn/image/* to it via this binding.
+	// Keeping the container DO out of the main worker means the main worker's
+	// build never has to resolve `cloudflare:workers` imports during Vite SSR.
+	"services": [
+		{
+			"binding": "IMAGE_PROCESSOR",
+			"service": "brianschwabauer-images",
+		},
+	],
+}

@@ -1,7 +1,7 @@
 /**
  * Image-processing worker. Handles upload, listing, deletion, and CDN serving
  * for blog images. The actual @delightstack/images Container DO lives here
- * (see wrangler.images.toml). The main brianschwabauer worker calls into this
+ * (see wrangler.images.jsonc). The main brianschwabauer worker calls into this
  * one via the IMAGE_PROCESSOR service binding (in prod) or via vite's HTTP
  * proxy on :8787 (in dev).
  *

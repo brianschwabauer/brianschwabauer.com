@@ -22,13 +22,13 @@ search. Built on SvelteKit and deployed to Cloudflare Workers.
 ## Repository layout
 
 ```
-src/                  SvelteKit app (routes, components, server logic)
+src/                   SvelteKit app (routes, components, server logic)
 image-worker/          Separate Cloudflare Worker for image processing
-delightstack/          Git submodule — shared @delightstack/* workspace packages
 static/                Static assets, _redirects, robots.txt
 scripts/encode.sh      HLS video encoding helper
-wrangler.toml          Main site worker config
-wrangler.images.toml   Image-processing worker config
+scripts/og/            Regenerates the OpenGraph share card
+wrangler.jsonc         Main site worker config
+wrangler.images.jsonc  Image-processing worker config
 ```
 
 The site is split into **two Cloudflare Workers**: the main site
@@ -98,7 +98,7 @@ Dev ports are pinned so this project can run alongside other local dev servers:
 `5180` site, `6180` image worker, `6181` the worker's inspector. The site's port
 lives in `vite.config.ts` (with `strictPort`, so a clash fails loudly instead of
 silently moving); the worker's two live in the `[dev]` section of
-`wrangler.images.toml`. The worker sits in the 61xx block on purpose — wrangler's
+`wrangler.images.jsonc`. The worker sits in the 61xx block on purpose — wrangler's
 defaults (`8787` / `9229`) and vite's auto-increment band (`5173`+) are both
 crowded by other repos.
 
@@ -112,7 +112,7 @@ integration must be able to read that (public) repository.
 The image worker is deployed separately:
 
 ```sh
-wrangler deploy --config wrangler.images.toml
+wrangler deploy --config wrangler.images.jsonc
 ```
 
 ### Redirects & 404 handling

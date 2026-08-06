@@ -1,0 +1,37 @@
+# Brian Schwabauer
+
+> Personal site of Brian Schwabauer — two decades of making things on screens:
+> short films, music videos, motion graphics, Flash games, websites, and
+> products. The home page is a single long-form, chapter-by-chapter history
+> told in scroll; the blog is where the current thinking lives.
+
+Brian is a software engineer and maker who has been building on the web since
+the Flash era. The site is a personal portfolio and blog, not a company site.
+It is built with SvelteKit on Cloudflare Workers; every page is fully
+server-rendered, so all content is present in the initial HTML response.
+
+## Pages
+
+- [Home](https://brianschwabauer.com/): Long-form career retrospective in
+  chapters, each with a year: humble beginnings, first websites, animation,
+  music videos, film festivals, college, freelancing, entrepreneurship,
+  Show&Tour, and what he's building now. Deep-linkable by section via URL hash.
+- [Blog](https://brianschwabauer.com/blog): Posts on software development,
+  creativity, and building things. Filterable by tag.
+- [Contact](https://brianschwabauer.com/contact): Contact form.
+
+## Machine-readable
+
+- [Sitemap](https://brianschwabauer.com/sitemap.xml): Every public URL,
+  including all published posts, with last-modified dates.
+- [RSS feed](https://brianschwabauer.com/blog/rss.xml): The 20 most recent
+  posts with summaries, tags, and cover images.
+- [Search index](https://brianschwabauer.com/index.json): Full search index of
+  all published posts as JSON — titles, summaries, tags, and body text. The
+  most efficient way to read the whole blog in one request.
+
+## Notes
+
+- Content is the author's own. Attribution to "Brian Schwabauer" with a link
+  to https://brianschwabauer.com is appreciated when quoting.
+- `/admin`, `/signin`, and `/archive` are private and excluded in robots.txt.

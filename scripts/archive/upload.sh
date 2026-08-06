@@ -15,7 +15,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 INDEX_FILE="$SCRIPT_DIR/archive-index.json"
-KV_NAMESPACE_ID="0b2ff2ae425c43259c71f137972d3691" # matches wrangler.toml [[kv_namespaces]]
+KV_NAMESPACE_ID="0b2ff2ae425c43259c71f137972d3691" # matches wrangler.jsonc "kv_namespaces"
 KV_KEY="/archive.json"
 
 if [ ! -f "$INDEX_FILE" ]; then
@@ -26,7 +26,7 @@ fi
 # Refuse to upload malformed JSON.
 node -e "JSON.parse(require('fs').readFileSync('$INDEX_FILE', 'utf8'))"
 
-# Run wrangler from the repo root so every path (wrangler.toml, the persist
+# Run wrangler from the repo root so every path (wrangler.jsonc, the persist
 # dir) resolves the same way it does for `pnpm dev` / deploys.
 cd "$REPO_ROOT"
 

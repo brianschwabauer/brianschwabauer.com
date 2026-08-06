@@ -31,6 +31,15 @@
 	const isRootPage = $derived(page.url.pathname === '/');
 	const isAdminPage = $derived(page.url.pathname.startsWith('/admin'));
 
+	// Routes that must never reach a search index: the admin surface, the
+	// sign-in page, and the archive (admin-gated, and its URLs shouldn't
+	// advertise that there's something here to be denied access to).
+	const isPrivatePage = $derived(
+		isAdminPage ||
+			page.url.pathname === '/signin' ||
+			page.url.pathname.startsWith('/archive'),
+	);
+
 	// The theme follows the CURRENT page, reactively — not a navigation hook.
 	// Hooks all fire too early: with preloaded data, even onNavigate runs the
 	// moment you click, and the OLD page then sits on screen for as long as the
@@ -83,9 +92,18 @@
 </script>
 
 <svelte:head>
-	<meta
-		name="description"
-		content="Brian Schwabauer — Delivering Delight. Two decades of making things on screens, and the platform I'm building now." />
+	<!-- Per-page metadata (title, description, canonical, OG, JSON-LD) is emitted
+	     by $lib/components/Seo.svelte, once per public page. Nothing meta-ish
+	     belongs here: <svelte:head> does not de-duplicate, so a description in
+	     the layout AND one on the page renders BOTH and search engines pick
+	     between them arbitrarily.
+
+	     The private routes are already disallowed in robots.txt, but that only
+	     asks a crawler not to fetch them — a URL discovered elsewhere can still
+	     be indexed. noindex is what actually keeps them out of results. -->
+	{#if isPrivatePage}
+		<meta name="robots" content="noindex, nofollow" />
+	{/if}
 </svelte:head>
 
 <div class="app">

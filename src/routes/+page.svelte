@@ -13,6 +13,36 @@
 	import YearCycler from '$lib/components/about/primitives/YearCycler.svelte';
 	import RootNavDropdown from '$lib/components/layout/RootNavDropdown.svelte';
 	import { governClips } from '$lib/components/about/clip-governor';
+	import Seo from '$lib/components/Seo.svelte';
+	import { SITE_URL, SITE_NAME, AUTHOR_NAME, SAME_AS, absoluteUrl } from '$lib/seo';
+
+	// Structured data for the home page. A @graph of two nodes rather than two
+	// separate blocks so the WebSite can point at the Person as its publisher
+	// via @id — that link is what lets Google treat the site and the person as
+	// one entity (and it's the part AI crawlers actually read).
+	const homeJsonLd = {
+		'@context': 'https://schema.org',
+		'@graph': [
+			{
+				'@type': 'Person',
+				'@id': `${SITE_URL}/#person`,
+				name: AUTHOR_NAME,
+				url: SITE_URL,
+				image: absoluteUrl('/profile_picture2.webp'),
+				description:
+					'Two decades of making things on screens — short films, music videos, motion graphics, Flash games, websites, and products.',
+				sameAs: SAME_AS,
+			},
+			{
+				'@type': 'WebSite',
+				'@id': `${SITE_URL}/#website`,
+				url: SITE_URL,
+				name: SITE_NAME,
+				publisher: { '@id': `${SITE_URL}/#person` },
+				inLanguage: 'en-US',
+			},
+		],
+	};
 
 	// ---- lazy: every section below the first fold ---------------------------
 	// Each loader is awaited inside a <svelte:boundary failed={sectionFailed}> below. With the
@@ -190,16 +220,11 @@
 	];
 </script>
 
-<svelte:head>
-	<title>Brian Schwabauer — Delivering Delight</title>
-	<meta
-		name="description"
-		content="Two decades of making things on screens — short films, music videos, motion graphics, weird Flash games, websites, products, and the platform I'm building now. The long version." />
-	<meta property="og:title" content="Brian Schwabauer — Delivering Delight" />
-	<meta
-		property="og:description"
-		content="For as long as I can remember, I've loved to make things — short films, Flash games, websites, products. I live to create. I work to delight." />
-</svelte:head>
+<Seo
+	title="Brian Schwabauer — Delivering Delight"
+	description="Two decades of making things on screens — short films, music videos, motion graphics, weird Flash games, websites, products, and the platform I'm building now. The long version."
+	og_description="For as long as I can remember, I've loved to make things — short films, Flash games, websites, products. I live to create. I work to delight."
+	json_ld={homeJsonLd} />
 
 <!--
   Last-resort fallback for a section whose chunk failed even after the retry in

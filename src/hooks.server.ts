@@ -5,9 +5,48 @@ import type { Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
 // IMAGE_PROCESSOR is a service binding to the brianschwabauer-images worker
-// (see wrangler.toml + wrangler.images.toml). The actual ImageProcessorContainer
+// (see wrangler.jsonc + wrangler.images.jsonc). The actual ImageProcessorContainer
 // DO lives in that separate worker, so the main worker never imports the
 // `cloudflare:workers` module — keeping Vite's SSR build clean.
+
+/**
+ * Baseline security headers.
+ *
+ * Applied to HTML responses only, and defensively. Static-asset and /cdn/
+ * responses can come back with immutable headers — mutating those throws, and
+ * this same worker has 500'd that way before (see the note in authHandle) — so
+ * anything that isn't a document is passed straight through untouched.
+ *
+ * Deliberately NOT set here: Content-Security-Policy. app.html carries three
+ * inline classic scripts (the theme bootstrap, the hash pin, the early-click
+ * capture) that run before hydration by design, and the page uses inline
+ * styles throughout, so a useful CSP needs per-request nonces threaded through
+ * all of it. Worth doing, but it's a change that can silently break the page
+ * in production, so it wants its own pass rather than riding along here.
+ */
+const securityHeadersHandle: Handle = async ({ event, resolve }) => {
+	const response = await resolve(event);
+	if (!response.headers.get('content-type')?.includes('text/html')) return response;
+
+	try {
+		response.headers.set('X-Content-Type-Options', 'nosniff');
+		response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+		response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+		response.headers.set(
+			'Permissions-Policy',
+			'camera=(), microphone=(), geolocation=(), payment=()',
+		);
+		// No `preload` — that's a one-way submission to the browser preload list
+		// and can't be quickly undone. includeSubDomains is safe: cdn. is HTTPS.
+		response.headers.set(
+			'Strict-Transport-Security',
+			'max-age=31536000; includeSubDomains',
+		);
+	} catch {
+		// Immutable headers — nothing to do but serve the response as-is.
+	}
+	return response;
+};
 
 const authHandle: Handle = async ({ event, resolve }) => {
 	// Skip auth for public asset routes. /cdn/* in particular must not run
@@ -137,4 +176,9 @@ const redirectHandle: Handle = async ({ event, resolve }) => {
 	return response;
 };
 
-export const handle = sequence(authHandle, sessionHandle, redirectHandle);
+export const handle = sequence(
+	securityHeadersHandle,
+	authHandle,
+	sessionHandle,
+	redirectHandle,
+);

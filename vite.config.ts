@@ -8,13 +8,13 @@ import { defineConfig } from 'vite';
 declare const process: { env: Record<string, string | undefined> };
 
 // In development, /api/images/* and /cdn/image/* are proxied to a separate
-// wrangler dev instance (see wrangler.images.toml + `pnpm dev:images`) that
+// wrangler dev instance (see wrangler.images.jsonc + `pnpm dev:images`) that
 // can run the @delightstack/images Cloudflare Container locally. In
 // production both routes are served by the same image-worker, reached via
 // the IMAGE_PROCESSOR service binding from the main worker.
 //
 // Dev ports for this project: 5180 site, 6180 image worker, 6181 its
-// inspector. The worker's two live in wrangler.images.toml's [dev] section —
+// inspector. The worker's two live in wrangler.images.jsonc's "dev" block —
 // keep this URL in sync with them.
 const IMAGE_WORKER_URL = process.env.IMAGE_WORKER_URL || 'http://127.0.0.1:6180';
 
