@@ -5,6 +5,7 @@
 		clipVideoUrl,
 		av1VideoSupported,
 	} from '../media-variants';
+	import { governorActive, scheduleGovernorPass } from '../clip-governor';
 
 	let {
 		src,
@@ -182,18 +183,31 @@
 
 	/*
 	 * The video branch's loading discipline: nothing is fetched until the
-	 * frame comes near the viewport (same 600px horizon as the image path),
-	 * then the clip loads and plays. On phones the clip governor may pause it
-	 * again — a paused video holds its frame at no decode cost — and it is
-	 * also the one that resumes it when the clip's turn comes back around.
+	 * frame comes near the viewport (same 600px horizon as the image path).
+	 * Ungoverned (desktop), the clip then loads and plays. Governed (phones,
+	 * reduced motion), coming near only *nominates* the clip — the governor
+	 * decides which nominees fetch and play, pauses the rest at a held frame,
+	 * and tears down the pipeline of anything that stays off screen.
 	 */
 	$effect(() => {
 		const vid = videoEl;
 		const box = frame;
 		if (!vid || !box || !use_video) return;
 		const start = () => {
-			if (vid.preload !== 'auto') vid.preload = 'auto';
 			vid.muted = true;
+			// On governed devices (phones, reduced motion) the governor owns
+			// startup: flag the clip as near and let the next ranking pass promote
+			// it if it wins a play slot. Starting here instead would open a media
+			// pipeline per clip the moment a gallery scrolls within range —
+			// fetches, buffers, and Android decoder sessions the cap never
+			// reclaimed — which is exactly the GPU pressure the governor exists to
+			// prevent.
+			if (governorActive()) {
+				vid.dataset.clipNear = '';
+				scheduleGovernorPass();
+				return;
+			}
+			if (vid.preload !== 'auto') vid.preload = 'auto';
 			vid.play().catch(() => {});
 		};
 		const NEAR = 600;

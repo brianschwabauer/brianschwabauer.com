@@ -20,6 +20,12 @@
  *   thumbnails) beyond VIDEO_CAP are simply paused — a paused video keeps its
  *   frame on screen for free — and off-screen ones are paused too, since a
  *   playing video holds a scarce Android decoder session even when unseen.
+ *   Off-screen long enough (RELEASE_MS) and the pipeline is torn down entirely
+ *   — src removed, buffer and decoder freed — and re-armed on return. The
+ *   governor also owns clip *startup* on governed devices: LazyMedia flags a
+ *   near clip with `data-clip-near` instead of playing it, and only ranking
+ *   winners are promoted to fetch/play, so a clip-dense gallery scrolling in
+ *   opens a handful of media pipelines instead of one per clip.
  *
  * Scrolling re-ranks, so clips take turns playing as they pass the middle of
  * the screen rather than all grinding together.
@@ -59,11 +65,43 @@ const TICK_MS = 600;
 /** frozen-frame overlay resolution — these are background clips, and every
  *  overlay is retained memory while frozen */
 const FROZEN_DPR_CAP = 1.5;
+/**
+ * How long a clip video stays off screen before its media resources are torn
+ * down. Pausing stops the *decode*, but a paused video keeps its buffered data
+ * and (on Android) often its MediaCodec session — so a fling down the page
+ * accumulates a dozen live media pipelines even with every one of them paused,
+ * and the GPU pressure that builds is what breaks raster elsewhere on screen
+ * (year-mark fills, images). Long enough that ordinary back-and-forth
+ * scrolling never churns a release/refetch cycle.
+ */
+const RELEASE_MS = 2000;
 
 type Clip = {
 	img: HTMLImageElement;
 	frozen: HTMLCanvasElement | null;
 };
+
+type VideoState = {
+	/** performance.now() when the video left the screen; 0 while on screen */
+	offscreen_since: number;
+};
+
+/**
+ * Set while a governor is attached. LazyMedia consults this: on governed
+ * devices it does not start clips itself — it flags them near
+ * (`data-clip-near`) and the governor's next ranking pass promotes the winners,
+ * so a 13-clip gallery scrolling in doesn't open 13 media pipelines at once.
+ */
+let schedule_pass: (() => void) | null = null;
+
+export function governorActive(): boolean {
+	return schedule_pass !== null;
+}
+
+/** Ask the attached governor (if any) for a ranking pass on the next frame. */
+export function scheduleGovernorPass(): void {
+	schedule_pass?.();
+}
 
 /** pause/play IS the freeze for the video pipeline — a paused <video> holds
  *  its frame on screen at zero decode cost */
@@ -71,10 +109,34 @@ function pauseVideo(el: HTMLVideoElement) {
 	if (!el.paused) el.pause();
 }
 function playVideo(el: HTMLVideoElement) {
-	// Never force a fetch: LazyMedia starts a clip only once it comes near the
-	// viewport. Until then preload is "none" and the governor leaves it alone.
-	if (el.preload === 'none') return;
+	// Re-arm a released clip: the src comes back and the fetch restarts. These
+	// are decorative loops, so the playback position is not restored.
+	if (el.dataset.clipSrc && !el.getAttribute('src')) {
+		el.src = el.dataset.clipSrc;
+		delete el.dataset.clipSrc;
+	}
+	if (el.preload === 'none') {
+		// Never force a fetch on a clip that hasn't come near the viewport:
+		// `data-clip-near` is LazyMedia's signal that it has. Without it, the
+		// clip keeps costing nothing.
+		if (el.dataset.clipNear === undefined) return;
+		el.preload = 'auto';
+	}
+	el.muted = true;
 	if (el.paused) el.play().catch(() => {});
+}
+/**
+ * Tear down an off-screen clip's media pipeline entirely. `removeAttribute`
+ * rather than `src = ''` — an empty src is a load *error* (which would trip
+ * LazyMedia's fallback-to-<img> path), an absent one is merely "no resource".
+ */
+function releaseVideo(el: HTMLVideoElement) {
+	const src = el.getAttribute('src');
+	if (!src) return;
+	pauseVideo(el);
+	el.dataset.clipSrc = src;
+	el.removeAttribute('src');
+	el.load();
 }
 
 function clipName(src: string): string {
@@ -178,7 +240,7 @@ export function governClips(root: HTMLElement) {
 	const video_cap = reduce ? 0 : VIDEO_CAP;
 
 	const clips = new Map<HTMLImageElement, Clip>();
-	const videos = new Set<HTMLVideoElement>();
+	const videos = new Map<HTMLVideoElement, VideoState>();
 
 	function collect(node: Node) {
 		if (!(node instanceof Element)) return;
@@ -200,7 +262,9 @@ export function governClips(root: HTMLElement) {
 				: node.querySelectorAll<HTMLVideoElement>(
 						'video[data-clip], video.thumbnail-video',
 					);
-		for (const vid of vids) videos.add(vid);
+		for (const vid of vids) {
+			if (!videos.has(vid)) videos.set(vid, { offscreen_since: 0 });
+		}
 	}
 	collect(root);
 	const mo = new MutationObserver((records) => {
@@ -244,24 +308,46 @@ export function governClips(root: HTMLElement) {
 			else freeze(near_imgs[i].clip);
 		}
 
+		const now = performance.now();
 		const near_vids: { el: HTMLVideoElement; dist: number }[] = [];
-		for (const el of videos) {
+		for (const [el, state] of videos) {
 			if (!el.isConnected) {
 				videos.delete(el);
 				continue;
 			}
 			const rect = el.getBoundingClientRect();
 			if (offscreen(rect)) {
-				// An off-screen playing video still holds a decoder session.
+				// An off-screen playing video still holds a decoder session — and a
+				// paused one still holds its buffer. Pause now, release once it has
+				// been gone long enough that this isn't scroll jitter.
 				pauseVideo(el);
+				if (!state.offscreen_since) state.offscreen_since = now;
+				else if (now - state.offscreen_since > RELEASE_MS) releaseVideo(el);
 				continue;
 			}
+			state.offscreen_since = 0;
 			near_vids.push({ el, dist: Math.abs((rect.top + rect.bottom) / 2 - center) });
 		}
 		near_vids.sort((a, b) => a.dist - b.dist);
 		for (let i = 0; i < near_vids.length; i++) {
-			if (i < video_cap) playVideo(near_vids[i].el);
-			else pauseVideo(near_vids[i].el);
+			const el = near_vids[i].el;
+			if (i < video_cap) {
+				playVideo(el);
+			} else {
+				// Over the cap but on screen: paused, yet it must still show a
+				// frame. A clip that was released while off screen has no src and
+				// so no frame — give the src back (still paused) so the first frame
+				// returns; and a flagged-near clip that never won a slot still gets
+				// to fetch so its box isn't empty, it just doesn't get to loop.
+				if (el.dataset.clipSrc && !el.getAttribute('src')) {
+					el.src = el.dataset.clipSrc;
+					delete el.dataset.clipSrc;
+				}
+				if (el.preload === 'none' && el.dataset.clipNear !== undefined) {
+					el.preload = 'auto';
+				}
+				pauseVideo(el);
+			}
 		}
 	}
 
@@ -272,10 +358,12 @@ export function governClips(root: HTMLElement) {
 	window.addEventListener('scroll', schedule, { passive: true });
 	window.addEventListener('resize', schedule);
 	const interval = setInterval(schedule, TICK_MS);
+	schedule_pass = schedule;
 	schedule();
 
 	return {
 		destroy() {
+			schedule_pass = null;
 			mo.disconnect();
 			window.removeEventListener('scroll', schedule);
 			window.removeEventListener('resize', schedule);
@@ -283,6 +371,14 @@ export function governClips(root: HTMLElement) {
 			if (raf) cancelAnimationFrame(raf);
 			for (const clip of clips.values()) thaw(clip);
 			clips.clear();
+			// Hand every released video its src back — nothing else knows it's gone.
+			for (const el of videos.keys()) {
+				if (el.dataset.clipSrc && !el.getAttribute('src')) {
+					el.src = el.dataset.clipSrc;
+					delete el.dataset.clipSrc;
+				}
+			}
+			videos.clear();
 		},
 	};
 }
