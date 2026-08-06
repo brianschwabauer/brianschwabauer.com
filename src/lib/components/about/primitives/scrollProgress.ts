@@ -22,7 +22,16 @@
  * force the next subscriber's read into a fresh layout.
  */
 
-type ProgressCallback = (rect: DOMRect) => void;
+/**
+ * Why the callback is running: `scroll` is the shared per-frame loop, `enter`
+ * is the IntersectionObserver re-admitting the element to that loop, `init` is
+ * the one synchronous call at subscribe time. Most subscribers only care about
+ * the rect; `enter` exists for the ones that need to know "you may have been
+ * skipped/rastered-out since I last ran" — see YearMark's repaint nudge.
+ */
+export type ProgressReason = 'init' | 'enter' | 'scroll';
+
+type ProgressCallback = (rect: DOMRect, reason: ProgressReason) => void;
 
 interface Subscriber {
 	callback: ProgressCallback;
@@ -46,7 +55,7 @@ function flush() {
 	// frame — which reads as "scroll effects stopped working" page-wide.
 	for (const [sub, rect] of measured) {
 		try {
-			sub.callback(rect);
+			sub.callback(rect, 'scroll');
 		} catch (err) {
 			console.error('scroll-progress subscriber failed:', err);
 		}
@@ -72,7 +81,7 @@ function setup() {
 					// Run once on entry so state is right before the next scroll.
 					if (sub.visible) {
 						try {
-							sub.callback(entry.target.getBoundingClientRect());
+							sub.callback(entry.target.getBoundingClientRect(), 'enter');
 						} catch (err) {
 							console.error('scroll-progress subscriber failed:', err);
 						}
@@ -111,7 +120,7 @@ export function onScrollProgress(el: Element, callback: ProgressCallback): () =>
 	subscribers.set(el, sub);
 	io?.observe(el);
 	// Initial run, so state is correct before the first scroll.
-	callback(el.getBoundingClientRect());
+	callback(el.getBoundingClientRect(), 'init');
 	return () => {
 		subscribers.delete(el);
 		io?.unobserve(el);

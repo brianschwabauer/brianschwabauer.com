@@ -39,13 +39,13 @@
 
 	$effect(() => {
 		if (!el) return;
-		// Everything downstream of `--p` is paint — the gradient wipe under
-		// background-clip, the clone blurs, the foil's drop-shadow — so the value
+		// Everything downstream of `--p` is paint — the clip-path wipe on the
+		// fill, the clone blurs, the foil's drop-shadow — so the value
 		// is QUANTIZED to 200 steps (well under what the wipe can show) and frames
 		// where the step hasn't changed write nothing at all, the same trade
 		// Hero's starVisual() makes.
 		let last_p = -1;
-		return onScrollProgress(el, (rect) => {
+		return onScrollProgress(el, (rect, reason) => {
 			const vh = window.innerHeight || 1;
 			const navbarHeight = 350;
 			// The reveal starts only once the mark's bottom edge has cleared the
@@ -56,7 +56,18 @@
 			const traversed = vh - rect.bottom;
 			const p = Math.max(0, Math.min(1, traversed / total));
 			const q = Math.round(p * 200) / 200;
-			if (q === last_p) return;
+			if (q === last_p) {
+				if (reason !== 'enter') return;
+				// Re-entering the viewport with the value unchanged: write a
+				// one-quantum nudge anyway. A raster of the fill that failed under
+				// GPU memory pressure (fast fling on a phone) stays broken until
+				// something invalidates paint, and an unchanged `--p` never does —
+				// the nudge forces the repaint, and the scroll that caused this
+				// re-entry corrects the value on its next frame.
+				last_p = -1;
+				progress = q > 0 ? q - 0.005 : 0.005;
+				return;
+			}
 			last_p = q;
 			progress = q;
 		});
@@ -110,7 +121,23 @@
 		{/each}
 	{/if}
 
-	<span class="year" aria-hidden="true" data-year={year}>{year}</span>
+	<span class="year" aria-hidden="true" data-year={year}>
+		{year}
+		{#if treatment !== 'foil'}
+			<!--
+			  The wipe: a filled copy of the numerals over the stroked ones, clipped
+			  by `--p`. Not `background-clip: text` — that path rasterizes the
+			  glyphs into a separate mask texture, huge at this type size, and under
+			  GPU memory pressure (seen on phones) the mask silently fails while
+			  the stroke still paints, leaving the year outlined forever. A
+			  clip-path over normally-filled text is ordinary glyph raster and
+			  survives the same pressure. The foil treatment paints the whole
+			  element itself (its metal needs a multi-stop gradient), so it takes
+			  no fill copy.
+			-->
+			<span class="fill">{year}</span>
+		{/if}
+	</span>
 
 	{#if subtitle}
 		<span class="subtitle">{subtitle}</span>
@@ -163,19 +190,26 @@
 		letter-spacing: -0.04em;
 		color: transparent;
 		-webkit-text-stroke: var(--year-stroke) var(--year-color);
-		background: linear-gradient(
-			90deg,
-			var(--year-color) calc(var(--p) * 100%),
-			transparent calc(var(--p) * 100%)
-		);
-		-webkit-background-clip: text;
-		background-clip: text;
 		transform: translateX(calc((1 - var(--p)) * -3vw));
 		/* No transition here: the transform is driven per-frame from --p, and a
 		   transition on it would restart every frame. */
 		/* Above its own clones. */
 		position: relative;
 		z-index: 1;
+	}
+	/*
+	 * The filled numerals, revealed left-to-right by the same `--p` the whole
+	 * mark runs on. The insets overshoot the box on every side: `line-height:
+	 * 0.85` makes the glyphs overhang their box top and bottom, and the leading
+	 * edge maps to a 2% overshoot past both ends so the fill starts fully
+	 * hidden (stroke bleed included) and ends fully shown.
+	 */
+	.fill {
+		position: absolute;
+		inset: 0;
+		color: var(--year-color);
+		-webkit-text-stroke: 0;
+		clip-path: inset(-10% calc((1 - var(--p)) * 104% - 2%) -10% -2%);
 	}
 
 	/*
