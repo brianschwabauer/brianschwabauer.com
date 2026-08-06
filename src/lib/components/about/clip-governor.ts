@@ -46,8 +46,8 @@ import { ANIMATED_CLIPS } from './animated-clips';
  * (typically ~6–8) — past that, decoders fail or silently fall back to
  * software, so the video cap stays under it.
  */
-const IMG_CAP = 4;
-const VIDEO_CAP = 8;
+const IMG_CAP = 3;
+const VIDEO_CAP = 5;
 /** how far past the viewport a clip still counts as "on screen" — matches the
  *  margin Chrome itself keeps animating within, so freezes happen just out of
  *  sight and a clip scrolling in is already resolved one way or the other */
