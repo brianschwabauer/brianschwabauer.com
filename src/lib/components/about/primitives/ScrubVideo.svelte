@@ -20,7 +20,9 @@
 	let activeIsReverse = $state(false);
 	// Don't download two full videos during initial page load — wait until the
 	// pin section is within ~1.5 viewports, then upgrade preload and warm the
-	// decoders.
+	// decoders. The resting preload is "none", NOT "metadata": WebM keeps its
+	// cues at the tail, so Chrome's metadata probe range-requests megabytes of
+	// both files at parse time — the single biggest download on a cold load.
 	let near = $state(false);
 
 	// Fallback: scroll progress arriving means the pin is on screen, whether or
@@ -277,7 +279,7 @@
 		{src}
 		muted
 		playsinline
-		preload={near ? 'auto' : 'metadata'}
+		preload={near ? 'auto' : 'none'}
 		disablepictureinpicture
 		disableremoteplayback
 		aria-label={ariaLabel}
@@ -290,7 +292,7 @@
 		src={reverseSrc}
 		muted
 		playsinline
-		preload={near ? 'auto' : 'metadata'}
+		preload={near ? 'auto' : 'none'}
 		disablepictureinpicture
 		disableremoteplayback
 		aria-hidden="true"

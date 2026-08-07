@@ -544,12 +544,14 @@
 			scale: 0.4;
 		}
 		/* Rise is faster than the fall — a bulb dumps its charge, then the
-		   phosphor and the eye both take a moment to let go. */
-		0.6% {
+		   phosphor and the eye both take a moment to let go. Keyframe stops
+		   must stay ≥ 1%: the minifier strips the leading zero from 0.6% and
+		   kit's inlineStyleThreshold re-parse rejects the bare `.6%`. */
+		1% {
 			opacity: 1;
 			scale: 1.15;
 		}
-		1.4% {
+		2% {
 			opacity: 0.85;
 			scale: 1;
 		}
