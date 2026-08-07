@@ -18,6 +18,7 @@ import {
 	uploadImage,
 	type ImageEnv,
 } from './lib/routes';
+import { serveOgCard, type OgCardParams } from './lib/og';
 
 // The Container DO is re-exported under its original name so wrangler's
 // [[durable_objects.bindings]] resolves it. The upstream class now calls
@@ -40,6 +41,24 @@ export default {
 					return new Response('Method Not Allowed', { status: 405 });
 				const path = pathname.slice('/cdn/image/'.length);
 				return serveImage(env, request, path);
+			}
+
+			// ── OpenGraph card rendering ─────────────────────────────────
+			// POSTed rather than GETed because the title travels in the body:
+			// it is arbitrary user text and does not belong in a URL. The main
+			// worker owns the KV lookup and calls this with the post already
+			// resolved, so this worker never needs to know what a blog post is.
+			if (pathname === '/api/og') {
+				if (request.method !== 'POST')
+					return new Response('Method Not Allowed', { status: 405 });
+				const body = (await request.json()) as OgCardParams & {
+					slug: string;
+					version: string;
+				};
+				if (!body?.slug || !body?.title) {
+					return jsonResponse({ message: 'slug and title are required' }, 400);
+				}
+				return serveOgCard(env, body);
 			}
 
 			// ── List + upload ────────────────────────────────────────────

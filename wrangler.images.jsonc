@@ -23,6 +23,14 @@
 		"inspector_port": 6181,
 	},
 
+	// The OpenGraph renderer imports its fonts and the white brandmark as bytes
+	// (assets/**). Without this rule wrangler treats the unknown extension as an ES module
+	// and the build fails on the first import. .wasm needs no rule — wrangler
+	// compiles it to a CompiledWasm module natively, which is exactly what
+	// satori's `init` and resvg's `initWasm` require, since Workers refuse to
+	// compile WASM from raw bytes at runtime.
+	"rules": [{ "type": "Data", "globs": ["**/*.ttf", "**/*.png"], "fallthrough": true }],
+
 	"r2_buckets": [
 		{
 			"binding": "R2",

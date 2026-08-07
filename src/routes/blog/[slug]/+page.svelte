@@ -139,10 +139,11 @@
 	const featured = $derived(data.post?.featuredImage ?? null);
 	const focalX = $derived(data.post?.coverFocalX ?? 50);
 	const focalY = $derived(data.post?.coverFocalY ?? 50);
-	// Share-card image. Seo resolves this to an absolute URL and falls back to
-	// the site-wide card when a post has no cover — a relative og:image is not
-	// spec-compliant and X and LinkedIn simply drop it.
-	const ogImage = $derived(featured ? `/cdn/image/${featured.path}/default` : null);
+	// Share card. NOT the raw cover: covers are stored as AVIF, which Facebook,
+	// X and LinkedIn cannot decode, so linking one directly renders a blank
+	// card. /cdn/og/blog/*.jpg is a generated card that composites the cover
+	// under the title and date (see image-worker/src/lib/og.ts).
+	const ogImage = $derived(data.post ? `/cdn/og/blog/${data.post.slug}.jpg` : null);
 	const isAdmin = $derived(
 		(page.data.session?.user as { role?: string } | undefined)?.role === 'admin',
 	);
@@ -164,7 +165,10 @@
 			url: `${SITE_URL}/blog/${data.post.slug}`,
 			headline: data.post.title,
 			...(summary ? { description: summary } : {}),
-			...(ogImage ? { image: absoluteUrl(ogImage) } : {}),
+			// The real cover, not the share card: Google decodes AVIF fine and
+			// wants the article's actual image here, whereas og:image has to be
+			// the generated card for the sake of the social scrapers.
+			...(featured ? { image: absoluteUrl(`/cdn/image/${featured.path}/default`) } : {}),
 			...(publishedTime ? { datePublished: publishedTime } : {}),
 			...(modifiedTime ? { dateModified: modifiedTime } : {}),
 			...(tags.length ? { keywords: tags.join(', ') } : {}),
