@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { page, navigating } from '$app/state';
-	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { goto, onNavigate } from '$app/navigation';
 	import { fly, scale, slide } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import { backIn, quintOut } from 'svelte/easing';
@@ -48,17 +48,44 @@
 	 * outgoing card linger in the DOM at view-transition-snapshot time,
 	 * which polluted the destination snapshot and broke the morph.
 	 *
-	 * A filter change is `/blog → /blog?tag=…` (same pathname, just a
-	 * query change), so the pathname-vs-pathname check cleanly separates
-	 * the two cases.
+	 * A filter change is `/blog → /blog?tag=…` (same pathname, just a query
+	 * change), so the destination pathname cleanly separates the two cases.
+	 *
+	 * This has to be latched in `onNavigate` rather than read off
+	 * `navigating`: the card transitions are `|global`, so they also fire
+	 * when the whole page unmounts — and by that point SvelteKit has already
+	 * cleared `navigating`, so the check read `false` exactly when it needed
+	 * to read `true`. `popOut` then ran for real on every card, pinning them
+	 * absolutely, and because global outros hold their block alive Svelte
+	 * never removed the listing at all: it stayed stranded in <main> under
+	 * the post page, animations still running, duplicating the post's
+	 * `view-transition-name` and aborting the morph. `onNavigate` fires at
+	 * navigation start, well before teardown, so the flag is reliably set.
+	 * It is registered per-component, so it unregisters with the page.
 	 */
-	const isCrossPageNav = $derived(
-		!!(
-			navigating.from &&
-			navigating.to &&
-			navigating.from.url.pathname !== navigating.to.url.pathname
-		),
-	);
+	let isCrossPageNav = $state(false);
+	onNavigate((nav) => {
+		if (nav.to?.url.pathname !== '/blog') isCrossPageNav = true;
+	});
+
+	/**
+	 * Undo everything `popOut` writes directly onto the element. Those are
+	 * plain inline styles, not transition css, so Svelte never cleans them
+	 * up — and when a card's outro is interrupted by the card coming back
+	 * (switch to a tag, switch away again) the node is reused with the
+	 * pinning styles still on it. `pointer-events: none` in particular is
+	 * permanent: the card silently stops accepting clicks for the rest of
+	 * the session. The intro is the exact counterpart of the outro, so
+	 * that's where the reset belongs.
+	 */
+	function unpin(el: HTMLElement) {
+		el.style.pointerEvents = '';
+		el.style.position = '';
+		el.style.top = '';
+		el.style.left = '';
+		el.style.width = '';
+		el.style.height = '';
+	}
 
 	/**
 	 * Stagger + slide-up entrance for cards added to a filtered list.
@@ -72,6 +99,7 @@
 		node: Element,
 		params: { enabled: boolean; crossPage: boolean; index: number },
 	) {
+		unpin(node as HTMLElement);
 		if (!params.enabled || params.crossPage) return { duration: 0, css: () => '' };
 		return fly(node as HTMLElement, {
 			y: 20,
@@ -139,8 +167,31 @@
 	 * If no post uses the tag at all (e.g. bookmarked URL pointing to a
 	 * deleted tag), we keep the raw URL value as the label so the active
 	 * chip is still visible — clicking "All Posts" clears it.
+	 *
+	 * We track it in state rather than deriving straight off `page.url`,
+	 * because `page.url` flips to the *destination* URL one flush before this
+	 * component is torn down. A plain derived would therefore see a URL with
+	 * no `?tag` and collapse the filter back to "all posts" mid-teardown —
+	 * re-inserting every filtered-out card and churning the keyed each block
+	 * at the exact moment the view transition is snapshotting the page. That
+	 * left the whole listing stranded in the DOM under the post page, with
+	 * duplicate `view-transition-name`s (one on the orphaned card, one on the
+	 * post's own title) — and a duplicate name makes Chrome abort the
+	 * transition outright, which is what turned the card→post morph into a
+	 * snap. It only ever showed up after *switching* filters: with no tag set
+	 * the value is null before and after, so nothing churned.
+	 *
+	 * The pathname guard freezes the list the moment we head elsewhere, so
+	 * the page unmounts perfectly still. `$effect.pre` (not `$effect`) runs
+	 * before the DOM update, so an actual filter change still applies in the
+	 * same frame with no flash of unfiltered posts. The initializer covers
+	 * SSR and hydration, where effects don't run at all.
 	 */
-	const activeTagParam = $derived(page.url.searchParams.get('tag') || null);
+	let activeTagParam = $state<string | null>(page.url.searchParams.get('tag') || null);
+	$effect.pre(() => {
+		if (page.url.pathname !== '/blog') return;
+		activeTagParam = page.url.searchParams.get('tag') || null;
+	});
 	const activeTag = $derived.by(() => {
 		if (!activeTagParam) return null;
 		const key = activeTagParam.toLowerCase();
