@@ -7,6 +7,8 @@
 	import PostCard from '$lib/components/blog/PostCard.svelte';
 	import FeaturedPostCard from '$lib/components/blog/FeaturedPostCard.svelte';
 	import PostFilters from '$lib/components/blog/PostFilters.svelte';
+	import { Select } from '@delightstack/components/form';
+	import { postYear } from '$lib/utils/date';
 	import Seo from '$lib/components/Seo.svelte';
 	import { SITE_URL, AUTHOR_NAME } from '$lib/seo';
 
@@ -210,13 +212,80 @@
 		goto(url, { keepFocus: true, noScroll: true });
 	}
 
-	const filteredPosts = $derived(
+	/**
+	 * The year filter is deliberately low-key: it only exists once `?year` is in
+	 * the URL at all, which in practice means you arrived by clicking a post's
+	 * date pill. `?year=` (present but empty) means "any year" — the param stays
+	 * so the picker stays, letting you keep browsing by year without the chip
+	 * row growing a permanent control nobody asked for.
+	 *
+	 * Both pieces of state are mirrored off `page.url` the same guarded way as
+	 * `activeTagParam` above — see that comment for why a plain `$derived` on
+	 * `page.url` churns the keyed each block during teardown and kills the
+	 * card→post view transition.
+	 */
+	let yearFilterShown = $state(page.url.searchParams.has('year'));
+	let activeYear = $state<string>(page.url.searchParams.get('year') || '');
+	$effect.pre(() => {
+		if (page.url.pathname !== '/blog') return;
+		yearFilterShown = page.url.searchParams.has('year');
+		activeYear = page.url.searchParams.get('year') || '';
+	});
+
+	/**
+	 * Sentinel for the "any year" option. It can't just be `''`: Select treats an
+	 * empty value as *unset* and falls back to showing the "Year" placeholder,
+	 * so a fresh load of `?year=` would render a picker that looks like nothing
+	 * has been chosen. A truthy sentinel keeps "Any year" visible as the
+	 * selected value; only the URL uses the empty string.
+	 */
+	const ANY_YEAR = 'any';
+
+	function setActiveYear(year: string) {
+		const url = new URL(page.url);
+		// Always `set`, never `delete`: an empty `?year=` is "any year" and must
+		// keep the picker on screen.
+		url.searchParams.set('year', year === ANY_YEAR ? '' : year);
+		goto(url, { keepFocus: true, noScroll: true });
+	}
+
+	const tagFilteredPosts = $derived(
 		activeTag
 			? data.posts.filter((p) =>
 					p.tags?.some((t) => t.toLowerCase() === activeTag!.toLowerCase()),
 				)
 			: data.posts,
 	);
+
+	const filteredPosts = $derived(
+		activeYear
+			? tagFilteredPosts.filter(
+					(p) => postYear(p.publishedAt ?? p.createdAt) === activeYear,
+				)
+			: tagFilteredPosts,
+	);
+
+	/**
+	 * Years offered in the picker, newest first, counted against the *tag*-filtered
+	 * set so every option is guaranteed to return posts — picking a year can never
+	 * land you on an empty list. The active year is force-included even at zero
+	 * posts, so a deep link like `?tag=vfx&year=2019` still shows what it's
+	 * filtering by instead of silently reading as "any year".
+	 */
+	const yearOptions = $derived.by(() => {
+		const counts = new Map<string, number>();
+		for (const p of tagFilteredPosts) {
+			const y = postYear(p.publishedAt ?? p.createdAt);
+			if (y) counts.set(y, (counts.get(y) ?? 0) + 1);
+		}
+		if (activeYear && !counts.has(activeYear)) counts.set(activeYear, 0);
+		return [
+			{ value: ANY_YEAR, label: 'Any year' },
+			...[...counts.entries()]
+				.sort((a, b) => b[0].localeCompare(a[0]))
+				.map(([y, count]) => ({ value: y, label: `${y} (${count})` })),
+		];
+	});
 
 	const pinnedPosts = $derived(
 		[...filteredPosts]
@@ -300,9 +369,23 @@
 		</p>
 	</div>
 
-	{#if displayTags.length > 0}
+	{#if displayTags.length > 0 || yearFilterShown}
 		<div class="blog-filters">
-			<PostFilters tags={displayTags} {activeTag} onChange={setActiveTag} />
+			{#if displayTags.length > 0}
+				<PostFilters tags={displayTags} {activeTag} onChange={setActiveTag} />
+			{/if}
+			{#if yearFilterShown}
+				<!-- slide so the row grows into place when you arrive from a post's
+				     date pill, rather than the chips jumping up a line. -->
+				<div class="year-filter" transition:slide={{ duration: 200, easing: quintOut }}>
+					<Select
+						label="Year"
+						size="0"
+						value={activeYear || ANY_YEAR}
+						options={yearOptions}
+						onchange={({ value }) => setActiveYear(String(value ?? ANY_YEAR))} />
+				</div>
+			{/if}
 		</div>
 	{/if}
 
@@ -441,8 +524,17 @@
 
 	.blog-filters {
 		display: flex;
+		flex-direction: row;
+		align-items: center;
 		justify-content: center;
+		gap: var(--space-3);
 		margin-bottom: var(--space-8);
+		@media (max-width: 768px) {
+			flex-direction: column-reverse;
+			.year-filter {
+				width: 100%;
+			}
+		}
 	}
 
 	.featured-section {

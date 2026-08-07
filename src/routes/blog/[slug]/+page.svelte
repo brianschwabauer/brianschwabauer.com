@@ -4,7 +4,7 @@
 	import { Video, Gallery, type GalleryItem } from '@delightstack/components/media';
 	import { page } from '$app/state';
 	import { bgStyle } from '$lib/client/images';
-	import { formatPostDate, isoPostDate } from '$lib/utils/date';
+	import { formatPostDate, isoPostDate, postYear } from '$lib/utils/date';
 	import Seo from '$lib/components/Seo.svelte';
 	import { SITE_URL, AUTHOR_NAME, absoluteUrl } from '$lib/seo';
 
@@ -136,6 +136,8 @@
 	const summary = $derived(data.post?.summary ?? data.post?.aiSummary ?? '');
 	const teaser = $derived(data.post?.teaser ?? '');
 	const tags = $derived(data.post?.tags ?? []);
+	const postDate = $derived(formatPostDate(data.post?.publishedAt));
+	const postYearValue = $derived(postYear(data.post?.publishedAt));
 	const featured = $derived(data.post?.featuredImage ?? null);
 	const focalX = $derived(data.post?.coverFocalX ?? 50);
 	const focalY = $derived(data.post?.coverFocalY ?? 50);
@@ -236,23 +238,27 @@
 			</div>
 		{/if}
 		<header class="post-header">
-			<div class="post-meta">
-				<time class="post-date" datetime={isoPostDate(data.post.publishedAt)}>
-					{formatPostDate(data.post.publishedAt)}
-				</time>
-
-				{#if tags.length > 0}
-					<div class="post-tags">
-						{#each tags as tag}
-							<a
-								class="tag"
-								href="/blog?tag={encodeURIComponent(tag)}"
-								title="Filter posts by {tag}">
-								{tag}
-							</a>
-						{/each}
-					</div>
+			<!-- The date rides in the tag row as the first pill: same shape as a
+			     topic tag, but it filters /blog by year instead. The month is still
+			     shown for reading; only the year is carried into the filter. -->
+			<div class="post-tags">
+				{#if postDate}
+					<a
+						class="tag"
+						href="/blog?year={postYearValue}"
+						title="Filter posts from {postYearValue}">
+						<time datetime={isoPostDate(data.post.publishedAt)}>{postDate}</time>
+					</a>
 				{/if}
+
+				{#each tags as tag}
+					<a
+						class="tag"
+						href="/blog?tag={encodeURIComponent(tag)}"
+						title="Filter posts by {tag}">
+						{tag}
+					</a>
+				{/each}
 			</div>
 
 			<h1 class="post-title" style:view-transition-name="post-title-{data.post.slug}">
@@ -378,21 +384,6 @@
 		margin: 0 auto var(--space-8);
 	}
 
-	.post-meta {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: var(--space-2) var(--space-3);
-		margin-bottom: var(--space-3);
-		font-size: var(--text-sm);
-	}
-
-	.post-date {
-		color: var(--color-text-muted);
-		text-box: trim-both cap alphabetic;
-		font-size: var(--text-base);
-	}
-
 	.post-title {
 		font-size: 2.5rem;
 		font-weight: 700;
@@ -418,8 +409,11 @@
 
 	.post-tags {
 		display: flex;
+		align-items: center;
 		flex-wrap: wrap;
 		gap: var(--space-2);
+		margin-bottom: var(--space-3);
+		font-size: var(--text-sm);
 	}
 
 	/* Registered so the press depth interpolates on its own transition
