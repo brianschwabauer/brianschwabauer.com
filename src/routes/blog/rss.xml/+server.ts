@@ -9,11 +9,22 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 		.map((post) => {
 			const pubDate = post.publishedAt ? new Date(post.publishedAt).toUTCString() : '';
 			const desc = post.summary ?? post.aiSummary;
-			const img = post.featuredImage;
-			// RSS enclosure for the featured image — readers display it as a thumbnail
-			const enclosure = img
-				? `<enclosure url="${siteUrl}/cdn/image/${img.path}/default" type="${escapeAttr(img.mime_type)}" length="0" />`
-				: '';
+			// Thumbnail for the reader. This points at the generated share card,
+			// NOT at the cover's stored variant, for two reasons: covers are only
+			// ever stored as AVIF, which most feed readers cannot decode; and the
+			// `type` here used to advertise the ORIGINAL upload's mime (usually
+			// image/jpeg) while the URL served AVIF bytes, so a reader that
+			// trusted the declared type got a decode error rather than simply no
+			// image. The card is JPEG by construction.
+			//
+			// It also exists for every published post, including those with no
+			// cover, so every item now carries a thumbnail instead of only the
+			// ones with a featured image.
+			//
+			// `length` is required by RSS 2.0, but knowing it would mean fetching
+			// all 20 cards on every feed build. 0 is the conventional stand-in for
+			// unknown and readers ignore it.
+			const enclosure = `<enclosure url="${siteUrl}/cdn/og/blog/${post.slug}.jpg" type="image/jpeg" length="0" />`;
 			const categories = (post.tags ?? [])
 				.map((t) => `<category><![CDATA[${t}]]></category>`)
 				.join('\n\t\t\t');
@@ -50,7 +61,3 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 		},
 	});
 };
-
-function escapeAttr(s: string): string {
-	return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-}
