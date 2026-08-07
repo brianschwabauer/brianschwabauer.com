@@ -33,21 +33,6 @@
 		{/if}
 		<div class="featured-body">
 			<div class="featured-meta">
-				<span class="featured-pin" aria-label="Pinned">
-					<svg
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						aria-hidden="true">
-						<line x1="12" x2="12" y1="17" y2="22" />
-						<path
-							d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
-					</svg>
-					Featured
-				</span>
 				<time class="featured-date" datetime={isoPostDate(post.publishedAt)}>
 					{formatPostDate(post.publishedAt)}
 				</time>
@@ -68,14 +53,6 @@
 					{/each}
 				</div>
 			{/if}
-
-			<span class="read-more">
-				Read article
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<line x1="5" y1="12" x2="19" y2="12" />
-					<polyline points="12 5 19 12 12 19" />
-				</svg>
-			</span>
 		</div>
 	</a>
 </article>
@@ -93,7 +70,7 @@
 	.featured-card {
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
+		border-radius: var(--radius-xl);
 		overflow: hidden;
 		transform: translateY(var(--lift, 0px)) perspective(100px)
 			translate3d(
@@ -106,6 +83,10 @@
 			transform var(--duration-fast),
 			box-shadow var(--duration-fast),
 			--press var(--duration-fast);
+		@supports (corner-shape: squircle) {
+			corner-shape: squircle;
+			border-radius: calc(var(--radius-xl) * 2);
+		}
 	}
 
 	.featured-card:hover {
@@ -146,13 +127,13 @@
 	.featured-body {
 		display: flex;
 		flex-direction: column;
-		padding: var(--space-7);
+		padding: var(--space-6);
 		flex: 1;
 	}
 
 	@media (min-width: 768px) {
 		.featured-body {
-			padding: var(--space-8);
+			padding: var(--space-7);
 		}
 	}
 
@@ -161,27 +142,8 @@
 		align-items: center;
 		flex-wrap: wrap;
 		gap: var(--space-2);
-		margin-bottom: var(--space-3);
+		margin-bottom: var(--space-1);
 		font-size: var(--text-sm);
-	}
-
-	.featured-pin {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-1);
-		padding: var(--space-1) var(--space-2);
-		border-radius: var(--radius-sm);
-		background: rgba(0, 180, 160, 0.12);
-		color: var(--color-action);
-		font-weight: 600;
-		font-size: var(--text-xs);
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-	}
-
-	.featured-pin svg {
-		width: 12px;
-		height: 12px;
 	}
 
 	.featured-date {
@@ -219,36 +181,17 @@
 	.featured-tags {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--space-2);
-		margin-bottom: var(--space-4);
+		gap: var(--space-1);
+		margin-top: auto;
 	}
 
+	/* Purely decorative here — the whole card is the link, so these stay
+	   filled pills rather than the outlined, interactive tag treatment. */
 	.tag {
 		font-size: var(--text-xs);
 		padding: var(--space-1) var(--space-2);
 		background: var(--color-bg-muted);
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius-full);
 		color: var(--color-text-muted);
-	}
-
-	.read-more {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-2);
-		font-size: var(--text-base);
-		font-weight: 600;
-		color: var(--color-action);
-		margin-top: auto;
-	}
-
-	.read-more svg {
-		width: 18px;
-		height: 18px;
-		transition: transform var(--duration-fast);
-	}
-
-	.featured-card:hover .read-more svg {
-		transition-duration: 0s;
-		transform: translateX(4px);
 	}
 </style>

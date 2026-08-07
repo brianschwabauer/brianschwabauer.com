@@ -56,14 +56,6 @@
 					{/each}
 				</div>
 			{/if}
-
-			<span class="read-more">
-				Read article
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<line x1="5" y1="12" x2="19" y2="12" />
-					<polyline points="12 5 19 12 12 19" />
-				</svg>
-			</span>
 		</div>
 	</a>
 </article>
@@ -81,7 +73,7 @@
 	.post-card {
 		background: var(--color-surface);
 		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
+		border-radius: var(--radius-xl);
 		overflow: hidden;
 		/* Hover lift and press depth live in one transform: --lift snaps
 		   with the hover rule, --press animates independently. Same
@@ -99,6 +91,10 @@
 			transform var(--duration-slow),
 			box-shadow var(--duration-slow),
 			--press var(--duration-slow);
+		@supports (corner-shape: squircle) {
+			corner-shape: squircle;
+			border-radius: calc(var(--radius-xl) * 2);
+		}
 	}
 
 	.post-card:hover {
@@ -179,36 +175,17 @@
 	.post-tags {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--space-2);
-		margin-bottom: var(--space-3);
+		gap: var(--space-1);
+		margin-top: auto;
 	}
 
+	/* Purely decorative here — the whole card is the link, so these stay
+	   filled pills rather than the outlined, interactive tag treatment. */
 	.tag {
 		font-size: var(--text-xs);
 		padding: var(--space-1) var(--space-2);
 		background: var(--color-bg-muted);
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius-full);
 		color: var(--color-text-muted);
-	}
-
-	.read-more {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-2);
-		font-size: var(--text-sm);
-		font-weight: 500;
-		color: var(--color-action);
-		margin-top: auto;
-	}
-
-	.read-more svg {
-		width: 16px;
-		height: 16px;
-		transition: transform var(--duration-fast);
-	}
-
-	.post-card:hover .read-more svg {
-		transition-duration: 0s;
-		transform: translateX(4px);
 	}
 </style>

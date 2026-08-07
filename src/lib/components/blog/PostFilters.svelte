@@ -52,7 +52,7 @@
 		position: relative;
 		overflow: hidden;
 		padding: var(--space-2) var(--space-3);
-		background: var(--color-surface);
+		background: transparent;
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-full);
 		color: var(--color-text-muted);
@@ -80,7 +80,8 @@
 		/* Instant hover-in for everything except --press, which keeps its
 		   duration so the :active depress animates even while hovered. */
 		transition-duration: 0s, 0s, 0s, 200ms;
-		background: var(--color-bg-muted);
+		background: var(--color-action-bg);
+		border-color: var(--color-action);
 		color: var(--color-text);
 	}
 
@@ -89,6 +90,15 @@
 	}
 
 	.filter-btn.active {
+		background: var(--color-action);
+		border-color: var(--color-action);
+		color: white;
+	}
+
+	/* The active chip already wears the filled treatment, so hover holds it
+	   rather than falling back to the outlined hover colors. */
+	.filter-btn.active:hover {
+		transition-duration: 0s, 0s, 0s, 200ms;
 		background: var(--color-action);
 		border-color: var(--color-action);
 		color: white;

@@ -45,7 +45,7 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
 		<title>Brian Schwabauer's Blog</title>
-		<description>Thoughts on software development, creativity, and the journey of building things.</description>
+		<description>Thoughts on software engineering, creativity, and the journey of building things.</description>
 		<link>${siteUrl}/blog</link>
 		<atom:link href="${siteUrl}/blog/rss.xml" rel="self" type="application/rss+xml"/>
 		<language>en-us</language>

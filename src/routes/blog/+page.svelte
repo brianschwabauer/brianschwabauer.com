@@ -245,7 +245,7 @@
 			<span class="blog-title-line">Blog.</span>
 		</h1>
 		<p class="blog-subtitle">
-			Thoughts on software development, creativity, and the journey of building things.
+			Thoughts on software engineering, creativity, and the journey of building things.
 		</p>
 	</div>
 

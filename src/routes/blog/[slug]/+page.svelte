@@ -240,6 +240,19 @@
 				<time class="post-date" datetime={isoPostDate(data.post.publishedAt)}>
 					{formatPostDate(data.post.publishedAt)}
 				</time>
+
+				{#if tags.length > 0}
+					<div class="post-tags">
+						{#each tags as tag}
+							<a
+								class="tag"
+								href="/blog?tag={encodeURIComponent(tag)}"
+								title="Filter posts by {tag}">
+								{tag}
+							</a>
+						{/each}
+					</div>
+				{/if}
 			</div>
 
 			<h1 class="post-title" style:view-transition-name="post-title-{data.post.slug}">
@@ -248,19 +261,6 @@
 
 			{#if teaser}
 				<p class="post-teaser">{teaser}</p>
-			{/if}
-
-			{#if tags.length > 0}
-				<div class="post-tags">
-					{#each tags as tag}
-						<a
-							class="tag"
-							href="/blog?tag={encodeURIComponent(tag)}"
-							title="Filter posts by {tag}">
-							{tag}
-						</a>
-					{/each}
-				</div>
 			{/if}
 		</header>
 
@@ -381,13 +381,16 @@
 	.post-meta {
 		display: flex;
 		align-items: center;
-		gap: var(--space-2);
+		flex-wrap: wrap;
+		gap: var(--space-2) var(--space-3);
 		margin-bottom: var(--space-3);
 		font-size: var(--text-sm);
 	}
 
 	.post-date {
 		color: var(--color-text-muted);
+		text-box: trim-both cap alphabetic;
+		font-size: var(--text-base);
 	}
 
 	.post-title {
@@ -419,26 +422,49 @@
 		gap: var(--space-2);
 	}
 
+	/* Registered so the press depth interpolates on its own transition
+	   entry — the hover rule's 0s durations can't touch it. Same recipe as
+	   the /blog filter chips (see PostFilters.svelte). */
+	@property --press {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+
 	.tag {
+		/* overflow so the pressed pill stays clipped to its own shape. */
 		display: inline-block;
-		font-size: var(--text-sm);
-		padding: var(--space-1) var(--space-2);
-		background: var(--color-bg-muted);
-		border: 1px solid transparent;
+		overflow: hidden;
+		font-size: var(--text-xs);
+		font-weight: 500;
+		text-box: trim-both cap alphabetic;
+		padding: var(--space-2) var(--space-2);
+		background: transparent;
+		border: 1px solid var(--color-border);
 		border-radius: var(--radius-full);
 		color: var(--color-text-muted);
 		text-decoration: none;
 		-webkit-tap-highlight-color: transparent;
+		/* `perspective()` inside the transform so each tag is its own
+		   vanishing point instead of tipping toward the row's center. */
+		transform: perspective(100px)
+			translate3d(
+				0,
+				calc(var(--press) * 1px),
+				calc(var(--press) * clamp(-10px, 0.2em - 12px, -2px))
+			);
 		transition:
 			color var(--duration-fast),
 			background-color var(--duration-fast),
 			border-color var(--duration-fast),
-			transform var(--duration-fast);
+			--press 200ms ease;
 	}
 	.tag:hover {
-		transition-duration: 0s;
+		/* Instant hover-in for everything except --press, which keeps its
+		   duration so the :active depress animates even while hovered. */
+		transition-duration: 0s, 0s, 0s, 200ms;
 		color: var(--color-text);
-		background: var(--color-surface);
+		background: var(--color-action-bg);
 		border-color: var(--color-action);
 	}
 	.tag:focus {
@@ -449,7 +475,7 @@
 		outline-offset: 2px;
 	}
 	.tag:active {
-		transform: scale(0.97);
+		--press: 1;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -458,6 +484,7 @@
 		}
 		.tag:active {
 			transform: none;
+			--press: 0;
 		}
 	}
 

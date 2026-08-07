@@ -253,6 +253,7 @@
 		.search-btn:active {
 			transition-duration: 0s;
 			transform: none;
+			--press: 0;
 		}
 	}
 
@@ -266,39 +267,54 @@
 		}
 	}
 
+	/* Registered so the press depth interpolates on its own transition
+	   entry — the hover rule's 0s durations can't touch it. Same recipe as
+	   the blog tag chips (see PostFilters.svelte). */
+	@property --press {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+
 	.nav-link {
-		position: relative; /* anchors the ripple overlay */
-		font-family: var(--font-mono, ui-monospace, monospace);
-		font-size: 0.78rem;
-		font-weight: 700;
-		letter-spacing: 0.16em;
-		text-transform: uppercase;
+		/* position + overflow so the ripple overlay is anchored inside the
+		   pill and clipped to its shape. */
+		position: relative;
+		overflow: hidden;
+		font-size: var(--text-sm);
+		font-weight: 500;
 		color: var(--color-text-muted);
-		padding: 0.55rem 1rem;
+		padding: 0.5rem 1rem;
 		border-radius: 999px;
 		border: 1px solid var(--color-border);
+		background: transparent;
 		-webkit-tap-highlight-color: transparent;
+		/* `perspective()` inside the transform so each pill is its own
+		   vanishing point instead of tipping toward the row's center. */
+		transform: perspective(100px)
+			translate3d(
+				0,
+				calc(var(--press) * 1px),
+				calc(var(--press) * clamp(-10px, 0.2em - 12px, -2px))
+			);
 		transition:
 			color var(--duration-fast),
 			background-color var(--duration-fast),
 			border-color var(--duration-fast),
-			transform var(--duration-fast);
+			--press 200ms ease;
 		@media (max-width: 768px) {
 			padding: 0.45rem 0.75rem;
-			letter-spacing: 0.05em;
-			font-weight: 500;
-			&.active {
-				font-weight: 700;
-			}
 		}
 	}
 	.nav-link:active {
-		transform: scale(0.97);
+		--press: 1;
 	}
 	.nav-link:hover {
-		transition-duration: 0s;
+		/* Instant hover-in for everything except --press, which keeps its
+		   duration so the :active depress animates even while hovered. */
+		transition-duration: 0s, 0s, 0s, 200ms;
 		color: var(--color-text);
-		background: var(--color-surface);
+		background: var(--color-action-bg);
 		border-color: var(--color-action);
 	}
 	.nav-link.on-dark {
@@ -306,28 +322,31 @@
 		border-color: rgba(255, 255, 255, 0.22);
 	}
 	.nav-link.on-dark:hover {
-		transition-duration: 0s;
+		transition-duration: 0s, 0s, 0s, 200ms;
 		color: #fff;
-		background: rgba(255, 255, 255, 0.08);
+		background: rgba(0, 242, 195, 0.15);
 		border-color: rgba(0, 242, 195, 0.45);
 	}
 	.nav-link.active,
 	.nav-link.active:hover {
-		transition-duration: 0s;
+		transition-duration: 0s, 0s, 0s, 200ms;
 		color: var(--color-action);
 		background: var(--color-action-bg);
 		border-color: var(--color-action);
 	}
 	.nav-link.active.on-dark,
 	.nav-link.active.on-dark:hover {
-		transition-duration: 0s;
+		transition-duration: 0s, 0s, 0s, 200ms;
 		color: #fff;
 		background: rgba(0, 242, 195, 0.15);
 		border-color: rgba(0, 242, 195, 0.45);
 	}
 
 	.search-btn {
-		position: relative; /* anchors the ripple overlay */
+		/* position + overflow so the ripple overlay is anchored inside the
+		   circle and clipped to it. */
+		position: relative;
+		overflow: hidden;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -338,20 +357,25 @@
 		color: var(--color-text-muted);
 		background: transparent;
 		-webkit-tap-highlight-color: transparent;
+		transform: perspective(100px)
+			translate3d(
+				0,
+				calc(var(--press) * 1px),
+				calc(var(--press) * clamp(-10px, 0.2em - 12px, -2px))
+			);
 		transition:
 			color var(--duration-fast),
 			background-color var(--duration-fast),
 			border-color var(--duration-fast),
-			transform var(--duration-fast);
+			--press 200ms ease;
 		&:hover {
-			transition-duration: 0s;
+			transition-duration: 0s, 0s, 0s, 200ms;
 			color: var(--color-text);
-			background: var(--color-surface);
+			background: var(--color-action-bg);
 			border-color: var(--color-action);
-			transition: none;
 		}
 		&:active {
-			transform: scale(0.97);
+			--press: 1;
 		}
 	}
 	.search-btn svg {
@@ -363,9 +387,9 @@
 		border-color: rgba(255, 255, 255, 0.22);
 	}
 	.search-btn.on-dark:hover {
-		transition-duration: 0s;
+		transition-duration: 0s, 0s, 0s, 200ms;
 		color: #fff;
-		background: rgba(255, 255, 255, 0.08);
+		background: rgba(0, 242, 195, 0.15);
 		border-color: rgba(0, 242, 195, 0.45);
 	}
 </style>
