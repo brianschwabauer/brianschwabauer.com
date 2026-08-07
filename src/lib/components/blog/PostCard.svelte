@@ -6,9 +6,15 @@
 
 	interface Props {
 		post: BlogPostMeta;
+		/** Above-the-fold card: load its image eagerly (and at high priority
+		 *  when it is likely the LCP element) instead of loading="lazy" —
+		 *  a lazy first card adds ~1.5s of LCP load delay because the
+		 *  preload scanner skips lazy images entirely. */
+		eager?: boolean;
+		priority?: boolean;
 	}
 
-	let { post }: Props = $props();
+	let { post, eager = false, priority = false }: Props = $props();
 
 	const summary = $derived(post.summary ?? post.aiSummary ?? '');
 </script>
@@ -24,7 +30,8 @@
 				<img
 					src={thumbnailURL(post.featuredImage)}
 					alt={post.featuredImage.alt_text ?? ''}
-					loading="lazy" />
+					loading={eager ? 'eager' : 'lazy'}
+					fetchpriority={priority ? 'high' : undefined} />
 			</div>
 		{/if}
 		<div class="post-body">

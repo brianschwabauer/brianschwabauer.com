@@ -221,6 +221,18 @@
 	});
 </script>
 
+<svelte:head>
+	<!-- Blog body text is Merriweather (delightstack's serif body). app.html only
+	     preloads the above-the-fold faces of the home page, so blog routes preload
+	     their own body face here; italic loads on demand. -->
+	<link
+		rel="preload"
+		href="/fonts/merriweather-latin.woff2"
+		as="font"
+		type="font/woff2"
+		crossorigin="anonymous" />
+</svelte:head>
+
 <Seo
 	title="Blog - Brian Schwabauer"
 	description="Thoughts on software engineering, creativity, and the journey of building things."
@@ -292,7 +304,7 @@
 						crossPage: isCrossPageNav,
 						pin: true,
 					}}>
-					<PostCard {post} />
+					<PostCard {post} eager={i < 3} priority={i === 0 && pinnedPosts.length === 0} />
 				</div>
 			{/each}
 		</div>

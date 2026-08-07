@@ -27,7 +27,8 @@
 					src={thumbnailURL(post.featuredImage)}
 					alt={post.featuredImage.alt_text ?? ''}
 					style:object-position="{focalX}% {focalY}%"
-					loading="eager" />
+					loading="eager"
+					fetchpriority="high" />
 			</div>
 		{/if}
 		<div class="featured-body">

@@ -180,6 +180,18 @@
 	});
 </script>
 
+<svelte:head>
+	<!-- Blog body text is Merriweather (delightstack's serif body). app.html only
+	     preloads the above-the-fold faces of the home page, so blog routes preload
+	     their own body face here; italic loads on demand. -->
+	<link
+		rel="preload"
+		href="/fonts/merriweather-latin.woff2"
+		as="font"
+		type="font/woff2"
+		crossorigin="anonymous" />
+</svelte:head>
+
 {#if data.post}
 	<Seo
 		title="{data.post.title} - Brian Schwabauer"
@@ -264,6 +276,7 @@
 					width={featured.width || undefined}
 					height={featured.height || undefined}
 					loading="eager"
+					fetchpriority="high"
 					decoding="async"
 					style:object-position={`${focalX}% ${focalY}%`} />
 			</figure>
