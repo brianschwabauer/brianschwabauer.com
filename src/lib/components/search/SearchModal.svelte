@@ -4,7 +4,7 @@
 	import { page } from '$app/state';
 	import { create, load, search, type AnyOrama, type Results } from '@orama/orama';
 	import { Button } from '@delightstack/components/actions';
-	import { entryLabel, indexSchema, type SearchEntry } from '$lib/search';
+	import { indexSchema, type SearchEntry } from '$lib/search';
 	import { scrollToSection } from '$lib/sectionNav';
 	import { bgStyle, thumbnailURL } from '$lib/client/images';
 	import { formatPostDate, isoPostDate } from '$lib/utils/date';
@@ -337,21 +337,18 @@
 								</div>
 							{/if}
 							<div class="result-body">
-								<div class="result-head">
-									<span class="result-category">{entryLabel(hit)}</span>
-									{#if hit.date && hit.type === 'blog'}
-										<time class="result-date" datetime={isoPostDate(hit.date)}>
-											{formatPostDate(hit.date)}
-										</time>
-									{/if}
-								</div>
 								<div class="result-title">{hit.title}</div>
 								{#if hit.summary}
 									<div class="result-summary">{hit.summary}</div>
 								{/if}
-								{#if hit.tags && hit.tags.length > 0}
-									<div class="result-tags">
-										{#each hit.tags.slice(0, 4) as tag}
+								{#if (hit.date && hit.type === 'blog') || hit.tags?.length}
+									<div class="result-meta">
+										{#if hit.date && hit.type === 'blog'}
+											<time class="result-date" datetime={isoPostDate(hit.date)}>
+												{formatPostDate(hit.date)}
+											</time>
+										{/if}
+										{#each hit.tags?.slice(0, 4) ?? [] as tag}
 											<span class="tag">{tag}</span>
 										{/each}
 									</div>
@@ -370,8 +367,9 @@
 				{#if vectorLoading}
 					<span class="footer-status">Searching deeper…</span>
 				{:else if showFullResultsButton}
-					<button class="full-btn" type="button" onclick={runVectorSearch}>
+					<Button transparent dense size="1" onclick={runVectorSearch}>
 						<svg
+							class="deep-icon"
 							viewBox="0 0 24 24"
 							fill="none"
 							stroke="currentColor"
@@ -381,14 +379,11 @@
 							<path d="M8 10h8M8 14h5" />
 						</svg>
 						Deep Search
-					</button>
+					</Button>
 				{:else if vectorResults !== null}
-					<button
-						class="full-btn ghost"
-						type="button"
-						onclick={() => (vectorResults = null)}>
+					<Button transparent size="1" onclick={() => (vectorResults = null)}>
 						Back
-					</button>
+					</Button>
 				{/if}
 				<span class="hint">
 					<kbd>↑</kbd>
@@ -438,7 +433,7 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
-		padding: var(--space-3) var(--space-4);
+		padding: var(--space-2) var(--space-3);
 		border-bottom: 1px solid var(--color-border);
 	}
 
@@ -447,6 +442,7 @@
 		height: 22px;
 		color: var(--color-text-muted);
 		flex-shrink: 0;
+		margin-bottom: 2px;
 	}
 
 	.search-bar input {
@@ -471,12 +467,14 @@
 		flex: 1;
 		overflow-y: auto;
 		padding: var(--space-2) var(--space-2) var(--space-2);
+		/* Inline-size container so the item press can shed a fixed pixel amount
+		   of width regardless of item width — see .result:active. */
+		container-type: inline-size;
 	}
 
 	.section-label {
 		font-family: var(--font-mono);
 		font-size: 0.68rem;
-		letter-spacing: 0.18em;
 		text-transform: uppercase;
 		color: var(--color-text-muted);
 		padding: var(--space-2) var(--space-2) var(--space-2);
@@ -502,22 +500,51 @@
 	}
 
 	.result {
+		/* The thumbnail's radius; the item's own radius is this plus the padding
+		   that surrounds the thumbnail, so the gap between the two curves stays
+		   an even 8px the whole way around the corner. */
+		--thumb-radius: 12px;
+		--pad: var(--space-2);
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
 		width: 100%;
 		text-align: left;
-		padding: var(--space-2) var(--space-2);
-		border-radius: var(--radius-md);
+		padding: var(--pad);
+		border-radius: calc(var(--thumb-radius) + var(--pad));
 		color: inherit;
 		background: transparent;
-		transition: background-color 250ms;
+		transition:
+			background-color 250ms,
+			translate 200ms ease,
+			scale 200ms ease;
+
+		@supports (corner-shape: squircle) {
+			corner-shape: squircle;
+			/* A squircle reads as roughly half the radius of the equivalent
+			   rounded rect, so both radii here are doubled to compensate. */
+			border-radius: calc((var(--thumb-radius) + var(--pad)) * var(--squircle-ratio, 2));
+		}
 	}
 
 	.result:hover,
 	.result.active {
-		transition-duration: 0s;
-		background: var(--color-bg-muted);
+		/*transition-duration: 0s;*/
+		background: var(--color-bg-active);
+		transition:
+			translate 200ms ease,
+			scale 200ms ease;
+	}
+
+	.result:active {
+		/* Delightstack's two-axis press: x sheds a fixed pixel width whatever the
+		   item's size (tan∘atan2 divides the two lengths against the .results
+		   container), y squashes by the standard press ratio. Plain fallback
+		   first for engines without trig or cqi units. */
+		translate: 0 2px;
+		scale: 0.98 var(--press-scale-y, 0.85);
+		scale: clamp(0.9, 1 - tan(atan2(var(--press-shrink, 20px), 100cqi)), 1)
+			var(--press-scale-y, 0.85);
 	}
 
 	.result-thumb {
@@ -525,8 +552,13 @@
 		width: 160px;
 		aspect-ratio: 16 / 9;
 		overflow: hidden;
-		border-radius: var(--radius-sm);
+		border-radius: var(--thumb-radius);
 		border: 1px solid var(--color-border);
+
+		@supports (corner-shape: squircle) {
+			corner-shape: squircle;
+			border-radius: calc(var(--thumb-radius) * var(--squircle-ratio, 2));
+		}
 	}
 
 	.result-thumb img {
@@ -539,37 +571,26 @@
 	.result-body {
 		flex: 1;
 		min-width: 0;
-	}
-
-	.result-head {
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-		margin-bottom: 2px;
-		font-size: 0.66rem;
-		font-family: var(--font-mono);
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-	}
-
-	.result-category {
-		color: var(--color-action);
-		font-weight: 600;
+		padding-left: 0.25rem;
 	}
 
 	.result-date {
+		flex-shrink: 0;
+		font-size: 0.66rem;
+		font-family: var(--font-mono);
+		text-transform: uppercase;
 		color: var(--color-text-muted);
 	}
 
 	.result-title {
-		font-size: 0.95rem;
+		font-size: 1.0625rem;
 		font-weight: 600;
 		line-height: 1.3;
 		margin-bottom: 2px;
 	}
 
 	.result-summary {
-		font-size: 0.82rem;
+		font-size: 0.78rem;
 		color: var(--color-text-muted);
 		line-height: 1.4;
 		display: -webkit-box;
@@ -579,21 +600,30 @@
 		overflow: hidden;
 	}
 
-	.result-tags {
+	.result-meta {
 		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-1);
+		align-items: center;
+		/* One line only — tags past the edge are clipped rather than wrapped, so
+		   a result never grows taller than its thumbnail. */
+		flex-wrap: nowrap;
+		overflow: hidden;
+		gap: var(--space-1) var(--space-2);
 		margin-top: var(--space-1);
 	}
 
 	.tag {
+		flex-shrink: 0;
 		font-size: 0.62rem;
 		padding: 1px var(--space-2);
 		border-radius: var(--radius-full);
 		background: var(--color-bg-muted);
 		color: var(--color-text-muted);
 		font-family: var(--font-mono);
-		letter-spacing: 0.06em;
+		white-space: nowrap;
+		@supports (text-box: trim-both cap alphabetic) {
+			text-box: trim-both cap alphabetic;
+			padding: 5px 6px;
+		}
 	}
 
 	.footer {
@@ -604,36 +634,12 @@
 		padding: var(--space-2) var(--space-3);
 		border-top: 1px solid var(--color-border);
 		background: var(--color-bg-muted);
+		&:global(:has(> .button)) {
+			padding-left: var(--space-2);
+		}
 	}
 
-	.full-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-2);
-		font-size: var(--text-sm);
-		font-weight: 500;
-		padding: var(--space-2) var(--space-2);
-		border-radius: var(--radius-md);
-		color: var(--color-text);
-		background: var(--color-surface);
-		border: 1px solid var(--color-border);
-		transition:
-			background-color var(--duration-fast),
-			border-color var(--duration-fast);
-	}
-
-	.full-btn:hover {
-		transition-duration: 0s;
-		background: var(--color-action-bg);
-		border-color: var(--color-action);
-		color: var(--color-action);
-	}
-
-	.full-btn.ghost {
-		background: transparent;
-	}
-
-	.full-btn svg {
+	.deep-icon {
 		width: 14px;
 		height: 14px;
 	}
