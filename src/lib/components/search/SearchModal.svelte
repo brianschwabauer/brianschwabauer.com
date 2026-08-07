@@ -4,6 +4,7 @@
 	import { page } from '$app/state';
 	import { create, load, search, type AnyOrama, type Results } from '@orama/orama';
 	import { Button } from '@delightstack/components/actions';
+	import { ripple } from '@delightstack/utilities';
 	import { indexSchema, type SearchEntry } from '$lib/search';
 	import { scrollToSection } from '$lib/sectionNav';
 	import { bgStyle, thumbnailURL } from '$lib/client/images';
@@ -33,6 +34,13 @@
 	let vectorLoading = $state(false);
 	let vectorError = $state<string | null>(null);
 	let activeIndex = $state(0);
+	/**
+	 * Index of the result the pointer went down on, cleared the moment the
+	 * pointer leaves it. A click only counts if it ends on the same result it
+	 * started on — the normal web convention that lets you slide off a control
+	 * to cancel the press.
+	 */
+	let pressedIndex = $state<number | null>(null);
 	let inputEl: HTMLInputElement | null = $state(null);
 	let listEl: HTMLDivElement | null = $state(null);
 
@@ -184,6 +192,20 @@
 		}
 	}
 
+	function handleResultClick(e: MouseEvent, hit: Hit, i: number) {
+		// Middle-click, ctrl/cmd/shift-click and the like are the browser's to
+		// handle — that's the whole reason these are anchors now. Let the real
+		// href do its job and get out of the way.
+		if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+		e.preventDefault();
+		// `detail === 0` is a keyboard-activated click, which never had a
+		// pointerdown to match against.
+		const cancelled = e.detail > 0 && pressedIndex !== i;
+		pressedIndex = null;
+		if (cancelled) return;
+		navigate(hit);
+	}
+
 	function handleKeydown(e: KeyboardEvent) {
 		if (!open) return;
 		if (e.key === 'Escape') {
@@ -246,6 +268,7 @@
 			vectorResults = null;
 			vectorError = null;
 			activeIndex = 0;
+			pressedIndex = null;
 			if (typeof document !== 'undefined') {
 				document.body.style.overflow = '';
 			}
@@ -320,13 +343,19 @@
 					{/if}
 
 					{#each visibleResults as hit, i (hit.id)}
-						<button
-							type="button"
+						<a
+							href={hit.url}
 							class="result"
 							class:active={i === activeIndex}
 							data-result-index={i}
+							{@attach ripple({ opacity: 0.08 })}
 							onmouseenter={() => (activeIndex = i)}
-							onclick={() => navigate(hit)}>
+							onpointerdown={(e) => (pressedIndex = e.button === 0 ? i : null)}
+							onpointerleave={() => {
+								if (pressedIndex === i) pressedIndex = null;
+							}}
+							onpointercancel={() => (pressedIndex = null)}
+							onclick={(e) => handleResultClick(e, hit, i)}>
 							{#if hit.featuredImage}
 								<div class="result-thumb" style={bgStyle(hit.featuredImage)}>
 									<img src={thumbnailURL(hit.featuredImage)} alt="" loading="lazy" />
@@ -354,7 +383,7 @@
 									</div>
 								{/if}
 							</div>
-						</button>
+						</a>
 					{/each}
 				{/if}
 
@@ -513,7 +542,13 @@
 		padding: var(--pad);
 		border-radius: calc(var(--thumb-radius) + var(--pad));
 		color: inherit;
+		text-decoration: none;
 		background: transparent;
+		/* Positioning context for the ripple, which the attachment inserts as an
+		   inset-0 first child. `isolate` keeps its z-index: -1 inside this item,
+		   so it paints over the item's own background but under its content. */
+		position: relative;
+		isolation: isolate;
 		transition:
 			background-color 250ms,
 			translate 200ms ease,
